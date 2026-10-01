@@ -1,0 +1,97 @@
+# ---------- 构建产物 ----------
+bin/
+obj/
+publish/
+[Bb]uild[Ll]og.*
+*.binlog
+*.ilk
+*.pdb
+*.opendb
+*.VC.db
+
+# MSIX / 打包中间物（本项目不打包，但保留规则以防本地试验）
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxsym
+*.msix
+*.msixbundle
+
+# ---------- Visual Studio / 编辑器 ----------
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.svclog
+*.psess
+*.vsp
+*.vspx
+
+# ---------- 运行时数据目录（便携数据，含数据库 / 日志 / 凭据 / 缓存） ----------
+# 发布版：<exe 同级>\Arietta\   调试版：src\Arietta\
+# 内含 Arietta.db、config.ini、log\、gacha\、DynamicBg\、CloudSync\（sync.json 为 DPAPI 加密的同步凭据）
+src/Arietta/
+dist/**/Arietta/
+data/
+Arietta/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# ---------- 密钥与本地机密 ----------
+*.pfx
+*.publishsettings
+*.key
+*.p12
+secrets.json
+*.local.json
+.env
+.env.*
+CloudSync/sync.json
+
+# ---------- 日志与临时产物 ----------
+*.log
+*.tlog
+.tmp/
+tmp/
+vid_frames/
+*.xbf
+
+# ---------- 依赖与工具缓存 ----------
+node_modules/
+__pycache__/
+tools/**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.nuget/
+packages/
+
+# ---------- 杂项 / 本地参考与外部仓库 ----------
+Github/
+.zcode/
+.zcodeignore
+.workbuddy/
+.backup/
+backup/
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.swp
+*~
+
+# 注释剥离工具生成目录
+dist/NoComments/
+
+# Xbox 专有字体（手柄映射图标用）：不进仓库，随发布包分发。
+# 获取：本机 Starward 安装目录 Assets/Font/XboxFluent2.ttf，或 Xbox Design System 下载。
+# 详见 docs/Gamepad-手柄映射-交接.md 的「图标（XboxFluent2）」一节。
+src/Assets/Font/XboxFluent2.ttf

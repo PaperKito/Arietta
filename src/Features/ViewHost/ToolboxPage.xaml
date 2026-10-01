@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mf:PageBase x:Class="Arietta.Features.ViewHost.ToolboxPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lang="using:Arietta.Localization"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mf="using:Arietta.Frameworks"
+             mc:Ignorable="d">
+
+    
+    <GridView Padding="0,0,24,24"
+              HorizontalAlignment="Stretch"
+              SelectionMode="None">
+        <Button Width="180"
+                Height="220"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
+                Click="Button_AdbTool_Click">
+            <Grid RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <FontIcon HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          FontSize="40"
+                          Glyph="&#xE90F;" />
+
+                <TextBlock Grid.Row="1"
+                           FontWeight="Bold"
+                           Text="{x:Bind lang:Lang.Instance.KuroAccount_UsbTitle, Mode=OneWay}"
+                           TextWrapping="Wrap" />
+
+                <TextBlock Grid.Row="2"
+                           FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.KuroAccount_UsbShortDesc, Mode=OneWay}"
+                           TextWrapping="Wrap" />
+            </Grid>
+        </Button>
+    </GridView>
+
+</mf:PageBase>

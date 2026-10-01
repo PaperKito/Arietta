@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl x:Class="Arietta.Features.Sync.CloudSyncSection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:sync="using:Arietta.Features.Sync"
+             xmlns:lang="using:Arietta.Localization"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
+    
+    <StackPanel Spacing="12">
+
+        
+        <Grid ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock FontSize="20"
+                           FontWeight="Bold"
+                           Text="{x:Bind lang:Lang.Instance.Sync_Title}" />
+                <TextBlock FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           IsTextScaleFactorEnabled="False"
+                           TextWrapping="Wrap"
+                           Text="{x:Bind lang:Lang.Instance.Sync_Description}" />
+            </StackPanel>
+
+            <ToggleSwitch Grid.Column="1"
+                          x:Name="ToggleSwitch_EnableSync"
+                          VerticalAlignment="Center"
+                          IsOn="True"
+                          MinWidth="0"
+                          OffContent=""
+                          OnContent="" />
+        </Grid>
+
+        
+        <Border HorizontalAlignment="Stretch"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="22">
+            <Button x:Name="Button_ServerEntry"
+                    Click="Button_ServerEntry_Click"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    CornerRadius="22"
+                    Padding="18,14">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    
+                    <Viewbox Width="28" Height="28" VerticalAlignment="Center">
+                        <Canvas Width="24" Height="24">
+                            <Rectangle Canvas.Left="3" Canvas.Top="4"
+                                       Width="18" Height="7"
+                                       RadiusX="2" RadiusY="2"
+                                       Fill="Transparent"
+                                       Stroke="#A8A8A8" StrokeThickness="1.8" />
+                            <Rectangle Canvas.Left="3" Canvas.Top="13"
+                                       Width="18" Height="7"
+                                       RadiusX="2" RadiusY="2"
+                                       Fill="Transparent"
+                                       Stroke="#A8A8A8" StrokeThickness="1.8" />
+                            <Ellipse Canvas.Left="6.6" Canvas.Top="6.9"
+                                     Width="1.2" Height="1.2"
+                                     Fill="#A8A8A8" />
+                            <Ellipse Canvas.Left="6.6" Canvas.Top="15.9"
+                                     Width="1.2" Height="1.2"
+                                     Fill="#A8A8A8" />
+                            <Line X1="11" Y1="7.5" X2="17" Y2="7.5"
+                                  Stroke="#A8A8A8" StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                            <Line X1="11" Y1="16.5" X2="17" Y2="16.5"
+                                  Stroke="#A8A8A8" StrokeThickness="1.8"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                        </Canvas>
+                    </Viewbox>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="{x:Bind lang:Lang.Instance.Sync_ServerEntry}" />
+                        <TextBlock x:Name="TextBlock_ServerSummary"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   TextTrimming="CharacterEllipsis"
+                                   Text="{x:Bind lang:Lang.Instance.Sync_NotConfigured}" />
+                    </StackPanel>
+
+                    <FontIcon Grid.Column="2"
+                              FontSize="12"
+                              Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                              Glyph="&#xE76C;" />
+                </Grid>
+            </Button>
+        </Border>
+
+        
+        <Button x:Name="Button_SyncNow"
+                Click="Button_SyncNow_Click"
+                HorizontalAlignment="Stretch"
+                Height="46"
+                Margin="0,8,0,0"
+                BorderThickness="0"
+                CornerRadius="23"
+                Style="{StaticResource AccentButtonStyle}">
+            <StackPanel Orientation="Horizontal" Spacing="9">
+                <FontIcon FontSize="17" Glyph="&#xE895;" />
+                <TextBlock Text="{x:Bind lang:Lang.Instance.Sync_SyncNow}" />
+            </StackPanel>
+        </Button>
+
+        
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <ProgressRing x:Name="ProgressRing_Busy"
+                          Width="14"
+                          Height="14"
+                          IsActive="False" />
+            <TextBlock x:Name="TextBlock_Feedback"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                       TextWrapping="Wrap"
+                       Text="{x:Bind lang:Lang.Instance.Sync_NotConfigured}" />
+        </StackPanel>
+
+    </StackPanel>
+</UserControl>

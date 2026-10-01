@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mf:PageBase x:Class="Arietta.Features.Setting.DownloadSetting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lang="using:Arietta.Localization"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mf="using:Arietta.Frameworks"
+             mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
+        <StackPanel Spacing="28" MaxWidth="1000" HorizontalAlignment="Left" Padding="0,0,0,24">
+
+            
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="18"
+                           FontWeight="Bold"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_HardLink, Mode=OneWay}" />
+                <TextBlock MaxWidth="680"
+                           HorizontalAlignment="Left"
+                           FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_HardLinkDesc, Mode=OneWay}"
+                           TextWrapping="Wrap" />
+                <ToggleSwitch x:Name="Toggle_HardLink"
+                              Margin="0,4,0,-6"
+                              OffContent="{x:Bind lang:Lang.Instance.FilePage_Disabled, Mode=OneWay}"
+                              OnContent="{x:Bind lang:Lang.Instance.FilePage_Enabled, Mode=OneWay}"
+                              Toggled="Toggle_HardLink_Toggled" />
+            </StackPanel>
+
+            
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="18"
+                           FontWeight="Bold"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_SpeedLimit, Mode=OneWay}" />
+                <TextBlock MaxWidth="680"
+                           HorizontalAlignment="Left"
+                           FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_SpeedLimitDesc, Mode=OneWay}"
+                           TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal"
+                            Spacing="12"
+                            Margin="0,4,0,-6">
+                    <NumberBox x:Name="Box_SpeedLimit"
+                               Width="110"
+                               MinWidth="0"
+                               Minimum="0"
+                               Maximum="124"
+                               SpinButtonPlacementMode="Hidden"
+                               ValueChanged="Box_SpeedLimit_ValueChanged" />
+                    <TextBlock VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               IsTextScaleFactorEnabled="False"
+                               Text="MB/s（＜125）" />
+                </StackPanel>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</mf:PageBase>

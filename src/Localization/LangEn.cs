@@ -1,0 +1,642 @@
+﻿using System.Collections.Generic;
+
+namespace Arietta.Localization;
+
+
+
+
+
+
+
+
+internal static class LangEn
+{
+
+    public static readonly Dictionary<string, string> Map = new()
+    {
+        
+        ["MainPage_Launcer"] = "Launcher",
+        ["LauncherPage_GameSetting"] = "Game Settings",
+        ["MainPage_GameScreenshot"] = "Screenshots",
+        ["GachaLogPage_ConveneRecords"] = "Convene Records",
+        ["Toolbox"] = "Toolbox",
+
+        
+        ["ScreenshotPage_MultiSelect"] = "Multi-select",
+        ["ScreenshotPage_OpenFolder"] = "Open Folder",
+        ["ScreenshotPage_Total0Files"] = "{0} items",
+        ["ScreenshotPage_Selected0Of1"] = "Selected {0} / {1}",
+        ["ScreenshotPage_Empty"] = "No screenshot folder found",
+        ["ScreenshotPage_EmptyDesc"] = "Screenshots are saved to <Game Folder>\\Client\\Saved\\Screenshots by default. Locate the game folder in Settings first.",
+        ["ScreenshotPage_Delete"] = "Delete",
+        ["ScreenshotPage_DeleteConfirm"] = "Move the {0} selected screenshots to the Recycle Bin?",
+        ["ScreenshotPage_Deleted"] = "Moved {0} screenshots to the Recycle Bin",
+        ["ScreenshotPage_DeleteFailed"] = "Delete failed: some files may be in use by another program",
+        ["ScreenshotPage_SelectFirst"] = "Select the screenshots to delete first",
+        ["ScreenshotPage_OpenImage"] = "Open Image",
+        ["ScreenshotPage_DeletedPartial"] = "Deleted {0} / {1}; the rest may be in use",
+
+        
+        ["SettingPage_Gamepad"] = "Gamepad Mapping",
+        ["GamepadPage_Desc"] = "Map the controller's Guide (Xbox logo) or Share button to a keyboard shortcut. These are system-reserved buttons that games never receive, so mapping them doesn't affect in-game controls. Useful for triggering screenshot shortcuts while playing on a controller.",
+        ["GamepadPage_Enable"] = "Enable gamepad mapping",
+        ["GamepadPage_Guide"] = "Guide button (Xbox logo)",
+        ["GamepadPage_Share"] = "Share button",
+        ["GamepadPage_KeysPlaceholder"] = "Keyboard shortcut, space-separated, e.g. Win Shift S (leave empty = no mapping)",
+        ["GamepadPage_BadKey"] = "Unrecognized key: {0}",
+        ["GamepadPage_NeedRedist"] = "The GameInput runtime is missing on this system. Install it and restart the launcher to enable gamepad mapping (required on Windows 10; built into Windows 11).",
+        ["GamepadPage_RedistOutdate"] = "The installed GameInput runtime is outdated. Install the latest version and restart the launcher.",
+        ["GamepadPage_RedistLink"] = "Download GameInputRedist.msi",
+        ["GamepadPage_ShareNote"] = "Note: when the Share button is mapped, Xbox Game Bar's built-in screenshot may still fire at the same time (system limitation). Prefer the Guide button.",
+
+        
+        ["KuroBbs"] = "Kuro BBS",
+        ["KuroBbs_SignIn"] = "Sign-in",
+        ["KuroBbs_Role"] = "Characters",
+        ["KuroBbs_ResourceBrief"] = "Resource Summary",
+
+        
+        ["PgrData_NoRole"] = "This Kuro BBS account hasn't set a PGR character yet. Set one under 'Me' in the Kuro BBS app, then check again here.",
+        ["PgrData_Locked"] = "Locked",
+        ["PgrData_FullIn"] = "Full in {0}",
+
+        
+        ["KuroBbs_DataTerminal"] = "Data Terminal",
+        ["KuroBbs_CombatData"] = "Combat Data",
+        ["DataTerminal_NoAccount"] = "Not logged in to Kuro BBS yet. Tap the account arrow above to log in first.",
+        ["DataTerminal_NoRole"] = "This Kuro BBS account hasn't bound a {0} character yet. Bind one in the Kuro BBS app first.",
+        ["DataTerminal_LoadFailed"] = "Failed to load the page: {0}",
+
+        
+        ["KuroBbs_PgrRole"] = "Characters",
+        ["KuroBbs_PgrResource"] = "Resource Report",
+        ["KuroBbs_PgrCage"] = "Pain Cage",
+        ["KuroBbs_PgrWarArea"] = "War Zone",
+        ["KuroBbs_PgrTransfinite"] = "Transfinite Mapping",
+        ["PgrRole_Fight"] = "Combat Power {0}",
+        ["PgrResource_Total"] = "Last 6 months",
+        ["PgrResource_BlackCard"] = "Black Cards",
+        ["PgrResource_Develop"] = "R&D Resources",
+        ["PgrResource_Trade"] = "Trade Vouchers",
+        ["PgrResource_SelectPeriod"] = "Select period",
+        ["PgrResource_Composition"] = "Income breakdown",
+        ["PgrResource_MonthlyData"] = "Monthly data",
+        ["PgrChallenge_NotOpen"] = "Not in the open period",
+        ["PgrChallenge_Locked"] = "Not unlocked yet",
+        ["PgrChallenge_NoArea"] = "No zone selected",
+        ["PgrChallenge_NoRecord"] = "No challenge records this period",
+        ["PgrChallenge_Level"] = "Level range {0}",
+        ["PgrWarArea_TotalPointLabel"] = "Total score",
+        ["PgrWarArea_TotalTimesLabel"] = "Attempts",
+        ["PgrWarArea_Waves"] = "Waves {0}",
+        ["PgrCommon_LoadFailed"] = "Failed to fetch data",
+
+        
+        ["DailyBriefing"] = "Briefing",
+        ["DailyBriefing_Desc"] = "In-game daily data",
+        ["DailyBriefing_Refresh"] = "Refresh",
+        ["DailyBriefing_Error"] = "Failed to fetch briefing data",
+        ["DailyBriefing_NoGameAccount"] = "No logged-in game account found. Please sign in and try again.",
+        ["DailyBriefing_NoRole"] = "No game character has been identified for this account yet. Start the game once (character info is resolved online via the official SDK).",
+        ["Briefing_Liveness"] = "Daily Activity",
+        ["Briefing_StoreEnergy"] = "Stored Waveplates",
+        ["Briefing_BattlePass"] = "Pioneer Podcast",
+        ["Briefing_ActionPoint"] = "Serum",
+        ["Briefing_Level"] = "Level",
+        ["KuroBbs_TowerOfAdversity"] = "Tower of Adversity",
+        ["KuroBbs_SongOfVoidSea"] = "Song of the Void Sea",
+        ["KuroBbs_DoomsdayMatrix"] = "Doomsday Matrix",
+        ["KuroBbs_ComingSoon"] = "{0} is under development",
+        ["KuroBbs_TokenExpired"] = "Kuro BBS login expired",
+        ["KuroBbs_TokenExpiredDesc"] = "Go to Settings → Kuro BBS Account to re-capture or re-enter the token",
+
+        
+        ["KuroAccount_UsbTitle"] = "ADB Tool",
+        ["KuroAccount_UsbShortDesc"] = "Connect an Android phone to capture the Kuro BBS Token and Did",
+        ["KuroAccount_UsbDesc"] = "Connect the phone with a USB cable and enable USB debugging: open the Kuro BBS app on the phone and go to the 'Data Terminal' or 'Growth Calculator' page, then tap 'Start Capture' and the tool captures the token and did automatically. Requires adb.exe (download it from the ",
+        ["KuroAccount_UsbDescTail"] = " official page).",
+        ["KuroAccount_UsbVerWarn"] = "⚠ The new version of the Kuro BBS app no longer works with this capture method; please use an older version.",
+        ["KuroAccount_AdbPlaceholder"] = "adb.exe path (leave empty to use PATH)",
+        ["KuroAccount_ApplyAdb"] = "Apply",
+        ["KuroAccount_SelectDevice"] = "Select Device",
+        ["KuroAccount_RefreshDevices"] = "Refresh",
+        ["KuroAccount_StartCapture"] = "Start Capture",
+        ["KuroAccount_StopCapture"] = "Stop Capture",
+        ["KuroAccount_FieldsTitle"] = "Account Info",
+        ["KuroAccount_FillHint"] = "Capture results fill in automatically; you can also paste them manually",
+        ["KuroAccount_Token"] = "Token",
+        ["KuroAccount_Did"] = "Did",
+        ["KuroAccount_Save"] = "Save",
+        ["KuroAccount_Clear"] = "Clear",
+        ["KuroAccount_Log"] = "Capture Log",
+        ["KuroAccount_AdbInvalidTitle"] = "Invalid ADB path",
+        ["KuroAccount_AdbInvalidDesc"] = "Enter a full valid path to adb.exe",
+        ["KuroAccount_AdbApplied"] = "ADB path applied",
+        ["KuroAccount_AdbApplyFailed"] = "Failed to apply the ADB path",
+        ["KuroAccount_NoDevice"] = "No Android device found",
+        ["KuroAccount_NoDeviceDesc"] = "Connect the phone and allow USB debugging",
+        ["KuroAccount_RefreshDevicesFailed"] = "Failed to refresh devices",
+        ["KuroAccount_SelectDeviceFirst"] = "Select a device first",
+        ["KuroAccount_SelectDeviceFirstDesc"] = "Tap 'Refresh' first, then select a device",
+        ["KuroAccount_NoPage"] = "No capturable web page found",
+        ["KuroAccount_NoPageDesc"] = "Open a web page such as 'Data Terminal' on the phone, then tap 'Start Capture'",
+        ["KuroAccount_CaptureFailed"] = "Capture connection failed",
+        ["KuroAccount_CaptureStarted"] = "Monitoring started",
+        ["KuroAccount_CaptureStartedDesc"] = "Open the 'Data Terminal' or 'Growth Calculator' page on the phone",
+        ["KuroAccount_Disconnected"] = "Phone disconnected",
+        ["KuroAccount_DisconnectedDesc"] = "The WebView page may have been closed. Tap 'Start Capture' again.",
+        ["KuroAccount_NoSocket"] = "WebView debugging interface not found",
+        ["KuroAccount_NoSocketDesc"] = "This Kuro BBS version may have disabled WebView remote debugging. See the diagnostic report for details.",
+        ["KuroAccount_DiagTitle"] = "Capture Diagnostic Report",
+        ["KuroAccount_DiagHint"] = "If the report shows 0 devtools sockets, this Kuro BBS version no longer enables WebView remote debugging (chrome://inspect in Chrome can't see it either), so ADB capture is a dead end. Instead, use phone number + SMS code login under 'Kuro BBS → Account → Log In' to get the Token and Did — no phone capture, no ADB needed.",
+        ["KuroAccount_DiagCopy"] = "Copy Report",
+        ["KuroAccount_DiagClose"] = "Close",
+        ["KuroAccount_DiagCopied"] = "Diagnostic report copied",
+        ["KuroAccount_Invalid"] = "Incomplete information",
+        ["KuroAccount_SaveNeedTokenDid"] = "Token and Did are required; roleId can be looked up automatically",
+        ["KuroAccount_Saved"] = "Account saved",
+        ["KuroAccount_Cleared"] = "Account cleared",
+
+        
+        ["RolePage_Refresh"] = "Refresh",
+        ["RolePage_NoAccount"] = "Kuro BBS account not configured yet",
+        ["RolePage_NoAccountDesc"] = "Go to Settings → Kuro BBS Account to finish setup, then refresh",
+        ["RolePage_LoadFailed"] = "Failed to load the character",
+        ["RolePage_Back"] = "Back to List",
+        ["RolePage_Phantoms"] = "Echoes",
+
+        
+        ["GachaLogPage_Refresh"] = "Update Records",
+        ["GachaLogPage_ImportUrl"] = "Import via URL",
+        ["GachaLogPage_ImportUrlDesc"] = "Paste the link of the Convene Details page (open 'Convene Details' in game and get it from the log, or copy from other tools). Also works with cloud phones.",
+        ["GachaLogPage_ImportUrlPlaceholder"] = "https://aki-gm-resources.aki-game.com/aki/gacha/index.html#/record?...",
+        ["GachaLogPage_UrlInvalid"] = "Invalid link: paste the full Convene Details page link containing record_id",
+        ["GachaLogPage_SelectPlayer"] = "Select Account",
+        ["GachaLogPage_CopyUrl"] = "Copy URL",
+        ["GachaLogPage_DeletePlayer"] = "Delete Records",
+        ["GachaLogPage_Delete"] = "Delete",
+        ["GachaLogPage_Avg5"] = "Avg",
+        ["GachaLogPage_Up"] = "/ UP",
+        ["GachaLogPage_Stat"] = "Stats",
+        ["GachaLogPage_Times"] = "pulls",
+        ["GachaLogPage_ItemStats"] = "Item Stats",
+        ["GachaLogPage_UpdateSavedUrl"] = "Update (Saved URL)",
+        ["GachaLogPage_UpdateAll"] = "Update (All)",
+        ["GachaLogPage_InputUrl"] = "Enter URL",
+        ["GachaLogPage_ViaCloudGame"] = "Get via Cloud Game",
+        ["CloudGame_Title"] = "Cloud Wuthering Waves - Log in and grab the convene link in one click",
+        ["CloudGame_Grab"] = "Get Convene Link",
+        ["CloudGame_StatusDefault"] = "Log in with your Kuro account here, tap 'Enter Game' and open the 'Convene Details' page once, then tap 'Get Convene Link'",
+        ["CloudGame_StatusSessionReady"] = "Cloud game login detected. Tap 'Get Convene Link' to finish syncing.",
+        ["CloudGame_StatusGrabbing"] = "Reading login info…",
+        ["CloudGame_StatusOk"] = "Success (player {0}). Syncing convene records…",
+        ["CloudGame_StatusFailReason"] = "Failed: {0}",
+        ["CloudGame_StatusNoRuntime"] = "Failed to initialize the embedded browser: the WebView2 Runtime is not installed. Install it from Microsoft's website and try again.",
+        ["GachaLogPage_ImportExport"] = "Import & Export",
+        ["GachaLogPage_HidePools"] = "Hide Banners",
+        ["GachaLogPage_ExportAs"] = "Export as",
+        ["GachaLogPage_ImportRecords"] = "Import Records (Choose File)",
+        ["GachaLogPage_ImportOk"] = "Imported: player {0}, {1} records (duplicates removed automatically)",
+        ["GachaLogPage_ImportFail"] = "Import failed: {0}",
+        ["GachaLogPage_ImportFailNoPlayer"] = "The file contains no account info and no account is selected, so its owner can't be determined",
+        ["GachaLogPage_OtherSettings"] = "Other Settings",
+        ["GachaLogPage_LinkHelp"] = "Always getting Authkey Timeout?",
+        ["GachaLogPage_LinkHelpDesc"] = "Delete the cache folder and restart the game",
+        ["GachaLogPage_ClearSavedUrl"] = "Delete Cache Folder",
+        ["GachaLogPage_ClearSavedUrlConfirm"] = "Delete the locally saved convene link? (Records already pulled won't be deleted.)",
+        ["GachaLogPage_ClearSavedUrlDone"] = "Saved convene link cleared. Open the 'Convene Details' page in game again.",
+        ["GachaLogPage_Language"] = "Language",
+        ["GachaLogPage_LanguageSaved"] = "Language saved. Item names switched instantly via the built-in translation table (items missing from it keep their original name until the next record update).",
+        ["GachaLogPage_LanguageApplied"] = "Renamed {0} records to {1}",
+        ["GachaLogPage_NoSavedUrl"] = "No saved link yet. Run 'Update (All)' first.",
+        ["GachaLogPage_LinkExpired"] = "Convene link expired",
+        ["GachaLogPage_LinkExpiredDesc"] = "The link has expired (API returned {0}). Open 'Convene Details' in game again.",
+        ["GachaLogPage_RefetchFromCloudGame"] = "Refetch via cloud game",
+        ["GachaLogPage_UpdateFailed"] = "Failed to update convene records: {0}",
+        ["GachaLogPage_FetchFailed"] = "Failed to fetch convene data. Please try again.",
+        ["GachaLogPage_LogNotFound"] = "Game log or convene link not found: locate the game (Wuthering Waves.exe) in Settings and open 'Convene Details' in game once, or choose 'Import via URL' from the 'Update Records' menu",
+        ["GachaLogPage_UrlNotFound"] = "Convene link not found. Open the 'Convene Details' page in game once.",
+        ["GachaLogPage_UrlCopied"] = "Convene link copied to clipboard",
+        ["GachaLogPage_PlayerDeleted"] = "Local convene records for UID {0} have been deleted",
+        ["GachaLogPage_DeleteConfirmText"] = "All local convene records for UID {0} will be deleted. This cannot be undone.",
+        ["GachaLogPage_EmptyTitle"] = "No convene records yet",
+        ["GachaLogPage_EmptyDesc"] = "Locate the game folder in Settings, open the 'Convene Details' page in game once, then come back here and tap 'Update Records' to sync.",
+
+        
+        ["LauncherPage_StartGame"] = "Start Game",
+        ["LauncherPage_InstallGame"] = "Install Game",
+        ["AccountSwitcher_SwitchAccount"] = "Switch Account",
+        ["AccountSwitcher_GameRunning"] = "Game is running; account switching is unavailable",
+        ["AccountSwitcher_AccountInfo"] = "Game Account",
+        ["AccountSwitcher_Nickname"] = "Nickname",
+        ["AccountSwitcher_RoleId"] = "Game UID",
+        ["AccountSwitcher_Save"] = "Save",
+        ["AccountSwitcher_Delete"] = "Delete",
+        ["AccountSwitcher_Unsaved"] = "The current logged-in account is not saved",
+        ["Notice_Activity"] = "Events",
+        ["Notice_NoticeTab"] = "Notices",
+        ["Notice_News"] = "News",
+        ["Notice_LoadFailed"] = "Failed to load notices",
+        ["LauncherPage_UpdateGame"] = "Update Game",
+
+        
+        ["SettingPage_Language"] = "Language",
+
+        
+        ["GameUpdate_PredownloadAvailable"] = "Pre-download for version {0} is available",
+        ["GameUpdate_Predownloaded"] = "{0} pre-downloaded. It can be installed directly once the update opens.",
+        ["GameUpdate_PredownloadButton"] = "Pre-download",
+        ["GameUpdate_ConfirmPredownload"] = "Pre-download version {0}? Total download {1}. Files are staged in the predownload folder inside the game folder, and nothing is re-downloaded when you apply the update after it goes live.",
+        ["GameUpdate_Applying"] = "Applying update…",
+        ["GameUpdate_Predownloading"] = "Pre-downloading {0}…",
+
+        ["GameUpdate_Done"] = "Updated to {0}",
+        ["GameUpdate_InstallDone"] = "{0} installed",
+        ["GameUpdate_PredownloadDone"] = "{0} pre-download complete. It can be installed directly once the update opens.",
+        ["GameUpdate_NoGameDir"] = "Locate the game in Settings first",
+        ["GameUpdate_Verifying"] = "Verifying {0} / {1}",
+        ["GameUpdate_VerifyReportTitle"] = "Verification Complete",
+        ["GameUpdate_VerifyDoneNone"] = "No corrupted or missing files found",
+        ["GameUpdate_VerifyDoneDamage"] = "Found {0} corrupted / missing files out of {1}",
+        ["GameUpdate_VerifyNoManifest"] = "Could not get the verification manifest. Check the network or try again later.",
+        ["GameUpdate_Repairing"] = "Repairing…",
+        ["GameUpdate_RepairDone"] = "Repaired {0} files",
+        ["GameUpdate_RepairNoBaseUrl"] = "Online repair is not supported for the current version. Update the game to the latest version first.",
+
+        
+        ["GameLauncherPage_Gallery"] = "Gallery",
+        ["Common_Copy"] = "Copy",
+        ["ImageViewWindow2_SaveAs"] = "Save As",
+        ["GameLauncherPage_PlayPause"] = "Play/Pause",
+        ["GameLauncherSettingDialog_DragAndDropImageOrVideoFiles"] = "Drop image files to change the background",
+        ["Background_Official"] = "Official Animated Background",
+        ["Background_OfficialStatic"] = "Official Static Background",
+        ["Background_OpenFolder"] = "Open Background Folder",
+        ["Background_AddFailed"] = "This background file can't be used",
+        ["InstallGameDialog_Installed"] = "Installed?",
+        ["InstallGameDialog_LocateGame"] = "Locate Game",
+        ["InstallGameDialog_SelectInstallationPath"] = "Select Installation Path",
+        ["Common_Change"] = "Change",
+        ["InstallGameDialog_SpaceRequiredToUnzip"] = "Space required to unzip ",
+        ["InstallGameDialog_SpaceAvailable"] = "Available space ",
+        ["InstallGameDialog_InsufficientSpace"] = "Insufficient available space",
+        ["InstallGameDialog_HardLinkEstimateDesc"] = "Identical files from other region clients on the same disk will be hard-linked. Estimated download is about {0}; this is an estimate only, subject to per-file verification during install.",
+        ["GameUpdate_ResumeInstall"] = "Unfinished installation of {0} detected, resuming from the previous directory",
+        ["GameLauncherPage_GameIsRunning"] = "The game is running",
+
+        
+        ["SettingPage_Download"] = "Download",
+
+        
+        ["DownloadGamePage_Downloading"] = "Downloading",
+        ["DownloadGamePage_Verifying"] = "Verifying",
+        ["DownloadGamePage_Pause"] = "Pause",
+
+        
+        ["Common_Confirm"] = "Confirm",
+        ["Common_Cancel"] = "Cancel",
+        ["Common_Close"] = "Close",
+        ["Common_Save"] = "Save",
+        ["Common_Error"] = "Error",
+        ["Common_Ok"] = "OK",
+        ["Common_Select"] = "Select",
+        ["Common_Apply"] = "Apply",
+        ["Common_Exit"] = "Exit",
+
+        
+        ["SettingPage_AppSettings"] = "Settings",
+        ["SettingPage_About"] = "About",
+        ["SettingPage_General"] = "General",
+        ["SettingPage_FileManagement"] = "File Management",
+
+        
+        ["FilePage_DataFolder"] = "Data Folder",
+        ["FilePage_DataFolderDesc"] = "Your personal data is stored in the folder below. It is important — please don't delete it casually.",
+        ["FilePage_ReselectDataFolder"] = "Reselect Data Folder",
+        ["FilePage_OpenDataFolder"] = "Open Data Folder",
+        ["FilePage_DeleteAllSettings"] = "Delete All Settings",
+        ["FilePage_ReselectFolderDone"] = "New data folder saved. It takes effect after restarting the app. The new folder starts empty; use 'Cloud Sync' to pull your old data back.",
+        ["FilePage_DeleteSettingsDone"] = "Settings deleted. It takes effect after restarting the app.",
+        ["FilePage_DeleteSettingsConfirm"] = "This deletes all settings (config.ini) and restores defaults after restart. Database content such as playtime and convene records is not affected. Continue?",
+        ["FilePage_OpenLogFolder"] = "Open Log Folder",
+        ["FilePage_Cache"] = "Cache",
+        ["FilePage_CacheLog"] = "Logs",
+        ["FilePage_CacheImage"] = "Images",
+        ["FilePage_CacheBackground"] = "Launcher Background",
+        ["FilePage_CleanCache"] = "Clear Cache",
+        ["FilePage_CleanBackgroundCache"] = "Clear Launcher Background Files",
+
+        
+        ["FilePage_HardLink"] = "Hard Links",
+["FilePage_HardLinkDesc"] = "When multiple clients are installed on the same disk, identical files are hard-linked to reduce storage usage",
+        ["FilePage_Enabled"] = "Enabled",
+        ["FilePage_Disabled"] = "Disabled",
+
+        
+        ["FilePage_SpeedLimit"] = "Speed Limit",
+        ["FilePage_SpeedLimitDesc"] = "0 means no limit",
+
+        
+        ["KuroBbs_RefreshInfo"] = "Refresh Info",
+        ["KuroBbs_Login"] = "Log In",
+        ["KuroBbs_Settings"] = "Kuro BBS Settings",
+
+        
+        ["Login_Title"] = "Log in to Kuro BBS",
+        ["Login_ByToken"] = "Token Login",
+        ["Login_BySms"] = "SMS Code Login",
+        ["Login_TokenPlaceholder"] = "Paste the Kuro BBS login token",
+        ["Login_DidPlaceholder"] = "Did captured together with the Token (leave empty to auto-generate)",
+        ["Login_TokenTip"] = "The Token and Did are captured from the Kuro BBS mobile app (Toolbox → USB Capture) and saved as a pair",
+        ["Login_PhonePlaceholder"] = "Phone number",
+        ["Login_CodePlaceholder"] = "SMS code",
+        ["Login_CodeLabel"] = "SMS Code",
+        ["Login_SmsTip"] = "Tap 'Send Code', then enter the code you receive by text message. The account is saved automatically after a successful login.",
+        ["Login_SendCode"] = "Send Code",
+        ["Login_Confirm"] = "Log In",
+        ["Login_Cancel"] = "Cancel",
+        ["Login_PhoneInvalid"] = "Invalid phone number format",
+        ["Login_Sending"] = "Sending SMS code…",
+        ["Login_CodeSent"] = "Code sent. Check your text messages.",
+        ["Login_CodeSendFailed"] = "Failed to send the code: {0}",
+        ["Login_NeedCode"] = "Enter the SMS code",
+        ["Login_TokenInvalid"] = "Invalid Token: paste the full Kuro BBS login token",
+        ["Login_Working"] = "Logging in…",
+        ["Login_Failed"] = "Login failed: {0}",
+        ["Login_SeekRoleFailed"] = "Failed to look up the bound character: {0}",
+        ["Login_Success"] = "Kuro BBS account '{0}' logged in",
+
+        
+        ["ResourceBrief_Month"] = "Monthly",
+        ["ResourceBrief_Week"] = "Weekly",
+        ["ResourceBrief_Version"] = "Version",
+        ["ResourceBrief_HistoryData"] = "History",
+        ["ResourceBrief_TotalGain"] = "Earned this period",
+        ["ResourceBrief_StarComposition"] = "Astrite income breakdown",
+        ["ResourceBrief_CoinComposition"] = "Shell Credit income breakdown",
+        ["ResourceBrief_Detail"] = "Details",
+        ["ResourceBrief_Empty"] = "No data for this period",
+
+        
+        ["SignPage_DoSignIn"] = "Sign In",
+        ["SignPage_MonthlySign"] = "This Month",
+        ["SignPage_SignedToday"] = "Signed in today",
+        ["SignPage_NotSignedToday"] = "Not signed in today",
+        ["SignPage_Done"] = "Signed in",
+        ["SignPage_AutoSign"] = "Auto Sign-in",
+        ["SignPage_SignedDaysFormat"] = "Signed {0} days this month",
+        ["SignPage_DayFormat"] = "Day {0}",
+        ["SignPage_Energy"] = "Waveplates",
+        ["TowerPage_TotalStarCount"] = "Total stars: {0} / {1}",
+        ["TowerPage_Floor"] = "Floor {0}",
+        ["TowerPage_NoChallengeData"] = "No challenge data",
+        ["TowerPage_RefreshAfter"] = "Refreshes in {0}d {1}h",
+        ["MatrixPage_Round"] = "Round {0}",
+        ["MatrixPage_NoRecord"] = "No records this period",
+        ["MatrixPage_Overview"] = "Overview",
+        ["MatrixPage_Singularity"] = "Singularity Expansion",
+        ["SlashPage_ScoreLabel"] = "Score: {0}",
+        ["SlashPage_ChallengeFallback"] = "Challenge {0}",
+        ["SlashPage_GroupScore"] = "Total score: {0} / {1}",
+        ["SlashPage_GroupScoreNamed"] = "{0} total score: {1} / {2}",
+        ["SlashPage_Team1"] = "Team 1",
+        ["SlashPage_Team2"] = "Team 2",
+        ["SlashPage_TeamN"] = "Team {0}",
+        ["CombatPage_Locked"] = "{0} is locked this period or has no data",
+        ["CombatPage_NoData"] = "No data: the server hasn't generated this period's records yet. Open '{0}' in the Kuro BBS app to refresh the data, then try again.",
+        ["CombatPage_StatsPeriod"] = "Stats period {0} - {1}",
+        ["CombatPage_ClearRecords"] = "Clear combat records",
+        ["CombatPage_ClearRecordsConfirm"] = "This deletes all locally saved period records of '{0}' and cannot be undone. Clear them?",
+        ["CombatPage_Clear"] = "Clear",
+
+        
+
+        
+        ["PlayTimeStatsDialog_TotalPlaytime"] = "Total Playtime",
+        ["PlayTimeStatsDialog_Started0Times"] = "Started {0} times",
+        ["PlayTimeStatsDialog_AverageDailyPlaytime"] = "Average Daily Playtime",
+        ["PlayTimeStatsDialog_PlayedFor0Days"] = "Played for {0} days",
+        ["PlayTimeStatsDialog_LongestStreak"] = "Longest Streak",
+        ["PlayTimeStatsDialog_0Days"] = "{0} days",
+        ["PlayTimeStatsDialog_LongestSession"] = "Longest Session",
+        ["PlayTimeStatsDialog_LongestDailyPlaytime"] = "Longest Single-Day Playtime",
+        ["PlayTimeButton_LastStartup"] = "Last Session",
+        ["PlayTimeStatsDialog_Last15Days"] = "Last 15 days",
+        ["PlayTimeStatsDialog_Last12Weeks"] = "Last 12 weeks",
+        ["PlayTimeStatsDialog_Last12Months"] = "Last 12 months",
+        ["PlayTimeStatsDialog_Total"] = "Total",
+        ["PlayTimeStatsDialog_PlaytimeStatistics"] = "Playtime Statistics",
+        ["PlayTimeStatsDialog_StatsTip"] = "Statistics only count playtime of game sessions started from this launcher.",
+
+        
+        ["ExperienceSettingPage_MinimizeToSystemTray"] = "Minimize to System Tray",
+        ["GameLauncherSettingDialog_BasicInformation"] = "Basic Information",
+        ["GameLauncherSettingDialog_ConfirmUninstall"] = "Confirm Uninstall",
+        ["GameLauncherSettingDialog_CustomBackground"] = "Custom Background",
+        ["GameLauncherSettingDialog_RelocateGame"] = "Relocate Game",
+        ["GameLauncherSettingDialog_Size"] = "Size",
+        ["GameLauncherSettingDialog_StartRepairing"] = "Start Repair",
+        ["GameLauncherSettingDialog_UninstallGameWarning"] = "Uninstall Game Warning",
+        ["LauncherPage_RepairGame"] = "Repair Game",
+        ["LauncherPage_ShowGameAnnouncement"] = "Show Game Notices",
+        ["LauncherPage_UninstallGame"] = "Uninstall Game",
+        ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "Mapped network drives are not supported. Use a network share path starting with double backslashes.",
+
+        
+        ["SettingPage_BgSizeTip"] = "Background Size Tip",
+        ["SettingPage_CustomBackgroundSupportVideo"] = "Custom background supports video",
+
+        
+        ["GameSettingPage_Resolution"] = "Resolution",
+        ["GameSettingPage_FullScreen"] = "Fullscreen",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "Your display's native resolution exceeds the game's supported maximum. The game forces windowed mode on startup, so fullscreen cannot take effect.",
+        ["GameSettingPage_CustomResolution"] = "Custom Resolution",
+        ["GameSettingPage_CustomResolutionTip"] = "Custom resolution applies in 'Windowed' display mode",
+        ["GameSettingPage_VoiceLanguage"] = "Voice Language",
+        ["GameSettingPage_VoiceLanguageDescription"] = "Set this before launching the game for the first time to avoid downloading some voice assets",
+        ["GameSettingPage_HDR"] = "HDR",
+        ["GameSettingPage_EnableHDR"] = "Enable HDR",
+        ["GameSettingPage_HDRNotSupported"] = "The current display doesn't support HDR",
+        ["GameSettingPage_HDRNotEnabled"] = "Windows HDR is not enabled yet; this may not take effect",
+        ["GameSettingPage_GameNotInstalled"] = "Game not installed",
+        ["GameSettingPage_GameNotInstalledDesc"] = "Set the game path on the launcher page first",
+        ["GameSettingPage_CloudGameNotSupport"] = "Cloud gaming doesn't need local game settings",
+        ["GameSettingPage_SettingNotEffect"] = "Settings applied while the game is running won't take effect",
+        ["GameSettingPage_ResolutionMustBeGreaterThan0"] = "Resolution must be greater than 0",
+        ["GameSettingPage_LoadFailed"] = "Failed to read game settings",
+        ["GameSettingPage_ApplyFailed"] = "Failed to apply game settings",
+        ["GameSettingPage_Applied"] = "Applied. It takes effect the next time the game starts.",
+
+        
+
+        
+        ["SettingPage_WindowBehavior"] = "Window Behavior",
+        ["SettingPage_CloseWindowOption"] = "When Closing the Window",
+        ["SettingPage_ExitApp"] = "Exit the App",
+        ["SettingPage_AfterLaunchOption"] = "After Launching the Game",
+        ["SettingPage_KeepWindow"] = "Keep the Window",
+        ["SettingPage_AfterGameExitOption"] = "After Game Exits",
+        ["SettingPage_RestoreMainWindow"] = "Show Main Window",
+        ["SettingPage_KeepHidden"] = "Keep Hidden",
+        ["SettingPage_CloseLauncher"] = "Close Launcher",
+        ["SettingPage_KuroCommunitySign"] = "Kuro BBS community sign-in (Kuro Coins)",
+        ["SettingPage_SuggestSystemFeatures"] = "For a better experience, enable the following in system settings.",
+        ["SettingPage_TransparencyEffects"] = "Transparency effects",
+        ["SettingPage_AnimationEffects"] = "Animation effects",
+
+        
+        ["SettingPage_CurrentVersion"] = "Current version:",
+
+        
+        ["GameSelector_Subtitle"] = "Tap the icon at the top-left to select or switch games",
+        ["GameSelector_AutoFind"] = "Auto-detect Installed Games",
+        ["GameSelector_SelectServer"] = "Select Server",
+        ["GameSelector_InstalledSize"] = "Actual disk space used by installed games ",
+        ["GameSelector_Calculating"] = "Calculating",
+
+        
+        ["KuroBbs_AccountLevelLabel"] = "Union Level ",
+        ["KuroBbs_SwitchRole"] = "Switch Character",
+        ["KuroBbs_ClearAccount"] = "Clear Account",
+
+        
+        ["GameBiz_Wuwa"] = "Wuthering Waves",
+        ["GameBiz_WuwaCn"] = "Wuthering Waves · CN",
+        ["GameBiz_WuwaGlobal"] = "Wuthering Waves · Global",
+        ["GameBiz_WuwaBilibili"] = "Wuthering Waves · Bilibili",
+        ["GameBiz_Pgr"] = "Punishing: Gray Raven",
+        ["GameBiz_ShortCn"] = "China Server",
+        ["GameBiz_ShortGlobal"] = "Global Server",
+        ["GameBiz_ShortBilibili"] = "Bilibili",
+        ["GameBiz_ShortPgr"] = "China Server",
+        ["GameBiz_PgrGlobal"] = "Punishing: Gray Raven · Global",
+        ["GameBiz_ShortGlobal"] = "Global Server",
+        ["GameBiz_PgrKorea"] = "Punishing: Gray Raven · Korea",
+        ["GameBiz_ShortKorea"] = "Korea Server",
+        ["GameBiz_PgrJapan"] = "Punishing: Gray Raven · Japan",
+        ["GameBiz_ShortJapan"] = "Japan Server",
+        ["GameBiz_PgrTaiwan"] = "Punishing: Gray Raven · Taiwan",
+        ["GameBiz_ShortTaiwan"] = "Taiwan Server",
+
+        
+        ["GachaPool_CharacterEvent"] = "Character Event Convene",
+        ["GachaPool_WeaponEvent"] = "Weapon Event Convene",
+        ["GachaPool_CharacterStandard"] = "Standard Character Convene",
+        ["GachaPool_WeaponStandard"] = "Standard Weapon Convene",
+        ["GachaPool_Novice"] = "Novice Convene",
+        ["GachaPool_NoviceChoice"] = "Novice Choice Convene",
+        ["GachaPool_NoviceGratitude"] = "Novice Choice Convene (Gratitude Convene)",
+        ["GachaPool_CharacterRookie"] = "Character Rookie Convene",
+        ["GachaPool_WeaponRookie"] = "Weapon Rookie Convene",
+        ["GachaPool_CharacterCollab"] = "Character Collab Convene",
+        ["GachaPool_WeaponCollab"] = "Weapon Collab Convene",
+        ["GachaPool_CharacterRevisit"] = "Character Revisit Convene",
+        ["GachaPool_WeaponRevisit"] = "Weapon Revisit Convene",
+        ["GachaPool_Unknown"] = "Pool {0}",
+
+        
+        ["Adb_DeviceOnline"] = "online",
+        ["Adb_DeviceUnauthorized"] = "unauthorized",
+
+        
+        ["Sync_Title"] = "WebDAV",
+        ["Sync_Description"] = "Save your data by syncing to the cloud",
+        ["Sync_ServerUrl"] = "Server address",
+        ["Sync_UserName"] = "Username",
+        ["Sync_Password"] = "Password or app authorization code",
+        ["Sync_ServerEntry"] = "Sync server",
+        ["Sync_EnableOff"] = "Off — turn on to sync automatically",
+        ["Sync_EnableNeedServer"] = "Configure a server first",
+        ["Sync_ConnectTitle"] = "Connect WebDAV",
+        ["Sync_ConnectDesc"] = "Enter the connection details provided by your cloud drive or server.",
+        ["Sync_ConnectInvalid"] = "Enter a full http:// or https:// address",
+        ["Sync_SaveAndTest"] = "Save and test",
+        ["Sync_Testing"] = "Testing connection…",
+        ["Sync_ConnectOk"] = "Connected. Settings saved.",
+        ["Sync_ConnectFail"] = "Connection failed. Check the server address, account and password, then try again.",
+        ["Sync_SyncNow"] = "Sync now",
+        ["Sync_RevealPassword"] = "Show or hide password",
+        ["Sync_Configured"] = "Configured",
+        ["Sync_NotConfigured"] = "Not configured",
+        ["Sync_NeverSynced"] = "Never synced",
+        ["Sync_LastSync"] = "Last sync",
+        ["Sync_Working"] = "Working…",
+
+        
+        ["CloudGame_ErrNoLogin"] = "No usable login info",
+        ["CloudGame_ErrHttp"] = "Cloud game service returned HTTP {0}",
+        ["CloudGame_ErrRequest"] = "Request to the cloud game service failed: {0}",
+        ["CloudGame_ErrParse"] = "The cloud game service returned unparseable content: {0}",
+        ["CloudGame_ErrEmpty"] = "The cloud game service returned empty content: {0}",
+        ["CloudGame_ErrCode"] = "Cloud game API returned error code={0}: {1}",
+
+        
+        ["GachaLogPage_ExportEmpty"] = "The current account has no convene records to export",
+        ["GachaLog_PityBuilt"] = "Pity",
+
+        
+        ["GameLauncherSettingDialog_PathRemoved"] = "Game path configuration removed",
+        ["GameLauncherSettingDialog_WrongServerExe"] = "The selected game exe does not belong to the selected server, please choose again",
+        ["GameLauncherSettingDialog_ExpectExe"] = "Please select the game's main executable: {0}",
+
+        
+        ["KrSdk_ErrNoUserCache"] = "KRSDKUserCache.json not found. Log in once in the game first.",
+        ["KrSdk_ErrEmptyContent"] = "Content is empty",
+        ["KrSdk_ErrParseFailed"] = "Failed to parse KRSDKUserCache.json; write aborted to avoid corrupting the login state.",
+        ["KrSdk_ErrNoAccountList"] = "No account_list in KRSDKUserCache.json.",
+        ["KrSdk_ErrAccountNotInCache"] = "This account is not in the local cache.",
+        ["KrSdk_ErrVerifyFailed"] = "Post-write verification failed; the cache has been restored to its previous state.",
+
+        
+        ["GameUpdate_ErrNoPlan"] = "Download plan is missing",
+        ["GameUpdate_ErrNoTarget"] = "Target version is missing",
+        ["GameUpdate_ErrNoGamePath"] = "Game path is not configured; cannot update",
+        ["GameUpdate_ErrNoManifest"] = "Failed to get the download manifest",
+        ["GameUpdate_ErrFileMissing"] = "Update file missing: {0}",
+        ["GameUpdate_ErrFileChecksum"] = "Update file checksum failed: {0}",
+
+        
+        ["GameSetting_ErrNoLocalStorage"] = "The game's LocalStorage.db was not found",
+        ["GameSetting_ErrNoGameUserSettings"] = "The game's GameUserSettings.ini was not found",
+
+        
+        ["KuroBbs_ErrConnection"] = "Connection failed, HTTP status: {0}",
+        ["KuroBbs_ErrAccessTokenEmpty"] = "requestToken returned an empty accessToken",
+        ["KuroBbs_ErrAccessToken"] = "Failed to get the B-At accessToken (code={0}): {1}",
+        ["KuroBbs_ErrSendCode"] = "Failed to send the SMS code",
+        ["KuroBbs_ErrLogin"] = "Login failed",
+        ["KuroBbs_SignOk"] = "Signed in",
+        ["KuroBbs_SignAlready"] = "Already signed in today",
+        ["KuroBbs_SignFail"] = "Sign-in failed",
+
+        
+
+        
+        ["Ugf_ErrNoUid"] = "The UGF file is missing the account uid",
+        ["Ugf_ErrUnknownFormat"] = "Unrecognized file format: expected UGF or pool-record JSON",
+
+        
+
+        
+        ["CombatPage_AreaFallback"] = "Zone {0}",
+
+        
+        ["KuroBbs_UnionLevel"] = "Union Level",
+        ["KuroBbs_CommanderLevel"] = "Commander Level",
+        ["KuroBbs_NoLevel"] = "No level yet",
+        ["KuroBbs_SelectRolePgr"] = "Select PGR Character",
+        ["KuroBbs_SelectRoleWuwa"] = "Select Wuthering Waves Character",
+        ["KuroBbs_SwitchedPgr"] = "PGR character switched",
+        ["KuroBbs_SwitchedWuwa"] = "Wuthering Waves character switched",
+        ["PgrData_DailySupply"] = "Daily Supply",
+        ["KuroBbs_AutoSignDoneToast"] = "Daily check-in completed",
+        ["KuroBbs_AutoSignFailedToast"] = "Daily check-in failed",
+
+        
+        ["RolePage_WeaponLevel"] = "LV.{0} · Ascension {1}",
+
+        
+        ["Common_UnknownError"] = "Unknown error",
+    };
+
+}

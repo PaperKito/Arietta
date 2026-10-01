@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mf:PageBase x:Class="Arietta.Features.Setting.GamepadSetting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lang="using:Arietta.Localization"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mf="using:Arietta.Frameworks"
+             x:DefaultBindMode="OneWay"
+             mc:Ignorable="d">
+
+    <ScrollViewer HorizontalScrollMode="Disabled"
+                  HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="4" MaxWidth="1000" HorizontalAlignment="Left">
+
+            <TextBlock Margin="0,0,0,12"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Text="{x:Bind lang:Lang.Instance.SettingPage_Gamepad}" />
+
+            <TextBlock Margin="0,0,0,12"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Text="{x:Bind lang:Lang.Instance.GamepadPage_Desc}"
+                       TextWrapping="Wrap" />
+
+            
+            <InfoBar x:Name="InfoBar_Redist"
+                     IsClosable="False"
+                     IsOpen="False"
+                     Severity="Warning">
+                <InfoBar.Content>
+                    <HyperlinkButton Content="{x:Bind lang:Lang.Instance.GamepadPage_RedistLink}"
+                                     NavigateUri="https://starward-static.scighost.com/resource/gameinput/GameInputRedist.msi" />
+                </InfoBar.Content>
+            </InfoBar>
+
+            <ToggleSwitch x:Name="Toggle_Enable"
+                          Header="{x:Bind lang:Lang.Instance.GamepadPage_Enable}"
+                          Toggled="Toggle_Enable_Toggled" />
+
+            
+            <StackPanel Margin="0,16,0,4"
+                        Orientation="Horizontal"
+                        Spacing="12">
+                <FontIcon FontFamily="{ThemeResource XboxFluent2}" Glyph="&#xE9A1;" />
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Text="{x:Bind lang:Lang.Instance.GamepadPage_Guide}" />
+            </StackPanel>
+
+            <TextBox x:Name="TextBox_GuideKeys"
+                     Width="360"
+                     HorizontalAlignment="Left"
+                     PlaceholderText="{x:Bind lang:Lang.Instance.GamepadPage_KeysPlaceholder}"
+                     TextChanged="TextBox_GuideKeys_TextChanged" />
+
+            <TextBlock x:Name="TextBlock_GuideError"
+                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                       TextWrapping="Wrap"
+                       Visibility="Collapsed" />
+
+            <StackPanel Margin="0,16,0,4"
+                        Orientation="Horizontal"
+                        Spacing="12">
+                <FontIcon FontFamily="{ThemeResource XboxFluent2}" Glyph="&#xE7D4;" />
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Text="{x:Bind lang:Lang.Instance.GamepadPage_Share}" />
+            </StackPanel>
+
+            <TextBox x:Name="TextBox_ShareKeys"
+                     Width="360"
+                     HorizontalAlignment="Left"
+                     PlaceholderText="{x:Bind lang:Lang.Instance.GamepadPage_KeysPlaceholder}"
+                     TextChanged="TextBox_ShareKeys_TextChanged" />
+
+            <TextBlock x:Name="TextBlock_ShareError"
+                       Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                       TextWrapping="Wrap"
+                       Visibility="Collapsed" />
+
+            <TextBlock Margin="0,12,0,0"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Text="{x:Bind lang:Lang.Instance.GamepadPage_ShareNote}"
+                       TextWrapping="Wrap" />
+
+        </StackPanel>
+    </ScrollViewer>
+
+</mf:PageBase>

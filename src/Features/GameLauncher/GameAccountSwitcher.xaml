@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl x:Class="Arietta.Features.GameLauncher.GameAccountSwitcher"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lang="using:Arietta.Localization"
+             xmlns:local="using:Arietta.Features.GameLauncher"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:DefaultBindMode="OneWay"
+             mc:Ignorable="d">
+
+    <StackPanel x:Name="StackPanel_Account"
+                Height="40"
+                Orientation="Horizontal"
+                Spacing="16">
+
+        
+        <Grid Background="{ThemeResource CustomAcrylicBrush}"
+              CornerRadius="20"
+              Shadow="{StaticResource ThemeShadow}"
+              Translation="0,0,16">
+            <ComboBox x:Name="ComboBox_GameAccount"
+                      Height="40"
+                      MinWidth="200"
+                      BorderThickness="0"
+                      ItemsSource="{x:Bind AccountList}"
+                      SelectedItem="{x:Bind SelectAccount, Mode=TwoWay}"
+                      SelectionChanged="ComboBox_GameAccount_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    
+                    <DataTemplate x:DataType="local:KrSdkAccount">
+                        <TextBlock Padding="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis">
+                            <Run Text="{x:Bind DisplayName}" />
+                            <Run Text="{x:Bind UidSeparator}" />
+                            <Run FontSize="12"
+                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                 Text="{x:Bind DisplayUid}" />
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+
+        
+        <Grid Background="{ThemeResource CustomAcrylicBrush}"
+              CornerRadius="20"
+              Shadow="{StaticResource ThemeShadow}"
+              ToolTipService.ToolTip="{x:Bind GameRunningHint}"
+              Translation="0,0,16">
+            <StackPanel Orientation="Horizontal">
+                <Button Height="40"
+                        MinWidth="110"
+                        BorderThickness="0"
+                        Command="{x:Bind SwitchAccountCommand}"
+                        CornerRadius="20,0,0,20"
+                        IsEnabled="{x:Bind CanSwitchAccount, Mode=OneWay}"
+                        Content="{x:Bind lang:Lang.Instance.AccountSwitcher_SwitchAccount, Mode=OneWay}" />
+                <Button Height="40"
+                        Width="40"
+                        BorderThickness="0"
+                        CornerRadius="0,20,20,0"
+                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                        IsEnabled="{x:Bind SelectAccount, Converter={StaticResource ObjectToBoolConverter}}">
+                    <FontIcon FontSize="14" Glyph="&#xE70F;" />
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel MinWidth="240"
+                                        MaxWidth="300"
+                                        Spacing="4">
+                                <TextBlock FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Text="{x:Bind lang:Lang.Instance.AccountSwitcher_AccountInfo, Mode=OneWay}" />
+                                
+                                <TextBlock Text="{x:Bind lang:Lang.Instance.AccountSwitcher_Nickname, Mode=OneWay}" />
+                                <TextBox x:Name="TextBox_Nickname"
+                                         IsSpellCheckEnabled="False"
+                                         Text="{x:Bind SelectAccount.Nickname, Mode=TwoWay}" />
+                                
+                                <TextBlock Text="{x:Bind lang:Lang.Instance.AccountSwitcher_RoleId, Mode=OneWay}" />
+                                <TextBox IsEnabled="False"
+                                         IsReadOnly="True"
+                                         Text="{x:Bind SelectAccount.DisplayUid}" />
+                                
+                                <TextBlock Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                           Text="{x:Bind lang:Lang.Instance.AccountSwitcher_Unsaved, Mode=OneWay}"
+                                           Visibility="{x:Bind ShowUnsavedHint, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                
+                                <Grid Margin="0,8,0,0"
+                                      HorizontalAlignment="Stretch"
+                                      Background="{ThemeResource CustomAcrylicBrush}"
+                                      CornerRadius="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Height="40"
+                                            HorizontalAlignment="Stretch"
+                                            Command="{x:Bind SaveAccountCommand}"
+                                            CornerRadius="20,0,0,20">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <FontIcon FontSize="16" Glyph="&#xE74E;" />
+                                            <TextBlock Text="{x:Bind lang:Lang.Instance.AccountSwitcher_Save, Mode=OneWay}" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Grid.Column="1"
+                                            Height="40"
+                                            HorizontalAlignment="Stretch"
+                                            Command="{x:Bind DeleteAccountCommand}"
+                                            CornerRadius="0,20,20,0">
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <TextBlock Text="{x:Bind lang:Lang.Instance.AccountSwitcher_Delete, Mode=OneWay}" />
+                                            <FontIcon FontSize="16" Glyph="&#xE74D;" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+    </StackPanel>
+</UserControl>

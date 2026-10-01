@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<UserControl x:Class="Arietta.Features.GameLauncher.StartGameButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lang="using:Arietta.Localization"
+             xmlns:local="using:Arietta.Features.GameLauncher"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:muxca="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+             x:DefaultBindMode="OneWay"
+             mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <Style x:Key="GameButtonStyle"
+               BasedOn="{StaticResource DefaultButtonStyle}"
+               TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter x:Name="ContentPresenter"
+                                          Padding="{TemplateBinding Padding}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Background="{TemplateBinding Background}"
+                                          BackgroundSizing="{TemplateBinding BackgroundSizing}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          ContentTransitions="{TemplateBinding ContentTransitions}"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter.BackgroundTransition>
+                                <BrushTransition Duration="0:0:0.083" />
+                            </ContentPresenter.BackgroundTransition>
+
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBackgroundPointerOver}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBorderBrushPointerOver}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="Background">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBackgroundPressed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentPresenter" Storyboard.TargetProperty="BorderBrush">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource ButtonBorderBrushPressed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled" />
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid x:Name="Grid_Root"
+          Height="44"
+          MinWidth="180"
+          Background="{ThemeResource CustomAcrylicBrush}"
+          CornerRadius="22"
+          PointerEntered="Control_PointerEntered"
+          PointerExited="Control_PointerExited"
+          Shadow="{ThemeResource ThemeShadow}"
+          Translation="0,0,16">
+
+        
+        <Rectangle x:Name="Rect_AccentBackground"
+                   Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                   IsHitTestVisible="False"
+                   Visibility="{x:Bind IsAccentColorBackgroundVisible}" />
+
+        
+        <Button x:Name="Button_GameAction"
+                Padding="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind GameCommand}"
+                CornerRadius="22"
+                Foreground="{x:Bind ActionButtonForeground}"
+                IsEnabledChanged="Button_GameAction_IsEnabledChanged"
+                PointerEntered="Control_PointerEntered"
+                PointerExited="Control_PointerExited"
+                Style="{ThemeResource GameButtonStyle}">
+            <Grid>
+                
+                <Grid Visibility="{x:Bind NonInstallingVisibility}">
+                    
+                    <ProgressRing Width="20"
+                                  Height="20"
+                                  Margin="14,0,0,0"
+                                  HorizontalAlignment="Left"
+                                  IsHitTestVisible="False"
+                                  Visibility="{x:Bind IsGameActionCommandRunning}" />
+                    
+                    <TextBlock Margin="41,5,53,6"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Text="{x:Bind StartGameButtonText}" />
+                </Grid>
+
+                
+                <Grid Margin="0,0,48,0"
+                      ColumnSpacing="10"
+                      IsHitTestVisible="False"
+                      Visibility="{x:Bind InstallingVisibility}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    
+                    <Grid Margin="10,0,0,0"
+                          HorizontalAlignment="Left">
+                        <ProgressRing Width="28"
+                                      Height="28"
+                                      Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                                      IsIndeterminate="{x:Bind InstallStateIsApplying}"
+                                      Value="{x:Bind ProgressRingValue}" />
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind ProgressRingValue}"
+                                   Visibility="{x:Bind RingValueTextVisibility}" />
+                    </Grid>
+
+                    
+                    <Grid Grid.Column="1"
+                          VerticalAlignment="Center"
+                          ColumnSpacing="4"
+                          Opacity="{x:Bind DownloadingRemainTimeOpacity}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        
+                        <FontIcon Grid.Row="0"
+                                  Grid.Column="0"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="12"
+                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                  Glyph="&#xE896;"
+                                  IsTextScaleFactorEnabled="False" />
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="1"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind InstallStateText}" />
+                        
+                        <FontIcon Grid.Row="1"
+                                  Grid.Column="0"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="12"
+                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                  Glyph="&#xE917;"
+                                  IsTextScaleFactorEnabled="False" />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind RemainTimeText}" />
+                    </Grid>
+
+                    
+                    <TextBlock Grid.Column="1"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               IsTextScaleFactorEnabled="False"
+                               Opacity="{x:Bind InstallStateCenterOpacity}"
+                               Text="{x:Bind InstallStateText}" />
+
+                    
+                    <TextBlock Grid.Column="1"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsTextScaleFactorEnabled="False"
+                               Opacity="{x:Bind PauseHintOpacity}"
+                               Text="{x:Bind PauseHintText}" />
+
+                </Grid>
+
+            </Grid>
+        </Button>
+
+        
+        <Button x:Name="Button_Setting"
+                Width="44"
+                Height="44"
+                Padding="12"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                BorderThickness="0"
+                Command="{x:Bind SettingCommand}"
+                CornerRadius="22"
+                Foreground="{x:Bind SettingButtonForeground}"
+                PointerEntered="Control_PointerEntered"
+                PointerExited="Control_PointerExited"
+                Style="{ThemeResource GameButtonStyle}">
+            <AnimatedIcon x:Name="AnimatedIcon_Setting">
+                <AnimatedIcon.Source>
+                    <muxca:AnimatedSettingsVisualSource />
+                </AnimatedIcon.Source>
+                <AnimatedIcon.FallbackIconSource>
+                    <FontIconSource Glyph="&#xE713;" />
+                </AnimatedIcon.FallbackIconSource>
+            </AnimatedIcon>
+        </Button>
+
+        
+        <Popup x:Name="Popup_GameInfo"
+               DesiredPlacement="Top"
+               PlacementTarget="{x:Bind Grid_Root}"
+               VerticalOffset="-4">
+            <Grid MinWidth="200"
+                  MaxWidth="260"
+                  Padding="20,12,20,12"
+                  Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                  CornerRadius="8">
+                
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind RunningGameInfo}"
+                           TextWrapping="Wrap"
+                           Visibility="{x:Bind NonInstallingVisibility}" />
+
+                
+                <StackPanel Visibility="{x:Bind InstallingVisibility}">
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="14"
+                                   FontWeight="Bold"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind InstallStateText}" />
+                        <TextBlock Margin="8,0,0,0"
+                                   VerticalAlignment="Bottom"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind ProgressPercentText}"
+                                   Visibility="{x:Bind RingValueTextVisibility}" />
+                        <FontIcon Margin="8,0,0,0"
+                                  VerticalAlignment="Bottom"
+                                  FontFamily="Segoe Fluent Icons"
+                                  FontSize="14"
+                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                  Glyph="&#xE917;"
+                                  IsTextScaleFactorEnabled="False"
+                                  Visibility="{x:Bind RemainTimeVisibility}" />
+                        <TextBlock Margin="4,0,0,0"
+                                   VerticalAlignment="Bottom"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind RemainTimeText}"
+                                   Visibility="{x:Bind RemainTimeVisibility}" />
+                    </StackPanel>
+
+                    <MenuFlyoutSeparator Margin="0,8,0,0" />
+
+                    
+                    <StackPanel Margin="0,8,0,0"
+                                Orientation="Horizontal"
+                                Spacing="4"
+                                Visibility="{x:Bind DownloadBytesVisibility}">
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  FontSize="12"
+                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                  Glyph="&#xE896;"
+                                  IsTextScaleFactorEnabled="False" />
+                        <TextBlock FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind lang:Lang.Instance.SettingPage_Download}" />
+                    </StackPanel>
+                    <Grid Width="200"
+                          Margin="0,2,0,0"
+                          Visibility="{x:Bind DownloadBytesVisibility}">
+                        <TextBlock FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind DownloadBytesText}" />
+                        <TextBlock HorizontalAlignment="Right"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind DownloadSpeedText}" />
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Popup>
+
+    </Grid>
+
+</UserControl>

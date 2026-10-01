@@ -1,0 +1,366 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mf:PageBase x:Class="Arietta.Features.GameLauncher.LauncherPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:bg="using:Arietta.Features.Background"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:lang="using:Arietta.Localization"
+             xmlns:local="using:Arietta.Features.GameLauncher"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mf="using:Arietta.Frameworks"
+             xmlns:pt="using:Arietta.Features.PlayTime"
+             x:DefaultBindMode="OneWay"
+             mc:Ignorable="d">
+
+    <mf:PageBase.Resources>
+        
+        <Style x:Key="TransparentIconButtonStyle"
+               TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter x:Name="ContentPresenter"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          AutomationProperties.AccessibilityView="Raw"
+                                          Background="Transparent"
+                                          Content="{TemplateBinding Content}"
+                                          Opacity="1">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0.8"
+                                                             Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0.6"
+                                                             Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0.4"
+                                                             Duration="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </mf:PageBase.Resources>
+
+    <Grid x:Name="RootGrid"
+          AllowDrop="True"
+          Background="Transparent"
+          DragLeave="RootGrid_DragLeave"
+          DragOver="RootGrid_DragOver"
+          Drop="RootGrid_Drop">
+
+        
+        <Border x:Name="Border_BackgroundDragIn"
+                Margin="0,40,0,0"
+                Padding="24"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                CornerRadius="8"
+                IsHitTestVisible="False"
+                Opacity="0">
+            <Border.OpacityTransition>
+                <ScalarTransition />
+            </Border.OpacityTransition>
+            <StackPanel HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="12">
+                <FontIcon FontSize="24"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          Glyph="&#xE91B;" />
+                <TextBlock VerticalAlignment="Center"
+                           FontSize="16"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_DragAndDropImageOrVideoFiles, Mode=OneWay}" />
+            </StackPanel>
+        </Border>
+
+        
+        <Border x:Name="Border_SwitchBackgroundImage"
+                Height="60"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                Opacity="0"
+                PointerEntered="Border_SwitchBackgroundImage_PointerEntered"
+                PointerExited="Border_SwitchBackgroundImage_PointerExited"
+                PointerWheelChanged="Border_SwitchBackgroundImage_PointerWheelChanged"
+                Visibility="Collapsed">
+            <StackPanel Margin="16,0,0,4"
+                        Padding="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Background="Transparent"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                
+                <PipsPager x:Name="PipsPager_SwitchBackgroundImage"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           NextButtonVisibility="VisibleOnPointerOver"
+                           NumberOfPages="{x:Bind BackgroundImages.Count}"
+                           PreviousButtonVisibility="VisibleOnPointerOver"
+                           SelectedPageIndex="{x:Bind CurrentBackgroundImageIndex, Mode=TwoWay}" />
+                <AppBarSeparator Padding="0,4,0,4" />
+                
+                <Button Padding="4"
+                        VerticalAlignment="Center"
+                        Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
+                        ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameLauncherPage_Gallery, Mode=OneWay}">
+                    <Button.Flyout>
+                        <Flyout Placement="Top">
+                            <Grid Width="420" RowSpacing="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <GridView x:Name="GridView_Backgrounds"
+                                          MaxHeight="320"
+                                          IsItemClickEnabled="True"
+                                          ItemClick="GridView_Backgrounds_ItemClick"
+                                          ItemsSource="{x:Bind BackgroundImages}"
+                                          SelectionMode="None">
+                                    <GridView.ItemTemplate>
+                                        <DataTemplate x:DataType="bg:BackgroundItem">
+                                            <StackPanel Width="116" Spacing="4">
+                                                <Image Width="116"
+                                                       Height="72"
+                                                       Source="{x:Bind Thumbnail}"
+                                                       Stretch="UniformToFill" />
+                                                <TextBlock FontSize="12"
+                                                           MaxLines="1"
+                                                           Text="{x:Bind Name}"
+                                                           TextTrimming="CharacterEllipsis" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridView.ItemTemplate>
+                                </GridView>
+                                <Button Grid.Row="1"
+                                        HorizontalAlignment="Left"
+                                        Click="Button_OpenBackgroundFolder_Click"
+                                        Content="{x:Bind lang:Lang.Instance.Background_OpenFolder, Mode=OneWay}" />
+                            </Grid>
+                        </Flyout>
+                    </Button.Flyout>
+                    <FontIcon FontSize="16"
+                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                              Glyph="&#xE91B;"
+                              IsTextScaleFactorEnabled="False" />
+                </Button>
+                
+                <Button Padding="4"
+                        VerticalAlignment="Center"
+                        Click="Button_CopyBackground_Click"
+                        Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
+                        ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.Common_Copy, Mode=OneWay}">
+                    <FontIcon FontSize="16"
+                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                              Glyph="&#xE8C8;"
+                              IsTextScaleFactorEnabled="False" />
+                </Button>
+                
+                <Button Padding="4"
+                        VerticalAlignment="Center"
+                        Click="Button_SaveBackgroundAs_Click"
+                        Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
+                        ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.ImageViewWindow2_SaveAs, Mode=OneWay}">
+                    <FontIcon FontSize="16"
+                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                              Glyph="&#xE74E;"
+                              IsTextScaleFactorEnabled="False" />
+                </Button>
+                
+                <Button Padding="4"
+                        VerticalAlignment="Center"
+                        Click="Button_PlayPauseBackground_Click"
+                        Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
+                        ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameLauncherPage_PlayPause, Mode=OneWay}"
+                        Visibility="{x:Bind CanStopVideo}">
+                    <FontIcon FontSize="16"
+                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                              Glyph="{x:Bind StartStopButtonIcon}"
+                              IsTextScaleFactorEnabled="False" />
+                </Button>
+            </StackPanel>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Offset="0.0" Color="#00000000" />
+                    <GradientStop Offset="1.0" Color="#88000000" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.OpacityTransition>
+                <ScalarTransition />
+            </Border.OpacityTransition>
+        </Border>
+
+        
+        <local:GameAccountSwitcher x:Name="GameAccountSwitcher"
+                                   Margin="0,0,40,100"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Bottom"
+                                   CurrentGameBiz="{x:Bind CurrentGameBiz}" />
+
+        
+        <Button x:Name="Button_DailyBriefing"
+                Width="40"
+                Height="40"
+                Margin="4"
+                Padding="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                BorderThickness="0"
+                Click="Button_DailyBriefing_Click"
+                CornerRadius="8"
+                Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
+                ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.DailyBriefing_Desc, Mode=OneWay}">
+            <Image x:Name="Image_BriefingIcon"
+                   Source="ms-appx:///Assets/Image/Common/1789406285416.png" />
+        </Button>
+
+        
+        
+        <local:GameBannerAndPost x:Name="BannerAndPost"
+                                 Margin="40,0,0,40"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Bottom"
+                                 CurrentGameBiz="{x:Bind CurrentGameBiz, Mode=OneWay}" />
+
+        
+        <StackPanel Margin="0,0,40,40"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom">
+
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="8">
+
+                
+                <Button x:Name="Button_PreDownload"
+                        Height="44"
+                        Padding="10,0,14,0"
+                        VerticalAlignment="Bottom"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Click="Button_PreDownload_Click"
+                        CornerRadius="16"
+                        PointerEntered="Button_PreDownload_PointerEntered"
+                        PointerExited="Button_PreDownload_PointerExited"
+                        ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameUpdate_PredownloadButton}"
+                        Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="8">
+                        <FontIcon FontFamily="Segoe Fluent Icons"
+                                  FontSize="24"
+                                  FontWeight="Bold"
+                                  Foreground="White"
+                                  Glyph="&#xEBD3;"
+                                  IsTextScaleFactorEnabled="False" />
+                        <TextBlock x:Name="Text_PreDownload"
+                                   VerticalAlignment="Center"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind lang:Lang.Instance.GameUpdate_PredownloadButton, Mode=OneWay}" />
+                    </StackPanel>
+                </Button>
+
+                
+                <Popup x:Name="Popup_PreDownloadProgress"
+                       DesiredPlacement="Top"
+                       IsOpen="False"
+                       PlacementTarget="{x:Bind Button_PreDownload}">
+                    <Border MinWidth="200"
+                            Padding="16,10,16,12"
+                            Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel Spacing="4">
+                            <TextBlock x:Name="Popup_PreDownloadStatus"
+                                       FontSize="14"
+                                       FontWeight="Bold" />
+                            <StackPanel x:Name="Popup_PreDownloadBytesRow"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                <FontIcon FontSize="14"
+                                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                          Glyph="&#xF012;" />
+                                <TextBlock x:Name="Popup_PreDownloadBytes"
+                                           FontSize="12"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel x:Name="Popup_PreDownloadSpeedRow"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                <FontIcon FontSize="14"
+                                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                          Glyph="&#xEC4A;" />
+                                <TextBlock x:Name="Popup_PreDownloadSpeed"
+                                           FontSize="12"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <StackPanel x:Name="Popup_PreDownloadRemainRow"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                <FontIcon FontSize="14"
+                                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                          Glyph="&#xE917;" />
+                                <TextBlock x:Name="Popup_PreDownloadRemain"
+                                           FontSize="12"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+                <pt:PlayTimeButton x:Name="Button_PlayTime"
+                                   CurrentGameBiz="{x:Bind CurrentGameBiz}"
+                                   VerticalAlignment="Bottom" />
+
+                <local:StartGameButton x:Name="Button_StartGame"
+                                       GameCommand="{x:Bind StartGameCommand}"
+                                       GameState="{x:Bind GameState}"
+                                       RunningGameInfo="{x:Bind RunningGameInfo}"
+                                       RunningGameTime="{x:Bind RunningGameTime}"
+                                       SettingCommand="{x:Bind OpenLauncherSettingDialogCommand}" />
+
+            </StackPanel>
+        </StackPanel>
+
+        
+        <TextBlock Margin="0,0,78,14"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Bottom"
+                   FontSize="12"
+                   Visibility="{x:Bind LocateGameVisibility}">
+            <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind lang:Lang.Instance.InstallGameDialog_Installed}" />
+            <Hyperlink Click="Hyperlink_LocateGame_Click" UnderlineStyle="None">
+                <Run Foreground="{ThemeResource SystemFillColorCautionBrush}" Text="{x:Bind lang:Lang.Instance.InstallGameDialog_LocateGame}" />
+            </Hyperlink>
+        </TextBlock>
+
+    </Grid>
+
+</mf:PageBase>
