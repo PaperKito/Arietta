@@ -50,6 +50,16 @@ public static class GameProcessMonitor
 
 
     
+    public static bool IsAnyRunning()
+    {
+        lock (Gate)
+        {
+            return Running.Count > 0;
+        }
+    }
+
+
+    
     public static void SetRunning(GameBiz biz, bool running)
     {
         bool changed;

@@ -8,8 +8,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mf="using:Arietta.Frameworks"
              xmlns:mxi="using:Microsoft.Xaml.Interactivity"
-             xmlns:mxc="using:Microsoft.Xaml.Interactions.Core"
-             xmlns:xim="using:Microsoft.Xaml.Interactions.Media"
+             xmlns:mxc="using:Microsoft.Xaml.Interactivity"
+             xmlns:xim="using:Microsoft.Xaml.Interactivity"
              x:DefaultBindMode="OneTime"
              mc:Ignorable="d">
 

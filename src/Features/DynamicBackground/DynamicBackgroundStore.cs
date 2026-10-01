@@ -75,6 +75,18 @@ public static class DynamicBackgroundStore
     public const string VolumeConfigKey = "DynBgVolume";
 
     
+    
+    public const string FpsCapConfigKey = "DynBgFpsCap";
+
+    
+    
+    public const string QualityConfigKey = "DynBgQuality";
+
+    
+    
+    public const string PauseOnGameConfigKey = "DynBgPauseOnGame";
+
+    
     public static event EventHandler<GameBiz>? Updated;
 
     private static Microsoft.Extensions.Logging.ILogger Log => AppConfig.GetLogger("DynamicBackgroundStore");

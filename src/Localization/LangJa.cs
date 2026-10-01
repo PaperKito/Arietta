@@ -405,7 +405,7 @@ internal static class LangJa
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "システムトレイに最小化",
         ["GameLauncherSettingDialog_BasicInformation"] = "基本情報",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "アンインストールの確認",
-        ["GameLauncherSettingDialog_CustomBackground"] = "カスタム背景",
+        ["GameLauncherSettingDialog_CustomBackground"] = "背景",
         ["GameLauncherSettingDialog_RelocateGame"] = "ゲームを再指定",
         ["GameLauncherSettingDialog_Size"] = "サイズ",
         ["GameLauncherSettingDialog_StartRepairing"] = "修復を開始",

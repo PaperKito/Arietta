@@ -391,7 +391,7 @@ internal static class LangKo
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "시스템 트레이로 최소화",
         ["GameLauncherSettingDialog_BasicInformation"] = "기본 정보",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "제거 확인",
-        ["GameLauncherSettingDialog_CustomBackground"] = "사용자 지정 배경",
+        ["GameLauncherSettingDialog_CustomBackground"] = "배경",
         ["GameLauncherSettingDialog_RelocateGame"] = "게임 다시 찾기",
         ["GameLauncherSettingDialog_Size"] = "크기",
         ["GameLauncherSettingDialog_StartRepairing"] = "복구 시작",

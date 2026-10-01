@@ -37,6 +37,21 @@ public sealed partial class DynamicBackgroundHost : UserControl
     
     private bool _pausedByUser;
 
+    
+    private double _fpsIntervalMs;
+
+    
+    private long _lastDrawTicks;
+
+    
+    private string _qualityMode = "auto";
+
+    
+    private bool _windowVisible = true;
+
+    
+    private bool _gameRunning;
+
     public DynamicBackgroundHost()
     {
         this.InitializeComponent();
@@ -48,6 +63,48 @@ public sealed partial class DynamicBackgroundHost : UserControl
                 Current = null;
             }
         };
+        _fpsIntervalMs = FpsToInterval(AppConfig.GetConfig(DynamicBackgroundStore.FpsCapConfigKey));
+        var configuredQuality = AppConfig.GetConfig(DynamicBackgroundStore.QualityConfigKey);
+        _qualityMode = configuredQuality is "high" or "medium" or "low" ? configuredQuality : "auto";
+        
+        Arietta.Features.GameLauncher.GameProcessMonitor.Changed += () => DispatcherQueue?.TryEnqueue(RefreshGameRunningPause);
+        RefreshGameRunningPause();
+    }
+
+
+    
+    public void SetFpsCap(int fps)
+    {
+        _fpsIntervalMs = fps > 0 ? 1000d / fps : 0;
+    }
+
+
+    
+    public void SetQuality(string quality)
+    {
+        _qualityMode = quality is "high" or "medium" or "low" ? quality : "auto";
+    }
+
+
+    
+    public void RefreshGameRunningPause()
+    {
+        bool enabled = AppConfig.GetConfig(DynamicBackgroundStore.PauseOnGameConfigKey) != "0";
+        bool any = enabled && Arietta.Features.GameLauncher.GameProcessMonitor.IsAnyRunning();
+        if (_gameRunning == any)
+        {
+            return;
+        }
+        _gameRunning = any;
+        UpdatePlayback();
+    }
+
+
+    private static double FpsToInterval(string? config)
+    {
+        
+        int fps = int.TryParse(config, out int v) ? v : 30;
+        return fps > 0 ? 1000d / fps : 0;
     }
 
 
@@ -74,6 +131,7 @@ public sealed partial class DynamicBackgroundHost : UserControl
                 string.Equals(_currentPath, videoPath, StringComparison.OrdinalIgnoreCase))
             {
                 ApplyVolume(null);
+                UpdatePlayback();
                 return;
             }
 
@@ -98,7 +156,7 @@ public sealed partial class DynamicBackgroundHost : UserControl
 
             Image_Video.Visibility = Visibility.Visible;
             ApplyVolume(null);
-            player.Play();
+            UpdatePlayback();
         }
         catch
         {
@@ -141,25 +199,60 @@ public sealed partial class DynamicBackgroundHost : UserControl
     
     public void SetWindowVisible(bool visible)
     {
+        _windowVisible = visible;
+        UpdatePlayback();
+    }
+
+
+    
+    
+    
+    
+    private void UpdatePlayback()
+    {
+        if (_player is null)
+        {
+            if (ShouldPlay() && _currentPath is { Length: > 0 })
+            {
+                
+                Play(_currentPath);
+            }
+            return;
+        }
+        if (ShouldPlay())
+        {
+            _player.Play();
+        }
+        else
+        {
+            SuspendPlayback();
+        }
+    }
+
+
+    private bool ShouldPlay() => _windowVisible && !_gameRunning && !_pausedByUser;
+
+
+    
+    
+    
+    
+    
+    private void SuspendPlayback()
+    {
         if (_player is null)
         {
             return;
         }
         try
         {
-            if (visible)
-            {
-                if (!_pausedByUser)
-                {
-                    _player.Play();
-                }
-            }
-            else
-            {
-                _player.Pause();
-            }
+            _player.VideoFrameAvailable -= Player_VideoFrameAvailable;
+            _player.Pause();
+            _player.Source = null;
+            _player.Dispose();
         }
         catch { }
+        _player = null;
     }
 
 
@@ -170,20 +263,8 @@ public sealed partial class DynamicBackgroundHost : UserControl
         {
             return;
         }
-        try
-        {
-            if (_pausedByUser)
-            {
-                _player.Play();
-                _pausedByUser = false;
-            }
-            else
-            {
-                _player.Pause();
-                _pausedByUser = true;
-            }
-        }
-        catch { }
+        _pausedByUser = !_pausedByUser;
+        UpdatePlayback();
     }
 
 
@@ -222,8 +303,15 @@ public sealed partial class DynamicBackgroundHost : UserControl
     
     
     
+    
     private void Player_VideoFrameAvailable(MediaPlayer sender, object args)
     {
+        long now = Environment.TickCount64;
+        if (_fpsIntervalMs > 0 && now - _lastDrawTicks < _fpsIntervalMs - 2)
+        {
+            return;
+        }
+        _lastDrawTicks = now;
         if (_frameSemaphore.CurrentCount == 0)
         {
             return;
@@ -239,13 +327,29 @@ public sealed partial class DynamicBackgroundHost : UserControl
                 {
                     return;
                 }
-                if (_videoImageSource is null || width != _surfaceWidth || height != _surfaceHeight)
+                
+                
+                double hostW = ActualWidth;
+                double hostH = ActualHeight;
+                double raster = XamlRoot?.RasterizationScale ?? 1;
+                double cover = hostW > 0 && hostH > 0 ? Math.Max(hostW * raster / width, hostH * raster / height) : 1;
+                double autoScale = Math.Min(cover, 1.0);
+                double scale = _qualityMode switch
+                {
+                    "high" => 1.0,
+                    "medium" => autoScale * 2d / 3,
+                    "low" => autoScale * 0.5,
+                    _ => autoScale,
+                };
+                int targetW = Math.Clamp((int)Math.Round(width * scale), 1, width);
+                int targetH = Math.Clamp((int)Math.Round(height * scale), 1, height);
+                if (_videoImageSource is null || targetW != _surfaceWidth || targetH != _surfaceHeight)
                 {
                     _videoSurface?.Dispose();
-                    _videoSurface = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), width, height, 96);
-                    _videoImageSource = new CanvasImageSource(CanvasDevice.GetSharedDevice(), width, height, 96);
-                    _surfaceWidth = width;
-                    _surfaceHeight = height;
+                    _videoSurface = new CanvasRenderTarget(CanvasDevice.GetSharedDevice(), targetW, targetH, 96);
+                    _videoImageSource = new CanvasImageSource(CanvasDevice.GetSharedDevice(), targetW, targetH, 96);
+                    _surfaceWidth = targetW;
+                    _surfaceHeight = targetH;
                     Image_Video.Source = _videoImageSource;
                 }
                 sender.CopyFrameToVideoSurface(_videoSurface);

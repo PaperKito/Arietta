@@ -391,7 +391,7 @@ internal static class LangPtBr
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "Minimizar para a bandeja do sistema",
         ["GameLauncherSettingDialog_BasicInformation"] = "Informações básicas",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "Confirmar desinstalação",
-        ["GameLauncherSettingDialog_CustomBackground"] = "Fundo personalizado",
+        ["GameLauncherSettingDialog_CustomBackground"] = "Plano de Fundo",
         ["GameLauncherSettingDialog_RelocateGame"] = "Realocar o jogo",
         ["GameLauncherSettingDialog_Size"] = "Tamanho",
         ["GameLauncherSettingDialog_StartRepairing"] = "Iniciar reparo",

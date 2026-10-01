@@ -391,7 +391,7 @@ internal static class LangFr
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "Réduire dans la zone de notification",
         ["GameLauncherSettingDialog_BasicInformation"] = "Informations de base",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "Confirmer la désinstallation",
-        ["GameLauncherSettingDialog_CustomBackground"] = "Fond personnalisé",
+        ["GameLauncherSettingDialog_CustomBackground"] = "Fond",
         ["GameLauncherSettingDialog_RelocateGame"] = "Relocaliser le jeu",
         ["GameLauncherSettingDialog_Size"] = "Taille",
         ["GameLauncherSettingDialog_StartRepairing"] = "Démarrer la réparation",

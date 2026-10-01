@@ -117,6 +117,88 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     public string? ChangeBgError { get; set => SetProperty(ref field, value); }
 
     
+    private bool _fpsCapEnabled;
+    public bool FpsCapEnabled
+    {
+        get => _fpsCapEnabled;
+        set
+        {
+            if (SetProperty(ref _fpsCapEnabled, value))
+            {
+                
+                WriteFpsCap(value ? (int)Math.Round(_fpsSliderValue) : 0);
+                OnPropertyChanged(nameof(FpsCapText));
+            }
+        }
+    }
+
+    
+    private double _fpsSliderValue = 30;
+    public double FpsSliderValue
+    {
+        get => _fpsSliderValue;
+        set
+        {
+            if (SetProperty(ref _fpsSliderValue, value))
+            {
+                if (_fpsCapEnabled)
+                {
+                    WriteFpsCap((int)Math.Round(value));
+                }
+                OnPropertyChanged(nameof(FpsCapText));
+            }
+        }
+    }
+
+    
+    public string FpsCapText => _fpsCapEnabled
+        ? $"{(int)Math.Round(_fpsSliderValue)} fps"
+        : Lang.Instance.GameLauncherSettingDialog_FpsUnlimited;
+
+    private void WriteFpsCap(int fps)
+    {
+        AppConfig.SetConfig(DynamicBackgroundStore.FpsCapConfigKey, fps.ToString());
+        DynamicBackgroundHost.Current?.SetFpsCap(fps);
+    }
+
+    
+    private string _bgQuality = "auto";
+    public string BgQuality
+    {
+        get => _bgQuality;
+        set
+        {
+            if (SetProperty(ref _bgQuality, value))
+            {
+                AppConfig.SetConfig(DynamicBackgroundStore.QualityConfigKey, value);
+                DynamicBackgroundHost.Current?.SetQuality(value);
+            }
+        }
+    }
+
+    
+    public int BgQualityIndex
+    {
+        get => _bgQuality switch { "high" => 1, "medium" => 2, "low" => 3, _ => 0 };
+        set => BgQuality = value switch { 1 => "high", 2 => "medium", 3 => "low", _ => "auto" };
+    }
+
+    
+    private bool _pauseOnGameRun;
+    public bool PauseOnGameRun
+    {
+        get => _pauseOnGameRun;
+        set
+        {
+            if (SetProperty(ref _pauseOnGameRun, value))
+            {
+                AppConfig.SetConfig(DynamicBackgroundStore.PauseOnGameConfigKey, value ? "1" : "0");
+                DynamicBackgroundHost.Current?.RefreshGameRunningPause();
+            }
+        }
+    }
+
+    
     public string? StartGameArgument
     {
         get => field;
@@ -161,6 +243,19 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         _videoBgVolume = DynamicBackgroundHost.GetConfiguredVolume();
         VideoBgVolumeButtonIcon = _videoBgVolume <= 0 ? "\uE74F" : "\uE767";
         OnPropertyChanged(nameof(VideoBgVolume));
+        
+        int fpsCap = int.TryParse(AppConfig.GetConfig(DynamicBackgroundStore.FpsCapConfigKey), out int v) ? v : 30;
+        _fpsCapEnabled = fpsCap > 0;
+        
+        _fpsSliderValue = fpsCap is >= 10 and <= 60 ? fpsCap : 30;
+        OnPropertyChanged(nameof(FpsCapEnabled));
+        OnPropertyChanged(nameof(FpsSliderValue));
+        OnPropertyChanged(nameof(FpsCapText));
+        var configuredQuality = AppConfig.GetConfig(DynamicBackgroundStore.QualityConfigKey);
+        _bgQuality = configuredQuality is "high" or "medium" or "low" ? configuredQuality : "auto";
+        OnPropertyChanged(nameof(BgQuality));
+        _pauseOnGameRun = AppConfig.GetConfig(DynamicBackgroundStore.PauseOnGameConfigKey) != "0";
+        OnPropertyChanged(nameof(PauseOnGameRun));
         StartGameArgument = AppConfig.GetConfig(GameRegistry.GetStartGameArgumentConfigKey(CurrentGameBiz));
         _enableThirdPartyTool = AppConfig.GetConfig(GameRegistry.GetEnableThirdPartyToolConfigKey(CurrentGameBiz)) == "1";
         OnPropertyChanged(nameof(EnableThirdPartyTool));

@@ -95,3 +95,8 @@ dist/NoComments/
 # 获取：本机 Starward 安装目录 Assets/Font/XboxFluent2.ttf，或 Xbox Design System 下载。
 # 详见 docs/Gamepad-手柄映射-交接.md 的「图标（XboxFluent2）」一节。
 src/Assets/Font/XboxFluent2.ttf
+
+# ---- 补充：打包产物与误留编译目录 ----
+dist/
+src/binx64*/
+tools/.tmp_*

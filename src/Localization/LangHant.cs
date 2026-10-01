@@ -410,7 +410,7 @@ internal static class LangHant
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "最小化到系統列",
         ["GameLauncherSettingDialog_BasicInformation"] = "基本資訊",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "確認解除安裝",
-        ["GameLauncherSettingDialog_CustomBackground"] = "自訂背景",
+        ["GameLauncherSettingDialog_CustomBackground"] = "背景",
         ["GameLauncherSettingDialog_RelocateGame"] = "重新定位遊戲",
         ["GameLauncherSettingDialog_Size"] = "大小",
         ["GameLauncherSettingDialog_StartRepairing"] = "開始修復",

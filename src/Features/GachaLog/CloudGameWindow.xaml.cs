@@ -41,6 +41,8 @@ public sealed partial class CloudGameWindow : Window
         Title = Lang.Instance.CloudGame_Title;
         this.AppWindow.Resize(new Windows.Graphics.SizeInt32(1180, 780));
         Web.Loaded += async (_, _) => await EnsureWebviewAsync();
+        
+        this.Closed += (_, _) => Web.Close();
     }
 
 

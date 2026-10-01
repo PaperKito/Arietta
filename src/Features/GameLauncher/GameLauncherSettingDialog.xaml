@@ -518,6 +518,46 @@
                             </StackPanel>
                         </Grid>
 
+                        
+                        <StackPanel Spacing="0">
+                            <ToggleSwitch Margin="0,0,0,-4"
+                                          IsOn="{x:Bind FpsCapEnabled, Mode=TwoWay}"
+                                          OffContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_BgFps, Mode=OneWay}"
+                                          OnContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_BgFps, Mode=OneWay}" />
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Slider IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
+                                        Maximum="60"
+                                        Minimum="10"
+                                        StepFrequency="1"
+                                        Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
+                                <TextBlock Grid.Column="1"
+                                           MinWidth="48"
+                                           VerticalAlignment="Center"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           Text="{x:Bind FpsCapText, Mode=OneWay}" />
+                            </Grid>
+                        </StackPanel>
+
+                        
+                        <ComboBox MinWidth="200"
+                                  Header="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_BgQuality, Mode=OneWay}"
+                                  SelectedIndex="{x:Bind BgQualityIndex, Mode=TwoWay}">
+                            <ComboBoxItem Content="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_QualityAuto, Mode=OneWay}" />
+                            <ComboBoxItem Content="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_QualityHigh, Mode=OneWay}" />
+                            <ComboBoxItem Content="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_QualityMedium, Mode=OneWay}" />
+                            <ComboBoxItem Content="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_QualityLow, Mode=OneWay}" />
+                        </ComboBox>
+
+                        
+                        <ToggleSwitch Margin="0,0,0,-8"
+                                      IsOn="{x:Bind PauseOnGameRun, Mode=TwoWay}"
+                                      OffContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_PauseOnGameRun, Mode=OneWay}"
+                                      OnContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_PauseOnGameRun, Mode=OneWay}" />
+
                     </StackPanel>
                     </ScrollViewer>
                 </FlipViewItem>

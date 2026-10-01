@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher;
 
@@ -11,9 +12,13 @@ public sealed partial class CachedImage : UserControl
 {
     private readonly Image _image = new() { Stretch = Stretch.Uniform };
 
+    
+    private Uri? _pendingUri;
+
     public CachedImage()
     {
         this.Content = _image;
+        SizeChanged += OnSizeChanged;
     }
 
     
@@ -63,25 +68,55 @@ public sealed partial class CachedImage : UserControl
         {
             if (uri == null)
             {
+                _pendingUri = null;
                 _image.Source = null;
                 return;
             }
-            if (uri.IsFile && File.Exists(uri.LocalPath))
+            if (ActualWidth < 1)
             {
-                var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(uri.LocalPath);
-                using var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
-                var bitmap = new BitmapImage();
-                bitmap.SetSource(stream);
-                _image.Source = bitmap;
+                _pendingUri = uri;
+                return;
             }
-            else
-            {
-                _image.Source = new BitmapImage(uri);
-            }
+            _pendingUri = null;
+            _image.Source = await DecodeAsync(uri, ActualWidth);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Failed to load image: {ex.Message}");
         }
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (_pendingUri is not null)
+        {
+            LoadImage(_pendingUri);
+        }
+    }
+
+    
+    
+    
+    
+    
+    
+    private static async Task<BitmapImage> DecodeAsync(Uri uri, double displayWidth)
+    {
+        var bitmap = new BitmapImage
+        {
+            DecodePixelType = DecodePixelType.Logical,
+            DecodePixelWidth = (int)Math.Ceiling(displayWidth),
+        };
+        if (uri.IsFile && File.Exists(uri.LocalPath))
+        {
+            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(uri.LocalPath);
+            using var stream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+            bitmap.SetSource(stream);
+        }
+        else
+        {
+            bitmap.UriSource = uri;
+        }
+        return bitmap;
     }
 }

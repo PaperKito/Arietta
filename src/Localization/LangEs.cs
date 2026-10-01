@@ -391,7 +391,7 @@ internal static class LangEs
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "Minimizar a la bandeja del sistema",
         ["GameLauncherSettingDialog_BasicInformation"] = "Información básica",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "Confirmar desinstalación",
-        ["GameLauncherSettingDialog_CustomBackground"] = "Fondo personalizado",
+        ["GameLauncherSettingDialog_CustomBackground"] = "Fondo",
         ["GameLauncherSettingDialog_RelocateGame"] = "Reubicar el juego",
         ["GameLauncherSettingDialog_Size"] = "Tamaño",
         ["GameLauncherSettingDialog_StartRepairing"] = "Iniciar reparación",

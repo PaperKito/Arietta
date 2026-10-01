@@ -391,7 +391,7 @@ internal static class LangDe
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "In den Infobereich minimieren",
         ["GameLauncherSettingDialog_BasicInformation"] = "Grundlegende Informationen",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "Deinstallation bestätigen",
-        ["GameLauncherSettingDialog_CustomBackground"] = "Eigener Hintergrund",
+        ["GameLauncherSettingDialog_CustomBackground"] = "Hintergrund",
         ["GameLauncherSettingDialog_RelocateGame"] = "Spiel neu suchen",
         ["GameLauncherSettingDialog_Size"] = "Größe",
         ["GameLauncherSettingDialog_StartRepairing"] = "Reparatur starten",

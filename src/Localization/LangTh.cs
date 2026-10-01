@@ -391,7 +391,7 @@ internal static class LangTh
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "ย่อไปที่ถาดระบบ",
         ["GameLauncherSettingDialog_BasicInformation"] = "ข้อมูลพื้นฐาน",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "ยืนยันการถอนการติดตั้ง",
-        ["GameLauncherSettingDialog_CustomBackground"] = "พื้นหลังแบบกำหนดเอง",
+        ["GameLauncherSettingDialog_CustomBackground"] = "พื้นหลัง",
         ["GameLauncherSettingDialog_RelocateGame"] = "ระบุตำแหน่งเกมใหม่",
         ["GameLauncherSettingDialog_Size"] = "ขนาด",
         ["GameLauncherSettingDialog_StartRepairing"] = "เริ่มซ่อมแซม",

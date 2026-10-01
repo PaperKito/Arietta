@@ -582,7 +582,15 @@ public sealed class Lang : INotifyPropertyChanged
 
     public string GameLauncherSettingDialog_BasicInformation => T("基本信息");
     public string GameLauncherSettingDialog_ConfirmUninstall => T("确认卸载");
-    public string GameLauncherSettingDialog_CustomBackground => T("自定义背景");
+    public string GameLauncherSettingDialog_CustomBackground => T("背景");
+    public string GameLauncherSettingDialog_BgFps => T("帧率上限");
+    public string GameLauncherSettingDialog_FpsUnlimited => T("不限");
+    public string GameLauncherSettingDialog_BgQuality => T("渲染等级");
+    public string GameLauncherSettingDialog_QualityAuto => T("自动（推荐）");
+    public string GameLauncherSettingDialog_QualityHigh => T("高（原画）");
+    public string GameLauncherSettingDialog_QualityMedium => T("中");
+    public string GameLauncherSettingDialog_QualityLow => T("低");
+    public string GameLauncherSettingDialog_PauseOnGameRun => T("游戏运行时暂停背景");
     public string GameLauncherSettingDialog_RelocateGame => T("重新定位游戏");
     public string GameLauncherSettingDialog_Size => T("大小");
     public string GameLauncherSettingDialog_StartRepairing => T("开始修复");
