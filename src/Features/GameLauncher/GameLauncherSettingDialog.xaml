@@ -529,11 +529,27 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Slider IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
-                                        Maximum="60"
-                                        Minimum="10"
-                                        StepFrequency="1"
-                                        Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
+                                <StackPanel>
+                                    <Slider IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
+                                            Maximum="60"
+                                            Minimum="10"
+                                            StepFrequency="1"
+                                            TickPlacement="BottomRight"
+                                            TickFrequency="10"
+                                            Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
+                                    
+                                    <Grid>
+                                        <TextBlock FontSize="11"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                   IsTextScaleFactorEnabled="False"
+                                                   Text="10" />
+                                        <TextBlock FontSize="11"
+                                                   HorizontalAlignment="Right"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                   IsTextScaleFactorEnabled="False"
+                                                   Text="60" />
+                                    </Grid>
+                                </StackPanel>
                                 <TextBlock Grid.Column="1"
                                            MinWidth="48"
                                            VerticalAlignment="Center"
