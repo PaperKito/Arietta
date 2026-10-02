@@ -32,6 +32,11 @@
                            Text="{x:Bind AppVersionText}" />
             </StackPanel>
 
+            
+            <HyperlinkButton Margin="0,4,0,0"
+                             Content="GitHub"
+                             NavigateUri="https://github.com/Pizazz-stack/Arietta" />
+
         </StackPanel>
     </ScrollViewer>
 

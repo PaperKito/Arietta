@@ -1414,10 +1414,20 @@ public static class GameUpdateService
     private static extern bool CreateHardLinkW(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
     
+    
+    
+    
+    
     private static void EnsureGameNotRunning(GameBiz biz)
     {
         using var running = GameProcessMonitor.FindRunningProcess(biz);
-        if (running != null)
+        if (running is null)
+        {
+            return;
+        }
+        _logger.LogInformation("更新前关闭运行中的游戏进程 {Pid}（{Biz}）", running.Id, biz);
+        running.Kill(entireProcessTree: true);
+        if (!running.WaitForExit(15000))
         {
             throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_GameRunning);
         }
