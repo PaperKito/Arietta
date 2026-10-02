@@ -398,7 +398,8 @@
                 <FlipViewItem>
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
                                   VerticalScrollMode="Auto">
-                    <StackPanel Spacing="12">
+                    
+                    <StackPanel Spacing="12" Margin="0,0,16,0">
                         <ToggleSwitch Margin="0,0,0,-8"
                                       IsOn="{x:Bind EnableCustomBg, Mode=TwoWay}"
                                       OffContent="{x:Bind lang:Lang.Instance.SettingPage_CustomBackgroundSupportVideo, Mode=OneWay}"
@@ -524,7 +525,7 @@
                                           IsOn="{x:Bind FpsCapEnabled, Mode=TwoWay}"
                                           OffContent="{x:Bind FpsHeaderText, Mode=OneWay}"
                                           OnContent="{x:Bind FpsHeaderText, Mode=OneWay}" />
-                            <StackPanel Margin="0,0,16,0">
+                            <StackPanel>
                                 <Grid>
                                     <Slider x:Name="Slider_FpsCap"
                                             IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
