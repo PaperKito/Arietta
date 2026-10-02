@@ -974,19 +974,22 @@ public sealed partial class LauncherPage : PageBase
 
             
             
+            
             string? persisted = GameUpdateService.GetPersistedInstallDir(biz);
             if (persisted is not null
                 && Directory.Exists(Path.Combine(persisted, "predownload", state.TargetVersion)))
             {
-                StartInstallSession(biz, state, persisted);
+                StartInstallSession(biz, state, persisted, GameUpdateService.GetInstallTier(biz));
                 InAppToast.MainWindow?.Information(string.Format(Lang.Instance.GameUpdate_ResumeInstall, state.TargetVersion));
                 return;
             }
 
             
             
-            var dialog = new InstallGameDialog(biz, state.PlanInfo!, state.TotalBytes,
-                persisted ?? _lastInstallDir)
+            
+            var tiers = await GameUpdateService.GetTierOptionsAsync(biz);
+            var dialog = new InstallGameDialog(biz, state.PlanInfo!, state.TotalBytes, tiers,
+                name => GameUpdateService.BuildTierPlanAsync(biz, name), persisted ?? _lastInstallDir)
             {
                 XamlRoot = this.XamlRoot,
             };
@@ -1010,7 +1013,23 @@ public sealed partial class LauncherPage : PageBase
             _lastInstallDir = dir;
             
             AppConfig.SetConfig(GameRegistry.GetInstallDirConfigKey(biz), dir);
-            StartInstallSession(biz, state, dir);
+            
+            
+            string? tier = dialog.SelectedTier;
+            GameUpdateService.SetInstallTier(biz, tier);
+            if (tier is not null && dialog.TotalBytes != state.TotalBytes)
+            {
+                state = new GameUpdateService.GameUpdateState
+                {
+                    Kind = state.Kind,
+                    LocalVersion = state.LocalVersion,
+                    Target = state.Target,
+                    TargetVersion = state.TargetVersion,
+                    Changelog = state.Changelog,
+                    TotalBytes = dialog.TotalBytes,
+                };
+            }
+            StartInstallSession(biz, state, dir, tier);
         }
         catch (Exception ex)
         {
@@ -1020,9 +1039,9 @@ public sealed partial class LauncherPage : PageBase
     }
 
     
-    private void StartInstallSession(GameBiz biz, GameUpdateService.GameUpdateState state, string dir)
+    private void StartInstallSession(GameBiz biz, GameUpdateService.GameUpdateState state, string dir, string? tier = null)
     {
-        GameUpdateSession.Current.StartInstall(biz, state, dir);
+        GameUpdateSession.Current.StartInstall(biz, state, dir, tier);
         Button_StartGame.ResetInstallState();
         GameState = GameState.Installing;
         Button_StartGame.GameCommand = PauseGameUpdateCommand;
@@ -1508,10 +1527,15 @@ public sealed partial class LauncherPage : PageBase
         
         
         
+        
         if (biz is GameBiz.WutheringWaves or GameBiz.WutheringWavesGlobal or GameBiz.WutheringWavesBilibili
-            && !args.Contains("krqlv", StringComparison.OrdinalIgnoreCase))
+            && !args.Contains("krqlv", StringComparison.OrdinalIgnoreCase)
+            && Path.GetDirectoryName(exePath) is { } gameDir)
         {
-            args = string.IsNullOrEmpty(args) ? "-krqlv=hd" : $"{args} -krqlv=hd";
+            string lv = Directory.Exists(Path.Combine(gameDir, "Client", "Content", "UHD")) ? "uhd"
+                : Directory.Exists(Path.Combine(gameDir, "Client", "Content", "SD")) ? "sd"
+                : "hd";
+            args = string.IsNullOrEmpty(args) ? $"-krqlv={lv}" : $"{args} -krqlv={lv}";
         }
         var startInfo = new ProcessStartInfo
         {

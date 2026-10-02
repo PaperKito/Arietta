@@ -427,6 +427,10 @@ public sealed class Lang : INotifyPropertyChanged
     public string InstallGameDialog_SpaceAvailable => T("可用空间 ");
     public string InstallGameDialog_InsufficientSpace => T("可用空间不足");
     public string InstallGameDialog_HardLinkEstimateDesc => T("同盘其它区服客户端的相同文件将直接硬链接复用，预计实际需下载约 {0}；该值仅为预估值，实际以下载时逐文件校验为准。");
+    
+    public string InstallGameDialog_TierUHD => T("极致(UHD)");
+    public string InstallGameDialog_TierHD => T("高清(HD)");
+    public string InstallGameDialog_TierSD => T("流畅(SD)");
     public string GameUpdate_ResumeInstall => T("检测到未完成的安装（{0}），已从上次目录继续");
     public string GameLauncherPage_GameIsRunning => T("游戏正在运行");
 

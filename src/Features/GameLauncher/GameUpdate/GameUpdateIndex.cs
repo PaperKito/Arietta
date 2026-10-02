@@ -31,6 +31,19 @@ public sealed class GameUpdateIndex
     public GameVersionNode? PredownloadNode { get; set; }
 
     
+    
+    
+    
+    
+    
+    
+    [JsonPropertyName("resourcePacks")]
+    public Dictionary<string, GameResourcePack>? ResourcePacks { get; set; }
+
+    [JsonPropertyName("bundles")]
+    public Dictionary<string, GameBundle>? Bundles { get; set; }
+
+    
     [JsonPropertyName("keyFileCheckList")]
     public List<string>? KeyFileCheckList { get; set; }
 
@@ -126,6 +139,49 @@ public sealed class GamePatchConfig
 
     [JsonPropertyName("size")]
     public long Size { get; set; }
+}
+
+
+
+
+
+public sealed class GameResourcePack
+{
+    [JsonPropertyName("version")]
+    public string? Version { get; set; }
+
+    
+    [JsonPropertyName("indexFile")]
+    public string? IndexFile { get; set; }
+
+    [JsonPropertyName("indexFileMd5")]
+    public string? IndexFileMd5 { get; set; }
+
+    
+    [JsonPropertyName("baseUrl")]
+    public string? BaseUrl { get; set; }
+
+    
+    
+    
+    
+    [JsonPropertyName("size")]
+    public long Size { get; set; }
+
+    [JsonPropertyName("unCompressSize")]
+    public long UnCompressSize { get; set; }
+
+    
+    [JsonPropertyName("patchConfig")]
+    public List<GamePatchConfig>? PatchConfig { get; set; }
+}
+
+
+public sealed class GameBundle
+{
+    
+    [JsonPropertyName("resourcePacks")]
+    public List<string>? ResourcePacks { get; set; }
 }
 
 public sealed class GameCdnItem

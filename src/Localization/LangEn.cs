@@ -281,6 +281,9 @@ internal static class LangEn
         ["InstallGameDialog_SpaceAvailable"] = "Available space ",
         ["InstallGameDialog_InsufficientSpace"] = "Insufficient available space",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Identical files from other region clients on the same disk will be hard-linked. Estimated download is about {0}; this is an estimate only, subject to per-file verification during install.",
+        ["InstallGameDialog_TierUHD"] = "UHD (Extreme)",
+        ["InstallGameDialog_TierHD"] = "HD (High)",
+        ["InstallGameDialog_TierSD"] = "SD (Smooth)",
         ["GameUpdate_ResumeInstall"] = "Unfinished installation of {0} detected, resuming from the previous directory",
         ["GameLauncherPage_GameIsRunning"] = "The game is running",
 

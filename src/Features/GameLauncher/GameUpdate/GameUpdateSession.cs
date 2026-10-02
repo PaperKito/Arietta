@@ -49,6 +49,9 @@ public sealed class GameUpdateSession
     public string? InstallDir { get; private set; }
 
     
+    public string? InstallTier { get; private set; }
+
+    
     public bool IsApplying { get; private set; }
 
     
@@ -86,18 +89,18 @@ public sealed class GameUpdateSession
     
     
     
-    public bool StartInstall(GameBiz biz, GameUpdateService.GameUpdateState state, string installDir)
+    public bool StartInstall(GameBiz biz, GameUpdateService.GameUpdateState state, string installDir, string? tierName = null)
     {
         if (state.Target is null || state.TargetVersion is null || string.IsNullOrWhiteSpace(installDir))
         {
             return false;
         }
-        return Begin(biz, state, installDir);
+        return Begin(biz, state, installDir, tierName);
     }
 
 
     
-    private bool Begin(GameBiz biz, GameUpdateService.GameUpdateState state, string? installDir)
+    private bool Begin(GameBiz biz, GameUpdateService.GameUpdateState state, string? installDir, string? tierName = null)
     {
         lock (_gate)
         {
@@ -111,6 +114,7 @@ public sealed class GameUpdateSession
         Biz = biz;
         Kind = installDir is null ? state.Kind : GameUpdateService.UpdateKind.Update;
         InstallDir = installDir;
+        InstallTier = tierName;
         TargetVersion = state.TargetVersion;
         IsApplying = false;
         ProgressValue = 0;
@@ -153,7 +157,7 @@ public sealed class GameUpdateSession
             if (InstallDir is { } installDir)
             {
                 
-                await Task.Run(() => GameUpdateService.InstallAsync(biz, installDir, state.Target!, progress, ct), ct);
+                await Task.Run(() => GameUpdateService.InstallAsync(biz, installDir, state.Target!, progress, ct, InstallTier), ct);
                 InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_InstallDone, state.TargetVersion));
             }
             else if (state.Kind == GameUpdateService.UpdateKind.Predownload)

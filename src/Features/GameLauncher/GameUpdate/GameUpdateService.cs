@@ -31,13 +31,18 @@ namespace Arietta.Features.GameLauncher.GameUpdate;
 
 public static class GameUpdateService
 {
-    private sealed record BizApi(string GameId, string AppIdKey);
+    
+    
+    
+    
+    private sealed record BizApi(string GameId, string AppIdKey, string? TierIndexKey = null);
 
     private static readonly Dictionary<GameBiz, BizApi> Configs = new()
     {
         [GameBiz.WutheringWaves] = new("G152", "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5"),
         [GameBiz.WutheringWavesBilibili] = new("G152", "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y"),
-        [GameBiz.WutheringWavesGlobal] = new("G153", "50004_obOHXFrFanqsaIEOmuKroCcbZkQRBC7c"),
+        [GameBiz.WutheringWavesGlobal] = new("G153", "50004_obOHXFrFanqsaIEOmuKroCcbZkQRBC7c",
+            "50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e"),
         [GameBiz.PunishingGrayRaven] = new("G148", "10012_RnIUKs3r59Csliu3N0rl5uRWWBOFDaJL"),
         
         
@@ -119,6 +124,56 @@ public static class GameUpdateService
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "版本索引拉取失败 {Url}", url);
+            }
+        }
+        return null;
+    }
+
+    private static readonly Dictionary<GameBiz, (GameUpdateIndex Index, DateTimeOffset Time)> _tierCache = new();
+
+    
+    
+    
+    
+    
+    
+    public static async Task<GameUpdateIndex?> GetTierIndexAsync(GameBiz biz, CancellationToken ct = default)
+    {
+        if (_tierCache.TryGetValue(biz, out var cached) && DateTimeOffset.Now - cached.Time < CacheLifetime)
+        {
+            return cached.Index;
+        }
+        if (!Configs.TryGetValue(biz, out var cfg) || cfg.TierIndexKey is null)
+        {
+            return null;
+        }
+        foreach (string baseUrl in IndexBases)
+        {
+            string url = $"{baseUrl}/launcher/game/{cfg.TierIndexKey}/{cfg.GameId}/official/index.json";
+            try
+            {
+                using var resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+                if (!resp.IsSuccessStatusCode)
+                {
+                    continue;
+                }
+                
+                await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+                var index = await System.Text.Json.JsonSerializer.DeserializeAsync<GameUpdateIndex>(stream, JsonOptions, ct);
+                if (index?.ResourcePacks is not { Count: > 0 } || index.Bundles is not { Count: > 0 })
+                {
+                    continue;
+                }
+                _tierCache[biz] = (index, DateTimeOffset.Now);
+                return index;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "分档索引拉取失败 {Url}", url);
             }
         }
         return null;
@@ -1742,6 +1797,89 @@ public static class GameUpdateService
     }
 
     
+    public sealed record GameTierOption(string Name, long SizeBytes);
+
+    
+    
+    
+    
+    public static async Task<List<GameTierOption>?> GetTierOptionsAsync(GameBiz biz)
+    {
+        var index = await GetTierIndexAsync(biz);
+        if (index?.ResourcePacks is not { } packs || !packs.TryGetValue("common", out var common)
+            || index.Bundles is not { Count: > 0 } bundles)
+        {
+            return null;
+        }
+        return bundles.Keys
+            .Where(k => packs.ContainsKey(k))
+            .OrderByDescending(k => packs[k].Size)
+            .Select(k => new GameTierOption(k, common.Size + packs[k].Size))
+            .ToList();
+    }
+
+    
+    
+    
+    
+    
+    public static async Task<DownloadPlan?> BuildTierPlanAsync(GameBiz biz, string tierName)
+    {
+        var index = await GetTierIndexAsync(biz);
+        if (index?.ResourcePacks is not { } packs
+            || !packs.TryGetValue("common", out var common)
+            || index.Bundles?.TryGetValue(tierName, out var bundle) != true
+            || bundle?.ResourcePacks is not { Count: > 0 })
+        {
+            return null;
+        }
+        var files = new List<GameResourceEntry>();
+        long total = 0;
+        string? version = null;
+        foreach (string packName in bundle.ResourcePacks)
+        {
+            if (!packs.TryGetValue(packName, out var pack) || pack.IndexFile is null)
+            {
+                continue;
+            }
+            var list = await FetchResourceListAsync(biz, pack.IndexFile);
+            if (list is null)
+            {
+                return null;
+            }
+            foreach (var entry in list.Resource)
+            {
+                if (string.IsNullOrWhiteSpace(entry.Dest))
+                {
+                    continue;
+                }
+                entry.FromFolder = pack.BaseUrl;
+                files.Add(entry);
+            }
+            total += pack.Size;
+            version ??= pack.Version;
+        }
+        if (files.Count == 0)
+        {
+            return null;
+        }
+        return new DownloadPlan(files, common.BaseUrl ?? "", total, null, null, version, null, null);
+    }
+
+    
+    public static string? GetInstallTier(GameBiz biz)
+    {
+        string v = AppConfig.GetConfig($"InstallTier_{biz}") ?? "";
+        return v.Length == 0 ? null : v;
+    }
+
+    public static void SetInstallTier(GameBiz biz, string? tier)
+    {
+        AppConfig.SetConfig($"InstallTier_{biz}", tier ?? "");
+    }
+
+    
+    
     
     
     
@@ -1749,13 +1887,15 @@ public static class GameUpdateService
     
     
     public static async Task<long> InstallAsync(
-        GameBiz biz, string installDir, GameVersionNode target, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
+        GameBiz biz, string installDir, GameVersionNode target, IProgress<GameDownloadProgress>? progress, CancellationToken ct,
+        string? tierName = null)
     {
         if (target.Config?.BaseUrl is null)
         {
             throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_ErrNoTarget);
         }
-        var plan = await BuildPlanAsync(biz, target, null)
+        var plan = await (tierName is null ? null : BuildTierPlanAsync(biz, tierName))
+            ?? await BuildPlanAsync(biz, target, null)
             ?? throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_ErrNoManifest);
         string stageDir = Path.Combine(installDir, "predownload", target.Version!);
         Directory.CreateDirectory(stageDir);
@@ -1770,10 +1910,13 @@ public static class GameUpdateService
             (done, total) => reportApplying(done, total)), ct);
 
         
-        var fullList = await FetchResourceListAsync(biz, target.Config?.IndexFile);
-        if (fullList != null)
+        
+        var localList = tierName is null
+            ? await FetchResourceListAsync(biz, target.Config?.IndexFile)
+            : new GameResourceList { Resource = plan.Files };
+        if (localList != null)
         {
-            WriteLocalGameResources(installDir, fullList);
+            WriteLocalGameResources(installDir, localList);
         }
 
         

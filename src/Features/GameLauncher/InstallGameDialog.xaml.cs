@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Arietta.Core;
@@ -7,7 +8,9 @@ using Arietta.Features.GameLauncher.GameUpdate;
 using Arietta.Helpers;
 using Arietta.Localization;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
@@ -20,10 +23,15 @@ namespace Arietta.Features.GameLauncher;
 
 
 
+
 [ObservableObject]
 public sealed partial class InstallGameDialog : ContentDialog
 {
-    public InstallGameDialog(GameBiz biz, GameUpdate.GameUpdateService.DownloadPlan plan, long totalBytes, string? initialPath)
+    
+    public delegate Task<GameUpdate.GameUpdateService.DownloadPlan?> TierPlanFactory(string tierName);
+
+    public InstallGameDialog(GameBiz biz, GameUpdate.GameUpdateService.DownloadPlan plan, long totalBytes,
+        List<GameUpdate.GameUpdateService.GameTierOption>? tiers, TierPlanFactory? tierPlanFactory, string? initialPath)
     {
         _biz = biz;
         _plan = plan;
@@ -33,12 +41,36 @@ public sealed partial class InstallGameDialog : ContentDialog
         HardLinkVisibility = AppConfig.GetConfig(GameUpdateService.UseHardLinkConfigKey) == "1"
             ? Visibility.Visible
             : Visibility.Collapsed;
+        _tierPlanFactory = tierPlanFactory;
+        TierVisibility = tiers is { Count: > 0 } ? Visibility.Visible : Visibility.Collapsed;
         InitializeComponent();
+        if (tiers is { Count: > 0 })
+        {
+            
+            
+            foreach (var tier in tiers)
+            {
+                _tierSizes[tier.Name] = tier.SizeBytes;
+                Segmented_Tier.Items.Add(new SegmentedItem { Content = TierLabel(tier.Name), Tag = tier.Name });
+            }
+            SelectedTier = tiers.FirstOrDefault(t => t.Name.Equals("HD", StringComparison.OrdinalIgnoreCase))?.Name
+                ?? tiers[0].Name;
+            Segmented_Tier.SelectedIndex = tiers.FindIndex(t => t.Name.Equals(SelectedTier, StringComparison.OrdinalIgnoreCase));
+            Segmented_Tier.SelectionChanged += Segmented_Tier_SelectionChanged;
+            _ = ApplyTierAsync();   
+        }
         RefreshSpace();
     }
 
     private readonly GameBiz _biz;
-    private readonly GameUpdate.GameUpdateService.DownloadPlan _plan;
+    private GameUpdate.GameUpdateService.DownloadPlan _plan;
+    private readonly TierPlanFactory? _tierPlanFactory;
+
+    
+    private readonly Dictionary<string, long> _tierSizes = new();
+
+    
+    private int _tierGen;
 
     
     private long _linkedBytes;
@@ -48,7 +80,13 @@ public sealed partial class InstallGameDialog : ContentDialog
     
     public bool Confirmed { get; private set; }
 
-    public long TotalBytes { get; }
+    
+    public string? SelectedTier { get; private set; }
+
+    public Visibility TierVisibility { get; private set; }
+
+    
+    public long TotalBytes { get; private set; }
 
     
     
@@ -177,5 +215,52 @@ public sealed partial class InstallGameDialog : ContentDialog
 
     private void TextBlock_IsTextTrimmedChanged(TextBlock sender, IsTextTrimmedChangedEventArgs e)
     {
+    }
+
+    
+    private static string TierLabel(string name) => name.ToUpperInvariant() switch
+    {
+        "UHD" => Lang.Instance.InstallGameDialog_TierUHD,
+        "HD" => Lang.Instance.InstallGameDialog_TierHD,
+        "SD" => Lang.Instance.InstallGameDialog_TierSD,
+        _ => name,
+    };
+
+    
+    
+    
+    
+    
+    private async Task ApplyTierAsync()
+    {
+        if (Segmented_Tier.SelectedItem is not SegmentedItem { Tag: string name })
+        {
+            return;
+        }
+        SelectedTier = name;
+        int gen = ++_tierGen;
+        if (_tierSizes.TryGetValue(name, out var size) && size > 0)
+        {
+            TotalBytes = size;
+            RefreshSpace();
+        }
+        if (_tierPlanFactory is null)
+        {
+            return;
+        }
+        var plan = await _tierPlanFactory(name);
+        if (gen != _tierGen || plan is null)
+        {
+            return;
+        }
+        _plan = plan;
+        TotalBytes = plan.TotalBytes;
+        RefreshSpace();
+        await RecomputeEstimateAsync();
+    }
+
+    private async void Segmented_Tier_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        await ApplyTierAsync();
     }
 }
