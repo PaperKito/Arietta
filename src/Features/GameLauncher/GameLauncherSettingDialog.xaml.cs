@@ -127,7 +127,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             {
                 
                 WriteFpsCap(value ? (int)Math.Round(_fpsSliderValue) : 0);
-                OnPropertyChanged(nameof(FpsCapText));
+                OnPropertyChanged(nameof(FpsHeaderText));
             }
         }
     }
@@ -145,10 +145,13 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
                 {
                     WriteFpsCap((int)Math.Round(value));
                 }
-                OnPropertyChanged(nameof(FpsCapText));
+                OnPropertyChanged(nameof(FpsHeaderText));
             }
         }
     }
+
+    
+    public string FpsHeaderText => $"{Lang.Instance.GameLauncherSettingDialog_BgFps} ({FpsCapText})";
 
     
     public string FpsCapText => _fpsCapEnabled
@@ -250,7 +253,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         _fpsSliderValue = fpsCap is >= 10 and <= 60 ? fpsCap : 30;
         OnPropertyChanged(nameof(FpsCapEnabled));
         OnPropertyChanged(nameof(FpsSliderValue));
-        OnPropertyChanged(nameof(FpsCapText));
+        OnPropertyChanged(nameof(FpsHeaderText));
         var configuredQuality = AppConfig.GetConfig(DynamicBackgroundStore.QualityConfigKey);
         _bgQuality = configuredQuality is "high" or "medium" or "low" ? configuredQuality : "auto";
         OnPropertyChanged(nameof(BgQuality));

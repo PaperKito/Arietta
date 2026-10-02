@@ -522,40 +522,29 @@
                         <StackPanel Spacing="0">
                             <ToggleSwitch Margin="0,0,0,-4"
                                           IsOn="{x:Bind FpsCapEnabled, Mode=TwoWay}"
-                                          OffContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_BgFps, Mode=OneWay}"
-                                          OnContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_BgFps, Mode=OneWay}" />
-                            <Grid ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel>
-                                    <Slider IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
-                                            Maximum="60"
-                                            Minimum="10"
-                                            StepFrequency="1"
-                                            TickPlacement="BottomRight"
-                                            TickFrequency="10"
-                                            Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
-                                    
-                                    <Grid>
-                                        <TextBlock FontSize="11"
-                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                   IsTextScaleFactorEnabled="False"
-                                                   Text="10" />
-                                        <TextBlock FontSize="11"
-                                                   HorizontalAlignment="Right"
-                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                   IsTextScaleFactorEnabled="False"
-                                                   Text="60" />
-                                    </Grid>
-                                </StackPanel>
-                                <TextBlock Grid.Column="1"
-                                           MinWidth="48"
-                                           VerticalAlignment="Center"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           Text="{x:Bind FpsCapText, Mode=OneWay}" />
-                            </Grid>
+                                          OffContent="{x:Bind FpsHeaderText, Mode=OneWay}"
+                                          OnContent="{x:Bind FpsHeaderText, Mode=OneWay}" />
+                            <StackPanel>
+                                <Slider IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
+                                        Maximum="60"
+                                        Minimum="10"
+                                        StepFrequency="1"
+                                        TickPlacement="BottomRight"
+                                        TickFrequency="10"
+                                        Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
+                                
+                                <Grid>
+                                    <TextBlock FontSize="11"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               IsTextScaleFactorEnabled="False"
+                                               Text="10" />
+                                    <TextBlock FontSize="11"
+                                               HorizontalAlignment="Right"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                               IsTextScaleFactorEnabled="False"
+                                               Text="60" />
+                                </Grid>
+                            </StackPanel>
                         </StackPanel>
 
                         
