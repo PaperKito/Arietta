@@ -35,12 +35,17 @@ public static class GameUpdateService
     
     
     
+    
+    
     private sealed record BizApi(string GameId, string AppIdKey, string? TierIndexKey = null);
 
     private static readonly Dictionary<GameBiz, BizApi> Configs = new()
     {
-        [GameBiz.WutheringWaves] = new("G152", "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5"),
-        [GameBiz.WutheringWavesBilibili] = new("G152", "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y"),
+        
+        [GameBiz.WutheringWaves] = new("G152", "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5",
+            "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5"),
+        [GameBiz.WutheringWavesBilibili] = new("G152", "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y",
+            "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y"),
         [GameBiz.WutheringWavesGlobal] = new("G153", "50004_obOHXFrFanqsaIEOmuKroCcbZkQRBC7c",
             "50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e"),
         [GameBiz.PunishingGrayRaven] = new("G148", "10012_RnIUKs3r59Csliu3N0rl5uRWWBOFDaJL"),
@@ -137,6 +142,8 @@ public static class GameUpdateService
     
     
     
+    
+    
     public static async Task<GameUpdateIndex?> GetTierIndexAsync(GameBiz biz, CancellationToken ct = default)
     {
         if (_tierCache.TryGetValue(biz, out var cached) && DateTimeOffset.Now - cached.Time < CacheLifetime)
@@ -147,33 +154,41 @@ public static class GameUpdateService
         {
             return null;
         }
+        string tierKey = cfg.TierIndexKey;
         foreach (string baseUrl in IndexBases)
         {
-            string url = $"{baseUrl}/launcher/game/{cfg.TierIndexKey}/{cfg.GameId}/official/index.json";
-            try
+            string[] urls =
+            [
+                $"{baseUrl}/launcher/game/{tierKey}/{cfg.GameId}/official/index.json",
+                $"{baseUrl}/launcher/game/{cfg.GameId}/{cfg.AppIdKey}/index.json",
+            ];
+            foreach (string url in urls)
             {
-                using var resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
-                if (!resp.IsSuccessStatusCode)
+                try
                 {
-                    continue;
+                    using var resp = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct);
+                    if (!resp.IsSuccessStatusCode)
+                    {
+                        continue;
+                    }
+                    
+                    await using var stream = await resp.Content.ReadAsStreamAsync(ct);
+                    var index = await System.Text.Json.JsonSerializer.DeserializeAsync<GameUpdateIndex>(stream, JsonOptions, ct);
+                    if (index?.ResourcePacks is not { Count: > 0 } || index.Bundles is not { Count: > 0 })
+                    {
+                        continue;
+                    }
+                    _tierCache[biz] = (index, DateTimeOffset.Now);
+                    return index;
                 }
-                
-                await using var stream = await resp.Content.ReadAsStreamAsync(ct);
-                var index = await System.Text.Json.JsonSerializer.DeserializeAsync<GameUpdateIndex>(stream, JsonOptions, ct);
-                if (index?.ResourcePacks is not { Count: > 0 } || index.Bundles is not { Count: > 0 })
+                catch (OperationCanceledException)
                 {
-                    continue;
+                    throw;
                 }
-                _tierCache[biz] = (index, DateTimeOffset.Now);
-                return index;
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "分档索引拉取失败 {Url}", url);
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "分档索引拉取失败 {Url}", url);
+                }
             }
         }
         return null;
