@@ -524,14 +524,34 @@
                                           IsOn="{x:Bind FpsCapEnabled, Mode=TwoWay}"
                                           OffContent="{x:Bind FpsHeaderText, Mode=OneWay}"
                                           OnContent="{x:Bind FpsHeaderText, Mode=OneWay}" />
-                            <StackPanel>
-                                <Slider IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
-                                        Maximum="60"
-                                        Minimum="10"
-                                        StepFrequency="1"
-                                        TickPlacement="BottomRight"
-                                        TickFrequency="10"
-                                        Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
+                            <StackPanel Margin="0,0,16,0">
+                                <Grid>
+                                    <Slider x:Name="Slider_FpsCap"
+                                            IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
+                                            Maximum="60"
+                                            Minimum="10"
+                                            StepFrequency="1"
+                                            TickPlacement="BottomRight"
+                                            TickFrequency="10"
+                                            ValueChanged="Slider_FpsCap_ValueChanged"
+                                            Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
+                                    
+                                    <Border x:Name="FpsBubble"
+                                            Background="{ThemeResource ToolTipBackgroundThemeBrush}"
+                                            CornerRadius="4"
+                                            HorizontalAlignment="Left"
+                                            IsHitTestVisible="False"
+                                            MinWidth="48"
+                                            Padding="6,3"
+                                            VerticalAlignment="Top"
+                                            Visibility="Collapsed">
+                                        <TextBlock x:Name="FpsBubbleText"
+                                                   FontSize="12"
+                                                   Foreground="{ThemeResource ToolTipForegroundThemeBrush}"
+                                                   IsTextScaleFactorEnabled="False"
+                                                   TextAlignment="Center" />
+                                    </Border>
+                                </Grid>
                                 
                                 <Grid>
                                     <TextBlock FontSize="11"

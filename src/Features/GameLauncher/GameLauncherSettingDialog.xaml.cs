@@ -37,6 +37,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             ServerCode = entry.ServerCode,
         };
         this.InitializeComponent();
+        WireFpsBubble();
         InitializeFromConfig();
     }
 
@@ -157,6 +158,47 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     public string FpsCapText => _fpsCapEnabled
         ? $"{(int)Math.Round(_fpsSliderValue)} fps"
         : Lang.Instance.GameLauncherSettingDialog_FpsUnlimited;
+
+    
+    
+    
+    private bool _fpsDragging;
+
+    private void WireFpsBubble()
+    {
+        void Hide()
+        {
+            _fpsDragging = false;
+            FpsBubble.Visibility = Visibility.Collapsed;
+        }
+        
+        Slider_FpsCap.AddHandler(UIElement.PointerPressedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => { _fpsDragging = true; UpdateFpsBubble(); }), true);
+        Slider_FpsCap.AddHandler(UIElement.PointerReleasedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
+        Slider_FpsCap.AddHandler(UIElement.PointerCanceledEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
+        Slider_FpsCap.AddHandler(UIElement.PointerCaptureLostEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
+    }
+
+    private void Slider_FpsCap_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+    {
+        if (_fpsDragging)
+        {
+            UpdateFpsBubble();
+        }
+    }
+
+    private void UpdateFpsBubble()
+    {
+        if (Slider_FpsCap.ActualWidth <= 0)
+        {
+            return;
+        }
+        double ratio = (Slider_FpsCap.Value - Slider_FpsCap.Minimum) / (Slider_FpsCap.Maximum - Slider_FpsCap.Minimum);
+        double center = ratio * Math.Max(0, Slider_FpsCap.ActualWidth - 20) + 10;
+        FpsBubbleText.Text = $"{(int)Math.Round(Slider_FpsCap.Value)} fps";
+        
+        FpsBubble.Margin = new Thickness(Math.Max(0, center - 24), -30, 0, 0);
+        FpsBubble.Visibility = Visibility.Visible;
+    }
 
     private void WriteFpsCap(int fps)
     {
