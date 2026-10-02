@@ -310,6 +310,8 @@ internal static class LangJa
         ["FilePage_Disabled"] = "無効",
         ["FilePage_SpeedLimit"] = "速度制限",
         ["FilePage_SpeedLimitDesc"] = "0で制限なし",
+        ["FilePage_DownloadThreads"] = "マルチスレッド",
+        ["FilePage_DownloadThreadsDesc"] = "同時に張るダウンロード接続数（1〜16）。大きいほど帯域を使い切れますが、CPU・メモリ・ディスクの負荷はわずかに増えます。変更は次回のダウンロードから有効。",
 
         
         ["KuroBbs_RefreshInfo"] = "情報を更新",

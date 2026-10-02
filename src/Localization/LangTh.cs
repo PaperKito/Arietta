@@ -308,6 +308,8 @@ internal static class LangTh
         ["FilePage_Disabled"] = "ปิดอยู่",
         ["FilePage_SpeedLimit"] = "จำกัดความเร็ว",
         ["FilePage_SpeedLimitDesc"] = "0 หมายถึงไม่จำกัดความเร็ว",
+        ["FilePage_DownloadThreads"] = "มัลติเธรด",
+        ["FilePage_DownloadThreadsDesc"] = "จำนวนการเชื่อมต่อดาวน์โหลดพร้อมกัน (1-16) ยิ่งสูงยิ่งใช้แบนด์วิดท์ได้เต็มที่ขึ้น แต่โหลด CPU หน่วยความจำและดิสก์เพิ่มขึ้นเล็กน้อย การเปลี่ยนแปลงมีผลตั้งแต่การดาวน์โหลดครั้งถัดไป",
 
         
         ["KuroBbs_RefreshInfo"] = "รีเฟรชข้อมูล",

@@ -308,6 +308,8 @@ internal static class LangKo
         ["FilePage_Disabled"] = "꺼짐",
         ["FilePage_SpeedLimit"] = "속도 제한",
         ["FilePage_SpeedLimitDesc"] = "0이면 제한 없음",
+        ["FilePage_DownloadThreads"] = "멀티스레드",
+        ["FilePage_DownloadThreadsDesc"] = "동시 다운로드 연결 수(1~16). 값이 클수록 대역폭을 최대한 사용하지만 CPU·메모리·디스크 부하가 약간 늘어납니다. 변경은 다음 다운로드부터 적용됩니다.",
 
         
         ["KuroBbs_RefreshInfo"] = "정보 새로 고침",

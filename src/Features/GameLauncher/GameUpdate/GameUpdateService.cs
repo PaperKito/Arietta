@@ -787,6 +787,23 @@ public static class GameUpdateService
             : 0;
 
     
+    public const string DownloadThreadsConfigKey = "GameUpdateDownloadThreads";
+
+    
+    public const int DownloadThreadsMin = 1;
+    public const int DownloadThreadsMax = 16;
+    public const int DownloadThreadsDefault = 8;
+
+    
+    
+    
+    
+    internal static int DownloadThreads =>
+        int.TryParse(AppConfig.GetConfig(DownloadThreadsConfigKey), out int value)
+            ? Math.Clamp(value, DownloadThreadsMin, DownloadThreadsMax)
+            : DownloadThreadsDefault;
+
+    
     
     
     

@@ -55,13 +55,14 @@ public sealed class GameUpdateDownloader
     
     
     
-    private const int Parallelism = 8;
+    
+    private readonly int _parallelism = GameUpdateService.DownloadThreads;
 
     
     private const long SegmentThreshold = 64L << 20;
 
     
-    private const int MaxSegmentsPerFile = 4;
+    private readonly int _maxSegments = Math.Clamp(GameUpdateService.DownloadThreads / 2, 1, 8);
 
     
     private const long MinSegmentSize = 16L << 20;
@@ -184,7 +185,7 @@ public sealed class GameUpdateDownloader
             });
         }
 
-        using var limiter = new SemaphoreSlim(Parallelism);
+        using var limiter = new SemaphoreSlim(_parallelism);
         
         var speedLimit = new SpeedLimiter();
         
@@ -498,9 +499,11 @@ public sealed class GameUpdateDownloader
     }
 
     
-    private static int SegmentCount(long size)
+    private int SegmentCount(long size)
     {
-        return size >= SegmentThreshold ? Math.Clamp((int)(size / MinSegmentSize), 2, MaxSegmentsPerFile) : 1;
+        return size >= SegmentThreshold && _maxSegments >= 2
+            ? Math.Clamp((int)(size / MinSegmentSize), 2, _maxSegments)
+            : 1;
     }
 
     

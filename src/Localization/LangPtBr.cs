@@ -308,6 +308,8 @@ internal static class LangPtBr
         ["FilePage_Disabled"] = "Desativado",
         ["FilePage_SpeedLimit"] = "Limite de velocidade",
         ["FilePage_SpeedLimitDesc"] = "0 significa sem limite",
+        ["FilePage_DownloadThreads"] = "Multithreading",
+        ["FilePage_DownloadThreadsDesc"] = "Número de conexões de download simultâneas (1-16). Valores maiores aproveitam melhor a banda, ao custo de uma carga um pouco maior de CPU, memória e disco. As alterações valem para o próximo download.",
 
         
         ["KuroBbs_RefreshInfo"] = "Atualizar informações",

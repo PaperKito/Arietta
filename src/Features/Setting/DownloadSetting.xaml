@@ -61,6 +61,41 @@
                 </StackPanel>
             </StackPanel>
 
+            
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="18"
+                           FontWeight="Bold"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_DownloadThreads, Mode=OneWay}" />
+                <TextBlock MaxWidth="680"
+                           HorizontalAlignment="Left"
+                           FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_DownloadThreadsDesc, Mode=OneWay}"
+                           TextWrapping="Wrap" />
+                <Grid Margin="0,4,0,-6"
+                      ColumnSpacing="12"
+                      MaxWidth="360"
+                      HorizontalAlignment="Left">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider x:Name="Slider_Threads"
+                            Maximum="16"
+                            Minimum="1"
+                            StepFrequency="1"
+                            ValueChanged="Slider_Threads_ValueChanged" />
+                    <TextBlock x:Name="Text_ThreadsValue"
+                               Grid.Column="1"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               IsTextScaleFactorEnabled="False"
+                               Text="8" />
+                </Grid>
+            </StackPanel>
+
         </StackPanel>
     </ScrollViewer>
 

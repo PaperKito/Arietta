@@ -29,6 +29,7 @@ public sealed partial class DownloadSetting : PageBase
         base.OnLoaded();
         RefreshHardLink();
         RefreshSpeedLimit();
+        RefreshThreads();
     }
 
 
@@ -47,6 +48,19 @@ public sealed partial class DownloadSetting : PageBase
             AppConfig.GetConfig(GameLauncher.GameUpdate.GameUpdateService.SpeedLimitConfigKey), out double mb)
             ? mb
             : 0;
+        _restoringDownload = false;
+    }
+
+
+    private void RefreshThreads()
+    {
+        
+        _restoringDownload = true;
+        Slider_Threads.Minimum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMin;
+        Slider_Threads.Maximum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMax;
+        int threads = GameLauncher.GameUpdate.GameUpdateService.DownloadThreads;
+        Slider_Threads.Value = threads;
+        Text_ThreadsValue.Text = threads.ToString();
         _restoringDownload = false;
     }
 
@@ -77,6 +91,20 @@ public sealed partial class DownloadSetting : PageBase
         }
         AppConfig.SetConfig(GameLauncher.GameUpdate.GameUpdateService.SpeedLimitConfigKey,
             ((long)mb).ToString());
+    }
+
+
+    private void Slider_Threads_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs args)
+    {
+        
+        if (_restoringDownload)
+        {
+            return;
+        }
+        int threads = (int)Math.Round(((Slider)sender).Value);
+        Text_ThreadsValue.Text = threads.ToString();
+        AppConfig.SetConfig(GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsConfigKey,
+            threads.ToString());
     }
 
 }

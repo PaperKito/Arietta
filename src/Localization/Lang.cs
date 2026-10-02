@@ -484,6 +484,10 @@ public sealed class Lang : INotifyPropertyChanged
     public string FilePage_SpeedLimitDesc => T("0表示不限速");
 
     
+    public string FilePage_DownloadThreads => T("多线程");
+    public string FilePage_DownloadThreadsDesc => T("同时建立的下载连接数（1~16），越大越容易跑满带宽；CPU、内存占用略增，机械硬盘上过高并行会因寻道变慢。改动对下次下载生效");
+
+    
     public string KuroBbs_RefreshInfo => T("刷新信息");
     public string KuroBbs_Login => T("登录");
 

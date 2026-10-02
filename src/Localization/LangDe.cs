@@ -308,6 +308,8 @@ internal static class LangDe
         ["FilePage_Disabled"] = "Deaktiviert",
         ["FilePage_SpeedLimit"] = "Geschwindigkeitsbegrenzung",
         ["FilePage_SpeedLimitDesc"] = "0 bedeutet unbegrenzt",
+        ["FilePage_DownloadThreads"] = "Multithreading",
+        ["FilePage_DownloadThreadsDesc"] = "Anzahl gleichzeitiger Download-Verbindungen (1-16). Höhere Werte nutzen die Bandbreite besser, erhöhen CPU-, RAM- und Festplattenlast aber leicht. Änderungen greifen beim nächsten Download.",
 
         
         ["KuroBbs_RefreshInfo"] = "Infos aktualisieren",
