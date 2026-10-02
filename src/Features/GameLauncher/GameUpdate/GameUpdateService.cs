@@ -714,6 +714,12 @@ public static class GameUpdateService
 
 
     
+    
+    
+    
+    
+    
+    
     private static long GetStagedPartBytes(GameBiz biz, string version)
     {
         try
@@ -723,6 +729,31 @@ public static class GameUpdateService
             {
                 try
                 {
+                    string sidecar = path + ".s";
+                    if (File.Exists(sidecar))
+                    {
+                        byte[] bytes = File.ReadAllBytes(sidecar);
+                        if (bytes.Length > 0 && bytes.Length % sizeof(long) == 0)
+                        {
+                            long sum = 0;
+                            bool valid = true;
+                            for (int offset = 0; offset + sizeof(long) <= bytes.Length; offset += sizeof(long))
+                            {
+                                long value = BitConverter.ToInt64(bytes, offset);
+                                if (value < 0)
+                                {
+                                    valid = false;
+                                    break;
+                                }
+                                sum += value;
+                            }
+                            if (valid)
+                            {
+                                total += sum;
+                                continue;
+                            }
+                        }
+                    }
                     total += new FileInfo(path).Length;
                 }
                 catch

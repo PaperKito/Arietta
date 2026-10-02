@@ -51,7 +51,23 @@ public sealed class GameDownloadProgress
 public sealed class GameUpdateDownloader
 {
     
-    private const int Parallelism = 3;
+    
+    
+    
+    
+    private const int Parallelism = 8;
+
+    
+    private const long SegmentThreshold = 64L << 20;
+
+    
+    private const int MaxSegmentsPerFile = 4;
+
+    
+    private const long MinSegmentSize = 16L << 20;
+
+    
+    private const long SegmentFlushBytes = 4L << 20;
 
     private const string TempSuffix = ".part";
 
@@ -112,11 +128,19 @@ public sealed class GameUpdateDownloader
     }
 
     
+    
+    
+    
     private long PartBytes(GameResourceEntry file)
     {
         try
         {
             string temp = Path.Combine(_destDir, file.Dest) + TempSuffix;
+            int segCount = SegmentCount(file.Size);
+            if (segCount > 1)
+            {
+                return ReadSegmentProgress(temp + ".s", segCount, file.Size)?.Sum() ?? 0;
+            }
             return File.Exists(temp) ? Math.Min(new FileInfo(temp).Length, file.Size) : 0;
         }
         catch
@@ -163,43 +187,46 @@ public sealed class GameUpdateDownloader
         using var limiter = new SemaphoreSlim(Parallelism);
         
         var speedLimit = new SpeedLimiter();
-        var tasks = _files.Select(file => Task.Run(async () =>
+        
+        var tasks = _files.OrderByDescending(f => f.Size).Select(file => Task.Run(async () =>
         {
-            await limiter.WaitAsync(ct);
-            try
+            
+            
+            
+            bool segmented = file.Size >= SegmentThreshold;
+            for (int attempt = 1; ; attempt++)
             {
-                
-                
-                long got = 0;
-                for (int attempt = 1; ; attempt++)
+                try
                 {
-                    try
+                    if (segmented)
                     {
-                        got = await DownloadOneAsync(file, speedMeter, speedLimit, ct);
-                        break;
+                        await DownloadSegmentedAsync(file, limiter, speedMeter, speedLimit, ct);
                     }
-                    catch (OperationCanceledException)
+                    else
                     {
-                        throw;
+                        await DownloadWholeAsync(file, limiter, speedMeter, speedLimit, ct);
                     }
-                    catch (Exception ex) when (attempt < MaxAttempts)
-                    {
-                        _logger.LogWarning(ex, "下载失败，重试 {Attempt}/{Max}：{Dest}", attempt, MaxAttempts - 1, file.Dest);
-                        await Task.Delay(TimeSpan.FromSeconds(attempt), ct);
-                    }
+                    break;
                 }
-                if (got > 0)
+                catch (OperationCanceledException)
                 {
-                    Interlocked.Add(ref _received, got);
-                    Interlocked.Add(ref _newBytes, got);
+                    throw;
                 }
-                Interlocked.Increment(ref completed);
-                Report(Path.GetFileName(file.Dest), force: true);
+                catch (RangeUnsupportedException ex) when (segmented)
+                {
+                    
+                    Interlocked.Add(ref _received, -DeleteSegmentState(file));
+                    segmented = false;
+                    _logger.LogWarning(ex, "{Dest} 服务器不支持 Range，改回单流下载", file.Dest);
+                }
+                catch (Exception ex) when (attempt < MaxAttempts)
+                {
+                    _logger.LogWarning(ex, "下载失败，重试 {Attempt}/{Max}：{Dest}", attempt, MaxAttempts - 1, file.Dest);
+                    await Task.Delay(TimeSpan.FromSeconds(attempt), ct);
+                }
             }
-            finally
-            {
-                limiter.Release();
-            }
+            Interlocked.Increment(ref completed);
+            Report(Path.GetFileName(file.Dest), force: true);
         }, ct));
         await Task.WhenAll(tasks);
         Report(null, force: true);
@@ -207,7 +234,10 @@ public sealed class GameUpdateDownloader
     }
 
     
-    private async Task<long> DownloadOneAsync(GameResourceEntry file, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
+    
+    
+    
+    private async Task DownloadWholeAsync(GameResourceEntry file, SemaphoreSlim limiter, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
     {
         string dest = Path.Combine(_destDir, file.Dest);
         string temp = dest + TempSuffix;
@@ -218,22 +248,202 @@ public sealed class GameUpdateDownloader
         
         if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5))
         {
-            return 0;
+            return;
         }
 
-        long existing = File.Exists(temp) ? new FileInfo(temp).Length : 0;
+        await limiter.WaitAsync(ct);
+        try
+        {
+            long existing = File.Exists(temp) ? new FileInfo(temp).Length : 0;
+
+            
+            string baseUrl = file.FromFolder ?? _fallbackBaseUrl ?? _baseUrl;
+            string url = GameUpdateService.BuildFileUrl(_cdn, baseUrl, file.Dest);
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            if (existing > 0 && existing < file.Size)
+            {
+                request.Headers.Range = new RangeHeaderValue(existing, null);
+            }
+
+            
+            
+            using var stallCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            stallCts.CancelAfter(ReadStallTimeout);
+            HttpResponseMessage resp;
+            try
+            {
+                resp = await GameUpdateService.SharedClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, stallCts.Token);
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                throw new IOException($"下载连接超时（{ReadStallTimeout.TotalSeconds:s}s 无响应）：{file.Dest}");
+            }
+            using (resp)
+            {
+                resp.EnsureSuccessStatusCode();
+                bool resuming = existing > 0 && resp.StatusCode == HttpStatusCode.PartialContent;
+                if (!resuming && File.Exists(temp))
+                {
+                    
+                    File.Delete(temp);
+                    Interlocked.Add(ref _received, -existing);
+                    existing = 0;
+                }
+
+                long downloadedNow = 0;
+                await using (var source = await resp.Content.ReadAsStreamAsync(ct))
+                await using (var output = new FileStream(temp, resuming ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 1 << 16))
+                {
+                    var buffer = new byte[1 << 16];
+                    int read;
+                    try
+                    {
+                        while ((read = await source.ReadAsync(buffer, stallCts.Token)) > 0)
+                        {
+                            await speedLimit.WaitAsync(read, ct);
+                            await output.WriteAsync(buffer.AsMemory(0, read), ct);
+                            downloadedNow += read;
+                            Interlocked.Add(ref _received, read);
+                            Interlocked.Add(ref _newBytes, read);
+                            speedMeter.Add(read);
+                            stallCts.CancelAfter(ReadStallTimeout);
+                        }
+                    }
+                    catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+                    {
+                        throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:s}s 无数据）：{file.Dest}（已收 {downloadedNow} 字节）");
+                    }
+                }
+
+            
+            if (new FileInfo(temp).Length != file.Size)
+            {
+                throw new InvalidDataException($"下载大小不符：{file.Dest}（期望 {file.Size}，实际 {new FileInfo(temp).Length}）");
+            }
+            if (file.Md5 is not null && !VerifyMd5(temp, file.Md5))
+            {
+                
+                long bad = new FileInfo(temp).Length;
+                File.Delete(temp);
+                Interlocked.Add(ref _received, -bad);
+                Interlocked.Add(ref _newBytes, -downloadedNow);
+                throw new InvalidDataException($"下载 MD5 校验失败：{file.Dest}");
+            }
+            if (File.Exists(dest))
+            {
+                File.Delete(dest);
+            }
+            File.Move(temp, dest);
+            }
+        }
+        finally
+        {
+            limiter.Release();
+        }
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    private async Task DownloadSegmentedAsync(GameResourceEntry file, SemaphoreSlim limiter, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
+    {
+        string dest = Path.Combine(_destDir, file.Dest);
+        string temp = dest + TempSuffix;
+        string sidecar = temp + ".s";
+        Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
+
+        if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5))
+        {
+            try { File.Delete(sidecar); } catch {  }
+            return;
+        }
+
+        int segCount = SegmentCount(file.Size);
+        long segSize = file.Size / segCount;
+        long[]? loaded = ReadSegmentProgress(sidecar, segCount, file.Size);
+        if (loaded == null || !File.Exists(temp) || new FileInfo(temp).Length != file.Size)
+        {
+            
+            
+            Interlocked.Add(ref _received, -(loaded?.Sum() ?? 0));
+            try { File.Delete(temp); } catch {  }
+            try { File.Delete(sidecar); } catch {  }
+            loaded = new long[segCount];
+            using (var fs = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                fs.SetLength(file.Size);
+            }
+        }
+        long[] progress = loaded;
+        long startDone = progress.Sum();
+
+        var segments = new Task[segCount];
+        for (int i = 0; i < segCount; i++)
+        {
+            int index = i;
+            long from = index * segSize;
+            long to = index == segCount - 1 ? file.Size : from + segSize;
+            segments[index] = Task.Run(async () =>
+            {
+                long done = Math.Min(progress[index], to - from);
+                if (done >= to - from)
+                {
+                    return; 
+                }
+                await limiter.WaitAsync(ct);
+                try
+                {
+                    await DownloadRangeAsync(file, temp, sidecar, index, from + done, to, progress, speedMeter, speedLimit, ct);
+                }
+                finally
+                {
+                    limiter.Release();
+                }
+            }, ct);
+        }
+        await Task.WhenAll(segments);
 
         
+        for (int i = 0; i < segCount; i++)
+        {
+            long len = i == segCount - 1 ? file.Size - (segCount - 1) * segSize : segSize;
+            if (progress[i] < len)
+            {
+                throw new InvalidDataException($"分段下载不完整：{file.Dest}（段 {i} 缺 {len - progress[i]} 字节）");
+            }
+        }
+        if (file.Md5 is not null && !VerifyMd5(temp, file.Md5))
+        {
+            
+            File.Delete(temp);
+            File.Delete(sidecar);
+            Interlocked.Add(ref _received, -file.Size);
+            Interlocked.Add(ref _newBytes, -(file.Size - startDone));
+            throw new InvalidDataException($"下载 MD5 校验失败：{file.Dest}");
+        }
+        File.Delete(sidecar);
+        if (File.Exists(dest))
+        {
+            File.Delete(dest);
+        }
+        File.Move(temp, dest);
+    }
+
+    
+    private async Task DownloadRangeAsync(GameResourceEntry file, string temp, string sidecar, int segIndex,
+        long from, long to, long[] progress, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
+    {
         string baseUrl = file.FromFolder ?? _fallbackBaseUrl ?? _baseUrl;
         string url = GameUpdateService.BuildFileUrl(_cdn, baseUrl, file.Dest);
         using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        if (existing > 0 && existing < file.Size)
-        {
-            request.Headers.Range = new RangeHeaderValue(existing, null);
-        }
+        request.Headers.Range = new RangeHeaderValue(from, to - 1);
 
-        
-        
         using var stallCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         stallCts.CancelAfter(ReadStallTimeout);
         HttpResponseMessage resp;
@@ -247,56 +457,125 @@ public sealed class GameUpdateDownloader
         }
         using (resp)
         {
-            resp.EnsureSuccessStatusCode();
-            bool resuming = existing > 0 && resp.StatusCode == HttpStatusCode.PartialContent;
-            if (!resuming && File.Exists(temp))
+            if (resp.StatusCode != HttpStatusCode.PartialContent)
             {
                 
-                File.Delete(temp);
-                Interlocked.Add(ref _received, -existing);
-                existing = 0;
+                throw new RangeUnsupportedException($"服务器不认 Range（HTTP {(int)resp.StatusCode}）：{file.Dest}");
             }
+            await using var source = await resp.Content.ReadAsStreamAsync(ct);
+            
+            await using var output = new FileStream(temp, FileMode.Open, FileAccess.Write, FileShare.ReadWrite, 1 << 16);
+            output.Seek(from, SeekOrigin.Begin);
 
-            long downloadedNow = 0;
-            await using (var source = await resp.Content.ReadAsStreamAsync(ct))
-            await using (var output = new FileStream(temp, resuming ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 1 << 16))
+            var buffer = new byte[1 << 16];
+            long pending = 0;
+            int read;
+            try
             {
-                var buffer = new byte[1 << 16];
-                int read;
-                try
+                while ((read = await source.ReadAsync(buffer, stallCts.Token)) > 0)
                 {
-                    while ((read = await source.ReadAsync(buffer, stallCts.Token)) > 0)
+                    await speedLimit.WaitAsync(read, ct);
+                    await output.WriteAsync(buffer.AsMemory(0, read), ct);
+                    Interlocked.Add(ref _received, read);
+                    Interlocked.Add(ref _newBytes, read);
+                    speedMeter.Add(read);
+                    progress[segIndex] += read; 
+                    pending += read;
+                    if (pending >= SegmentFlushBytes)
                     {
-                        await speedLimit.WaitAsync(read, ct);
-                        await output.WriteAsync(buffer.AsMemory(0, read), ct);
-                        downloadedNow += read;
-                        speedMeter.Add(read);
-                        stallCts.CancelAfter(ReadStallTimeout);
+                        WriteSegmentProgress(sidecar, progress);
+                        pending = 0;
                     }
-                }
-                catch (OperationCanceledException) when (!ct.IsCancellationRequested)
-                {
-                    throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:s}s 无数据）：{file.Dest}（已收 {downloadedNow} 字节）");
+                    stallCts.CancelAfter(ReadStallTimeout);
                 }
             }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:s}s 无数据）：{file.Dest}（段 {segIndex} 已收 {progress[segIndex]} 字节）");
+            }
+            WriteSegmentProgress(sidecar, progress);
+        }
+    }
 
-        
-        if (new FileInfo(temp).Length != file.Size)
+    
+    private static int SegmentCount(long size)
+    {
+        return size >= SegmentThreshold ? Math.Clamp((int)(size / MinSegmentSize), 2, MaxSegmentsPerFile) : 1;
+    }
+
+    
+    
+    
+    
+    private static long[]? ReadSegmentProgress(string sidecar, int segCount, long fileSize)
+    {
+        try
         {
-            throw new InvalidDataException($"下载大小不符：{file.Dest}（期望 {file.Size}，实际 {new FileInfo(temp).Length}）");
+            if (!File.Exists(sidecar))
+            {
+                return null;
+            }
+            byte[] bytes = File.ReadAllBytes(sidecar);
+            if (bytes.Length != segCount * sizeof(long))
+            {
+                return null;
+            }
+            long segSize = fileSize / segCount;
+            var progress = new long[segCount];
+            for (int i = 0; i < segCount; i++)
+            {
+                long value = BitConverter.ToInt64(bytes, i * sizeof(long));
+                long max = i == segCount - 1 ? fileSize - (segCount - 1) * segSize : segSize;
+                if (value < 0 || value > max)
+                {
+                    return null;
+                }
+                progress[i] = value;
+            }
+            return progress;
         }
-        if (file.Md5 is not null && !VerifyMd5(temp, file.Md5))
+        catch
         {
-            File.Delete(temp);
-            throw new InvalidDataException($"下载 MD5 校验失败：{file.Dest}");
+            return null;
         }
-        if (File.Exists(dest))
+    }
+
+    
+    private static void WriteSegmentProgress(string sidecar, long[] progress)
+    {
+        try
         {
-            File.Delete(dest);
+            var bytes = new byte[progress.Length * sizeof(long)];
+            for (int i = 0; i < progress.Length; i++)
+            {
+                BitConverter.GetBytes(progress[i]).CopyTo(bytes, i * sizeof(long));
+            }
+            lock (progress)
+            {
+                File.WriteAllBytes(sidecar, bytes);
+            }
         }
-        File.Move(temp, dest);
-            return downloadedNow;
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "段进度落盘失败：{Sidecar}", sidecar);
         }
+    }
+
+    
+    private long DeleteSegmentState(GameResourceEntry file)
+    {
+        string temp = Path.Combine(_destDir, file.Dest) + TempSuffix;
+        string sidecar = temp + ".s";
+        long sum = ReadSegmentProgress(sidecar, SegmentCount(file.Size), file.Size)?.Sum() ?? 0;
+        try { File.Delete(temp); } catch {  }
+        try { File.Delete(sidecar); } catch {  }
+        return sum;
+    }
+
+    
+    private sealed class RangeUnsupportedException : IOException
+    {
+        public RangeUnsupportedException(string message) : base(message) { }
     }
 
     
