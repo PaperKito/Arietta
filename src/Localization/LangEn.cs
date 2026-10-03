@@ -285,7 +285,6 @@ internal static class LangEn
         ["InstallGameDialog_TierUHD"] = "UHD (Extreme)",
         ["InstallGameDialog_TierHD"] = "HD (High)",
         ["InstallGameDialog_TierSD"] = "SD (Smooth)",
-        ["GameUpdate_ResumeInstall"] = "Unfinished installation of {0} detected, resuming from the previous directory",
         ["GameLauncherPage_GameIsRunning"] = "The game is running",
 
         

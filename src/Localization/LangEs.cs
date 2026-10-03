@@ -303,7 +303,6 @@ internal static class LangEs
         
         ["FilePage_HardLink"] = "Vínculos físicos",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Los archivos idénticos de otros clientes de región en el mismo disco se reutilizarán mediante vínculos físicos. Descarga estimada: unos {0}. Solo es una estimación; rige la verificación por archivo durante la instalación.",
-        ["GameUpdate_ResumeInstall"] = "Se detectó una instalación sin terminar de {0}; se continúa desde el directorio anterior",
 ["FilePage_HardLinkDesc"] = "Al instalar varios clientes en el mismo disco, los archivos idénticos se vinculan físicamente para reducir el almacenamiento",
         ["FilePage_Enabled"] = "Activado",
         ["FilePage_Disabled"] = "Desactivado",

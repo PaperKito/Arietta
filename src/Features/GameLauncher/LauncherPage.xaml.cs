@@ -984,8 +984,8 @@ public sealed partial class LauncherPage : PageBase
             if (persisted is not null
                 && Directory.Exists(Path.Combine(persisted, "predownload", state.TargetVersion)))
             {
+                
                 StartInstallSession(biz, state, persisted, GameUpdateService.GetInstallTier(biz));
-                InAppToast.MainWindow?.Information(string.Format(Lang.Instance.GameUpdate_ResumeInstall, state.TargetVersion));
                 return;
             }
 

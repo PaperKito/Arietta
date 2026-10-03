@@ -303,7 +303,6 @@ internal static class LangKo
         
         ["FilePage_HardLink"] = "하드 링크",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "같은 디스크의 다른 리전 클라이언트와 동일한 파일은 하드링크로 재사용됩니다. 예상 다운로드는 약 {0}이며, 실제는 설치 시 파일별 검증 기준입니다.",
-        ["GameUpdate_ResumeInstall"] = "완료되지 않은 설치({0})가 감지되어 이전 폴더에서 계속합니다",
 ["FilePage_HardLinkDesc"] = "같은 디스크에 여러 클라이언트를 설치할 때 동일 파일을 하드링크하여 저장 공간 사용을 줄입니다",
         ["FilePage_Enabled"] = "켜짐",
         ["FilePage_Disabled"] = "꺼짐",

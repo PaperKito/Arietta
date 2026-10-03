@@ -308,7 +308,6 @@ internal static class LangHant
         
         ["FilePage_HardLink"] = "硬連結",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "同磁碟其它區服客戶端的相同檔案將直接硬連結複用，預計實際需下載約 {0}；該值僅為預估值，實際以下載時逐檔案校驗為準。",
-        ["GameUpdate_ResumeInstall"] = "偵測到未完成的安裝（{0}），已從上次目錄繼續",
 ["FilePage_HardLinkDesc"] = "同磁碟安裝多個用戶端時，硬連結相同檔案，從而減少佔用的儲存空間",
         ["FilePage_Enabled"] = "已啟用",
         ["FilePage_Disabled"] = "已停用",
