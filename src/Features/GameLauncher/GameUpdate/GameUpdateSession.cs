@@ -3,6 +3,7 @@ using Arietta.Core;
 using Arietta.Helpers;
 using Arietta.Localization;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,6 +36,9 @@ public sealed class GameUpdateSession
 
     private readonly object _gate = new();
     private CancellationTokenSource? _cts;
+
+    
+    private long _cancelRequestedTimestamp;
 
 
     public bool IsBusy { get; private set; }
@@ -136,6 +140,9 @@ public sealed class GameUpdateSession
         {
             cts = _cts;
         }
+        
+        Interlocked.CompareExchange(ref _cancelRequestedTimestamp, Stopwatch.GetTimestamp(), 0);
+        AppConfig.GetLogger<GameUpdateSession>().LogInformation("暂停请求已发出");
         try
         {
             cts?.Cancel();
@@ -197,6 +204,12 @@ public sealed class GameUpdateSession
                 _cts = null;
             }
             IsApplying = false;
+            long cancelTs = Interlocked.Exchange(ref _cancelRequestedTimestamp, 0);
+            if (cancelTs != 0)
+            {
+                double ms = (Stopwatch.GetTimestamp() - cancelTs) * 1000.0 / Stopwatch.Frequency;
+                AppConfig.GetLogger<GameUpdateSession>().LogInformation("会话结束（暂停响应 {Ms:0}ms）", ms);
+            }
             Changed?.Invoke(this, EventArgs.Empty);
         }
     }

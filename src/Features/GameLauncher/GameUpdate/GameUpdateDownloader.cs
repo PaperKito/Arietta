@@ -62,7 +62,11 @@ public sealed class GameUpdateDownloader
     private const long SegmentThreshold = 64L << 20;
 
     
-    private readonly int _maxSegments = Math.Clamp(GameUpdateService.DownloadThreads / 2, 1, 8);
+    
+    
+    
+    
+    private readonly int _maxSegments = GameUpdateService.DownloadThreads <= 1 ? 1 : 4;
 
     
     private const long MinSegmentSize = 16L << 20;

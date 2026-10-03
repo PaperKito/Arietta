@@ -695,6 +695,11 @@ public sealed partial class LauncherPage : PageBase
                     Button_StartGame.GameCommand = StartGameCommand;
                 }
                 UpdateGameState();
+                
+                
+                
+                
+                RenderUpdateState();
                 _ = RefreshUpdateStateAsync();
                 return;
             }
