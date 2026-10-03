@@ -96,6 +96,7 @@ public sealed class Lang : INotifyPropertyChanged
 
     
     public string SettingPage_Gamepad => T("手柄");
+    public string GamepadPage_Title => T("手柄映射");
     public string GamepadPage_Enable => T("启用手柄功能");
     public string GamepadPage_Guide => T("Guide 键（Xbox 徽标键）");
     public string GamepadPage_Share => T("Share 键（分享键）");

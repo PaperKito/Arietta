@@ -38,6 +38,7 @@ internal static class LangEn
 
         
         ["SettingPage_Gamepad"] = "Gamepad",
+        ["GamepadPage_Title"] = "Gamepad Mapping",
         ["GamepadPage_Enable"] = "Enable gamepad",
         ["GamepadPage_Guide"] = "Guide button (Xbox logo)",
         ["GamepadPage_Share"] = "Share button",

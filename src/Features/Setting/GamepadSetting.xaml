@@ -20,7 +20,7 @@
                 <TextBlock VerticalAlignment="Center"
                            FontSize="20"
                            FontWeight="Bold"
-                           Text="{x:Bind lang:Lang.Instance.SettingPage_Gamepad}" />
+                           Text="{x:Bind lang:Lang.Instance.GamepadPage_Title}" />
                 <ToggleSwitch x:Name="Toggle_Enable"
                               VerticalAlignment="Center"
                               Toggled="Toggle_Enable_Toggled" />
