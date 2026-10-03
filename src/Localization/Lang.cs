@@ -96,16 +96,16 @@ public sealed class Lang : INotifyPropertyChanged
 
     
     public string SettingPage_Gamepad => T("手柄映射");
-    public string GamepadPage_Desc => T("把手柄的 Guide（Xbox 徽标键）或 Share（分享键）映射成键盘组合键——这两个键是系统保留键，游戏收不到，映射后不影响游戏内操作。适合用手柄游玩时触发截图等组合键。");
+    public string GamepadPage_Desc => T("把手柄的 Guide（Xbox 徽标键）或 Share（分享键）映射为键盘组合键。这两个键是系统专用键，游戏本身收不到，映射后不会占用游戏内任何操作，适合用手柄游玩时触发截图（Win+Shift+S）等快捷键。");
     public string GamepadPage_Enable => T("启用手柄映射");
     public string GamepadPage_Guide => T("Guide 键（Xbox 徽标键）");
     public string GamepadPage_Share => T("Share 键（分享键）");
-    public string GamepadPage_KeysPlaceholder => T("键盘组合键，空格分隔，例如：Win Shift S（留空 = 不映射）");
+    public string GamepadPage_KeysPlaceholder => T("键盘组合键，如 Win Shift S（空格分隔，留空不映射）");
     public string GamepadPage_BadKey => T("无法识别按键：{0}");
-    public string GamepadPage_NeedRedist => T("当前系统缺少 GameInput 运行库，安装后重启启动器即可启用手柄映射（Win10 需要，Win11 系统自带）。");
-    public string GamepadPage_RedistOutdate => T("已安装的 GameInput 运行库版本过旧，请下载安装新版后重启启动器。");
+    public string GamepadPage_NeedRedist => T("缺少手柄映射依赖的 GameInput 运行库（Win11 系统自带，Win10 需手动安装）。请点击下方链接下载安装，完成后重启启动器。");
+    public string GamepadPage_RedistOutdate => T("已安装的 GameInput 运行库版本过旧，请点击下方链接安装新版，完成后重启启动器。");
     public string GamepadPage_RedistLink => T("下载 GameInputRedist.msi");
-    public string GamepadPage_ShareNote => T("提示：映射 Share 键时，Xbox Game Bar 的自带截图可能仍会同时触发（系统限制），建议优先使用 Guide 键。");
+    public string GamepadPage_ShareNote => T("注意：由于系统限制，映射 Share 键后，Xbox Game Bar 的自带截图可能仍会同时触发，造成重复截图，建议优先使用 Guide 键。");
 
     
     public string KuroBbs => T("库街区");

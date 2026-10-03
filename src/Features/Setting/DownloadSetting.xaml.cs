@@ -97,7 +97,7 @@ public sealed partial class DownloadSetting : PageBase
     private void Slider_Threads_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs args)
     {
         
-        if (_restoringDownload)
+        if (_restoringDownload || Text_ThreadsValue is null)
         {
             return;
         }
