@@ -1,12 +1,10 @@
-# Arietta
+简体中文 | [English](./README.en.md)
 
-简体中文 | [English](README.en.md)
+# Arietta
 
 > 名字取自意大利语 *arietta*（*aria* 的指小形式，即「小咏叹调」；该词另有「微风」之义）
 
 Arietta 旨在解决官方启动器的不足，它支持 Kuro Games 旗下所有的 PC 游戏（鸣潮，战双帕弥什）。
-
-界面支持 10 种语言：简体中文、繁體中文、English、日本語、한국어、Français、Deutsch、Español、ไทย、Português (Brasil)；首次启动跟随系统语言，之后可在设置中更改。
 
 除启动器的基本功能外，我根据个人需求增加了额外功能，例如：
 

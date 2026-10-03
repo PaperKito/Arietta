@@ -1,12 +1,10 @@
-# Arietta
+English | [简体中文](./README.md)
 
-English | [简体中文](README.md)
+# Arietta
 
 > The name comes from Italian *arietta* — the diminutive of *aria* ("a little aria"); the word also means "a light breeze".
 
 Arietta aims to make up for what the official launcher is missing. It supports all Kuro Games PC titles (Wuthering Waves, Punishing: Gray Raven).
-
-The UI ships in 10 languages: Simplified Chinese, Traditional Chinese, English, 日本語, 한국어, Français, Deutsch, Español, ไทย, Português (Brasil). It follows the system language on first launch and can be changed any time in Settings.
 
 Besides the launcher basics, I added extra features driven by my own needs, for example:
 
