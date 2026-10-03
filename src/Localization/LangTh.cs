@@ -481,8 +481,8 @@ internal static class LangTh
         ["GameBiz_ShortTaiwan"] = "เซิร์ฟเวอร์ไต้หวัน",
 
         
-        ["GachaPool_CharacterEvent"] = "อัญเชิญอีเวนต์ตัวละคร",
-        ["GachaPool_WeaponEvent"] = "อัญเชิญอีเวนต์อาวุธ",
+        ["GachaPool_CharacterEvent"] = "อัญเชิญเรโซเนเตอร์ลิมิเต็ด",
+        ["GachaPool_WeaponEvent"] = "อัญเชิญอาวุธลิมิเต็ด",
         ["GachaPool_CharacterStandard"] = "อัญเชิญตัวละครประจำ",
         ["GachaPool_WeaponStandard"] = "อัญเชิญอาวุธประจำ",
         ["GachaPool_Novice"] = "อัญเชิญมือใหม่",

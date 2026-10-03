@@ -277,7 +277,7 @@ public sealed class GameUpdateDownloader
             }
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
-                throw new IOException($"下载连接超时（{ReadStallTimeout.TotalSeconds:s}s 无响应）：{file.Dest}");
+                throw new IOException($"下载连接超时（{ReadStallTimeout.TotalSeconds:0}s 无响应）：{file.Dest}");
             }
             using (resp)
             {
@@ -312,7 +312,7 @@ public sealed class GameUpdateDownloader
                     }
                     catch (OperationCanceledException) when (!ct.IsCancellationRequested)
                     {
-                        throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:s}s 无数据）：{file.Dest}（已收 {downloadedNow} 字节）");
+                        throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:0}s 无数据）：{file.Dest}（已收 {downloadedNow} 字节）");
                     }
                 }
 
@@ -454,7 +454,7 @@ public sealed class GameUpdateDownloader
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
-            throw new IOException($"下载连接超时（{ReadStallTimeout.TotalSeconds:s}s 无响应）：{file.Dest}");
+            throw new IOException($"下载连接超时（{ReadStallTimeout.TotalSeconds:0}s 无响应）：{file.Dest}");
         }
         using (resp)
         {
@@ -492,7 +492,7 @@ public sealed class GameUpdateDownloader
             }
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
-                throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:s}s 无数据）：{file.Dest}（段 {segIndex} 已收 {progress[segIndex]} 字节）");
+                throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:0}s 无数据）：{file.Dest}（段 {segIndex} 已收 {progress[segIndex]} 字节）");
             }
             WriteSegmentProgress(sidecar, progress);
         }

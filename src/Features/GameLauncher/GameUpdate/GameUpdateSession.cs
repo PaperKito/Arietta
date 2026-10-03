@@ -172,9 +172,16 @@ public sealed class GameUpdateSession
                 InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_Done, state.TargetVersion));
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
             
+        }
+        catch (OperationCanceledException ex)
+        {
+            
+            
+            AppConfig.GetLogger<GameUpdateSession>().LogWarning(ex, "游戏更新非用户取消而中止 {Biz}", biz);
+            InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_UpdateGame);
         }
         catch (Exception ex)
         {

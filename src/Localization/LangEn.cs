@@ -536,17 +536,20 @@ internal static class LangEn
         ["GameBiz_ShortTaiwan"] = "Taiwan Server",
 
         
-        ["GachaPool_CharacterEvent"] = "Character Event Convene",
-        ["GachaPool_WeaponEvent"] = "Weapon Event Convene",
-        ["GachaPool_CharacterStandard"] = "Standard Character Convene",
+        
+        
+        
+        ["GachaPool_CharacterEvent"] = "Featured Resonator Convene",
+        ["GachaPool_WeaponEvent"] = "Featured Weapon Convene",
+        ["GachaPool_CharacterStandard"] = "Standard Resonator Convene",
         ["GachaPool_WeaponStandard"] = "Standard Weapon Convene",
         ["GachaPool_Novice"] = "Novice Convene",
-        ["GachaPool_NoviceChoice"] = "Novice Choice Convene",
-        ["GachaPool_NoviceGratitude"] = "Novice Choice Convene (Gratitude Convene)",
+        ["GachaPool_NoviceChoice"] = "Beginner's Choice Convene",
+        ["GachaPool_NoviceGratitude"] = "Beginner's Choice Convene (Gratitude Convene)",
         ["GachaPool_CharacterRookie"] = "Character Rookie Convene",
         ["GachaPool_WeaponRookie"] = "Weapon Rookie Convene",
-        ["GachaPool_CharacterCollab"] = "Character Collab Convene",
-        ["GachaPool_WeaponCollab"] = "Weapon Collab Convene",
+        ["GachaPool_CharacterCollab"] = "Collab Resonator Convene",
+        ["GachaPool_WeaponCollab"] = "Collab Weapon Convene",
         ["GachaPool_CharacterRevisit"] = "Character Revisit Convene",
         ["GachaPool_WeaponRevisit"] = "Weapon Revisit Convene",
         ["GachaPool_Unknown"] = "Pool {0}",

@@ -481,8 +481,8 @@ internal static class LangEs
         ["GameBiz_ShortTaiwan"] = "Servidor Taiwán",
 
         
-        ["GachaPool_CharacterEvent"] = "Invocación de evento de personaje",
-        ["GachaPool_WeaponEvent"] = "Invocación de evento de arma",
+        ["GachaPool_CharacterEvent"] = "Invocación de Resonadores destacada",
+        ["GachaPool_WeaponEvent"] = "Invocación de armas destacada",
         ["GachaPool_CharacterStandard"] = "Invocación estándar de personaje",
         ["GachaPool_WeaponStandard"] = "Invocación estándar de arma",
         ["GachaPool_Novice"] = "Invocación de novato",

@@ -130,6 +130,29 @@ public static class GachaPools
     };
 
     
+    
+    
+    
+    private static readonly Dictionary<string, string> LegacyNameToId = new()
+    {
+        ["Character Event Convene"] = CharacterEvent,
+        ["Weapon Event Convene"] = WeaponEvent,
+        ["Standard Character Convene"] = CharacterStandard,
+        ["Novice Choice Convene"] = NoviceChoice,
+        ["Novice Choice Convene (Gratitude Convene)"] = NoviceGratitude,
+        ["Character Collab Convene"] = CharacterCollab,
+        ["Weapon Collab Convene"] = WeaponCollab,
+        ["Convocation d'événement de personnage"] = CharacterEvent,
+        ["Convocation d'événement d'arme"] = WeaponEvent,
+        ["Charakter-Event-Einberufung"] = CharacterEvent,
+        ["Waffen-Event-Einberufung"] = WeaponEvent,
+        ["Invocación de evento de personaje"] = CharacterEvent,
+        ["Invocación de evento de arma"] = WeaponEvent,
+        ["อัญเชิญอีเวนต์ตัวละคร"] = CharacterEvent,
+        ["อัญเชิญอีเวนต์อาวุธ"] = WeaponEvent,
+    };
+
+    
     public static string GetName(string poolId)
     {
         return poolId switch
@@ -169,6 +192,10 @@ public static class GachaPools
         if (CnNameToId.TryGetValue(nameOrId, out var cnId))
         {
             return cnId;
+        }
+        if (LegacyNameToId.TryGetValue(nameOrId, out var legacyId))
+        {
+            return legacyId;
         }
         foreach (var poolId in DisplayOrder)
         {

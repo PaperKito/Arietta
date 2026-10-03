@@ -481,8 +481,8 @@ internal static class LangFr
         ["GameBiz_ShortTaiwan"] = "Serveur Taïwan",
 
         
-        ["GachaPool_CharacterEvent"] = "Convocation d'événement de personnage",
-        ["GachaPool_WeaponEvent"] = "Convocation d'événement d'arme",
+        ["GachaPool_CharacterEvent"] = "Convier des Personnages à durée limitée",
+        ["GachaPool_WeaponEvent"] = "Convier des Armes à durée limitée",
         ["GachaPool_CharacterStandard"] = "Convocation standard de personnage",
         ["GachaPool_WeaponStandard"] = "Convocation standard d'arme",
         ["GachaPool_Novice"] = "Convocation de novice",

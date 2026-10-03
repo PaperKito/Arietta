@@ -481,8 +481,8 @@ internal static class LangDe
         ["GameBiz_ShortTaiwan"] = "Taiwan Server",
 
         
-        ["GachaPool_CharacterEvent"] = "Charakter-Event-Einberufung",
-        ["GachaPool_WeaponEvent"] = "Waffen-Event-Einberufung",
+        ["GachaPool_CharacterEvent"] = "Hervorgehobenes Resonator-Zusammenrufen",
+        ["GachaPool_WeaponEvent"] = "Hervorgehobenes Waffen-Zusammenrufen",
         ["GachaPool_CharacterStandard"] = "Standard-Charakter-Einberufung",
         ["GachaPool_WeaponStandard"] = "Standard-Waffen-Einberufung",
         ["GachaPool_Novice"] = "Neulings-Einberufung",
