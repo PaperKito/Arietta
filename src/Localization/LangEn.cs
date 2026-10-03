@@ -38,16 +38,16 @@ internal static class LangEn
 
         
         ["SettingPage_Gamepad"] = "Gamepad Mapping",
-        ["GamepadPage_Desc"] = "Map the controller's Guide (Xbox logo) or Share button to a keyboard shortcut. These are system-reserved buttons that games never receive, so mapping them doesn't affect in-game controls. Useful for triggering screenshot shortcuts while playing on a controller.",
+        ["GamepadPage_Desc"] = "Map your controller's Guide (Xbox logo) or Share button to a keyboard shortcut. These two buttons are reserved for the system and never reach games, so mapping them doesn't interfere with in-game controls — handy for triggering shortcuts like a screenshot (Win+Shift+S) while playing on a controller.",
         ["GamepadPage_Enable"] = "Enable gamepad mapping",
         ["GamepadPage_Guide"] = "Guide button (Xbox logo)",
         ["GamepadPage_Share"] = "Share button",
-        ["GamepadPage_KeysPlaceholder"] = "Keyboard shortcut, space-separated, e.g. Win Shift S (leave empty = no mapping)",
+        ["GamepadPage_KeysPlaceholder"] = "Keyboard shortcut, e.g. Win Shift S (space-separated, leave empty for no mapping)",
         ["GamepadPage_BadKey"] = "Unrecognized key: {0}",
-        ["GamepadPage_NeedRedist"] = "The GameInput runtime is missing on this system. Install it and restart the launcher to enable gamepad mapping (required on Windows 10; built into Windows 11).",
-        ["GamepadPage_RedistOutdate"] = "The installed GameInput runtime is outdated. Install the latest version and restart the launcher.",
+        ["GamepadPage_NeedRedist"] = "The GameInput runtime required for gamepad mapping is missing (built into Windows 11, needs manual install on Windows 10). Download and install it via the link below, then restart the launcher.",
+        ["GamepadPage_RedistOutdate"] = "The installed GameInput runtime is outdated. Install the latest version via the link below, then restart the launcher.",
         ["GamepadPage_RedistLink"] = "Download GameInputRedist.msi",
-        ["GamepadPage_ShareNote"] = "Note: when the Share button is mapped, Xbox Game Bar's built-in screenshot may still fire at the same time (system limitation). Prefer the Guide button.",
+        ["GamepadPage_ShareNote"] = "Note: due to a system limitation, Xbox Game Bar's built-in screenshot may still fire when Share is mapped, causing duplicate captures. Prefer the Guide button.",
 
         
         ["KuroBbs"] = "Kuro BBS",
