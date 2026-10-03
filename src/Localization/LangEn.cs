@@ -38,12 +38,12 @@ internal static class LangEn
 
         
         ["SettingPage_Gamepad"] = "Gamepad",
-        ["GamepadPage_Enable"] = "Enable gamepad mapping",
+        ["GamepadPage_Enable"] = "Enable gamepad",
         ["GamepadPage_Guide"] = "Guide button (Xbox logo)",
         ["GamepadPage_Share"] = "Share button",
         ["GamepadPage_KeysPlaceholder"] = "Separate multiple key names with spaces",
         ["GamepadPage_BadKey"] = "Unrecognized key: {0}",
-        ["GamepadPage_NeedRedist"] = "The GameInput runtime required for gamepad mapping is missing (built into Windows 11, needs manual install on Windows 10). Download and install it via the link below, then restart the launcher.",
+        ["GamepadPage_NeedRedist"] = "The GameInput runtime is missing (built into Windows 11, needs manual install on Windows 10). Download and install it via the link below, then restart the launcher to enable gamepad support.",
         ["GamepadPage_RedistOutdate"] = "The installed GameInput runtime is outdated. Install the latest version via the link below, then restart the launcher.",
         ["GamepadPage_RedistLink"] = "Download GameInputRedist.msi",
         ["GamepadPage_ShareNote"] = "Note: due to a system limitation, Xbox Game Bar's built-in screenshot may still fire when Share is mapped, causing duplicate captures. Prefer the Guide button.",
