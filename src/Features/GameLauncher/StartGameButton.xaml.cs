@@ -46,6 +46,10 @@ public sealed partial class StartGameButton : UserControl
     public GameState GameState { get; set { if (SetProperty(ref field, value)) UpdateActionButtonState(); } }
 
 
+    
+    public bool IsResumeInstall { get; set { if (SetProperty(ref field, value)) OnPropertyChanged(nameof(StartGameButtonText)); } }
+
+
     public bool ActionButtonPointerOver { get; set { if (SetProperty(ref field, value)) UpdateButtonForeground(); } }
 
 
@@ -64,7 +68,7 @@ public sealed partial class StartGameButton : UserControl
         GameState.StartGame => Lang.Instance.LauncherPage_StartGame,
         
         GameState.GameIsRunning => RunningGameTime ?? "",
-        GameState.InstallGame => Lang.Instance.LauncherPage_InstallGame,
+        GameState.InstallGame => IsResumeInstall ? Lang.Instance.LauncherPage_ResumeInstall : Lang.Instance.LauncherPage_InstallGame,
         GameState.UpdateGame => Lang.Instance.LauncherPage_UpdateGame,
         GameState.Installing => "",
         _ => "",

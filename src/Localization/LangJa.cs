@@ -212,6 +212,7 @@ internal static class LangJa
         
         ["LauncherPage_StartGame"] = "ゲームを起動",
         ["LauncherPage_InstallGame"] = "ゲームをインストール",
+        ["LauncherPage_ResumeInstall"] = "インストールを続行",
         ["AccountSwitcher_SwitchAccount"] = "アカウントを切り替え",
         ["AccountSwitcher_GameRunning"] = "ゲーム実行中のため、アカウントを切り替えられません",
         ["AccountSwitcher_AccountInfo"] = "ゲームアカウント",

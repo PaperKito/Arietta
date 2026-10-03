@@ -209,6 +209,7 @@ internal static class LangPtBr
         
         ["LauncherPage_StartGame"] = "Iniciar jogo",
         ["LauncherPage_InstallGame"] = "Instalar jogo",
+        ["LauncherPage_ResumeInstall"] = "Continuar instalação",
         ["AccountSwitcher_SwitchAccount"] = "Trocar de conta",
         ["AccountSwitcher_GameRunning"] = "O jogo está em execução; não é possível trocar de conta no momento",
         ["AccountSwitcher_AccountInfo"] = "Conta do jogo",

@@ -225,6 +225,7 @@ internal static class LangEn
         
         ["LauncherPage_StartGame"] = "Start Game",
         ["LauncherPage_InstallGame"] = "Install Game",
+        ["LauncherPage_ResumeInstall"] = "Resume Install",
         ["AccountSwitcher_SwitchAccount"] = "Switch Account",
         ["AccountSwitcher_GameRunning"] = "Game is running; account switching is unavailable",
         ["AccountSwitcher_AccountInfo"] = "Game Account",

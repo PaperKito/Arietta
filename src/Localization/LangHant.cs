@@ -211,6 +211,7 @@ internal static class LangHant
         
         ["LauncherPage_StartGame"] = "開始遊戲",
         ["LauncherPage_InstallGame"] = "安裝遊戲",
+        ["LauncherPage_ResumeInstall"] = "繼續安裝",
         ["AccountSwitcher_SwitchAccount"] = "切換帳號",
         ["AccountSwitcher_GameRunning"] = "遊戲執行中，暫時無法切換帳號",
         ["AccountSwitcher_AccountInfo"] = "遊戲帳號",

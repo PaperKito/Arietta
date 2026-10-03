@@ -105,9 +105,12 @@ public static class GachaStore
         try
         {
             using var connection = DatabaseService.CreateConnection();
+            
+            
+            
             var rows = connection.Query<GachaRow>(
                 $"SELECT CardPoolType, ResourceId, QualityLevel, ResourceType, Name, Count, Time " +
-                $"FROM {DatabaseSchema.Tables.GachaLogItem} WHERE PlayerId = @p ORDER BY Time DESC, SubSeq ASC;",
+                $"FROM {DatabaseSchema.Tables.GachaLogItem} WHERE PlayerId = @p ORDER BY Time DESC, rowid ASC;",
                 new { p = playerId });
             if (!rows.Any())
             {

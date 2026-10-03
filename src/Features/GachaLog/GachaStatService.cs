@@ -59,6 +59,9 @@ public static class GachaStatService
                     bool isUp = isEventPool && !standardIds.Contains(record.ResourceId);
                     items5.Add(new PoolItem(record.Name, record.ResourceId, since5, isUp, record.Time));
                     since5 = 0;
+                    
+                    
+                    since4 = 0;
                     break;
                 case 4:
                     items4.Add(new PoolItem(record.Name, record.ResourceId, since4, false, record.Time));

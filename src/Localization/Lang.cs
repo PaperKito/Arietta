@@ -349,6 +349,7 @@ public sealed class Lang : INotifyPropertyChanged
     
     public string LauncherPage_StartGame => T("开始游戏");
     public string LauncherPage_InstallGame => T("安装游戏");
+    public string LauncherPage_ResumeInstall => T("继续安装");
     
     public string AccountSwitcher_SwitchAccount => T("切换账号");
     public string AccountSwitcher_AccountInfo => T("游戏账号");

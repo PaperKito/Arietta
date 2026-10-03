@@ -223,6 +223,17 @@ public static class GameUpdateService
     }
 
     
+    
+    
+    
+    public static bool HasResumableInstall(GameBiz biz)
+    {
+        string? dir = GetPersistedInstallDir(biz);
+        string root = Path.Combine(dir ?? "", "predownload");
+        return Directory.Exists(root) && Directory.EnumerateDirectories(root).Any();
+    }
+
+    
     public static string? GetLocalVersion(GameBiz biz)
     {
         string? dir = GetGameDir(biz);

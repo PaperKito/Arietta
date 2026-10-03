@@ -1154,8 +1154,9 @@ public sealed partial class LauncherPage : PageBase
         }
         if (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe))
         {
-            GameState = GameState.InstallGame;
             
+            Button_StartGame.IsResumeInstall = GameUpdateService.HasResumableInstall(CurrentGameBiz);
+            GameState = GameState.InstallGame;
             Button_StartGame.GameCommand = InstallGameCommand;
             RunningGameInfo = null;
         }

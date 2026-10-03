@@ -209,6 +209,7 @@ internal static class LangKo
         
         ["LauncherPage_StartGame"] = "게임 시작",
         ["LauncherPage_InstallGame"] = "게임 설치",
+        ["LauncherPage_ResumeInstall"] = "설치 계속",
         ["AccountSwitcher_SwitchAccount"] = "계정 전환",
         ["AccountSwitcher_GameRunning"] = "게임 실행 중에는 계정을 전환할 수 없습니다",
         ["AccountSwitcher_AccountInfo"] = "게임 계정",

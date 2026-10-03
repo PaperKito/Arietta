@@ -209,6 +209,7 @@ internal static class LangDe
         
         ["LauncherPage_StartGame"] = "Spiel starten",
         ["LauncherPage_InstallGame"] = "Spiel installieren",
+        ["LauncherPage_ResumeInstall"] = "Installation fortsetzen",
         ["AccountSwitcher_SwitchAccount"] = "Konto wechseln",
         ["AccountSwitcher_GameRunning"] = "Spiel läuft – Kontowechsel derzeit nicht möglich",
         ["AccountSwitcher_AccountInfo"] = "Spielkonto",

@@ -209,6 +209,7 @@ internal static class LangTh
         
         ["LauncherPage_StartGame"] = "เริ่มเกม",
         ["LauncherPage_InstallGame"] = "ติดตั้งเกม",
+        ["LauncherPage_ResumeInstall"] = "ติดตั้งต่อ",
         ["AccountSwitcher_SwitchAccount"] = "สลับบัญชี",
         ["AccountSwitcher_GameRunning"] = "เกมกำลังทำงาน จึงสลับบัญชีไม่ได้ชั่วคราว",
         ["AccountSwitcher_AccountInfo"] = "บัญชีเกม",
