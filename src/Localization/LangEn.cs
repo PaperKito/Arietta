@@ -277,7 +277,7 @@ internal static class LangEn
         ["InstallGameDialog_LocateGame"] = "Locate Game",
         ["InstallGameDialog_SelectInstallationPath"] = "Select Installation Path",
         ["Common_Change"] = "Change",
-        ["InstallGameDialog_SpaceRequiredToUnzip"] = "Space required to unzip ",
+        ["InstallGameDialog_SpaceRequiredToDownload"] = "Space required to download ",
         ["InstallGameDialog_SpaceAvailable"] = "Available space ",
         ["InstallGameDialog_InsufficientSpace"] = "Insufficient available space",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Identical files from other region clients on the same disk will be hard-linked. Estimated download is about {0}; this is an estimate only, subject to per-file verification during install.",

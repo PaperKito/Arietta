@@ -423,7 +423,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string InstallGameDialog_LocateGame => T("定位游戏");
     public string InstallGameDialog_SelectInstallationPath => T("选择安装路径");
     public string Common_Change => T("更改");
-    public string InstallGameDialog_SpaceRequiredToUnzip => T("解压所需空间 ");
+    public string InstallGameDialog_SpaceRequiredToDownload => T("下载所需空间 ");
     public string InstallGameDialog_SpaceAvailable => T("可用空间 ");
     public string InstallGameDialog_InsufficientSpace => T("可用空间不足");
     public string InstallGameDialog_HardLinkEstimateDesc => T("同盘其它区服客户端的相同文件将直接硬链接复用，预计实际需下载约 {0}；该值仅为预估值，实际以下载时逐文件校验为准。");
