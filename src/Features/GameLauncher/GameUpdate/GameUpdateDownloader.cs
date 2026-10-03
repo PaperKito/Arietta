@@ -247,7 +247,7 @@ public sealed class GameUpdateDownloader
         
         
         
-        if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5))
+        if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5, ct))
         {
             return;
         }
@@ -321,7 +321,7 @@ public sealed class GameUpdateDownloader
             {
                 throw new InvalidDataException($"下载大小不符：{file.Dest}（期望 {file.Size}，实际 {new FileInfo(temp).Length}）");
             }
-            if (file.Md5 is not null && !VerifyMd5(temp, file.Md5))
+            if (file.Md5 is not null && !VerifyMd5(temp, file.Md5, ct))
             {
                 
                 long bad = new FileInfo(temp).Length;
@@ -359,7 +359,7 @@ public sealed class GameUpdateDownloader
         string sidecar = temp + ".s";
         Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
 
-        if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5))
+        if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5, ct))
         {
             try { File.Delete(sidecar); } catch {  }
             return;
@@ -419,7 +419,7 @@ public sealed class GameUpdateDownloader
                 throw new InvalidDataException($"分段下载不完整：{file.Dest}（段 {i} 缺 {len - progress[i]} 字节）");
             }
         }
-        if (file.Md5 is not null && !VerifyMd5(temp, file.Md5))
+        if (file.Md5 is not null && !VerifyMd5(temp, file.Md5, ct))
         {
             
             File.Delete(temp);
@@ -582,7 +582,10 @@ public sealed class GameUpdateDownloader
     }
 
     
-    public static bool VerifyMd5(string path, string? expectedMd5)
+    
+    
+    
+    public static bool VerifyMd5(string path, string? expectedMd5, CancellationToken ct = default)
     {
         if (expectedMd5 is null)
         {
@@ -591,8 +594,22 @@ public sealed class GameUpdateDownloader
         try
         {
             using var stream = File.OpenRead(path);
-            string actual = Convert.ToHexStringLower(MD5.HashData(stream));
+            using var md5 = MD5.Create();
+            var buffer = new byte[1 << 20];
+            int read;
+            ct.ThrowIfCancellationRequested();
+            while ((read = stream.Read(buffer)) > 0)
+            {
+                ct.ThrowIfCancellationRequested();
+                md5.TransformBlock(buffer, 0, read, null, 0);
+            }
+            md5.TransformFinalBlock([], 0, 0);
+            string actual = Convert.ToHexStringLower(md5.Hash!);
             return string.Equals(actual, expectedMd5, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch
         {

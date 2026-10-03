@@ -854,7 +854,7 @@ public static class GameUpdateService
         var directFiles = plan.DirectFiles;
         _logger.LogInformation("PrepareStaging: 开始校验暂存区 {Count} 个文件 {Dir}", directFiles.Count, stageDir);
         var todo = await Task.Run(() => FilterOutdated(stageDir, directFiles,
-            (done, total) => reportVerifying(done, total)), ct);
+            (done, total) => reportVerifying(done, total), ct), ct);
         reportVerifying(directFiles.Count, directFiles.Count, force: true);
         _logger.LogInformation("PrepareStaging: 待下载 {Todo}/{Total}", todo.Count, directFiles.Count);
 
@@ -862,7 +862,7 @@ public static class GameUpdateService
         if (todo.Count > 0)
         {
             var linked = await Task.Run(() => TryHardLinkFromSiblings(biz, todo, stageDir,
-                (done, total) => reportVerifying(done, total)), ct);
+                (done, total) => reportVerifying(done, total), ct), ct);
             if (linked.Count > 0)
             {
                 _logger.LogInformation("PrepareStaging: 从其它区服客户端硬链接 {Count} 个文件，免下载", linked.Count);
@@ -886,12 +886,12 @@ public static class GameUpdateService
             var entries = plan.ZipEntries;
             
             await Task.Run(() => TryHardLinkFromSiblings(biz, entries, stageDir,
-                (done, total) => reportVerifying(done, total)), ct);
+                (done, total) => reportVerifying(done, total), ct), ct);
             
             
             _logger.LogInformation("PrepareStaging: 校验 {Count} 个分包内文件是否就位", entries.Count);
             bool allThere = await Task.Run(() => AllPresent(stageDir, gameDir, entries,
-                (done, total) => reportVerifying(done, total)), ct);
+                (done, total) => reportVerifying(done, total), ct), ct);
             _logger.LogInformation("PrepareStaging: 分包内文件就位判定 {AllThere}（{Count} 条）", allThere, entries.Count);
             if (!allThere)
             {
@@ -913,7 +913,7 @@ public static class GameUpdateService
     
     
     private static List<GameResourceEntry> TryHardLinkFromSiblings(
-        GameBiz biz, List<GameResourceEntry> files, string stageDir, Action<int, int>? onChecked = null)
+        GameBiz biz, List<GameResourceEntry> files, string stageDir, Action<int, int>? onChecked = null, CancellationToken ct = default)
     {
         if (!UseHardLink)
         {
@@ -928,6 +928,7 @@ public static class GameUpdateService
         int done = 0;
         foreach (var file in files)
         {
+            ct.ThrowIfCancellationRequested();
             string staged = Path.Combine(stageDir, file.Dest);
             if (!File.Exists(staged))
             {
@@ -938,7 +939,7 @@ public static class GameUpdateService
                         string candidate = Path.Combine(src, file.Dest);
                         
                         if (!File.Exists(candidate) || new FileInfo(candidate).Length != file.Size
-                            || !GameUpdateDownloader.VerifyMd5(candidate, file.Md5))
+                            || !GameUpdateDownloader.VerifyMd5(candidate, file.Md5, ct))
                         {
                             continue;
                         }
@@ -948,6 +949,10 @@ public static class GameUpdateService
                             linked.Add(file);
                             break;
                         }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
                     }
                     catch (Exception ex)
                     {
@@ -1006,7 +1011,7 @@ public static class GameUpdateService
         foreach (var file in plan.Files)
         {
             ct.ThrowIfCancellationRequested();
-            if (IsLinkable(sources, file, verified))
+            if (IsLinkable(sources, file, verified, ct))
             {
                 linked += file.Size;
                 onRefined?.Report(linked);
@@ -1023,7 +1028,7 @@ public static class GameUpdateService
             if (entries.Count > 0 && entries.All(e =>
             {
                 ct.ThrowIfCancellationRequested();
-                return IsLinkable(sources, e, verified);
+                return IsLinkable(sources, e, verified, ct);
             }))
             {
                 linked += entries.Sum(e => e.Size);
@@ -1038,7 +1043,7 @@ public static class GameUpdateService
     }
 
     
-    private static bool IsLinkable(List<string> sources, GameResourceEntry file, HashSet<string> verified)
+    private static bool IsLinkable(List<string> sources, GameResourceEntry file, HashSet<string> verified, CancellationToken ct = default)
     {
         string? candidate = FindSizeMatchSource(sources, file);
         if (candidate is null)
@@ -1046,7 +1051,7 @@ public static class GameUpdateService
             return false;
         }
         
-        if (!verified.Contains(file.Dest) && !GameUpdateDownloader.VerifyMd5(candidate, file.Md5))
+        if (!verified.Contains(file.Dest) && !GameUpdateDownloader.VerifyMd5(candidate, file.Md5, ct))
         {
             return false;
         }
@@ -1205,7 +1210,7 @@ public static class GameUpdateService
         int zipEntryTotal = plan.ZipPackages!.Sum(z => z.Entries?.Count ?? 0);
         reportApplying(0, zipEntryTotal, force: true);
         await Task.Run(() => ExtractPackages(stageDir, plan.ZipPackages!,
-            (done, total) => reportApplying(done, total)), ct);
+            (done, total) => reportApplying(done, total), ct), ct);
 
         
         foreach (var info in plan.ZipPackages!)
@@ -1230,12 +1235,13 @@ public static class GameUpdateService
     
     
     
-    private static void ExtractPackages(string stageDir, List<GameResourceZipInfo> packages, Action<int, int>? onProgress = null)
+    private static void ExtractPackages(string stageDir, List<GameResourceZipInfo> packages, Action<int, int>? onProgress = null, CancellationToken ct = default)
     {
         int total = packages.Sum(p => p.Entries?.Count ?? 0);
         int done = 0;
         foreach (var info in packages)
         {
+            ct.ThrowIfCancellationRequested();
             string path = Path.Combine(stageDir, info.Dest);
             if (!File.Exists(path))
             {
@@ -1251,6 +1257,7 @@ public static class GameUpdateService
             }
             foreach (var entry in entries)
             {
+                ct.ThrowIfCancellationRequested();
                 string name = entry.Dest.Replace('\\', '/');
                 if (!map.TryGetValue(name, out var zipEntry))
                 {
@@ -1260,7 +1267,7 @@ public static class GameUpdateService
                 string dest = Path.Combine(stageDir, name);
                 Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
                 zipEntry.ExtractToFile(dest, true);
-                if (!VerifyFile(dest, entry))
+                if (!VerifyFile(dest, entry, ct))
                 {
                     File.Delete(dest);
                     throw new InvalidDataException(
@@ -1274,17 +1281,18 @@ public static class GameUpdateService
 
     
     
-    private static bool AllPresent(string stageDir, string? gameDir, List<GameResourceEntry> files, Action<int, int>? onChecked = null)
+    private static bool AllPresent(string stageDir, string? gameDir, List<GameResourceEntry> files, Action<int, int>? onChecked = null, CancellationToken ct = default)
     {
         int done = 0;
         foreach (var file in files)
         {
-            if (VerifyFile(Path.Combine(stageDir, file.Dest), file))
+            ct.ThrowIfCancellationRequested();
+            if (VerifyFile(Path.Combine(stageDir, file.Dest), file, ct))
             {
                 onChecked?.Invoke(++done, files.Count);
                 continue;
             }
-            if (gameDir is null || !VerifyFile(Path.Combine(gameDir, file.Dest), file))
+            if (gameDir is null || !VerifyFile(Path.Combine(gameDir, file.Dest), file, ct))
             {
                 return false;
             }
@@ -1327,13 +1335,16 @@ public static class GameUpdateService
     
     
     
-    private static List<GameResourceEntry> FilterOutdated(string dir, List<GameResourceEntry> files, Action<int, int>? onChecked = null)
+    private static List<GameResourceEntry> FilterOutdated(string dir, List<GameResourceEntry> files, Action<int, int>? onChecked = null, CancellationToken ct = default)
     {
         var todo = new List<GameResourceEntry>();
         int done = 0;
         foreach (var f in files)
         {
-            if (!VerifyFile(Path.Combine(dir, f.Dest), f))
+            
+            
+            ct.ThrowIfCancellationRequested();
+            if (!VerifyFile(Path.Combine(dir, f.Dest), f, ct))
             {
                 todo.Add(f);
             }
@@ -1482,14 +1493,14 @@ public static class GameUpdateService
             if (!File.Exists(staged))
             {
                 
-                if (VerifyFile(destPath, file))
+                if (VerifyFile(destPath, file, ct))
                 {
                     onProgress?.Invoke(++done, files.Count);
                     continue;
                 }
                 throw new FileNotFoundException(string.Format(Localization.Lang.Instance.GameUpdate_ErrFileMissing, file.Dest), staged);
             }
-            if (!GameUpdateDownloader.VerifyMd5(staged, file.Md5))
+            if (!GameUpdateDownloader.VerifyMd5(staged, file.Md5, ct))
             {
                 throw new InvalidDataException(string.Format(Localization.Lang.Instance.GameUpdate_ErrFileChecksum, file.Dest));
             }
@@ -1609,17 +1620,17 @@ public static class GameUpdateService
             if (!File.Exists(marker))
             {
                 
-                if (dstFiles.Count > 0 && !dstFiles.All(f => VerifyFile(Path.Combine(gameDir, f.Dest), f)))
+                if (dstFiles.Count > 0 && !dstFiles.All(f => VerifyFile(Path.Combine(gameDir, f.Dest), f, ct)))
                 {
                     string patchPath = Path.Combine(stageDir, group.Dest);
-                    if (!File.Exists(patchPath) || !GameUpdateDownloader.VerifyMd5(patchPath, patchMd5.GetValueOrDefault(group.Dest)))
+                    if (!File.Exists(patchPath) || !GameUpdateDownloader.VerifyMd5(patchPath, patchMd5.GetValueOrDefault(group.Dest), ct))
                     {
                         throw new InvalidDataException(string.Format(Localization.Lang.Instance.GameUpdate_ErrFileChecksum, group.Dest));
                     }
                     await RunHpatchzAsync(hpatchz, gameDir, patchPath, tempDir, ct);
                     foreach (var f in dstFiles)
                     {
-                        if (!VerifyFile(Path.Combine(tempDir, f.Dest), f))
+                        if (!VerifyFile(Path.Combine(tempDir, f.Dest), f, ct))
                         {
                             throw new InvalidDataException(string.Format(Localization.Lang.Instance.GameUpdate_ErrFileChecksum, f.Dest));
                         }
@@ -2158,7 +2169,7 @@ public static class GameUpdateService
             await limiter.WaitAsync(ct);
             try
             {
-                if (!VerifyFile(Path.Combine(gameDir, file.Dest), file))
+                if (!VerifyFile(Path.Combine(gameDir, file.Dest), file, ct))
                 {
                     lock (result.Damaged)
                     {
@@ -2234,7 +2245,7 @@ public static class GameUpdateService
     }
 
     
-    internal static bool VerifyFile(string path, GameResourceEntry entry)
+    internal static bool VerifyFile(string path, GameResourceEntry entry, CancellationToken ct = default)
     {
         if (!File.Exists(path))
         {
@@ -2244,7 +2255,7 @@ public static class GameUpdateService
         {
             return false;
         }
-        return GameUpdateDownloader.VerifyMd5(path, entry.Md5);
+        return GameUpdateDownloader.VerifyMd5(path, entry.Md5, ct);
     }
 
     
