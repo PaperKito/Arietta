@@ -714,6 +714,22 @@ public sealed partial class LauncherPage : PageBase
     
     private void RenderUpdateSession(GameUpdateSession session)
     {
+        
+        
+        if (session.IsPausing)
+        {
+            Button_StartGame.ShowPausing();
+            Popup_PreDownloadProgress.IsOpen = false;
+            if (session.Kind == GameUpdateService.UpdateKind.Predownload)
+            {
+                Button_PreDownload.Visibility = Visibility.Visible;
+                Button_PreDownload.IsEnabled = true;
+                Text_PreDownload.Text = Lang.Instance.GameUpdate_Pausing;
+                ToolTipService.SetToolTip(Button_PreDownload, null);
+            }
+            return;
+        }
+
         if (session.Kind == GameUpdateService.UpdateKind.Update)
         {
             

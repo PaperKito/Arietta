@@ -280,6 +280,17 @@ public sealed partial class StartGameButton : UserControl
 
 
     
+    
+    
+    
+    public void ShowPausing()
+    {
+        DownloadSpeedText = Lang.Instance.GameUpdate_Pausing;
+        RemainTimeText = "--:--:--";
+    }
+
+
+    
     private void RefreshInstallStateBindings()
     {
         OnPropertyChanged(nameof(GameStateIsInstalling));

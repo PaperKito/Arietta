@@ -386,6 +386,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameUpdate_PackageSize => T("安装包大小 ");
     public string GameUpdate_PredownloadedSize => T("已预下载 ");
     public string GameUpdate_Applying => T("正在应用更新…");
+    
+    public string GameUpdate_Pausing => T("正在暂停…");
 
     public string GameUpdate_ApplyingProgress => T("正在应用更新 {0} / {1}");
     public string GameUpdate_Patching => T("正在应用补丁 {0} / {1}");

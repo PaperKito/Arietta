@@ -59,6 +59,13 @@ public sealed class GameUpdateSession
     public bool IsApplying { get; private set; }
 
     
+    
+    
+    
+    
+    public bool IsPausing { get; private set; }
+
+    
     public double ProgressValue { get; private set; }
 
     public long ReceivedBytes { get; private set; }
@@ -121,6 +128,7 @@ public sealed class GameUpdateSession
         InstallTier = tierName;
         TargetVersion = state.TargetVersion;
         IsApplying = false;
+        IsPausing = false;
         ProgressValue = 0;
         ReceivedBytes = 0;
         TotalBytes = state.TotalBytes;
@@ -143,6 +151,20 @@ public sealed class GameUpdateSession
         
         Interlocked.CompareExchange(ref _cancelRequestedTimestamp, Stopwatch.GetTimestamp(), 0);
         AppConfig.GetLogger<GameUpdateSession>().LogInformation("暂停请求已发出");
+        bool notify = false;
+        lock (_gate)
+        {
+            if (IsBusy && !IsPausing)
+            {
+                IsPausing = true;
+                notify = true;
+            }
+        }
+        
+        if (notify)
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
         try
         {
             cts?.Cancel();
@@ -204,6 +226,7 @@ public sealed class GameUpdateSession
                 _cts = null;
             }
             IsApplying = false;
+            IsPausing = false;
             long cancelTs = Interlocked.Exchange(ref _cancelRequestedTimestamp, 0);
             if (cancelTs != 0)
             {
