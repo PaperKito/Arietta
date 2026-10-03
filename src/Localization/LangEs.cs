@@ -309,7 +309,7 @@ internal static class LangEs
         ["FilePage_SpeedLimit"] = "Límite de velocidad",
         ["FilePage_SpeedLimitDesc"] = "0 significa sin límite",
         ["FilePage_DownloadThreads"] = "Multihilo",
-        ["FilePage_DownloadThreadsDesc"] = "Número de conexiones de descarga simultáneas (1-16). Un valor más alto aprovecha mejor el ancho de banda, a costa de una carga ligeramente mayor de CPU, memoria y disco. Los cambios se aplican en la próxima descarga.",
+        ["FilePage_DownloadThreadsDesc"] = "Número de conexiones de descarga simultáneas. Demasiado paralelismo ralentiza los HDD por los movimientos del cabezal. Los cambios se aplican en la próxima descarga.",
 
         
         ["KuroBbs_RefreshInfo"] = "Actualizar información",

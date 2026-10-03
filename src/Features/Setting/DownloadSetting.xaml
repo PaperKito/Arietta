@@ -74,9 +74,10 @@
                            IsTextScaleFactorEnabled="False"
                            Text="{x:Bind lang:Lang.Instance.FilePage_DownloadThreadsDesc, Mode=OneWay}"
                            TextWrapping="Wrap" />
+                
                 <Grid Margin="0,4,0,-6"
                       ColumnSpacing="12"
-                      MaxWidth="360"
+                      Width="360"
                       HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

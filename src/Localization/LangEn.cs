@@ -339,7 +339,7 @@ internal static class LangEn
         ["FilePage_SpeedLimit"] = "Speed Limit",
         ["FilePage_SpeedLimitDesc"] = "0 means no limit",
         ["FilePage_DownloadThreads"] = "Multi-threaded",
-        ["FilePage_DownloadThreadsDesc"] = "Number of simultaneous download connections (1-16). Higher values saturate bandwidth more easily, at a slight cost to CPU, memory and disk load. Changes take effect on the next download.",
+        ["FilePage_DownloadThreadsDesc"] = "Number of simultaneous download connections. Too much parallelism slows HDDs down due to seek. Changes take effect on the next download.",
 
         
         ["KuroBbs_RefreshInfo"] = "Refresh Info",
