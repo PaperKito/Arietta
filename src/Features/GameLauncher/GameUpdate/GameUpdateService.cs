@@ -1882,10 +1882,11 @@ public static class GameUpdateService
         }
         
         
+        
         var packMap = new Dictionary<string, GameResourcePack>(packs, StringComparer.OrdinalIgnoreCase);
         return bundles.Keys
             .Where(packMap.ContainsKey)
-            .OrderByDescending(k => packMap[k].Size)
+            .OrderBy(k => packMap[k].Size)
             .Select(k => new GameTierOption(k, common.Size + packMap[k].Size))
             .ToList();
     }
