@@ -61,6 +61,7 @@ public sealed partial class DownloadSetting : PageBase
         Slider_Threads.Minimum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMin;
         Slider_Threads.Maximum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMax;
         Slider_Threads.Value = GameLauncher.GameUpdate.GameUpdateService.DownloadThreads;
+        Text_ThreadsMax.Text = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMax.ToString();
         _threadsReady = true;
     }
 
