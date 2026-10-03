@@ -1314,8 +1314,11 @@ public sealed partial class LauncherPage : PageBase
             return;
         }
         using Process? running = _recordService.FindRunningClient(biz);
-        if (running is not null)
+        if (running is not null && PlayTimeRecordService.HasOwnStartRecord(biz, running.Id))
         {
+            
+            
+            
             EnterRunningState(biz);
             
             

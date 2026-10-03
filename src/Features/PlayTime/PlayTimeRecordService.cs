@@ -258,6 +258,28 @@ internal class PlayTimeRecordService
 
 
     
+    
+    
+    
+    
+    
+    public static bool HasOwnStartRecord(GameBiz biz, int pid)
+    {
+        try
+        {
+            using var dapper = DatabaseService.CreateConnection();
+            return dapper.ExecuteScalar<long>(
+                "SELECT COUNT(*) FROM PlayTimeItem WHERE GameBiz = @biz AND Pid = @pid AND State = @state;",
+                new { biz = biz.ToString(), pid, state = (int)PlayTimeState.Start }) > 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+
+    
     private Process? FindLoggableProcess(string[] names)
     {
         foreach (var process in EnumerateSessionProcesses(names))
