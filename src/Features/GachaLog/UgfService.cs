@@ -25,10 +25,11 @@ namespace Arietta.Features.GachaLog;
 
 public static class UgfService
 {
-    private const string Format = "UGF";
-    private const string FormatVersion = "1.0";
     private const string ExportApp = "Arietta";
-    private const string GameId = "wuwa";
+    
+    
+    private const string GameId = "wuthering-waves";
+    private const string LegacyGameId = "wuwa";
 
     
     private const string CnOffset = "+08:00";
@@ -146,11 +147,12 @@ public static class UgfService
         if (root.TryGetProperty("accounts", out var accounts) && accounts.ValueKind == JsonValueKind.Array)
         {
             
+            
             JsonElement account = default;
             foreach (var candidate in accounts.EnumerateArray())
             {
                 if (candidate.TryGetProperty("game", out var g)
-                    && GetRaw(g) is { Length: > 0 } game && game != GameId)
+                    && GetRaw(g) is { Length: > 0 } game && game != GameId && game != LegacyGameId)
                 {
                     continue;
                 }
@@ -342,7 +344,7 @@ public class UgfFile
     public string Format { get; set; } = "UGF";
 
     [JsonPropertyName("version")]
-    public string Version { get; set; } = "1.0";
+    public string Version { get; set; } = "1.1";
 
     [JsonPropertyName("exporter")]
     public UgfExporter Exporter { get; set; } = new();
@@ -369,7 +371,7 @@ public class UgfExporter
 public class UgfAccount
 {
     [JsonPropertyName("game")]
-    public string Game { get; set; } = "wuwa";
+    public string Game { get; set; } = "wuthering-waves";
 
     [JsonPropertyName("uid")]
     public string Uid { get; set; } = "";
