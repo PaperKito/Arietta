@@ -108,7 +108,7 @@ public static class GachaTableImporter
         {
             return GachaPools.CharacterEvent;
         }
-        if (GachaPools.Names.ContainsKey(value))
+        if (GachaPools.IsPoolId(value))
         {
             return value;
         }

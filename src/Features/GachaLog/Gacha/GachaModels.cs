@@ -111,26 +111,73 @@ public static class GachaPools
         CharacterRevisit, WeaponRevisit,
     ];
 
-    public static readonly Dictionary<string, string> Names = new()
+    
+    private static readonly Dictionary<string, string> CnNameToId = new()
     {
-        [CharacterEvent] = Localization.Lang.Instance.GachaPool_CharacterEvent,
-        [WeaponEvent] = Localization.Lang.Instance.GachaPool_WeaponEvent,
-        [CharacterStandard] = Localization.Lang.Instance.GachaPool_CharacterStandard,
-        [WeaponStandard] = Localization.Lang.Instance.GachaPool_WeaponStandard,
-        [Novice] = Localization.Lang.Instance.GachaPool_Novice,
-        [NoviceChoice] = Localization.Lang.Instance.GachaPool_NoviceChoice,
-        [NoviceGratitude] = Localization.Lang.Instance.GachaPool_NoviceGratitude,
-        [CharacterRookie] = Localization.Lang.Instance.GachaPool_CharacterRookie,
-        [WeaponRookie] = Localization.Lang.Instance.GachaPool_WeaponRookie,
-        [CharacterCollab] = Localization.Lang.Instance.GachaPool_CharacterCollab,
-        [WeaponCollab] = Localization.Lang.Instance.GachaPool_WeaponCollab,
-        [CharacterRevisit] = Localization.Lang.Instance.GachaPool_CharacterRevisit,
-        [WeaponRevisit] = Localization.Lang.Instance.GachaPool_WeaponRevisit,
+        ["角色活动唤取"] = CharacterEvent,
+        ["武器活动唤取"] = WeaponEvent,
+        ["角色常驻唤取"] = CharacterStandard,
+        ["武器常驻唤取"] = WeaponStandard,
+        ["新手唤取"] = Novice,
+        ["新手自选唤取"] = NoviceChoice,
+        ["新手自选唤取（感恩定向唤取）"] = NoviceGratitude,
+        ["角色新旅唤取"] = CharacterRookie,
+        ["武器新旅唤取"] = WeaponRookie,
+        ["角色联动唤取"] = CharacterCollab,
+        ["武器联动唤取"] = WeaponCollab,
+        ["角色忆旅唤取"] = CharacterRevisit,
+        ["武器忆旅唤取"] = WeaponRevisit,
     };
 
+    
     public static string GetName(string poolId)
     {
-        return Names.TryGetValue(poolId, out var name) ? name : string.Format(Localization.Lang.Instance.GachaPool_Unknown, poolId);
+        return poolId switch
+        {
+            CharacterEvent => Localization.Lang.Instance.GachaPool_CharacterEvent,
+            WeaponEvent => Localization.Lang.Instance.GachaPool_WeaponEvent,
+            CharacterStandard => Localization.Lang.Instance.GachaPool_CharacterStandard,
+            WeaponStandard => Localization.Lang.Instance.GachaPool_WeaponStandard,
+            Novice => Localization.Lang.Instance.GachaPool_Novice,
+            NoviceChoice => Localization.Lang.Instance.GachaPool_NoviceChoice,
+            NoviceGratitude => Localization.Lang.Instance.GachaPool_NoviceGratitude,
+            CharacterRookie => Localization.Lang.Instance.GachaPool_CharacterRookie,
+            WeaponRookie => Localization.Lang.Instance.GachaPool_WeaponRookie,
+            CharacterCollab => Localization.Lang.Instance.GachaPool_CharacterCollab,
+            WeaponCollab => Localization.Lang.Instance.GachaPool_WeaponCollab,
+            CharacterRevisit => Localization.Lang.Instance.GachaPool_CharacterRevisit,
+            WeaponRevisit => Localization.Lang.Instance.GachaPool_WeaponRevisit,
+            _ => string.Format(Localization.Lang.Instance.GachaPool_Unknown, poolId),
+        };
+    }
+
+    
+    public static bool IsPoolId(string poolId)
+    {
+        return poolId is CharacterEvent or WeaponEvent or CharacterStandard or WeaponStandard
+            or Novice or NoviceChoice or NoviceGratitude or CharacterCollab or WeaponCollab
+            or CharacterRookie or WeaponRookie or CharacterRevisit or WeaponRevisit;
+    }
+
+    
+    public static string ResolvePoolId(string nameOrId)
+    {
+        if (IsPoolId(nameOrId))
+        {
+            return nameOrId;
+        }
+        if (CnNameToId.TryGetValue(nameOrId, out var cnId))
+        {
+            return cnId;
+        }
+        foreach (var poolId in DisplayOrder)
+        {
+            if (GetName(poolId) == nameOrId)
+            {
+                return poolId;
+            }
+        }
+        return "";
     }
 
     

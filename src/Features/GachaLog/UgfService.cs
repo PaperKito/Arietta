@@ -43,18 +43,9 @@ public static class UgfService
     };
 
     
-    private static readonly Dictionary<string, string> NameToPoolId = GachaPools.Names
-        .ToDictionary(kv => kv.Value, kv => kv.Key);
-
-
-    
     public static string ResolvePoolId(string nameOrId)
     {
-        if (GachaPools.Names.ContainsKey(nameOrId))
-        {
-            return nameOrId;
-        }
-        return NameToPoolId.TryGetValue(nameOrId, out var id) ? id : "";
+        return GachaPools.ResolvePoolId(nameOrId);
     }
 
 
@@ -233,8 +224,12 @@ public static class UgfService
                 continue;
             }
             
-            string poolId = NameToPoolId.TryGetValue(prop.Name, out var id) ? id : prop.Name;
-            if (!GachaPools.Names.ContainsKey(poolId) && !int.TryParse(poolId, out _))
+            string poolId = GachaPools.ResolvePoolId(prop.Name);
+            if (poolId.Length == 0)
+            {
+                poolId = prop.Name;
+            }
+            if (!GachaPools.IsPoolId(poolId) && !int.TryParse(poolId, out _))
             {
                 continue;
             }
@@ -274,7 +269,8 @@ public static class UgfService
         }
         
         string poolId = Get("pool");
-        if (!GachaPools.Names.ContainsKey(poolId) && NameToPoolId.TryGetValue(poolId, out var mapped))
+        string mapped = GachaPools.ResolvePoolId(poolId);
+        if (mapped.Length > 0)
         {
             poolId = mapped;
         }
@@ -304,7 +300,8 @@ public static class UgfService
         {
             poolId = Get("uigf_gacha_type");
         }
-        if (!GachaPools.Names.ContainsKey(poolId) && NameToPoolId.TryGetValue(poolId, out var mapped))
+        string mapped = GachaPools.ResolvePoolId(poolId);
+        if (mapped.Length > 0)
         {
             poolId = mapped;
         }
