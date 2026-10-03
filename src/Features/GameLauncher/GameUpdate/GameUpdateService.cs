@@ -176,8 +176,12 @@ public static class GameUpdateService
                     var index = await System.Text.Json.JsonSerializer.DeserializeAsync<GameUpdateIndex>(stream, JsonOptions, ct);
                     if (index?.ResourcePacks is not { Count: > 0 } || index.Bundles is not { Count: > 0 })
                     {
+                        
+                        _logger.LogInformation("分档索引 {Url}：200 但无 resourcePacks/bundles（旧格式内容）", url);
                         continue;
                     }
+                    _logger.LogInformation("分档索引 {Biz}：{Count} 档（{Names}），来源 {Url}",
+                        biz, index.Bundles!.Count, string.Join("/", index.Bundles.Keys), url);
                     _tierCache[biz] = (index, DateTimeOffset.Now);
                     return index;
                 }
@@ -191,6 +195,8 @@ public static class GameUpdateService
                 }
             }
         }
+        
+        _logger.LogInformation("分档索引 {Biz}：所有探测点均无分档内容，按无分档处理", biz);
         return null;
     }
 
@@ -1874,10 +1880,13 @@ public static class GameUpdateService
         {
             return null;
         }
+        
+        
+        var packMap = new Dictionary<string, GameResourcePack>(packs, StringComparer.OrdinalIgnoreCase);
         return bundles.Keys
-            .Where(k => packs.ContainsKey(k))
-            .OrderByDescending(k => packs[k].Size)
-            .Select(k => new GameTierOption(k, common.Size + packs[k].Size))
+            .Where(packMap.ContainsKey)
+            .OrderByDescending(k => packMap[k].Size)
+            .Select(k => new GameTierOption(k, common.Size + packMap[k].Size))
             .ToList();
     }
 
