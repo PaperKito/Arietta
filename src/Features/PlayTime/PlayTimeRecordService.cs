@@ -370,6 +370,8 @@ internal class PlayTimeRecordService
     
     
     
+    
+    
     public Process? FindRunningClient(GameBiz biz)
     {
         try
@@ -397,6 +399,17 @@ internal class PlayTimeRecordService
                 }
                 
                 
+                
+                
+                
+                
+                if (image is not null && IsUnderOtherGameDir(biz, image))
+                {
+                    process.Dispose();
+                    continue;
+                }
+                
+                
                 if (fallback is null)
                 {
                     fallback = process;
@@ -413,6 +426,28 @@ internal class PlayTimeRecordService
             
         }
         return null;
+    }
+
+
+    
+    
+    
+    
+    private static bool IsUnderOtherGameDir(GameBiz biz, string imagePath)
+    {
+        foreach (GameRegistry.GameEntry entry in GameRegistry.Games)
+        {
+            if (entry.Biz == biz)
+            {
+                continue;
+            }
+            string? otherRoot = Path.GetDirectoryName(GameRegistry.GetConfiguredExePath(entry.Biz));
+            if (otherRoot is not null && IsUnderGameDir(imagePath, otherRoot))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 
