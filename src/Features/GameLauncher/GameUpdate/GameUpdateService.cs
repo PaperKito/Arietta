@@ -807,9 +807,12 @@ public static class GameUpdateService
     public const string DownloadThreadsConfigKey = "GameUpdateDownloadThreads";
 
     
+    
+    
+    
     public const int DownloadThreadsMin = 1;
     public const int DownloadThreadsMax = 16;
-    public const int DownloadThreadsDefault = 8;
+    public const int DownloadThreadsDefault = 16;
 
     
     
