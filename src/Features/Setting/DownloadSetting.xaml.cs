@@ -17,6 +17,9 @@ public sealed partial class DownloadSetting : PageBase
     
     private bool _restoringDownload;
 
+    
+    private bool _threadsReady;
+
 
     public DownloadSetting()
     {
@@ -55,13 +58,10 @@ public sealed partial class DownloadSetting : PageBase
     private void RefreshThreads()
     {
         
-        _restoringDownload = true;
         Slider_Threads.Minimum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMin;
         Slider_Threads.Maximum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMax;
-        int threads = GameLauncher.GameUpdate.GameUpdateService.DownloadThreads;
-        Slider_Threads.Value = threads;
-        Text_ThreadsValue.Text = threads.ToString();
-        _restoringDownload = false;
+        Slider_Threads.Value = GameLauncher.GameUpdate.GameUpdateService.DownloadThreads;
+        _threadsReady = true;
     }
 
 
@@ -97,14 +97,12 @@ public sealed partial class DownloadSetting : PageBase
     private void Slider_Threads_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs args)
     {
         
-        if (_restoringDownload || Text_ThreadsValue is null)
+        if (!_threadsReady)
         {
             return;
         }
-        int threads = (int)Math.Round(((Slider)sender).Value);
-        Text_ThreadsValue.Text = threads.ToString();
         AppConfig.SetConfig(GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsConfigKey,
-            threads.ToString());
+            ((int)Math.Round(((Slider)sender).Value)).ToString());
     }
 
 }

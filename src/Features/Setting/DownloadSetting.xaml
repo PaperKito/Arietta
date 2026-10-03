@@ -8,6 +8,21 @@
              xmlns:mf="using:Arietta.Frameworks"
              mc:Ignorable="d">
 
+    
+    <mf:PageBase.Resources>
+        <Style TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Ellipse Width="20"
+                                 Height="20"
+                                 Fill="{ThemeResource AccentFillColorDefaultBrush}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </mf:PageBase.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
         <StackPanel Spacing="28" MaxWidth="1000" HorizontalAlignment="Left" Padding="0,0,0,24">
 
@@ -75,26 +90,14 @@
                            Text="{x:Bind lang:Lang.Instance.FilePage_DownloadThreadsDesc, Mode=OneWay}"
                            TextWrapping="Wrap" />
                 
-                <Grid Margin="0,4,0,-6"
-                      ColumnSpacing="12"
-                      Width="360"
-                      HorizontalAlignment="Left">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Slider x:Name="Slider_Threads"
-                            Maximum="16"
-                            Minimum="1"
-                            StepFrequency="1"
-                            ValueChanged="Slider_Threads_ValueChanged" />
-                    <TextBlock x:Name="Text_ThreadsValue"
-                               Grid.Column="1"
-                               VerticalAlignment="Center"
-                               FontWeight="SemiBold"
-                               IsTextScaleFactorEnabled="False"
-                               Text="8" />
-                </Grid>
+                <Slider x:Name="Slider_Threads"
+                        Margin="0,4,0,-6"
+                        Width="360"
+                        HorizontalAlignment="Left"
+                        Maximum="16"
+                        Minimum="1"
+                        StepFrequency="1"
+                        ValueChanged="Slider_Threads_ValueChanged" />
             </StackPanel>
 
         </StackPanel>
