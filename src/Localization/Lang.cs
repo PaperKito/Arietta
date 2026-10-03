@@ -95,12 +95,11 @@ public sealed class Lang : INotifyPropertyChanged
     public string ScreenshotPage_DeletedPartial => T("已删除 {0} / {1} 张，其余可能正被占用");
 
     
-    public string SettingPage_Gamepad => T("手柄映射");
-    public string GamepadPage_Desc => T("把手柄的 Guide（Xbox 徽标键）或 Share（分享键）映射为键盘组合键。这两个键是系统专用键，游戏本身收不到，映射后不会占用游戏内任何操作，适合用手柄游玩时触发截图（Win+Shift+S）等快捷键。");
+    public string SettingPage_Gamepad => T("手柄");
     public string GamepadPage_Enable => T("启用手柄映射");
     public string GamepadPage_Guide => T("Guide 键（Xbox 徽标键）");
     public string GamepadPage_Share => T("Share 键（分享键）");
-    public string GamepadPage_KeysPlaceholder => T("键盘组合键，如 Win Shift S（空格分隔，留空不映射）");
+    public string GamepadPage_KeysPlaceholder => T("多键需用空格分隔");
     public string GamepadPage_BadKey => T("无法识别按键：{0}");
     public string GamepadPage_NeedRedist => T("缺少手柄映射依赖的 GameInput 运行库（Win11 系统自带，Win10 需手动安装）。请点击下方链接下载安装，完成后重启启动器。");
     public string GamepadPage_RedistOutdate => T("已安装的 GameInput 运行库版本过旧，请点击下方链接安装新版，完成后重启启动器。");
@@ -485,7 +484,7 @@ public sealed class Lang : INotifyPropertyChanged
 
     
     public string FilePage_DownloadThreads => T("多线程");
-    public string FilePage_DownloadThreadsDesc => T("同时建立的下载连接数，机械硬盘上过并行会因寻道而变慢。改动对下次生效");
+    public string FilePage_DownloadThreadsDesc => T("同时建立的下载连接数，机械硬盘上过高并行会因寻道而变慢。改动对下次生效");
 
     
     public string KuroBbs_RefreshInfo => T("刷新信息");

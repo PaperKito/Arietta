@@ -314,7 +314,7 @@ internal static class LangHant
         ["FilePage_SpeedLimit"] = "限速",
         ["FilePage_SpeedLimitDesc"] = "0表示不限速",
         ["FilePage_DownloadThreads"] = "多線程",
-        ["FilePage_DownloadThreadsDesc"] = "同時建立的下載連線數，機械硬碟上過並行會因尋道而變慢。改動對下次生效。",
+        ["FilePage_DownloadThreadsDesc"] = "同時建立的下載連線數，機械硬碟上過高並行會因尋道而變慢。改動對下次生效。",
 
         
         ["KuroBbs_RefreshInfo"] = "重新整理資訊",

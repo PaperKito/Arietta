@@ -37,12 +37,11 @@ internal static class LangEn
         ["ScreenshotPage_DeletedPartial"] = "Deleted {0} / {1}; the rest may be in use",
 
         
-        ["SettingPage_Gamepad"] = "Gamepad Mapping",
-        ["GamepadPage_Desc"] = "Map your controller's Guide (Xbox logo) or Share button to a keyboard shortcut. These two buttons are reserved for the system and never reach games, so mapping them doesn't interfere with in-game controls — handy for triggering shortcuts like a screenshot (Win+Shift+S) while playing on a controller.",
+        ["SettingPage_Gamepad"] = "Gamepad",
         ["GamepadPage_Enable"] = "Enable gamepad mapping",
         ["GamepadPage_Guide"] = "Guide button (Xbox logo)",
         ["GamepadPage_Share"] = "Share button",
-        ["GamepadPage_KeysPlaceholder"] = "Keyboard shortcut, e.g. Win Shift S (space-separated, leave empty for no mapping)",
+        ["GamepadPage_KeysPlaceholder"] = "Separate multiple key names with spaces",
         ["GamepadPage_BadKey"] = "Unrecognized key: {0}",
         ["GamepadPage_NeedRedist"] = "The GameInput runtime required for gamepad mapping is missing (built into Windows 11, needs manual install on Windows 10). Download and install it via the link below, then restart the launcher.",
         ["GamepadPage_RedistOutdate"] = "The installed GameInput runtime is outdated. Install the latest version via the link below, then restart the launcher.",
