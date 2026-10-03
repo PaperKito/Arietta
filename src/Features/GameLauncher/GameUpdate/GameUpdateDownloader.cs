@@ -189,6 +189,22 @@ public sealed class GameUpdateDownloader
             });
         }
 
+        
+        
+        using var reporterCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        var reporter = Task.Run(async () =>
+        {
+            try
+            {
+                while (!reporterCts.IsCancellationRequested)
+                {
+                    Report(null);
+                    await Task.Delay(200, reporterCts.Token);
+                }
+            }
+            catch (OperationCanceledException) {  }
+        }, CancellationToken.None);
+
         using var limiter = new SemaphoreSlim(_parallelism);
         
         var speedLimit = new SpeedLimiter();
@@ -234,6 +250,8 @@ public sealed class GameUpdateDownloader
             Report(Path.GetFileName(file.Dest), force: true);
         }, ct));
         await Task.WhenAll(tasks);
+        reporterCts.Cancel();
+        await reporter;
         Report(null, force: true);
         return Interlocked.Read(ref _newBytes);
     }
