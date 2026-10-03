@@ -46,7 +46,7 @@ internal static class LangEn
         ["GamepadPage_NeedRedist"] = "The GameInput runtime is missing (built into Windows 11, needs manual install on Windows 10). Download and install it via the link below, then restart the launcher to enable gamepad support.",
         ["GamepadPage_RedistOutdate"] = "The installed GameInput runtime is outdated. Install the latest version via the link below, then restart the launcher.",
         ["GamepadPage_RedistLink"] = "Download GameInputRedist.msi",
-        ["GamepadPage_ShareNote"] = "Note: due to a system limitation, Xbox Game Bar's built-in screenshot may still fire when Share is mapped, causing duplicate captures. Prefer the Guide button.",
+        ["GamepadPage_ShareNote"] = "Note: due to a system limitation, when Share is set, Xbox Game Bar's built-in screenshot may still fire at the same time, causing duplicate captures. Prefer the Guide button.",
 
         
         ["KuroBbs"] = "Kuro BBS",
@@ -448,6 +448,10 @@ internal static class LangEn
         ["GameLauncherSettingDialog_RelocateGame"] = "Relocate Game",
         ["GameLauncherSettingDialog_Size"] = "Size",
         ["GameLauncherSettingDialog_StartRepairing"] = "Start Repair",
+        ["GameLauncherSettingDialog_StartupArguments"] = "Launch Arguments",
+        ["GameLauncherSettingDialog_CommandLineArgument"] = "Command Line Arguments",
+        ["GameLauncherSettingDialog_CustomProgramTip"] = "When this server's game is not configured or its exe is missing, clicking \"Start Game\" will launch this program instead; it has no effect while the game itself is available.",
+        ["LauncherPage_CustomStartExecutable"] = "Custom Executable",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "Uninstall Game Warning",
         ["LauncherPage_RepairGame"] = "Repair Game",
         ["LauncherPage_ShowGameAnnouncement"] = "Show Game Notices",

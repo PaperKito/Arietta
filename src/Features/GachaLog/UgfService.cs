@@ -344,7 +344,7 @@ public class UgfFile
     public string Format { get; set; } = "UGF";
 
     [JsonPropertyName("version")]
-    public string Version { get; set; } = "1.1";
+    public string Version { get; set; } = "1.2";
 
     [JsonPropertyName("exporter")]
     public UgfExporter Exporter { get; set; } = new();
