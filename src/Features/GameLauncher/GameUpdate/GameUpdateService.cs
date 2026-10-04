@@ -42,8 +42,9 @@ public static class GameUpdateService
     private static readonly Dictionary<GameBiz, BizApi> Configs = new()
     {
         
+        
         [GameBiz.WutheringWaves] = new("G152", "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5",
-            "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5"),
+            "10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ"),
         [GameBiz.WutheringWavesBilibili] = new("G152", "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y",
             "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y"),
         [GameBiz.WutheringWavesGlobal] = new("G153", "50004_obOHXFrFanqsaIEOmuKroCcbZkQRBC7c",
