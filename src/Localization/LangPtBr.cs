@@ -232,7 +232,7 @@ internal static class LangPtBr
         ["GameUpdate_Predownloaded"] = "{0} já está em pré-download; poderá ser instalado diretamente quando a atualização abrir",
         ["GameUpdate_PredownloadButton"] = "Pré-baixar",
         ["GameUpdate_ConfirmPredownload"] = "Pré-baixar a versão {0}? Download total: {1}. Os arquivos ficam na pasta predownload dentro da pasta do jogo; ao aplicar a atualização oficial não será necessário baixar de novo.",
-        ["GameUpdate_Applying"] = "Aplicando a atualização…",
+        ["GameUpdate_Applying"] = "Extraindo a atualização…",
         ["GameUpdate_Pausing"] = "Pausando…",
         ["GameUpdate_Predownloading"] = "Pré-baixando {0}…",
 

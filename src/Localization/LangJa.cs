@@ -235,7 +235,7 @@ internal static class LangJa
         ["GameUpdate_Predownloaded"] = "{0} は事前ダウンロード済みです。アップデート開始後にそのままインストールできます",
         ["GameUpdate_PredownloadButton"] = "事前ダウンロード",
         ["GameUpdate_ConfirmPredownload"] = "バージョン {0} を事前ダウンロードしますか？合計 {1} のダウンロードが必要です。ファイルはゲームフォルダ内の predownload フォルダに保存され、公式アップデートの適用時に再ダウンロードは不要です。",
-        ["GameUpdate_Applying"] = "アップデートを適用中…",
+        ["GameUpdate_Applying"] = "アップデートを展開中…",
         ["GameUpdate_Pausing"] = "一時停止中…",
         ["GameUpdate_Predownloading"] = "{0} を事前ダウンロード中…",
 

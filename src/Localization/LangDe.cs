@@ -232,7 +232,7 @@ internal static class LangDe
         ["GameUpdate_Predownloaded"] = "{0} vorab geladen; kann nach Freigabe des Updates direkt installiert werden",
         ["GameUpdate_PredownloadButton"] = "Vorab laden",
         ["GameUpdate_ConfirmPredownload"] = "Version {0} vorab laden? Gesamtgröße {1}. Die Dateien werden im Ordner predownload des Spielordners zwischengespeichert; beim Anwenden des offiziellen Updates ist kein erneuter Download nötig.",
-        ["GameUpdate_Applying"] = "Update wird angewendet…",
+        ["GameUpdate_Applying"] = "Update wird entpackt…",
         ["GameUpdate_Pausing"] = "Pausieren…",
         ["GameUpdate_Predownloading"] = "Vorab-Download {0}…",
 

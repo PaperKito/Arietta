@@ -232,7 +232,7 @@ internal static class LangTh
         ["GameUpdate_Predownloaded"] = "พรีโหลด {0} แล้ว เมื่อเปิดอัปเดตจะติดตั้งได้ทันที",
         ["GameUpdate_PredownloadButton"] = "พรีโหลด",
         ["GameUpdate_ConfirmPredownload"] = "พรีโหลดเวอร์ชัน {0} หรือไม่? ต้องดาวน์โหลดทั้งหมด {1} ไฟล์จะถูกเก็บไว้ในโฟลเดอร์ predownload ในโฟลเดอร์เกม เมื่อทางการเปิดอัปเดตก็ไม่ต้องดาวน์โหลดซ้ำ",
-        ["GameUpdate_Applying"] = "กำลังปรับใช้การอัปเดต…",
+        ["GameUpdate_Applying"] = "กำลังแตกไฟล์อัปเดต…",
         ["GameUpdate_Pausing"] = "กำลังหยุดชั่วคราว…",
         ["GameUpdate_Predownloading"] = "กำลังดาวน์โหลดล่วงหน้า {0}…",
 

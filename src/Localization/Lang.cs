@@ -385,12 +385,12 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameUpdate_PredownloadTitle => T("预下载新版本 {0}");
     public string GameUpdate_PackageSize => T("安装包大小 ");
     public string GameUpdate_PredownloadedSize => T("已预下载 ");
-    public string GameUpdate_Applying => T("正在应用更新…");
+    public string GameUpdate_Applying => T("正在解压更新…");
     
     public string GameUpdate_Pausing => T("正在暂停…");
 
-    public string GameUpdate_ApplyingProgress => T("正在应用更新 {0} / {1}");
-    public string GameUpdate_Patching => T("正在应用补丁 {0} / {1}");
+    public string GameUpdate_ApplyingProgress => T("正在解压更新 {0} / {1}");
+    public string GameUpdate_Patching => T("正在解压补丁 {0} / {1}");
     public string GameUpdate_GameRunning => T("游戏正在运行，请先退出游戏再更新");
     public string GameUpdate_ErrPatchFailed => T("补丁应用失败：{0}（退出码 {1}）");
     public string GameUpdate_ErrNotEnoughSpaceForPatch => T("磁盘空间不足：应用补丁还需要至少 {0} 的可用空间");
