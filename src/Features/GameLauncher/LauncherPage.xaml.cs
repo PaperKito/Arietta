@@ -1305,6 +1305,12 @@ public sealed partial class LauncherPage : PageBase
         }
         RunningGameTime = null;
         RunningGameInfo = null;
+        
+        
+        
+        
+        GameState = GameState.StartGame;
+        Button_StartGame.GameCommand = StartGameCommand;
     }
 
 
@@ -1319,17 +1325,51 @@ public sealed partial class LauncherPage : PageBase
             return;
         }
         using Process? running = _recordService.FindRunningClient(biz);
-        if (running is not null && PlayTimeRecordService.HasOwnStartRecord(biz, running.Id))
+        if (running is null)
+        {
+            return;
+        }
+        if (!PlayTimeRecordService.HasOwnStartRecord(biz, running.Id))
         {
             
             
             
-            EnterRunningState(biz);
             
             
             
-            
-            _ = _recordService.StartProcessToLogAsync(new GameId(biz, biz.ToString()), running.Id);
+            AppConfig.GetLogger<LauncherPage>().LogInformation("Game process of {biz} (pid {pid}) has no Start record yet, will retry takeover", biz, running.Id);
+            _ = RetryEnterRunningStateAsync(biz, running.Id);
+            return;
+        }
+        EnterRunningState(biz);
+        
+        
+        
+        
+        _ = _recordService.StartProcessToLogAsync(new GameId(biz, biz.ToString()), running.Id);
+    }
+
+
+    
+    
+    
+    
+    
+    private async Task RetryEnterRunningStateAsync(GameBiz biz, int pid)
+    {
+        for (int i = 0; i < 17; i++)
+        {
+            await Task.Delay(2000);
+            if (GameState is GameState.GameIsRunning || _updateBusy || biz != CurrentGameBiz)
+            {
+                return;
+            }
+            if (!PlayTimeRecordService.HasOwnStartRecord(biz, pid))
+            {
+                continue;
+            }
+            DispatcherQueue.TryEnqueue(() => EnterRunningStateIfGameRunning(biz));
+            return;
         }
     }
 

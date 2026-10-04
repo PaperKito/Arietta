@@ -304,6 +304,8 @@ internal static class LangKo
         
         ["FilePage_HardLink"] = "하드 링크",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "같은 디스크의 다른 리전 클라이언트와 동일한 파일은 하드링크로 재사용됩니다. 예상 다운로드는 약 {0}이며, 실제는 설치 시 파일별 검증 기준입니다.",
+        ["InstallGameDialog_HardLinkAfterSize"] = "하드링크 후 크기: ",
+        ["InstallGameDialog_EstimateOnly"] = "이 값은 추정치입니다",
         ["InstallGameDialog_SpaceDesc"] = "압축 패키지 크기이며, 압축 해제 후 실제 사용 공간은 이 값보다 커집니다.",
 ["FilePage_HardLinkDesc"] = "같은 디스크에 여러 클라이언트를 설치할 때 동일 파일을 하드링크하여 저장 공간 사용을 줄입니다",
         ["FilePage_Enabled"] = "켜짐",

@@ -304,6 +304,8 @@ internal static class LangTh
         
         ["FilePage_HardLink"] = "Hard Link",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "ไฟล์ที่เหมือนกันของไคลเอ็นต์ภูมิภาคอื่นในดิสก์เดียวกันจะใช้ฮาร์ดลิงก์ซ้ำ คาดดาวน์โหลดประมาณ {0} เป็นเพียงค่าประมาณ ค่าจริงขึ้นกับการตรวจสอบแต่ละไฟล์ตอนติดตั้ง",
+        ["InstallGameDialog_HardLinkAfterSize"] = "ขนาดหลังฮาร์ดลิงก์: ",
+        ["InstallGameDialog_EstimateOnly"] = "ค่านี้เป็นเพียงค่าประมาณการเท่านั้น",
         ["InstallGameDialog_SpaceDesc"] = "ขนาดของแพ็กเกจบีบอัด พื้นที่ที่ใช้จริงหลังแตกไฟล์จะมากกว่าค่านี้",
 ["FilePage_HardLinkDesc"] = "เมื่อติดตั้งหลายไคลเอ็นต์ในดิสก์เดียวกัน ไฟล์ที่เหมือนกันจะใช้ฮาร์ดลิงก์เพื่อลดพื้นที่จัดเก็บ",
         ["FilePage_Enabled"] = "เปิดอยู่",

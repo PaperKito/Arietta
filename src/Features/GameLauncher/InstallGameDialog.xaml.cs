@@ -75,6 +75,9 @@ public sealed partial class InstallGameDialog : ContentDialog
     
     private long _linkedBytes;
 
+    
+    private bool _estimateDone;
+
     private CancellationTokenSource? _estimateCts;
 
     
@@ -93,6 +96,12 @@ public sealed partial class InstallGameDialog : ContentDialog
     
     
     public string RequiredBytesText { get; private set => SetProperty(ref field, value); } = "";
+
+    
+    
+    
+    
+    public string HardLinkAfterBytesText { get; private set => SetProperty(ref field, value); } = "--";
 
     
     public string? HardLinkEstimateText { get; private set => SetProperty(ref field, value); }
@@ -165,13 +174,14 @@ public sealed partial class InstallGameDialog : ContentDialog
             error = Lang.Instance.InstallGameDialog_SelectInstallationPath;
         }
         AvailableSpaceText = available;
+        RequiredBytesText = GameUpdateSession.FormatSize(TotalBytes);
         
-        bool estimated = _linkedBytes > 0;
-        long spaceNeeded = estimated ? TotalBytes - _linkedBytes : TotalBytes;
-        RequiredBytesText = GameUpdateSession.FormatSize(spaceNeeded);
+        HardLinkAfterBytesText = _estimateDone
+            ? GameUpdateSession.FormatSize(TotalBytes - _linkedBytes)
+            : "---------";
         
         string spaceDesc = Lang.Instance.InstallGameDialog_SpaceDesc;
-        HardLinkEstimateText = estimated
+        HardLinkEstimateText = _linkedBytes > 0
             ? spaceDesc + "\n" + string.Format(Lang.Instance.InstallGameDialog_HardLinkEstimateDesc,
                 GameUpdateSession.FormatSize(TotalBytes - _linkedBytes))
             : spaceDesc;
@@ -189,6 +199,7 @@ public sealed partial class InstallGameDialog : ContentDialog
         _estimateCts?.Cancel();
         var cts = _estimateCts = new CancellationTokenSource();
         _linkedBytes = 0;
+        _estimateDone = false;
         RefreshSpace();
         string path = InstallationPath;
         if (!string.IsNullOrWhiteSpace(path))
@@ -204,6 +215,8 @@ public sealed partial class InstallGameDialog : ContentDialog
             try
             {
                 await Task.Run(() => GameUpdateService.EstimateHardLinkBytes(_biz, _plan, path, progress, cts.Token), cts.Token);
+                _estimateDone = true;
+                RefreshSpace();
             }
             catch (OperationCanceledException)
             {
