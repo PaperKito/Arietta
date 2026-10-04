@@ -304,6 +304,7 @@ internal static class LangFr
         
         ["FilePage_HardLink"] = "Liens matériels",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Les fichiers identiques d’autres clients de région sur le même disque seront réutilisés par liens physiques. Téléchargement estimé : environ {0}. Valeur indicative ; la vérification fichier par fichier lors de l’installation fait foi.",
+        ["InstallGameDialog_SpaceDesc"] = "Ce launcher télécharge directement les fichiers finaux du jeu sur le disque, sans étape de fusion/décompression d'archives ; pas de trafic supplémentaire ni d'espace temporaire requis. L'« espace nécessaire au téléchargement » correspond à la taille finale.",
 ["FilePage_HardLinkDesc"] = "Lorsque plusieurs clients sont installés sur le même disque, les fichiers identiques sont liés physiquement pour réduire l’espace utilisé",
         ["FilePage_Enabled"] = "Activé",
         ["FilePage_Disabled"] = "Désactivé",

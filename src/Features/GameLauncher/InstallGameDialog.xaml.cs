@@ -97,8 +97,6 @@ public sealed partial class InstallGameDialog : ContentDialog
     
     public string? HardLinkEstimateText { get; private set => SetProperty(ref field, value); }
 
-    public Visibility EstimateInfoVisibility { get; private set => SetProperty(ref field, value); }
-
     public string InstallationPath { get => field; set { SetProperty(ref field, value); RefreshSpace(); _ = RecomputeEstimateAsync(); } }
 
     public string AvailableSpaceText { get; private set => SetProperty(ref field, value); } = "--";
@@ -171,11 +169,12 @@ public sealed partial class InstallGameDialog : ContentDialog
         bool estimated = _linkedBytes > 0;
         long spaceNeeded = estimated ? TotalBytes - _linkedBytes : TotalBytes;
         RequiredBytesText = GameUpdateSession.FormatSize(spaceNeeded);
+        
+        string spaceDesc = Lang.Instance.InstallGameDialog_SpaceDesc;
         HardLinkEstimateText = estimated
-            ? string.Format(Lang.Instance.InstallGameDialog_HardLinkEstimateDesc,
+            ? spaceDesc + "\n" + string.Format(Lang.Instance.InstallGameDialog_HardLinkEstimateDesc,
                 GameUpdateSession.FormatSize(TotalBytes - _linkedBytes))
-            : null;
-        EstimateInfoVisibility = estimated ? Visibility.Visible : Visibility.Collapsed;
+            : spaceDesc;
         ErrorMessage = error;
         
         OnPropertyChanged(nameof(CanStart));

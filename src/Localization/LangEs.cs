@@ -304,6 +304,7 @@ internal static class LangEs
         
         ["FilePage_HardLink"] = "Vínculos físicos",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Los archivos idénticos de otros clientes de región en el mismo disco se reutilizarán mediante vínculos físicos. Descarga estimada: unos {0}. Solo es una estimación; rige la verificación por archivo durante la instalación.",
+        ["InstallGameDialog_SpaceDesc"] = "Este launcher descarga directamente los archivos finales del juego al disco, sin pasos de fusión/descompresión de paquetes; no consume tráfico adicional ni requiere espacio temporal extra. El \"espacio necesario para la descarga\" es el tamaño final.",
 ["FilePage_HardLinkDesc"] = "Al instalar varios clientes en el mismo disco, los archivos idénticos se vinculan físicamente para reducir el almacenamiento",
         ["FilePage_Enabled"] = "Activado",
         ["FilePage_Disabled"] = "Desactivado",

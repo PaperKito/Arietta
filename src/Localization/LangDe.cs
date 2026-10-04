@@ -304,6 +304,7 @@ internal static class LangDe
         
         ["FilePage_HardLink"] = "Hardlinks",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Identische Dateien anderer Region-Clients auf derselben Festplatte werden per Hardlink wiederverwendet. Geschätzter Download: ca. {0}. Nur eine Schätzung, maßgeblich ist die dateiweise Prüfung bei der Installation.",
+        ["InstallGameDialog_SpaceDesc"] = "Dieser Launcher lädt die finalen Spieldateien direkt auf die Festplatte — kein Archiv-Zusammenführen/Entpacken, kein zusätzlicher Datenverkehr und kein zusätzlicher temporärer Speicherplatz; der „für den Download erforderliche Speicherplatz\" entspricht der finalen Größe.",
 ["FilePage_HardLinkDesc"] = "Bei mehreren Clients auf demselben Laufwerk werden identische Dateien gehardlinkt, um Speicherplatz zu sparen",
         ["FilePage_Enabled"] = "Aktiviert",
         ["FilePage_Disabled"] = "Deaktiviert",

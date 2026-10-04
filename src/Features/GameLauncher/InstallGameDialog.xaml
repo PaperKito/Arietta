@@ -84,8 +84,7 @@
                 </TextBlock>
                 
                 <Button Padding="4"
-                        Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
-                        Visibility="{x:Bind EstimateInfoVisibility}">
+                        Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
                     <FontIcon FontSize="12"
                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                               Glyph="&#xE9CE;"
