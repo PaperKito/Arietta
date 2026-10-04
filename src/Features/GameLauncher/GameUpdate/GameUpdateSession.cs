@@ -241,13 +241,16 @@ public sealed class GameUpdateSession
     private void OnProgress(GameDownloadProgress p)
     {
         LastProgress = p;
+        
+        static string WithPercent(string text, long done, long total)
+            => total > 0 ? $"{text} · {done * 100 / total}%" : text;
         if (p.Phase == DownloadPhase.Applying)
         {
             IsApplying = true;
             
             ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
             ProgressText = p.TotalFiles > 0
-                ? string.Format(Lang.Instance.GameUpdate_ApplyingProgress, p.CompletedFiles, p.TotalFiles)
+                ? WithPercent(string.Format(Lang.Instance.GameUpdate_ApplyingProgress, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)
                 : Lang.Instance.GameUpdate_Applying;
         }
         else if (p.Phase == DownloadPhase.Patching)
@@ -258,14 +261,14 @@ public sealed class GameUpdateSession
             
             ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
             ProgressText = p.TotalFiles > 0
-                ? string.Format(Lang.Instance.GameUpdate_Patching, p.CompletedFiles, p.TotalFiles)
+                ? WithPercent(string.Format(Lang.Instance.GameUpdate_Patching, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)
                 : Lang.Instance.GameUpdate_Applying;
         }
         else if (p.Phase == DownloadPhase.Verifying)
         {
             IsApplying = false;
             ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
-            ProgressText = string.Format(Lang.Instance.GameUpdate_Verifying, p.CompletedFiles, p.TotalFiles);
+            ProgressText = WithPercent(string.Format(Lang.Instance.GameUpdate_Verifying, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles);
         }
         else
         {
