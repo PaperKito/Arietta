@@ -77,6 +77,17 @@ public sealed class GameUpdateDownloader
     private const string TempSuffix = ".part";
 
     
+    
+    
+    
+    
+    
+    
+    
+    
+    private readonly SemaphoreSlim _diskWriteGate = new(1, 1);
+
+    
     private const int MaxAttempts = 3;
 
     
@@ -260,6 +271,24 @@ public sealed class GameUpdateDownloader
     
     
     
+    private async Task WriteGatedAsync(Func<ValueTask> write, CancellationTokenSource stallCts, CancellationToken ct)
+    {
+        await _diskWriteGate.WaitAsync(ct);
+        try
+        {
+            stallCts.CancelAfter(ReadStallTimeout);
+            await write();
+        }
+        finally
+        {
+            _diskWriteGate.Release();
+        }
+    }
+
+    
+    
+    
+    
     private async Task DownloadWholeAsync(GameResourceEntry file, SemaphoreSlim limiter, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
     {
         string dest = Path.Combine(_destDir, file.Dest);
@@ -324,7 +353,7 @@ public sealed class GameUpdateDownloader
                         while ((read = await source.ReadAsync(buffer, stallCts.Token)) > 0)
                         {
                             await speedLimit.WaitAsync(read, ct);
-                            await output.WriteAsync(buffer.AsMemory(0, read), ct);
+                            await WriteGatedAsync(() => output.WriteAsync(buffer.AsMemory(0, read), ct), stallCts, ct);
                             downloadedNow += read;
                             Interlocked.Add(ref _received, read);
                             Interlocked.Add(ref _newBytes, read);
@@ -498,7 +527,7 @@ public sealed class GameUpdateDownloader
                 while ((read = await source.ReadAsync(buffer, stallCts.Token)) > 0)
                 {
                     await speedLimit.WaitAsync(read, ct);
-                    await output.WriteAsync(buffer.AsMemory(0, read), ct);
+                    await WriteGatedAsync(() => output.WriteAsync(buffer.AsMemory(0, read), ct), stallCts, ct);
                     Interlocked.Add(ref _received, read);
                     Interlocked.Add(ref _newBytes, read);
                     speedMeter.Add(read);
