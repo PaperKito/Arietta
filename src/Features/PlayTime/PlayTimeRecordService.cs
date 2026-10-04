@@ -211,6 +211,22 @@ internal class PlayTimeRecordService
                 var process = FindLoggableProcess(names);
                 if (process is not null)
                 {
+                    string? image;
+                    try
+                    {
+                        image = process.MainModule?.FileName;
+                    }
+                    catch
+                    {
+                        image = null;
+                    }
+                    if (image is not null && IsUnderOtherGameDir(biz, image))
+                    {
+                        
+                        
+                        process.Dispose();
+                        continue;
+                    }
                     await LogPlayTimeAsync(biz, process.Id);
                     return;
                 }
