@@ -132,7 +132,7 @@
                         <ProgressRing Width="28"
                                       Height="28"
                                       Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
-                                      IsIndeterminate="{x:Bind InstallStateIsApplying}"
+                                      IsIndeterminate="{x:Bind InstallRingIndeterminate}"
                                       Value="{x:Bind ProgressRingValue}" />
                         <TextBlock HorizontalAlignment="Center"
                                    VerticalAlignment="Center"

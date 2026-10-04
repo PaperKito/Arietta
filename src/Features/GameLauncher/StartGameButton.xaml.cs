@@ -184,6 +184,9 @@ public sealed partial class StartGameButton : UserControl
     public bool InstallStateIsApplying => InstallPhase is DownloadPhase.Applying;
 
     
+    public bool InstallRingIndeterminate => InstallPhase is DownloadPhase.Applying && !ApplyingHasCounts;
+
+    
     public bool ApplyingHasCounts { get; private set => SetProperty(ref field, value); }
 
     public string InstallStateText => InstallPhase switch
@@ -245,7 +248,7 @@ public sealed partial class StartGameButton : UserControl
         {
             
             ApplyingHasCounts = true;
-            ProgressRingValue = 100;
+            ProgressRingValue = (int)(p.CompletedFiles * 100.0 / p.TotalFiles);
             ProgressPercentText = $"{p.CompletedFiles}/{p.TotalFiles}";
             DownloadBytesText = "";
             DownloadSpeedText = "";
@@ -297,6 +300,7 @@ public sealed partial class StartGameButton : UserControl
         OnPropertyChanged(nameof(NonInstallingVisibility));
         OnPropertyChanged(nameof(InstallingVisibility));
         OnPropertyChanged(nameof(InstallStateIsApplying));
+        OnPropertyChanged(nameof(InstallRingIndeterminate));
         OnPropertyChanged(nameof(ApplyingHasCounts));
         OnPropertyChanged(nameof(InstallStateText));
         OnPropertyChanged(nameof(PauseHintText));
