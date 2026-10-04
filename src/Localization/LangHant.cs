@@ -235,6 +235,7 @@ internal static class LangHant
         ["GameUpdate_PredownloadButton"] = "預先下載",
         ["GameUpdate_ConfirmPredownload"] = "預先下載版本 {0}？共需下載 {1}，檔案會暫存在遊戲目錄的 predownload 資料夾裡，官方開放更新後套用時無需再下載。",
         ["GameUpdate_Applying"] = "正在套用更新…",
+        ["GameUpdate_Pausing"] = "正在暫停…",
         ["GameUpdate_Predownloading"] = "正在預下載 {0}…",
 
         ["GameUpdate_Done"] = "已更新到 {0}",

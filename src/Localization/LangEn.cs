@@ -249,6 +249,7 @@ internal static class LangEn
         ["GameUpdate_PredownloadButton"] = "Pre-download",
         ["GameUpdate_ConfirmPredownload"] = "Pre-download version {0}? Total download {1}. Files are staged in the predownload folder inside the game folder, and nothing is re-downloaded when you apply the update after it goes live.",
         ["GameUpdate_Applying"] = "Applying update…",
+        ["GameUpdate_Pausing"] = "Pausing…",
         ["GameUpdate_Predownloading"] = "Pre-downloading {0}…",
 
         ["GameUpdate_Done"] = "Updated to {0}",

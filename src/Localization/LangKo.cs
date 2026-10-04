@@ -233,6 +233,7 @@ internal static class LangKo
         ["GameUpdate_PredownloadButton"] = "사전 다운로드",
         ["GameUpdate_ConfirmPredownload"] = "버전 {0}을(를) 사전 다운로드할까요? 총 다운로드 {1}. 파일은 게임 폴더 안의 predownload 폴더에 저장되며, 공식 업데이트를 적용할 때 다시 다운로드할 필요가 없습니다.",
         ["GameUpdate_Applying"] = "업데이트 적용 중…",
+        ["GameUpdate_Pausing"] = "일시 중지 중…",
         ["GameUpdate_Predownloading"] = "{0} 사전 다운로드 중…",
 
         ["GameUpdate_Done"] = "{0}(으)로 업데이트했습니다",

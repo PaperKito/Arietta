@@ -233,6 +233,7 @@ internal static class LangFr
         ["GameUpdate_PredownloadButton"] = "Pré-télécharger",
         ["GameUpdate_ConfirmPredownload"] = "Pré-télécharger la version {0} ? Téléchargement total : {1}. Les fichiers sont stockés dans le dossier predownload du dossier du jeu ; lors de l'application de la mise à jour officielle, aucun nouveau téléchargement n'est nécessaire.",
         ["GameUpdate_Applying"] = "Application de la mise à jour…",
+        ["GameUpdate_Pausing"] = "Mise en pause…",
         ["GameUpdate_Predownloading"] = "Pré-téléchargement de {0}…",
 
         ["GameUpdate_Done"] = "Mis à jour vers {0}",

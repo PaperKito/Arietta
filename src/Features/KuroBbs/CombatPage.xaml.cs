@@ -32,6 +32,9 @@ public sealed class CombatPeriodItem
     public Visibility StarIconVisibility { get; init; } = Visibility.Collapsed;
 
     
+    public Visibility ValueVisibility { get; init; } = Visibility.Visible;
+
+    
     public ImageSource? RankSource { get; init; }
 
     
@@ -468,6 +471,12 @@ public sealed partial class CombatPage : PageBase
                 (valueScore, rankSource) = ResolveMatrixPeriodInfo(record);
                 rankSize = MatrixPeriodRankSize;
             }
+            else if (_mode == CombatRecordStore.ModeSlash)
+            {
+                
+                
+                valueScore = ResolveSlashPeriodScore(record);
+            }
             items.Add(new CombatPeriodItem
             {
                 Entry = record,
@@ -475,6 +484,7 @@ public sealed partial class CombatPage : PageBase
                 DateLabel = FormatPeriodDate(record, starts[i]),
                 ValueLabel = _mode == CombatRecordStore.ModeTower ? record.Star.ToString() : valueScore.ToString("N0"),
                 StarIconVisibility = _mode == CombatRecordStore.ModeTower ? Visibility.Visible : Visibility.Collapsed,
+                ValueVisibility = _mode != CombatRecordStore.ModeTower && valueScore <= 0 ? Visibility.Collapsed : Visibility.Visible,
                 RankSource = rankSource,
                 RankIconVisibility = rankSource is null ? Visibility.Collapsed : Visibility.Visible,
                 RankIconSize = rankSize,
@@ -966,14 +976,28 @@ public sealed partial class CombatPage : PageBase
         }
         for (int i = 0; i < teams.Count; i++)
         {
-            list.Children.Add(CreateMatrixTeamRow(teams[i], i + 1));
+            list.Children.Add(CreateMatrixTeamRow(teams[i], i + 1, MeasureRoundColumnWidth(teams, 13)));
         }
         return list;
     }
 
 
     
-    private FrameworkElement CreateMatrixTeamRow(KuroNewTowerTeam team, int index)
+    private static double MeasureRoundColumnWidth(List<KuroNewTowerTeam> teams, double fontSize)
+    {
+        double max = 0;
+        var probe = new TextBlock { FontSize = fontSize };
+        foreach (var team in teams)
+        {
+            probe.Text = string.Format(Lang.Instance.MatrixPage_Round, team.Round);
+            probe.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+            max = Math.Max(max, probe.DesiredSize.Width);
+        }
+        return Math.Ceiling(max);
+    }
+
+    
+    private FrameworkElement CreateMatrixTeamRow(KuroNewTowerTeam team, int index, double roundColumnWidth)
     {
         var row = new Grid
         {
@@ -987,7 +1011,7 @@ public sealed partial class CombatPage : PageBase
         
         
         
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(46) });                    
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(roundColumnWidth) });      
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110) });                   
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(76) });                    
 
@@ -1231,7 +1255,7 @@ public sealed partial class CombatPage : PageBase
         {
             for (int i = 0; i < teams.Count; i++)
             {
-                rows.Children.Add(CreateMatrixShareRow(teams[i], i + 1));
+                rows.Children.Add(CreateMatrixShareRow(teams[i], i + 1, MeasureRoundColumnWidth(teams, 12)));
             }
         }
         body.Children.Add(rows);
@@ -1248,14 +1272,14 @@ public sealed partial class CombatPage : PageBase
 
 
     
-    private FrameworkElement CreateMatrixShareRow(KuroNewTowerTeam team, int index)
+    private FrameworkElement CreateMatrixShareRow(KuroNewTowerTeam team, int index, double roundColumnWidth)
     {
         var row = new Grid { ColumnSpacing = 10 };
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(MatrixTeamIndexWidth) }); 
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });                      
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); 
         
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(40) });                   
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(roundColumnWidth) });      
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(48) });                   
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(58) });                   
 
@@ -1581,12 +1605,9 @@ public sealed partial class CombatPage : PageBase
     
     private static (KuroSlashDifficulty Difficulty, KuroSlashChallenge Challenge)? FindSlashHeadline(KuroSlashData data)
     {
-        var difficulties = (data.DifficultyList ?? []).Where(d => d.ChallengeList is { Count: > 0 }).ToList();
-        var pool = difficulties.Where(d => (d.DifficultyName ?? "").Contains("湍渊")).ToList();
-        if (pool.Count == 0)
-        {
-            pool = difficulties;
-        }
+        var pool = (data.DifficultyList ?? [])
+            .Where(d => (d.DifficultyName ?? "").Contains("湍渊") && d.ChallengeList is { Count: > 0 })
+            .ToList();
 
         (KuroSlashDifficulty, KuroSlashChallenge)? best = null;
         foreach (var difficulty in pool)
@@ -1614,8 +1635,26 @@ public sealed partial class CombatPage : PageBase
                 return score;
             }
         }
-        return (data.DifficultyList ?? []).Where(d => d.ChallengeList is { Count: > 0 })
-            .Select(d => d.AllScore).DefaultIfEmpty(0).Max();
+        return 0;
+    }
+
+
+    
+    private static int ResolveSlashPeriodScore(CombatRecordEntry record)
+    {
+        try
+        {
+            if (JsonSerializer.Deserialize<KuroSlashData>(record.Detail, JsonOptions) is { } slash)
+            {
+                
+                return ResolveSlashHeadlineScore(slash);
+            }
+        }
+        catch
+        {
+            
+        }
+        return record.Score;
     }
 
 

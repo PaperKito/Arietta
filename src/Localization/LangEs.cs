@@ -233,6 +233,7 @@ internal static class LangEs
         ["GameUpdate_PredownloadButton"] = "Predescargar",
         ["GameUpdate_ConfirmPredownload"] = "¿Predescargar la versión {0}? Descarga total: {1}. Los archivos se guardan en la carpeta predownload de la carpeta del juego; al aplicar la actualización oficial no hará falta volver a descargarlos.",
         ["GameUpdate_Applying"] = "Aplicando la actualización…",
+        ["GameUpdate_Pausing"] = "Pausando…",
         ["GameUpdate_Predownloading"] = "Predescargando {0}…",
 
         ["GameUpdate_Done"] = "Actualizado a {0}",
