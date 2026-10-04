@@ -212,7 +212,7 @@ public sealed partial class StartGameButton : UserControl
         ? Visibility.Visible
         : Visibility.Collapsed;
 
-    public Visibility DownloadBytesVisibility => InstallPhase is DownloadPhase.Downloading
+    public Visibility DownloadBytesVisibility => InstallPhase is DownloadPhase.Downloading or DownloadPhase.Applying or DownloadPhase.Patching
         ? Visibility.Visible
         : Visibility.Collapsed;
 
@@ -247,11 +247,13 @@ public sealed partial class StartGameButton : UserControl
         else if (p.Phase is DownloadPhase.Applying && p.TotalFiles > 0)
         {
             
+            
             ApplyingHasCounts = true;
-            ProgressRingValue = (int)(p.CompletedFiles * 100.0 / p.TotalFiles);
-            ProgressPercentText = $"{p.CompletedFiles}/{p.TotalFiles}";
-            DownloadBytesText = "";
-            DownloadSpeedText = "";
+            double applyProgress = (double)p.CompletedFiles / p.TotalFiles;
+            ProgressRingValue = (int)(applyProgress * 100);
+            ProgressPercentText = $"{applyProgress:P1}";
+            DownloadBytesText = ToBytesText(p.ReceivedBytes, p.TotalBytes) ?? "";
+            DownloadSpeedText = ToSpeedText(p.SpeedBytesPerSec);
             RemainTimeText = "--:--:--";
         }
         else

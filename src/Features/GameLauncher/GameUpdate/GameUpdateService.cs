@@ -687,8 +687,10 @@ public static class GameUpdateService
     #region 预下载暂存与应用更新
 
     
-    private delegate void ReportFileProgress(int done, int total, bool force = false);
+    private delegate void ReportFileProgress(int done, int total, long doneBytes = -1, bool force = false);
 
+    
+    
     
     
     
@@ -697,18 +699,33 @@ public static class GameUpdateService
         IProgress<GameDownloadProgress>? progress, long totalBytes, DownloadPhase phase)
     {
         var clock = Stopwatch.StartNew();
-        return (done, total, force) =>
+        long lastBytes = -1;
+        long lastMs = 0;
+        long speed = 0;
+        return (done, total, doneBytes, force) =>
         {
             if (progress == null || (!force && clock.ElapsedMilliseconds < 200))
             {
                 return;
             }
+            long nowMs = clock.ElapsedMilliseconds;
+            if (doneBytes >= 0)
+            {
+                if (lastBytes >= 0 && nowMs > lastMs)
+                {
+                    long inst = (doneBytes - lastBytes) * 1000 / (nowMs - lastMs);
+                    speed = speed == 0 ? inst : (long)(speed * 0.6 + inst * 0.4);
+                }
+                lastBytes = doneBytes;
+                lastMs = nowMs;
+            }
             clock.Restart();
             progress.Report(new GameDownloadProgress
             {
                 Phase = phase,
-                ReceivedBytes = totalBytes,
+                ReceivedBytes = doneBytes >= 0 ? doneBytes : totalBytes,
                 TotalBytes = totalBytes,
+                SpeedBytesPerSec = doneBytes >= 0 ? speed : 0,
                 CompletedFiles = done,
                 TotalFiles = total,
             });
@@ -1222,9 +1239,9 @@ public static class GameUpdateService
         var reportApplying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Applying);
 
         int zipEntryTotal = plan.ZipPackages!.Sum(z => z.Entries?.Count ?? 0);
-        reportApplying(0, zipEntryTotal, force: true);
+        reportApplying(0, zipEntryTotal, 0, force: true);
         await Task.Run(() => ExtractPackages(stageDir, plan.ZipPackages!,
-            (done, total) => reportApplying(done, total), ct), ct);
+            (done, total, bytes) => reportApplying(done, total, bytes), ct), ct);
 
         
         foreach (var info in plan.ZipPackages!)
@@ -1249,10 +1266,11 @@ public static class GameUpdateService
     
     
     
-    private static void ExtractPackages(string stageDir, List<GameResourceZipInfo> packages, Action<int, int>? onProgress = null, CancellationToken ct = default)
+    private static void ExtractPackages(string stageDir, List<GameResourceZipInfo> packages, Action<int, int, long>? onProgress = null, CancellationToken ct = default)
     {
         int total = packages.Sum(p => p.Entries?.Count ?? 0);
         int done = 0;
+        long bytes = 0;
         foreach (var info in packages)
         {
             ct.ThrowIfCancellationRequested();
@@ -1287,7 +1305,9 @@ public static class GameUpdateService
                     throw new InvalidDataException(
                         string.Format(Localization.Lang.Instance.GameUpdate_ErrFileChecksum, entry.Dest));
                 }
-                onProgress?.Invoke(++done, total);
+                done++;
+                bytes += zipEntry.Length;   
+                onProgress?.Invoke(done, total, bytes);
             }
         }
     }
@@ -1437,9 +1457,9 @@ public static class GameUpdateService
         
         var allFiles = plan.AllFiles;
         var reportApplying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Applying);
-        reportApplying(0, allFiles.Count, force: true);
+        reportApplying(0, allFiles.Count, 0, force: true);
         bool keepStaging = await Task.Run(() => ApplyStagedToGame(gameDir, stageDir, allFiles, ct,
-            (done, total) => reportApplying(done, total)), ct);
+            (done, total, bytes) => reportApplying(done, total, bytes)), ct);
 
         
         
@@ -1492,13 +1512,15 @@ public static class GameUpdateService
     
     
     
-    private static bool ApplyStagedToGame(string gameDir, string stageDir, List<GameResourceEntry> files, CancellationToken ct, Action<int, int>? onProgress = null)
+    private static bool ApplyStagedToGame(string gameDir, string stageDir, List<GameResourceEntry> files, CancellationToken ct, Action<int, int, long>? onProgress = null)
     {
         
         bool linkMode = UseHardLink
             && string.Equals(Path.GetPathRoot(stageDir), Path.GetPathRoot(gameDir), StringComparison.OrdinalIgnoreCase)
             && !stageDir.StartsWith(gameDir.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
         int done = 0;
+        long bytes = 0;
+        void Report() => onProgress?.Invoke(done, files.Count, bytes);
         foreach (var file in files)
         {
             ct.ThrowIfCancellationRequested();
@@ -1509,7 +1531,9 @@ public static class GameUpdateService
                 
                 if (VerifyFile(destPath, file, ct))
                 {
-                    onProgress?.Invoke(++done, files.Count);
+                    done++;
+                    bytes += file.Size;
+                    Report();
                     continue;
                 }
                 throw new FileNotFoundException(string.Format(Localization.Lang.Instance.GameUpdate_ErrFileMissing, file.Dest), staged);
@@ -1527,13 +1551,17 @@ public static class GameUpdateService
                 }
                 if (CreateHardLinkSafe(staged, destPath))
                 {
-                    onProgress?.Invoke(++done, files.Count);
+                    done++;
+                    bytes += file.Size;
+                    Report();
                     continue;
                 }
                 
             }
             File.Move(staged, destPath, true);
-            onProgress?.Invoke(++done, files.Count);
+            done++;
+            bytes += file.Size;
+            Report();
         }
         return linkMode;
     }
@@ -1623,13 +1651,14 @@ public static class GameUpdateService
         var dstSet = plan.KrdiffDstFiles.Select(f => f.Dest).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var report = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Patching);
         _logger.LogInformation("krpdiff: {Count} 组补丁，最大组 dst {Bytes}，temp {Dir}", total, maxGroupBytes, tempDir);
+        long patchBytes = 0;
 
         for (int i = 0; i < total; i++)
         {
             ct.ThrowIfCancellationRequested();
             var group = groups[i];
             var dstFiles = group.DstFiles ?? [];
-            report(i, total);
+            report(i, total, patchBytes);
             string marker = Path.Combine(tempDir, $"g_{i}");
             if (!File.Exists(marker))
             {
@@ -1657,8 +1686,9 @@ public static class GameUpdateService
                 _logger.LogInformation("krpdiff: 组 {Index}/{Total} 落位完成 {Dest}（{Files} 个文件）",
                     i + 1, total, group.Dest, dstFiles.Count);
             }
+            patchBytes += dstFiles.Sum(f => f.Size);
             try { File.Delete(Path.Combine(stageDir, group.Dest)); } catch { }   
-            report(i + 1, total, force: true);
+            report(i + 1, total, patchBytes, force: true);
         }
 
         
@@ -2002,10 +2032,10 @@ public static class GameUpdateService
 
         var allFiles = plan.AllFiles;
         var reportApplying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Applying);
-        reportApplying(0, allFiles.Count, force: true);
+        reportApplying(0, allFiles.Count, 0, force: true);
         
         bool keepStaging = await Task.Run(() => ApplyStagedToGame(installDir, stageDir, allFiles, ct,
-            (done, total) => reportApplying(done, total)), ct);
+            (done, total, bytes) => reportApplying(done, total, bytes)), ct);
 
         
         
