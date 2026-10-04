@@ -87,7 +87,11 @@ public sealed partial class LauncherPage : PageBase
     
     
     
-    private bool _updateBusy => GameUpdateSession.Current.IsBusy;
+    
+    
+    
+    
+    private bool _updateBusy => GameUpdateSession.Current.IsActiveFor(CurrentGameBiz);
 
     
     private bool _updateSessionWasActive;
@@ -842,7 +846,7 @@ public sealed partial class LauncherPage : PageBase
     [RelayCommand]
     private void UpdateGame()
     {
-        if (_updateState is not { HasUpdate: true, Kind: GameUpdateService.UpdateKind.Update } || _updateBusy)
+        if (_updateState is not { HasUpdate: true, Kind: GameUpdateService.UpdateKind.Update } || GameUpdateSession.Current.IsBusy)
         {
             return;
         }
@@ -873,7 +877,7 @@ public sealed partial class LauncherPage : PageBase
             GameUpdateSession.Current.Cancel();
             return;
         }
-        if (_updateBusy)
+        if (GameUpdateSession.Current.IsBusy)
         {
             return;
         }
@@ -978,7 +982,7 @@ public sealed partial class LauncherPage : PageBase
     [RelayCommand]
     private async Task InstallGameAsync()
     {
-        if (_updateBusy || GameUpdateSession.Current.IsBusy)
+        if (GameUpdateSession.Current.IsBusy)
         {
             return;
         }
