@@ -309,7 +309,7 @@ internal static class LangHant
         
         ["FilePage_HardLink"] = "硬連結",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "同磁碟其它區服客戶端的相同檔案將直接硬連結複用，預計實際需下載約 {0}；該值僅為預估值，實際以下載時逐檔案校驗為準。",
-        ["InstallGameDialog_SpaceDesc"] = "本啟動器直接按遊戲最終檔案落碟下載，無壓縮檔合併/解壓環節，不消耗額外流量、也不需要額外暫存空間；「下載所需空間」即最終佔用大小。",
+        ["InstallGameDialog_SpaceDesc"] = "下載的是壓縮檔，全部下載完成後才就地解壓並落進遊戲目錄；解壓過程不消耗額外流量，但需要額外的磁碟空間（最終佔用比下載量更大）。",
 ["FilePage_HardLinkDesc"] = "同磁碟安裝多個用戶端時，硬連結相同檔案，從而減少佔用的儲存空間",
         ["FilePage_Enabled"] = "已啟用",
         ["FilePage_Disabled"] = "已停用",

@@ -304,7 +304,7 @@ internal static class LangKo
         
         ["FilePage_HardLink"] = "하드 링크",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "같은 디스크의 다른 리전 클라이언트와 동일한 파일은 하드링크로 재사용됩니다. 예상 다운로드는 약 {0}이며, 실제는 설치 시 파일별 검증 기준입니다.",
-        ["InstallGameDialog_SpaceDesc"] = "이 런처는 게임 최종 파일을 디스크에 바로 다운로드합니다. 압축 패키지 병합/압축 해제 단계가 없어 추가 트래픽이나 임시 디스크 공간이 필요하지 않습니다. 「다운로드 필요 공간」이 곧 최종 사용 공간입니다.",
+        ["InstallGameDialog_SpaceDesc"] = "다운로드는 압축 패키지로 이루어지며, 모두 내려받은 후 로컬에서 압축을 해제해 게임 폴더로 옮깁니다. 압축 해제 중 추가 트래픽은 없지만 추가 디스크 공간이 필요합니다(최종 용량은 다운로드 크기보다 큽니다).",
 ["FilePage_HardLinkDesc"] = "같은 디스크에 여러 클라이언트를 설치할 때 동일 파일을 하드링크하여 저장 공간 사용을 줄입니다",
         ["FilePage_Enabled"] = "켜짐",
         ["FilePage_Disabled"] = "꺼짐",
