@@ -304,7 +304,7 @@ internal static class LangDe
         
         ["FilePage_HardLink"] = "Hardlinks",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Identische Dateien anderer Region-Clients auf derselben Festplatte werden per Hardlink wiederverwendet. Geschätzter Download: ca. {0}. Nur eine Schätzung, maßgeblich ist die dateiweise Prüfung bei der Installation.",
-        ["InstallGameDialog_SpaceDesc"] = "Geladen werden komprimierte Pakete; nach dem Download werden sie entpackt und ins Spielverzeichnis verschoben. Das Entpacken verbraucht kein zusätzliches Datenvolumen, benötigt aber zusätzlichen Festplattenspeicher (die finale Größe ist größer als der Download).",
+        ["InstallGameDialog_SpaceDesc"] = "Dies ist die Größe der komprimierten Pakete; der tatsächliche Speicherplatzbedarf nach dem Entpacken ist größer.",
 ["FilePage_HardLinkDesc"] = "Bei mehreren Clients auf demselben Laufwerk werden identische Dateien gehardlinkt, um Speicherplatz zu sparen",
         ["FilePage_Enabled"] = "Aktiviert",
         ["FilePage_Disabled"] = "Deaktiviert",

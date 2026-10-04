@@ -304,7 +304,7 @@ internal static class LangPtBr
         
         ["FilePage_HardLink"] = "Hardlinks",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Arquivos idênticos de outros clientes de região no mesmo disco serão reutilizados via links físicos. Download estimado: cerca de {0}. Apenas uma estimativa; vale a verificação arquivo por arquivo na instalação.",
-        ["InstallGameDialog_SpaceDesc"] = "O download consiste em pacotes compactados; após concluído, eles são extraídos localmente e movidos para a pasta do jogo. A extração não consome tráfego extra, mas precisa de espaço em disco adicional (o tamanho final é maior que o download).",
+        ["InstallGameDialog_SpaceDesc"] = "É o tamanho dos pacotes compactados; o espaço realmente ocupado após a extração será maior.",
 ["FilePage_HardLinkDesc"] = "Ao instalar vários clientes no mesmo disco, arquivos idênticos são vinculados fisicamente para reduzir o uso de armazenamento",
         ["FilePage_Enabled"] = "Ativado",
         ["FilePage_Disabled"] = "Desativado",

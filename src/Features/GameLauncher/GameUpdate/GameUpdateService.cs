@@ -2057,6 +2057,9 @@ public static class GameUpdateService
         {
             _logger.LogWarning("Install: 安装目录里没找到游戏 exe {Biz}，请到设置里手动定位", biz);
         }
+        
+        
+        GameAutoSearch.WriteOfficialLedger(biz, installDir, elevateForHklm: true);
 
         WriteLocalVersion(installDir, target.Version!);
         if (keepStaging)

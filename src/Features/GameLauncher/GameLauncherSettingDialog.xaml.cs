@@ -394,6 +394,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
         LocateError = null;
         AppConfig.SetConfig(GameRegistry.GetExePathConfigKey(CurrentGameBiz), path);
+        Arietta.Helpers.GameAutoSearch.WriteOfficialLedger(CurrentGameBiz, Path.GetDirectoryName(path));
         InstallPath = path;
         UninstallAndRepairEnabled = true;
         _ = UpdateGameSizeAsync(path);
@@ -538,6 +539,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     private void ClearInstallPathUi()
     {
         AppConfig.SetConfig(GameRegistry.GetExePathConfigKey(CurrentGameBiz), null);
+        Arietta.Helpers.GameAutoSearch.WriteOfficialLedger(CurrentGameBiz, null);
         InstallPath = null;
         UninstallAndRepairEnabled = false;
         GameSize = null;

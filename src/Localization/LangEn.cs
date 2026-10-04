@@ -283,7 +283,7 @@ internal static class LangEn
         ["InstallGameDialog_SpaceAvailable"] = "Available space ",
         ["InstallGameDialog_InsufficientSpace"] = "Insufficient available space",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Identical files from other region clients on the same disk will be hard-linked. Estimated download is about {0}; this is an estimate only, subject to per-file verification during install.",
-        ["InstallGameDialog_SpaceDesc"] = "The download consists of compressed packages; after everything is downloaded they are extracted locally and moved into the game directory. Extraction uses no extra bandwidth but does need extra disk space (the final size is larger than the download).",
+        ["InstallGameDialog_SpaceDesc"] = "This is the compressed package size; actual disk usage after extraction will be larger.",
         ["InstallGameDialog_TierUHD"] = "UHD (Extreme)",
         ["InstallGameDialog_TierHD"] = "HD (High)",
         ["InstallGameDialog_TierSD"] = "SD (Smooth)",

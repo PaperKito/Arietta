@@ -430,7 +430,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string InstallGameDialog_SpaceAvailable => T("可用空间 ");
     public string InstallGameDialog_InsufficientSpace => T("可用空间不足");
     public string InstallGameDialog_HardLinkEstimateDesc => T("同盘其它区服客户端的相同文件将直接硬链接复用，预计实际需下载约 {0}；该值仅为预估值，实际以下载时逐文件校验为准。");
-    public string InstallGameDialog_SpaceDesc => T("下载的是压缩包文件，全部下载完成后才就地解压并落进游戏目录；解压过程不消耗额外流量，但需要额外的磁盘空间（最终占用比下载量更大）。");
+    public string InstallGameDialog_SpaceDesc => T("为压缩包文件大小，解压后实际占用空间会大于该值");
     
     public string InstallGameDialog_TierUHD => T("极致(UHD)");
     public string InstallGameDialog_TierHD => T("高清(HD)");

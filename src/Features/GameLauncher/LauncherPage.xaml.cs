@@ -1104,6 +1104,7 @@ public sealed partial class LauncherPage : PageBase
 
             AppConfig.SetConfig(GameRegistry.GetExePathConfigKey(biz), exe);
             AppConfig.SetConfig(GameRegistry.GetInstallDirConfigKey(biz), Path.GetDirectoryName(exe));
+            Arietta.Helpers.GameAutoSearch.WriteOfficialLedger(biz, Path.GetDirectoryName(exe));
             UpdateGameState();
         }
         catch (Exception ex)

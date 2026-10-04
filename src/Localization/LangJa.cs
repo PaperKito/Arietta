@@ -306,7 +306,7 @@ internal static class LangJa
         
         ["FilePage_HardLink"] = "ハードリンク",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "同一ディスク上の他リージョンクライアントの同一ファイルはハードリンクで再利用されます。ダウンロードは約 {0} の見込みです。これは推定値であり、実際はインストール時のファイルごとの検証によります。",
-        ["InstallGameDialog_SpaceDesc"] = "ダウンロードは圧縮パッケージで、すべてのダウンロード完了後にローカルで展開してゲームフォルダへ移動します。展開中に追加のトラフィックは発生しませんが、追加のディスク容量が必要です（最終容量はダウンロード量より大きくなります）。",
+        ["InstallGameDialog_SpaceDesc"] = "圧縮パッケージのサイズです。展開後の実際の使用容量はこれより大きくなります。",
 ["FilePage_HardLinkDesc"] = "同一ディスクに複数のクライアントをインストールする際、同一ファイルをハードリンクしてストレージ使用量を削減します",
         ["FilePage_Enabled"] = "有効",
         ["FilePage_Disabled"] = "無効",

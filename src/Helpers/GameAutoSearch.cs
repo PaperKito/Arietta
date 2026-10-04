@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
+using Microsoft.Extensions.Logging;
 using Arietta.Core;
 
 namespace Arietta.Helpers;
@@ -77,6 +78,72 @@ internal static class GameAutoSearch
             }
         }
         return null;
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    public static void WriteOfficialLedger(GameBiz gameBiz, string? gameDir, bool elevateForHklm = false)
+    {
+        foreach (var keyName in Core.GameRegistry.GetEntry(gameBiz).RegistryKeys)
+        {
+            
+            
+            bool hklm = keyName.StartsWith("HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase);
+            if (hklm)
+            {
+                if (gameDir is not null && elevateForHklm)
+                {
+                    WriteElevatedRegAdd(keyName["HKEY_LOCAL_MACHINE\\".Length..], "InstallPath", gameDir);
+                }
+                continue;
+            }
+            try
+            {
+                string valueName = keyName.Contains(@"kurogame\KRLauncher", StringComparison.OrdinalIgnoreCase)
+                    ? "SingleLauncherInstallPath" : "InstallPath";
+                if (gameDir is null)
+                {
+                    using var reg = Registry.CurrentUser.OpenSubKey(keyName["HKEY_CURRENT_USER\\".Length..], writable: true);
+                    reg?.DeleteValue(valueName, throwOnMissingValue: false);
+                }
+                else
+                {
+                    Registry.SetValue(keyName, valueName, gameDir);
+                }
+            }
+            catch (Exception ex)
+            {
+                AppConfig.GetLogger("GameAutoSearch").LogWarning(ex, "写官方安装账本失败 {Key}", keyName);
+            }
+        }
+    }
+
+    
+    private static void WriteElevatedRegAdd(string subKey, string valueName, string value)
+    {
+        try
+        {
+            var psi = new System.Diagnostics.ProcessStartInfo("reg.exe")
+            {
+                Arguments = $"add \"{subKey}\" /v {valueName} /t REG_SZ /d \"{value}\" /f",
+                UseShellExecute = true,
+                Verb = "runas",
+                CreateNoWindow = true,
+            };
+            using var p = System.Diagnostics.Process.Start(psi);
+            p?.WaitForExit(15000);
+        }
+        catch (Exception ex)
+        {
+            
+            AppConfig.GetLogger("GameAutoSearch").LogInformation(ex, "elevated 写 HKLM 账本被取消或失败 {SubKey}", subKey);
+        }
     }
 
 
