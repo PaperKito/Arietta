@@ -386,6 +386,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameUpdate_ConfirmPredownload => T("预下载版本 {0}？共需下载 {1}，文件将暂存在游戏目录的 predownload 文件夹里，官方开放更新后应用时无需再下载。");
     public string GameUpdate_PredownloadTitle => T("预下载新版本 {0}");
     public string GameUpdate_PackageSize => T("安装包大小 ");
+    public string GameUpdate_SpaceRequired => T("所需空间 ");
     public string GameUpdate_PredownloadedSize => T("已预下载 ");
     public string GameUpdate_Applying => T("正在解压更新…");
     

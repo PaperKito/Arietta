@@ -37,7 +37,7 @@
                     <TextBlock FontSize="12"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                IsTextScaleFactorEnabled="False">
-                        <Run Text="{x:Bind lang:Lang.Instance.GameUpdate_PackageSize, Mode=OneWay}" />
+                        <Run Text="{x:Bind SizeLabel}" />
                         <Run Text="{x:Bind PackageSizeText}" />
                     </TextBlock>
                     

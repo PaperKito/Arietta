@@ -23,9 +23,12 @@ public sealed partial class PreDownloadDialog : ContentDialog
     {
         _biz = biz;
         _totalBytes = state.TotalBytes;
+        _requiredBytes = state.RequiredDiskSpace;
         _stagedBytes = state.PredownloadedBytes;
         TitleText = string.Format(Lang.Instance.GameUpdate_PredownloadTitle, state.TargetVersion);
-        PackageSizeText = GameUpdateSession.FormatSize(state.TotalBytes);
+        
+        SizeLabel = _requiredBytes > 0 ? Lang.Instance.GameUpdate_SpaceRequired : Lang.Instance.GameUpdate_PackageSize;
+        PackageSizeText = GameUpdateSession.FormatSize(_requiredBytes > 0 ? _requiredBytes : _totalBytes);
         PredownloadedSizeText = GameUpdateSession.FormatSize(_stagedBytes);
         StartButtonText = state.HasStagedProgress
             ? Lang.Instance.GameUpdate_ContinuePredownload
@@ -36,12 +39,14 @@ public sealed partial class PreDownloadDialog : ContentDialog
 
     private readonly GameBiz _biz;
     private readonly long _totalBytes;
+    private readonly long _requiredBytes;
     private readonly long _stagedBytes;
 
     
     public bool Confirmed { get; private set; }
 
     public string TitleText { get; }
+    public string SizeLabel { get; }
     public string PackageSizeText { get; }
     public string PredownloadedSizeText { get; }
     public string StartButtonText { get; }
@@ -64,6 +69,7 @@ public sealed partial class PreDownloadDialog : ContentDialog
     
     
     
+    
     private void RefreshSpace()
     {
         string? error = null;
@@ -77,8 +83,8 @@ public sealed partial class PreDownloadDialog : ContentDialog
                 if (drive.IsReady)
                 {
                     available = GameUpdateSession.FormatSize(drive.AvailableFreeSpace);
-                    long remaining = Math.Max(0, _totalBytes - _stagedBytes);
-                    if (drive.AvailableFreeSpace < remaining)
+                    long budget = Math.Max(0, (_requiredBytes > 0 ? _requiredBytes : _totalBytes) - _stagedBytes);
+                    if (drive.AvailableFreeSpace < budget)
                     {
                         error = Lang.Instance.InstallGameDialog_InsufficientSpace;
                     }

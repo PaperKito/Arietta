@@ -352,6 +352,9 @@ public static class GameUpdateService
         
         public bool HasStagedProgress { get; init; }
 
+        
+        public long RequiredDiskSpace { get; init; }
+
         public bool HasUpdate => Kind != UpdateKind.None;
     }
 
@@ -440,6 +443,7 @@ public static class GameUpdateService
                 PredownloadedCount = staged.Item1,
                 PredownloadedBytes = staged.Item2 + partBytes,
                 HasStagedProgress = staged.Item1 > 0 || partBytes > 0,
+                RequiredDiskSpace = plan?.RequiredDiskSpace ?? 0,
             };
         }
 
@@ -458,6 +462,7 @@ public static class GameUpdateService
                 PlanInfo = plan,
                 TotalBytes = plan?.TotalBytes ?? 0,
                 PredownloadedCount = staged.Item1,
+                RequiredDiskSpace = plan?.RequiredDiskSpace ?? 0,
             };
         }
 
@@ -531,8 +536,11 @@ public static class GameUpdateService
         }
         
         string? zipBaseUrl = patch?.BaseUrl;
+        
+        
+        long requiredDiskSpace = patch?.Ext?.RequiredDiskSpace ?? 0;
         return new DownloadPlan(files, baseUrl, total, zipBaseUrl, list.ZipInfos, target.Version,
-            list.GroupInfos is { Count: > 0 } ? list.GroupInfos : null, patchFiles);
+            list.GroupInfos is { Count: > 0 } ? list.GroupInfos : null, patchFiles, requiredDiskSpace);
     }
 
     
@@ -594,7 +602,8 @@ public static class GameUpdateService
         List<GameResourceZipInfo>? ZipPackages = null,
         string? Version = null,
         List<GameResourceGroupInfo>? KrdiffGroups = null,
-        List<GameResourceEntry>? KrdiffFiles = null)
+        List<GameResourceEntry>? KrdiffFiles = null,
+        long RequiredDiskSpace = 0)
     {
         public bool HasZipPackages => ZipPackages is { Count: > 0 };
 

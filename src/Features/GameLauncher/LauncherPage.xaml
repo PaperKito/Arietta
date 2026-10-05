@@ -3,6 +3,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:bg="using:Arietta.Features.Background"
+             xmlns:cu="using:CommunityToolkit.WinUI"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:lang="using:Arietta.Localization"
              xmlns:local="using:Arietta.Features.GameLauncher"
@@ -268,22 +269,36 @@
                         PointerExited="Button_PreDownload_PointerExited"
                         ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameUpdate_PredownloadButton}"
                         Visibility="Collapsed">
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="8">
-                        <FontIcon FontFamily="Segoe Fluent Icons"
-                                  FontSize="24"
-                                  FontWeight="Bold"
-                                  Foreground="White"
-                                  Glyph="&#xEBD3;"
-                                  IsTextScaleFactorEnabled="False" />
-                        <TextBlock x:Name="Text_PreDownload"
-                                   VerticalAlignment="Center"
-                                   FontSize="16"
-                                   FontWeight="Bold"
-                                   Foreground="White"
-                                   IsTextScaleFactorEnabled="False"
-                                   Text="{x:Bind lang:Lang.Instance.GameUpdate_PredownloadButton, Mode=OneWay}" />
-                    </StackPanel>
+                    <Grid>
+                        <Grid.Resources>
+                            
+                            <cu:AttachedDropShadow x:Key="PreDownloadTextShadow"
+                                                   BlurRadius="6"
+                                                   CastTo="{x:Bind Border_PreDownloadShadowTarget}"
+                                                   Offset="0,2"
+                                                   Color="#80000000" />
+                        </Grid.Resources>
+                        
+                        <Border x:Name="Border_PreDownloadShadowTarget" />
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="8">
+                            <FontIcon FontFamily="Segoe Fluent Icons"
+                                      FontSize="24"
+                                      FontWeight="Bold"
+                                      Foreground="White"
+                                      Glyph="&#xEBD3;"
+                                      IsTextScaleFactorEnabled="False"
+                                      cu:Effects.Shadow="{StaticResource PreDownloadTextShadow}" />
+                            <TextBlock x:Name="Text_PreDownload"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       IsTextScaleFactorEnabled="False"
+                                       Text="{x:Bind lang:Lang.Instance.GameUpdate_PredownloadButton, Mode=OneWay}"
+                                       cu:Effects.Shadow="{StaticResource PreDownloadTextShadow}" />
+                        </StackPanel>
+                    </Grid>
                 </Button>
 
                 

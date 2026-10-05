@@ -139,6 +139,20 @@ public sealed class GamePatchConfig
 
     [JsonPropertyName("size")]
     public long Size { get; set; }
+
+    
+    
+    
+    
+    
+    [JsonPropertyName("ext")]
+    public GamePatchConfigExt? Ext { get; set; }
+}
+
+public sealed class GamePatchConfigExt
+{
+    [JsonPropertyName("requiredDiskSpace")]
+    public long RequiredDiskSpace { get; set; }
 }
 
 
