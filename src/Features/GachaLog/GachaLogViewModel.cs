@@ -283,7 +283,14 @@ public partial class GachaLogViewModel : ObservableObject
             }
             else
             {
-                SetStatus(Lang.Instance.GachaLogPage_FetchFailed, true);
+                
+                
+                
+                InAppToast.MainWindow?.ShowWithButton(InfoBarSeverity.Warning,
+                                                      Lang.Instance.GachaLogPage_FetchEmpty,
+                                                      Lang.Instance.GachaLogPage_FetchEmptyDesc,
+                                                      Lang.Instance.GachaLogPage_RefetchFromCloudGame,
+                                                      () => CloudGameFetchRequested?.Invoke());
             }
             return null;
         }

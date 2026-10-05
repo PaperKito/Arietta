@@ -196,6 +196,8 @@ internal static class LangDe
         ["GachaLogPage_NoSavedUrl"] = "Kein gespeicherter Link vorhanden. Führe zuerst „Aktualisieren (alle)“ aus.",
         ["GachaLogPage_LinkExpired"] = "Einberufungslink abgelaufen",
         ["GachaLogPage_LinkExpiredDesc"] = "Der Link ist abgelaufen (API antwortete mit {0}). Öffne „Einberufungsnachweise“ im Spiel erneut.",
+        ["GachaLogPage_FetchEmpty"] = "Keine Einberufungsnachweise gefunden",
+        ["GachaLogPage_FetchEmptyDesc"] = "Die API meldete keinen Fehler, aber alle Banner sind leer — der Link ist möglicherweise abgelaufen. Öffne „Einberufungsnachweise“ im Spiel erneut und versuche es wieder.",
         ["GachaLogPage_UpdateFailed"] = "Einberufungsverlauf konnte nicht aktualisiert werden: {0}",
         ["GachaLogPage_FetchFailed"] = "Einberufungsdaten konnten nicht abgerufen werden. Bitte erneut versuchen.",
         ["GachaLogPage_LogNotFound"] = "Spiel-Log oder Einberufungslink nicht gefunden: lege das Spiel (Wuthering Waves.exe) in den Einstellungen fest und öffne einmal „Einberufungsnachweise“ im Spiel, oder wähle im Menü „Einberufungen aktualisieren“ die Option „Über Link importieren“",

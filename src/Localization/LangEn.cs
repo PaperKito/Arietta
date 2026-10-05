@@ -211,6 +211,8 @@ internal static class LangEn
         ["GachaLogPage_NoSavedUrl"] = "No saved link yet. Run 'Update (All)' first.",
         ["GachaLogPage_LinkExpired"] = "Convene link expired",
         ["GachaLogPage_LinkExpiredDesc"] = "The link has expired (API returned {0}). Open 'Convene Details' in game again.",
+        ["GachaLogPage_FetchEmpty"] = "No convene records found",
+        ["GachaLogPage_FetchEmptyDesc"] = "The API returned no error but every banner is empty — the link may have expired. Open 'Convene Details' in game and try again.",
         ["GachaLogPage_RefetchFromCloudGame"] = "Refetch via cloud game",
         ["GachaLogPage_UpdateFailed"] = "Failed to update convene records: {0}",
         ["GachaLogPage_FetchFailed"] = "Failed to fetch convene data. Please try again.",

@@ -198,6 +198,8 @@ internal static class LangHant
         ["GachaLogPage_NoSavedUrl"] = "沒有已儲存的連結，請先執行一次「更新（全部）」",
         ["GachaLogPage_LinkExpired"] = "喚取連結已失效",
         ["GachaLogPage_LinkExpiredDesc"] = "連結已失效（介面傳回 {0}），請在遊戲內重新開啟「喚取記錄」",
+        ["GachaLogPage_FetchEmpty"] = "未取得任何喚取記錄",
+        ["GachaLogPage_FetchEmptyDesc"] = "介面未回報錯誤但全部卡池均無記錄，可能是連結已失效，請在遊戲內重新開啟「喚取記錄」後重試",
         ["GachaLogPage_UpdateFailed"] = "更新調頻記錄失敗：{0}",
         ["GachaLogPage_FetchFailed"] = "取得調頻資料失敗，請重試",
         ["GachaLogPage_LogNotFound"] = "未找到遊戲日誌或喚取連結：請先在設定中定位遊戲（Wuthering Waves.exe）並在遊戲內開啟一次「喚取記錄」頁面，或在「更新記錄」選單中選擇「貼上連結匯入」",

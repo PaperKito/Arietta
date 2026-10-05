@@ -196,6 +196,8 @@ internal static class LangKo
         ["GachaLogPage_NoSavedUrl"] = "저장된 링크가 없습니다. 먼저 '업데이트 (전체)'를 실행하세요",
         ["GachaLogPage_LinkExpired"] = "소환 링크가 만료되었습니다",
         ["GachaLogPage_LinkExpiredDesc"] = "링크가 만료되었습니다 (API 응답 {0}). 게임 내에서 '소환 상세'를 다시 열어주세요",
+        ["GachaLogPage_FetchEmpty"] = "소환 기록을 가져오지 못했습니다",
+        ["GachaLogPage_FetchEmptyDesc"] = "API는 오류를 반환하지 않았지만 모든 배너에 기록이 없습니다. 링크가 만료되었을 수 있으니 게임 내에서 '소환 상세'를 다시 열고 재시도해 주세요",
         ["GachaLogPage_UpdateFailed"] = "소환 기록 업데이트 실패: {0}",
         ["GachaLogPage_FetchFailed"] = "소환 데이터를 가져오지 못했습니다. 다시 시도해 주세요",
         ["GachaLogPage_LogNotFound"] = "게임 로그 또는 소환 링크를 찾을 수 없습니다: 설정에서 게임(Wuthering Waves.exe)을 지정하고 게임 내에서 '소환 상세' 페이지를 한 번 열거나, '기록 업데이트' 메뉴에서 '링크 붙여넣어 가져오기'를 선택하세요",

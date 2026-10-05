@@ -196,6 +196,8 @@ internal static class LangEs
         ["GachaLogPage_NoSavedUrl"] = "No hay enlace guardado. Ejecuta antes «Actualizar (todo)».",
         ["GachaLogPage_LinkExpired"] = "El enlace de invocación ha caducado",
         ["GachaLogPage_LinkExpiredDesc"] = "El enlace ha caducado (la API devolvió {0}). Vuelve a abrir «Detalles de invocación» en el juego.",
+        ["GachaLogPage_FetchEmpty"] = "No se obtuvo ningún registro de invocación",
+        ["GachaLogPage_FetchEmptyDesc"] = "La API no devolvió ningún error pero todos los banners están vacíos; puede que el enlace haya caducado. Vuelve a abrir «Detalles de invocación» en el juego e inténtalo de nuevo.",
         ["GachaLogPage_UpdateFailed"] = "Error al actualizar el historial de invocación: {0}",
         ["GachaLogPage_FetchFailed"] = "No se pudieron obtener los datos de invocación. Inténtalo de nuevo.",
         ["GachaLogPage_LogNotFound"] = "No se encontró el registro del juego ni el enlace de invocación: indica el juego (Wuthering Waves.exe) en los ajustes y abre una vez «Detalles de invocación» en el juego, o elige «Importar con enlace» en el menú «Actualizar registros»",

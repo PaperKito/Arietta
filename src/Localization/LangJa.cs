@@ -199,6 +199,8 @@ internal static class LangJa
         ["GachaLogPage_NoSavedUrl"] = "保存済みのリンクがありません。先に「更新（すべて）」を一度実行してください",
         ["GachaLogPage_LinkExpired"] = "喚取リンクの有効期限が切れています",
         ["GachaLogPage_LinkExpiredDesc"] = "リンクの有効期限が切れています（API が {0} を返しました）。ゲーム内で「喚取記録」を再度開いてください",
+        ["GachaLogPage_FetchEmpty"] = "喚取記録を1件も取得できませんでした",
+        ["GachaLogPage_FetchEmptyDesc"] = "API はエラーを返していませんが、すべてのバナーに記録がありません。リンクの有効期限が切れている可能性があるため、ゲーム内で「喚取記録」を再度開いてから再試行してください",
         ["GachaLogPage_UpdateFailed"] = "喚取履歴の更新に失敗しました：{0}",
         ["GachaLogPage_FetchFailed"] = "喚取データの取得に失敗しました。もう一度お試しください",
         ["GachaLogPage_LogNotFound"] = "ゲームログまたは喚取リンクが見つかりません：先に設定でゲーム（Wuthering Waves.exe）を指定し、ゲーム内で「喚取記録」ページを一度開くか、「記録を更新」メニューから「リンクを貼り付けてインポート」を選択してください",

@@ -335,6 +335,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string GachaLogPage_NoSavedUrl => T("没有已保存的链接，请先执行一次「更新（全部）」");
     public string GachaLogPage_LinkExpired => T("唤取链接已失效");
     public string GachaLogPage_LinkExpiredDesc => T("链接已失效（接口返回 {0}），请在游戏内重新打开「唤取记录」");
+    public string GachaLogPage_FetchEmpty => T("未获取到任何唤取记录");
+    public string GachaLogPage_FetchEmptyDesc => T("接口未报错但全部卡池均无记录，可能是链接已失效，请在游戏内重新打开「唤取记录」后重试");
     public string GachaLogPage_RefetchFromCloudGame => T("重新从云游戏获取");
     public string GachaLogPage_UpdateFailed => T("更新调频记录失败：{0}");
     public string GachaLogPage_FetchFailed => T("获取调频数据失败，请重试");

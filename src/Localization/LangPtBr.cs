@@ -196,6 +196,8 @@ internal static class LangPtBr
         ["GachaLogPage_NoSavedUrl"] = "Nenhum link salvo. Execute \"Atualizar (tudo)\" antes.",
         ["GachaLogPage_LinkExpired"] = "O link de convocação expirou",
         ["GachaLogPage_LinkExpiredDesc"] = "O link expirou (a API respondeu {0}). Abra \"Detalhes da Convocação\" no jogo de novo.",
+        ["GachaLogPage_FetchEmpty"] = "Nenhum registro de convocação obtido",
+        ["GachaLogPage_FetchEmptyDesc"] = "A API não retornou erro, mas todos os banners estão vazios — o link pode ter expirado. Abra \"Detalhes da Convocação\" no jogo de novo e tente novamente.",
         ["GachaLogPage_UpdateFailed"] = "Falha ao atualizar os registros de convocação: {0}",
         ["GachaLogPage_FetchFailed"] = "Falha ao obter os dados de convocação. Tente de novo.",
         ["GachaLogPage_LogNotFound"] = "Log do jogo ou link de convocação não encontrado: defina o jogo (Wuthering Waves.exe) nas configurações e abra uma vez \"Detalhes da Convocação\" no jogo, ou escolha \"Importar com link\" no menu \"Atualizar registros\"",

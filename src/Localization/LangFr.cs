@@ -196,6 +196,8 @@ internal static class LangFr
         ["GachaLogPage_NoSavedUrl"] = "Aucun lien enregistré. Exécutez d'abord « Mettre à jour (tout) ».",
         ["GachaLogPage_LinkExpired"] = "Lien de convocation expiré",
         ["GachaLogPage_LinkExpiredDesc"] = "Le lien a expiré (l'API a renvoyé {0}). Rouvrez « Détails de convocation » en jeu.",
+        ["GachaLogPage_FetchEmpty"] = "Aucun enregistrement de convocation trouvé",
+        ["GachaLogPage_FetchEmptyDesc"] = "L'API n'a renvoyé aucune erreur mais toutes les bannières sont vides — le lien a peut-être expiré. Rouvrez « Détails de convocation » en jeu, puis réessayez.",
         ["GachaLogPage_UpdateFailed"] = "Échec de la mise à jour des registres de convocation : {0}",
         ["GachaLogPage_FetchFailed"] = "Échec de la récupération des données de convocation. Réessayez.",
         ["GachaLogPage_LogNotFound"] = "Journal du jeu ou lien de convocation introuvable : indiquez le jeu (Wuthering Waves.exe) dans les paramètres et ouvrez une fois « Détails de convocation » en jeu, ou choisissez « Importer via un lien » dans le menu « Mettre à jour les relevés »",
