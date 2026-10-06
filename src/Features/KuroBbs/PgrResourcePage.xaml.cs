@@ -287,7 +287,7 @@ public sealed partial class PgrResourcePage : PageBase
         var rendered = segments.Where(s => s.Value > 0).ToList();
         var bar = new StackPanel { Orientation = Orientation.Horizontal };
         var legend = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, Margin = new Thickness(0, 4, 0, 0) };
-        double barWidth = 620;
+        var plan = new List<(Border Segment, double Share)>();
         for (int i = 0; i < rendered.Count; i++)
         {
             var (label, value) = rendered[i];
@@ -304,7 +304,7 @@ public sealed partial class PgrResourcePage : PageBase
                 Background = brush,
             };
             bar.Children.Add(segment);
-            KuroBbsUi.AnimateWidth(segment, Math.Max(3, barWidth * value / (double)total), 150 + i * 110);
+            plan.Add((segment, (double)value / total));
 
             var legendItem = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 5 };
             legendItem.Children.Add(new Border
@@ -325,6 +325,32 @@ public sealed partial class PgrResourcePage : PageBase
         }
         host.Children.Add(bar);
         host.Children.Add(legend);
+
+        
+        void AnimateSegments(double totalWidth)
+        {
+            for (int k = 0; k < plan.Count; k++)
+            {
+                KuroBbsUi.AnimateWidth(plan[k].Segment, Math.Max(3, totalWidth * plan[k].Share), 150 + k * 110);
+            }
+        }
+        if (host.ActualWidth > 0)
+        {
+            AnimateSegments(host.ActualWidth);
+        }
+        else
+        {
+            SizeChangedEventHandler handler = null;
+            handler = (s, e) =>
+            {
+                host.SizeChanged -= handler;
+                if (e.NewSize.Width > 0)
+                {
+                    AnimateSegments(e.NewSize.Width);
+                }
+            };
+            host.SizeChanged += handler;
+        }
     }
 
 
