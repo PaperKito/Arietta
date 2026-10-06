@@ -80,20 +80,25 @@
                             <TextBlock FontSize="13"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        Text="{x:Bind lang:Lang.Instance.ResourceBrief_TotalGain, Mode=OneWay}" />
-                            <StackPanel Orientation="Horizontal" Spacing="36">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal" Spacing="8">
                                     <Image Width="22" Height="22" Source="ms-appx:///Assets/Image/Common/blackCard.png" />
                                     <TextBlock x:Name="TextBlock_TotalBlackCard" FontSize="22" FontWeight="Bold" Text="0" />
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
                                     <Image Width="22" Height="22" Source="ms-appx:///Assets/Image/Common/developResource.png" />
                                     <TextBlock x:Name="TextBlock_TotalDevelop" FontSize="22" FontWeight="Bold" Text="0" />
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
                                     <Image Width="22" Height="22" Source="ms-appx:///Assets/Image/Common/tradeCredit.png" />
                                     <TextBlock x:Name="TextBlock_TotalTrade" FontSize="22" FontWeight="Bold" Text="0" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
                         </StackPanel>
                     </Border>
 
