@@ -254,7 +254,7 @@ public sealed partial class LauncherPage : PageBase
     
     
     
-    private async Task ApplyAfterGameExitWindowActionAsync()
+    private async Task ApplyAfterGameExitWindowActionAsync(Task playTimeRefresh)
     {
         try
         {
@@ -262,7 +262,7 @@ public sealed partial class LauncherPage : PageBase
             if (action == "CloseLauncher")
             {
                 
-                await RefreshPlayTimeAsync();
+                await playTimeRefresh;
                 App.Current.ExitApp();
             }
             else if (action != "KeepHidden")
@@ -1291,14 +1291,14 @@ public sealed partial class LauncherPage : PageBase
         if (biz is not null)
         {
             GameProcessMonitor.SetRunning(biz.Value, false);
-            
-            
-            Task playTimeRefresh = RefreshPlayTimeAsync(biz.Value, enteredAtMs);
-            
-            GameAccountSwitcher.UpdateAccounts();
-            
-            _ = ApplyAfterGameExitWindowActionAsync(playTimeRefresh);
         }
+        
+        
+        Task playTimeRefresh = biz is { } playing ? RefreshPlayTimeAsync(playing, enteredAtMs) : Task.CompletedTask;
+        
+        GameAccountSwitcher.UpdateAccounts();
+        
+        _ = ApplyAfterGameExitWindowActionAsync(playTimeRefresh);
     }
 
 
@@ -1597,9 +1597,27 @@ public sealed partial class LauncherPage : PageBase
 
 
     
-    private async Task RefreshPlayTimeAsync()
+    
+    
+    
+    
+    private async Task RefreshPlayTimeAsync(GameBiz biz, long enteredAtMs)
     {
-        await Task.Delay(1500);
+        try
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                await Task.Delay(500);
+                if (PlayTimeRecordService.HasStatsRecord(biz, enteredAtMs))
+                {
+                    break;
+                }
+            }
+        }
+        catch
+        {
+            
+        }
         Button_PlayTime.Reload();
     }
 
