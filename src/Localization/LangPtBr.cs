@@ -425,6 +425,7 @@ internal static class LangPtBr
         
         ["GameSettingPage_Resolution"] = "Resolução",
         ["GameSettingPage_FullScreen"] = "Tela cheia",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "A resolução do seu monitor excede o máximo suportado pelo jogo, portanto a tela cheia não está disponível",
         ["GameSettingPage_UsePopupWindow"] = "Janela sem bordas",
         ["GameSettingPage_CustomResolution"] = "Resolução personalizada",
         ["GameSettingPage_CustomResolutionTip"] = "A resolução personalizada vale no modo de exibição \"Janela\"",

@@ -425,6 +425,7 @@ internal static class LangFr
         
         ["GameSettingPage_Resolution"] = "Résolution",
         ["GameSettingPage_FullScreen"] = "Plein écran",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "La résolution de votre écran dépasse le maximum pris en charge par le jeu, le plein écran n'est donc pas disponible",
         ["GameSettingPage_UsePopupWindow"] = "Fenêtre sans bordure",
         ["GameSettingPage_CustomResolution"] = "Résolution personnalisée",
         ["GameSettingPage_CustomResolutionTip"] = "La résolution personnalisée s'applique en mode « Fenêtré »",

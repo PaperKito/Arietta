@@ -444,6 +444,7 @@ internal static class LangHant
         
         ["GameSettingPage_Resolution"] = "解析度",
         ["GameSettingPage_FullScreen"] = "全螢幕",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "目前顯示器解析度超過遊戲支援上限，全螢幕無法正常使用",
         ["GameSettingPage_UsePopupWindow"] = "無邊框視窗",
         ["GameSettingPage_CustomResolution"] = "自訂解析度",
         ["GameSettingPage_CustomResolutionTip"] = "自訂解析度在「視窗」顯示模式下生效",

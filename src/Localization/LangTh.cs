@@ -425,6 +425,7 @@ internal static class LangTh
         
         ["GameSettingPage_Resolution"] = "ความละเอียด",
         ["GameSettingPage_FullScreen"] = "เต็มหน้าจอ",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "ความละเอียดของจอเกินขีดจำกัดที่เกมรองรับ โหมดเต็มหน้าจอจึงใช้งานไม่ได้ตามปกติ",
         ["GameSettingPage_UsePopupWindow"] = "หน้าต่างไร้ขอบ",
         ["GameSettingPage_CustomResolution"] = "ความละเอียดแบบกำหนดเอง",
         ["GameSettingPage_CustomResolutionTip"] = "ความละเอียดแบบกำหนดเองมีผลในโหมดแสดงผล \"หน้าต่าง\"",

@@ -425,6 +425,7 @@ internal static class LangDe
         
         ["GameSettingPage_Resolution"] = "Auflösung",
         ["GameSettingPage_FullScreen"] = "Vollbild",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "Die Auflösung Ihres Bildschirms überschreitet das vom Spiel unterstützte Maximum, der Vollbildmodus ist daher nicht verfügbar",
         ["GameSettingPage_UsePopupWindow"] = "Randloses Fenster",
         ["GameSettingPage_CustomResolution"] = "Eigene Auflösung",
         ["GameSettingPage_CustomResolutionTip"] = "Die eigene Auflösung gilt im Anzeigemodus „Fenster“",

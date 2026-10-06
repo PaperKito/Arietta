@@ -296,6 +296,28 @@ internal class PlayTimeRecordService
 
 
     
+    
+    
+    
+    
+    
+    public static bool HasStatsRecord(GameBiz biz, long minEndTimeMs)
+    {
+        try
+        {
+            using var dapper = DatabaseService.CreateConnection();
+            return dapper.ExecuteScalar<long>(
+                "SELECT COUNT(*) FROM PlayTimeStats WHERE GameBiz = @biz AND EndTime >= @minEndTimeMs;",
+                new { biz = biz.ToString(), minEndTimeMs }) > 0;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+
+    
     private Process? FindLoggableProcess(string[] names)
     {
         foreach (var process in EnumerateSessionProcesses(names))

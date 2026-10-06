@@ -446,6 +446,7 @@ internal static class LangJa
         ["Common_Apply"] = "適用",
         ["GameSettingPage_Resolution"] = "解像度",
         ["GameSettingPage_FullScreen"] = "フルスクリーン",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "現在のディスプレイの解像度がゲームの対応上限を超えているため、フルスクリーンは正常に使用できません",
         ["GameSettingPage_UsePopupWindow"] = "ボーダーレスウィンドウ",
         ["GameSettingPage_CustomResolution"] = "カスタム解像度",
         ["GameSettingPage_CustomResolutionTip"] = "カスタム解像度は「ウィンドウ」表示モードで有効になります",

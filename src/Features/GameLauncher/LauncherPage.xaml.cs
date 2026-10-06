@@ -1233,6 +1233,13 @@ public sealed partial class LauncherPage : PageBase
     
     private static readonly TimeSpan RunningMissGrace = TimeSpan.FromSeconds(5);
 
+    
+    
+    
+    
+    
+    private static readonly TimeSpan RunningVacuumWindow = TimeSpan.FromSeconds(60);
+
     private readonly PlayTimeRecordService _recordService = PlayTimeRecordService.Create();
 
 
@@ -1276,6 +1283,7 @@ public sealed partial class LauncherPage : PageBase
     private void ExitRunningState()
     {
         GameBiz? biz = _runningBiz;
+        long enteredAtMs = new DateTimeOffset(_runningEnteredAt).ToUnixTimeMilliseconds();
         StopRunningState();
         Button_StartGame.GameCommand = StartGameCommand;
         UpdateGameState();
@@ -1283,11 +1291,14 @@ public sealed partial class LauncherPage : PageBase
         if (biz is not null)
         {
             GameProcessMonitor.SetRunning(biz.Value, false);
+            
+            
+            Task playTimeRefresh = RefreshPlayTimeAsync(biz.Value, enteredAtMs);
+            
+            GameAccountSwitcher.UpdateAccounts();
+            
+            _ = ApplyAfterGameExitWindowActionAsync(playTimeRefresh);
         }
-        
-        GameAccountSwitcher.UpdateAccounts();
-        
-        _ = ApplyAfterGameExitWindowActionAsync();
     }
 
 
@@ -1460,9 +1471,15 @@ public sealed partial class LauncherPage : PageBase
             
             AppConfig.GetLogger<LauncherPage>().LogWarning("Game process of {biz} not found yet (adopted={adopted})", target, adopted);
         }
-        bool ended = adopted
-            ? DateTime.Now - missFrom >= RunningMissGrace
-            : DateTime.Now - _runningEnteredAt >= RunningProbeTimeout;
+        
+        
+        
+        
+        
+        bool ended = exited && DateTime.Now - _runningEnteredAt > RunningVacuumWindow
+            || (adopted
+                ? DateTime.Now - missFrom >= RunningMissGrace
+                : DateTime.Now - _runningEnteredAt >= RunningProbeTimeout);
         if (ended)
         {
             DispatcherQueue.TryEnqueue(ExitRunningState);

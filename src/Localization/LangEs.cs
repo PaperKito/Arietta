@@ -425,6 +425,7 @@ internal static class LangEs
         
         ["GameSettingPage_Resolution"] = "Resolución",
         ["GameSettingPage_FullScreen"] = "Pantalla completa",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "La resolución de tu pantalla supera el máximo admitido por el juego, por lo que la pantalla completa no está disponible",
         ["GameSettingPage_UsePopupWindow"] = "Ventana sin bordes",
         ["GameSettingPage_CustomResolution"] = "Resolución personalizada",
         ["GameSettingPage_CustomResolutionTip"] = "La resolución personalizada se aplica en el modo «Ventana»",

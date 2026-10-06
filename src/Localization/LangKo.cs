@@ -425,6 +425,7 @@ internal static class LangKo
         
         ["GameSettingPage_Resolution"] = "해상도",
         ["GameSettingPage_FullScreen"] = "전체 화면",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "현재 디스플레이 해상도가 게임 지원 상한을 초과하여 전체 화면을 정상적으로 사용할 수 없습니다",
         ["GameSettingPage_UsePopupWindow"] = "테두리 없는 창",
         ["GameSettingPage_CustomResolution"] = "사용자 지정 해상도",
         ["GameSettingPage_CustomResolutionTip"] = "사용자 지정 해상도는 '창 모드'에서 적용됩니다",
