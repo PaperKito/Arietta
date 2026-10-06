@@ -645,7 +645,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string Common_Apply => T("应用");
     public string GameSettingPage_Resolution => T("分辨率");
     public string GameSettingPage_FullScreen => T("全屏");
-    public string GameSettingPage_PgrFullscreenBlockedTip => T("显示器原生分辨率超过游戏支持的上限，游戏启动后会强制切回窗口模式，全屏无法生效。");
+    public string GameSettingPage_PgrFullscreenBlockedTip => T("当前显示器分辨率超过游戏支持上限，全屏无法正常使用");
     public string GameSettingPage_CustomResolution => T("自定义分辨率");
     public string GameSettingPage_CustomResolutionTip => T("自定义分辨率在「窗口」显示模式下生效");
     public string GameSettingPage_VoiceLanguage => T("语音语言");

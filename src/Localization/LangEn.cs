@@ -477,7 +477,7 @@ internal static class LangEn
         
         ["GameSettingPage_Resolution"] = "Resolution",
         ["GameSettingPage_FullScreen"] = "Fullscreen",
-        ["GameSettingPage_PgrFullscreenBlockedTip"] = "Your display's native resolution exceeds the game's supported maximum. The game forces windowed mode on startup, so fullscreen cannot take effect.",
+        ["GameSettingPage_PgrFullscreenBlockedTip"] = "Your display's resolution exceeds the game's supported maximum, so fullscreen is unavailable.",
         ["GameSettingPage_CustomResolution"] = "Custom Resolution",
         ["GameSettingPage_CustomResolutionTip"] = "Custom resolution applies in 'Windowed' display mode",
         ["GameSettingPage_VoiceLanguage"] = "Voice Language",
