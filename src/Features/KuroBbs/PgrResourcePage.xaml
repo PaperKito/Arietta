@@ -63,7 +63,8 @@
                      Message="{x:Bind lang:Lang.Instance.RolePage_NoAccountDesc, Mode=OneWay}" />
 
             <ScrollViewer Padding="0,4,16,16">
-                <StackPanel Spacing="16" MaxWidth="980" HorizontalAlignment="Left">
+                
+                <StackPanel Spacing="16">
 
                     <InfoBar x:Name="InfoBar_Error"
                              IsOpen="False"

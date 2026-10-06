@@ -336,18 +336,14 @@ public static class GameSettingService
     }
 
 
+    
+    
+    
+    
     public static bool IsPgrFullscreenBlocked()
     {
-        int maxW = 0, maxH = 0;
-        foreach (var (w, h) in GetMonitorSupportedModes())
-        {
-            if ((long)w * h > (long)maxW * maxH)
-            {
-                maxW = w;
-                maxH = h;
-            }
-        }
-        return maxW > 0 && (maxW > 2560 || maxH > 2048);
+        var (w, h) = GetMonitorResolution();
+        return w > 0 && (w > 2560 || h > 2048);
     }
 
 
