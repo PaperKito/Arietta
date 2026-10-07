@@ -86,7 +86,9 @@ internal class PlayTimeRecordService
         var startTime = new DateTimeOffset(process.StartTime);
         Log(biz, process.Id, PlayTimeState.Start, startTime.ToUnixTimeMilliseconds(), $"{process.ProcessName} [{startTime}]");
         using var dapper = DatabaseService.CreateConnection();
-        var last = dapper.QueryFirstOrDefault<PlayTimeItemStruct>("SELECT * FROM PlayTimeItem WHERE GameBiz = @biz AND Pid = @Id ORDER BY TimeStamp DESC LIMIT 1;", new { biz = biz.ToString(), process.Id });
+        
+        
+        var last = dapper.QueryFirstOrDefault<PlayTimeItemStruct>("SELECT * FROM PlayTimeItem WHERE GameBiz = @biz AND Pid = @Id ORDER BY TimeStamp DESC LIMIT 1;", new { biz, process.Id });
         DateTimeOffset time = startTime;
         if (last.TimeStamp > startTime.ToUnixTimeMilliseconds())
         {
@@ -284,9 +286,11 @@ internal class PlayTimeRecordService
         try
         {
             using var dapper = DatabaseService.CreateConnection();
+            
+            
             return dapper.ExecuteScalar<long>(
                 "SELECT COUNT(*) FROM PlayTimeItem WHERE GameBiz = @biz AND Pid = @pid AND State = @state;",
-                new { biz = biz.ToString(), pid, state = (int)PlayTimeState.Start }) > 0;
+                new { biz, pid, state = (int)PlayTimeState.Start }) > 0;
         }
         catch
         {
@@ -306,9 +310,10 @@ internal class PlayTimeRecordService
         try
         {
             using var dapper = DatabaseService.CreateConnection();
+            
             return dapper.ExecuteScalar<long>(
                 "SELECT COUNT(*) FROM PlayTimeStats WHERE GameBiz = @biz AND EndTime >= @minEndTimeMs;",
-                new { biz = biz.ToString(), minEndTimeMs }) > 0;
+                new { biz, minEndTimeMs }) > 0;
         }
         catch
         {
