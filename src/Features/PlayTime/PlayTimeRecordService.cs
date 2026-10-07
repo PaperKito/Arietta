@@ -213,6 +213,12 @@ internal class PlayTimeRecordService
                 var process = FindLoggableProcess(names);
                 if (process is not null)
                 {
+                    if (HasStartRecordForOtherBiz(biz, process.Id))
+                    {
+                        
+                        process.Dispose();
+                        continue;
+                    }
                     string? image;
                     try
                     {
@@ -446,6 +452,13 @@ internal class PlayTimeRecordService
             Process? fallback = null;
             foreach (Process process in EnumerateSessionProcesses(names))
             {
+                if (HasStartRecordForOtherBiz(biz, process.Id))
+                {
+                    
+                    
+                    process.Dispose();
+                    continue;
+                }
                 string? image;
                 try
                 {
@@ -491,6 +504,29 @@ internal class PlayTimeRecordService
             
         }
         return null;
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    public static bool HasStartRecordForOtherBiz(GameBiz biz, int pid)
+    {
+        try
+        {
+            using var dapper = DatabaseService.CreateConnection();
+            return dapper.ExecuteScalar<long>(
+                "SELECT COUNT(*) FROM PlayTimeItem WHERE Pid = @pid AND State = @state AND GameBiz != @biz;",
+                new { pid, state = (int)PlayTimeState.Start, biz }) > 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
 
