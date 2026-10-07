@@ -1157,6 +1157,13 @@ public sealed partial class LauncherPage : PageBase
         {
             return;
         }
+        
+        
+        
+        if (GameState is GameState.GameIsRunning)
+        {
+            return;
+        }
         var entry = GameRegistry.GetEntry(CurrentGameBiz);
         if (entry.CloudUrl is not null)
         {
