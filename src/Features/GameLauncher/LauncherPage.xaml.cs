@@ -198,6 +198,9 @@ public sealed partial class LauncherPage : PageBase
             var process = StartGameProcess(exe, biz);
             if (process != null)
             {
+                
+                
+                GameLaunchAnchor.Set(biz, process.Id);
                 MonitorGameProcess(process, () =>
                 {
                     
@@ -209,7 +212,7 @@ public sealed partial class LauncherPage : PageBase
                 EnterRunningState(biz);
                 
                 GameProcessMonitor.SetRunning(biz, true);
-                StartPlayTimeRecording();
+                StartPlayTimeRecording(process);
                 
                 ApplyAfterLaunchWindowAction();
             }
@@ -1298,6 +1301,8 @@ public sealed partial class LauncherPage : PageBase
         if (biz is not null)
         {
             GameProcessMonitor.SetRunning(biz.Value, false);
+            
+            GameLaunchAnchor.Clear(biz.Value);
         }
         
         
@@ -1585,15 +1590,39 @@ public sealed partial class LauncherPage : PageBase
     
     
     
-    private void StartPlayTimeRecording()
+    private void StartPlayTimeRecording(Process? launchedProcess)
     {
         var biz = CurrentGameBiz;
+        
+        int? launchedPid = null;
+        string? launchedName = null;
+        try
+        {
+            if (launchedProcess is not null)
+            {
+                launchedPid = launchedProcess.Id;
+                launchedName = launchedProcess.ProcessName;
+            }
+        }
+        catch
+        {
+            launchedPid = null;
+            launchedName = null;
+        }
         _ = Task.Run(async () =>
         {
             try
             {
-                await PlayTimeRecordService.Create()
-                                           .StartProcessToLogAsync(new GameId(biz, biz.ToString()));
+                var service = PlayTimeRecordService.Create();
+                var gameId = new GameId(biz, biz.ToString());
+                if (launchedPid is { } pid && launchedName is { } name)
+                {
+                    await service.StartProcessToLogAsync(gameId, pid, name);
+                }
+                else
+                {
+                    await service.StartProcessToLogAsync(gameId);
+                }
             }
             catch (Exception ex)
             {

@@ -91,6 +91,7 @@ public partial class App : Application
         {
             string[] cmd = AppConfig.CommandLineArgs;
             int pid = GetIntArgument(cmd, "--pid");
+            int anchorPid = GetIntArgument(cmd, "--anchor-pid");
             string? bizName = GetStringArgument(cmd, "--biz");
             if (Enum.TryParse<Core.GameBiz>(bizName, true, out var biz))
             {
@@ -103,7 +104,9 @@ public partial class App : Application
                 {
                     
                     
-                    await service.WaitGameProcessAndLogAsync(biz);
+                    
+                    
+                    await service.WaitGameProcessAndLogAsync(biz, anchorPid > 0 ? anchorPid : 0);
                 }
             }
         }

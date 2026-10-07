@@ -174,12 +174,12 @@ internal class PlayTimeRecordService
     
     
     
-    public Task<Process?> StartProcessToLogAsync(GameId gameId)
+    public Task<Process?> StartProcessToLogAsync(GameId gameId, int? anchorPid = null)
     {
         try
         {
             _logger.LogInformation("Start to log playtime ({biz}), waiting for the game process in the helper process", gameId.GameBiz);
-            StartPlayTimeLoggerProcess(gameId.GameBiz, null);
+            StartPlayTimeLoggerProcess(gameId.GameBiz, null, anchorPid);
         }
         catch (Exception ex)
         {
@@ -195,7 +195,37 @@ internal class PlayTimeRecordService
     
     
     
-    public async Task WaitGameProcessAndLogAsync(GameBiz biz)
+    
+    
+    
+    
+    
+    public Task StartProcessToLogAsync(GameId gameId, int launchedPid, string launchedProcessName)
+    {
+        string[] names = GetGameExeNames(gameId);
+        bool launchedIsGame = names.Length > 0
+            && string.Equals(launchedProcessName, Path.GetFileNameWithoutExtension(names[0]), StringComparison.OrdinalIgnoreCase);
+        if (launchedIsGame)
+        {
+            return StartProcessToLogAsync(gameId, launchedPid);
+        }
+        StartProcessToLogAsync(gameId, anchorPid: launchedPid);
+        return Task.CompletedTask;
+    }
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public async Task WaitGameProcessAndLogAsync(GameBiz biz, int anchorPid = 0)
     {
         try
         {
@@ -207,43 +237,67 @@ internal class PlayTimeRecordService
                 return;
             }
             string[] names = GetGameExeNames(new GameId(biz, biz.ToString()));
-            for (int i = 0; i < 15; i++)
+            DateTime deadline = DateTime.Now.AddSeconds(30);
+            DateTime hardCap = DateTime.Now.AddMinutes(10);
+            Process? lastResort = null;
+            while (true)
             {
                 await Task.Delay(2000);
-                var process = FindLoggableProcess(names);
+                var parents = anchorPid > 0 ? ProcessTree.BuildParentMap() : null;
+                
+                
+                var process = parents is { Count: > 0 }
+                    ? FindLoggableProcess(biz, names, anchorPid, anchorPid, parents)
+                    : FindLoggableProcess(biz, names, anchorPid, 0, null);
                 if (process is not null)
                 {
-                    if (HasStartRecordForOtherBiz(biz, process.Id))
-                    {
-                        
-                        process.Dispose();
-                        continue;
-                    }
-                    string? image;
-                    try
-                    {
-                        image = process.MainModule?.FileName;
-                    }
-                    catch
-                    {
-                        image = null;
-                    }
-                    if (image is not null && IsUnderOtherGameDir(biz, image))
-                    {
-                        
-                        
-                        process.Dispose();
-                        continue;
-                    }
                     await LogPlayTimeAsync(biz, process.Id);
                     return;
                 }
+                
+                if (anchorPid > 0)
+                {
+                    lastResort?.Dispose();
+                    lastResort = FindLoggableProcess(biz, names, anchorPid, 0, null);
+                }
+                
+                if (anchorPid > 0 && IsProcessAlive(anchorPid) && DateTime.Now < hardCap)
+                {
+                    continue;
+                }
+                if (DateTime.Now < deadline)
+                {
+                    continue;
+                }
+                if (lastResort is not null)
+                {
+                    
+                    _logger.LogWarning("Anchored wait found no descendant ({biz}, anchor {anchor}); falling back to pid {pid}",
+                        biz, anchorPid, lastResort.Id);
+                    await LogPlayTimeAsync(biz, lastResort.Id);
+                    return;
+                }
+                _logger.LogWarning("30 秒内没找到游戏进程（{biz}），本次不记录时长：{names}", biz, string.Join("/", names));
+                return;
             }
-            _logger.LogWarning("30 秒内没找到游戏进程（{biz}），本次不记录时长：{names}", biz, string.Join("/", names));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Wait game process to log play time: {biz}", biz);
+        }
+    }
+
+
+    private static bool IsProcessAlive(int pid)
+    {
+        try
+        {
+            using var process = Process.GetProcessById(pid);
+            return !process.HasExited;
+        }
+        catch
+        {
+            return false;
         }
     }
 
@@ -329,15 +383,48 @@ internal class PlayTimeRecordService
 
 
     
-    private Process? FindLoggableProcess(string[] names)
+    
+    
+    
+    
+    
+    private Process? FindLoggableProcess(GameBiz biz, string[] names, int excludePid = 0, int anchorPid = 0, Dictionary<int, int>? parents = null)
     {
+        bool requireDescendant = anchorPid > 0 && parents is { Count: > 0 };
         foreach (var process in EnumerateSessionProcesses(names))
         {
             try
             {
-                if (AppInstance.GetInstances().Any(x => x.Key == $"playtime_{process.Id}"))
+                int id = process.Id;
+                if (excludePid > 0 && id == excludePid)
                 {
                     
+                    process.Dispose();
+                    continue;
+                }
+                if (requireDescendant && !ProcessTree.IsSelfOrDescendant(id, anchorPid, parents!))
+                {
+                    
+                    process.Dispose();
+                    continue;
+                }
+                if (HasStartRecordForOtherBiz(biz, id))
+                {
+                    
+                    process.Dispose();
+                    continue;
+                }
+                if (AppInstance.GetInstances().Any(x => x.Key == $"playtime_{id}"))
+                {
+                    
+                    process.Dispose();
+                    continue;
+                }
+                string? image = ProcessImage.GetPath(process);
+                if (image is not null && IsUnderOtherGameDir(biz, image))
+                {
+                    
+                    process.Dispose();
                     continue;
                 }
                 return process;
@@ -356,7 +443,8 @@ internal class PlayTimeRecordService
     
     
     
-    private void StartPlayTimeLoggerProcess(GameBiz biz, int? pid)
+    
+    private void StartPlayTimeLoggerProcess(GameBiz biz, int? pid, int? anchorPid = null)
     {
         try
         {
@@ -365,6 +453,10 @@ internal class PlayTimeRecordService
             string arguments = pid is null
                 ? $"playtime --biz {biz}"
                 : $"playtime --biz {biz} --pid {pid}";
+            if (anchorPid is { } anchor)
+            {
+                arguments += $" --anchor-pid {anchor}";
+            }
             Process.Start(new ProcessStartInfo
             {
                 FileName = exe,
@@ -430,6 +522,18 @@ internal class PlayTimeRecordService
 
     
     
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _candidateDiagLogged = new();
+
+    private static void LogCandidateOnce(int pid, string kind, Action log)
+    {
+        if (_candidateDiagLogged.TryAdd($"{pid}:{kind}", 0))
+        {
+            log();
+        }
+    }
+
+
+    
     
     
     
@@ -449,6 +553,15 @@ internal class PlayTimeRecordService
         {
             string[] names = GetGameExeNames(new GameId(biz, biz.ToString()));
             string? root = Path.GetDirectoryName(GameRegistry.GetConfiguredExePath(biz));
+            
+            
+            int anchor = GameLaunchAnchor.Get(biz);
+            var parents = anchor > 0 ? ProcessTree.BuildParentMap() : null;
+            if (parents is { Count: 0 })
+            {
+                parents = null;
+            }
+            Process? anchored = null;
             Process? fallback = null;
             foreach (Process process in EnumerateSessionProcesses(names))
             {
@@ -459,19 +572,13 @@ internal class PlayTimeRecordService
                     process.Dispose();
                     continue;
                 }
-                string? image;
-                try
-                {
-                    image = process.MainModule?.FileName;
-                }
-                catch
-                {
-                    
-                    image = null;
-                }
+                string? image = ProcessImage.GetPath(process);
                 if (root is not null && IsUnderGameDir(image, root))
                 {
                     
+                    LogCandidateOnce(process.Id, "match", () => AppConfig.GetLogger<PlayTimeRecordService>().LogInformation(
+                        "FindRunningClient ({biz}) matched own dir: pid {pid}, image {image}", biz, process.Id, image));
+                    anchored?.Dispose();
                     fallback?.Dispose();
                     return process;
                 }
@@ -483,19 +590,47 @@ internal class PlayTimeRecordService
                 
                 if (image is not null && IsUnderOtherGameDir(biz, image))
                 {
+                    LogCandidateOnce(process.Id, "other", () => AppConfig.GetLogger<PlayTimeRecordService>().LogInformation(
+                        "FindRunningClient ({biz}) excluded other-server process: pid {pid}, image {image}", biz, process.Id, image));
                     process.Dispose();
+                    continue;
+                }
+                
+                
+                if (parents is not null && ProcessTree.IsSelfOrDescendant(process.Id, anchor, parents))
+                {
+                    if (anchored is null)
+                    {
+                        anchored = process;
+                    }
+                    else
+                    {
+                        process.Dispose();
+                    }
                     continue;
                 }
                 
                 
                 if (fallback is null)
                 {
+                    if (image is null)
+                    {
+                        LogCandidateOnce(process.Id, "unreadable", () => AppConfig.GetLogger<PlayTimeRecordService>().LogWarning(
+                            "FindRunningClient ({biz}) pid {pid}: image path unreadable, fallback to name-only match (multi-install attribution unreliable)",
+                            biz, process.Id));
+                    }
                     fallback = process;
                 }
                 else
                 {
                     process.Dispose();
                 }
+            }
+            
+            if (anchored is not null)
+            {
+                fallback?.Dispose();
+                return anchored;
             }
             return fallback;
         }

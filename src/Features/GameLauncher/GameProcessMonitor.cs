@@ -188,7 +188,7 @@ public static class GameProcessMonitor
                 bool matched = false;
                 try
                 {
-                    string? image = process.MainModule?.FileName;
+                    string? image = Core.ProcessImage.GetPath(process);
                     
                     
                     
