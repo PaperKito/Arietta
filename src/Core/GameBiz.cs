@@ -401,6 +401,10 @@ public static class GameRegistry
     
     
     
+    
+    
+    
+    
     public static string? GetEnabledThirdPartyToolPath(GameBiz biz)
     {
         if (AppConfig.GetConfig(GetEnableThirdPartyToolConfigKey(biz)) != "1")

@@ -410,7 +410,7 @@ internal static class LangKo
         ["GameLauncherSettingDialog_StartRepairing"] = "복구 시작",
         ["GameLauncherSettingDialog_StartupArguments"] = "시작 인수",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "명령줄 인수",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "이 서버의 게임이 구성되지 않았거나 exe가 없을 경우 '게임 시작'을 클릭하면 이 프로그램이 대신 실행됩니다. 게임 본체를 사용할 수 있는 경우에는 적용되지 않습니다.",
+        ["GameLauncherSettingDialog_CustomProgramTip"] = "\ud65c\uc131\ud654\ud558\uba74 '\uac8c\uc784 \uc2dc\uc791'\uc744 \ud074\ub9ad\ud560 \ub54c \uac8c\uc784 \ubcf8\uccb4 \ub300\uc2e0 \uc774 \ud504\ub85c\uadf8\ub7a8\uc774 \uc2e4\ud589\ub429\ub2c8\ub2e4. \uac8c\uc784\uc744 \ub2e4\uc2dc \uc2e4\ud589\ud558\ub824\uba74 \uc2a4\uc704\uce58\ub97c \ub044\uc138\uc694. \uc11c\ubc84\ubcc4\ub85c \uac1c\ubcc4 \uc124\uc815\ub429\ub2c8\ub2e4.",
         ["LauncherPage_CustomStartExecutable"] = "사용자 지정 실행 파일",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "게임 제거 경고",
         ["LauncherPage_RepairGame"] = "게임 복구",

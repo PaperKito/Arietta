@@ -424,7 +424,7 @@ internal static class LangJa
         ["GameLauncherSettingDialog_StartRepairing"] = "修復を開始",
         ["GameLauncherSettingDialog_StartupArguments"] = "起動引数",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "コマンドライン引数",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "このサーバーのゲームが未設定または exe が見つからない場合、「ゲームを起動」をクリックするとこのプログラムが起動されます。ゲーム本体が利用可能な場合は効果ありません。",
+        ["GameLauncherSettingDialog_CustomProgramTip"] = "\u6709\u52b9\u306b\u3059\u308b\u3068\u3001\u300c\u30b2\u30fc\u30e0\u3092\u8d77\u52d5\u300d\u3092\u30af\u30ea\u30c3\u30af\u3057\u305f\u969b\u306b\u30b2\u30fc\u30e0\u672c\u4f53\u3067\u306f\u306a\u304f\u3053\u306e\u30d7\u30ed\u30b0\u30e9\u30e0\u304c\u8d77\u52d5\u3057\u307e\u3059\u3002\u672c\u4f53\u3092\u8d77\u52d5\u3059\u308b\u306b\u306f\u30b9\u30a4\u30c3\u30c1\u3092\u30aa\u30d5\u306b\u3057\u3066\u304f\u3060\u3055\u3044\u3002\u30b5\u30fc\u30d0\u30fc\u3054\u3068\u306b\u500b\u5225\u8a2d\u5b9a\u3067\u3059\u3002",
         ["LauncherPage_CustomStartExecutable"] = "カスタム実行ファイル",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "ゲームのアンインストールに関する警告",
         ["LauncherPage_RepairGame"] = "ゲームを修復",

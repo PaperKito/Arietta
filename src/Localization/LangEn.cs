@@ -462,7 +462,7 @@ internal static class LangEn
         ["GameLauncherSettingDialog_StartRepairing"] = "Start Repair",
         ["GameLauncherSettingDialog_StartupArguments"] = "Launch Arguments",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "Command Line Arguments",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "When this server's game is not configured or its exe is missing, clicking \"Start Game\" will launch this program instead; it has no effect while the game itself is available.",
+        ["GameLauncherSettingDialog_CustomProgramTip"] = "When enabled, clicking \"Start Game\" launches this program instead of the game itself; turn the switch off to launch the game again. Configured per server.",
         ["LauncherPage_CustomStartExecutable"] = "Custom Executable",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "Uninstall Game Warning",
         ["LauncherPage_RepairGame"] = "Repair Game",

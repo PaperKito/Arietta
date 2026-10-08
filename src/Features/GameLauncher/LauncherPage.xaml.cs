@@ -181,18 +181,22 @@ public sealed partial class LauncherPage : PageBase
             }
             return;
         }
-        string? exe = GameRegistry.GetConfiguredExePath(biz);
         
-        bool isGameExe = !string.IsNullOrWhiteSpace(exe) && File.Exists(exe);
-        if (!isGameExe)
+        
+        bool isGameExe = false;
+        string? exe = GameRegistry.GetEnabledThirdPartyToolPath(biz);
+        if (exe is null)
         {
             
-            exe = GameRegistry.GetEnabledThirdPartyToolPath(biz);
-            if (exe is null)
+            string? gameExe = GameRegistry.GetConfiguredExePath(biz);
+            if (string.IsNullOrWhiteSpace(gameExe) || !File.Exists(gameExe))
             {
+                
                 _ = OpenLauncherSettingDialogAsync();
                 return;
             }
+            exe = gameExe;
+            isGameExe = true;
         }
         try
         {
@@ -1178,13 +1182,9 @@ public sealed partial class LauncherPage : PageBase
             ApplyUpdateStateToMainButton();
             return;
         }
-        string? exe = GameRegistry.GetConfiguredExePath(CurrentGameBiz);
-        if ((string.IsNullOrWhiteSpace(exe) || !File.Exists(exe))
-            && GameRegistry.GetEnabledThirdPartyToolPath(CurrentGameBiz) is { } tool)
-        {
-            
-            exe = tool;
-        }
+        
+        string? exe = GameRegistry.GetEnabledThirdPartyToolPath(CurrentGameBiz)
+                      ?? GameRegistry.GetConfiguredExePath(CurrentGameBiz);
         if (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe))
         {
             

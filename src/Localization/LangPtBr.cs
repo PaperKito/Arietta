@@ -410,7 +410,7 @@ internal static class LangPtBr
         ["GameLauncherSettingDialog_StartRepairing"] = "Iniciar reparo",
         ["GameLauncherSettingDialog_StartupArguments"] = "Argumentos de inicialização",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "Argumentos de linha de comando",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "Se o jogo deste servidor não estiver configurado ou o exe estiver ausente, clicar em «Iniciar jogo» iniciará este programa em vez disso; não tem efeito enquanto o jogo estiver disponível.",
+        ["GameLauncherSettingDialog_CustomProgramTip"] = "Quando ativado, clicar em \u00abIniciar jogo\u00bb iniciar\u00e1 este programa em vez do jogo; desative a op\u00e7\u00e3o para iniciar o jogo novamente. Configurado por servidor.",
         ["LauncherPage_CustomStartExecutable"] = "Executável personalizado",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "Aviso de desinstalação do jogo",
         ["LauncherPage_RepairGame"] = "Reparar jogo",

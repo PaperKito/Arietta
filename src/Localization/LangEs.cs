@@ -410,7 +410,7 @@ internal static class LangEs
         ["GameLauncherSettingDialog_StartRepairing"] = "Iniciar reparación",
         ["GameLauncherSettingDialog_StartupArguments"] = "Argumentos de inicio",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "Argumentos de línea de comandos",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "Si el juego de este servidor no está configurado o falta su exe, al pulsar «Iniciar juego» se iniciará este programa en su lugar; no tiene efecto mientras el juego esté disponible.",
+        ["GameLauncherSettingDialog_CustomProgramTip"] = "Al activarlo, al pulsar \u00abIniciar juego\u00bb se iniciar\u00e1 este programa en lugar del juego; desactiva el interruptor para volver a iniciar el juego. Se configura por servidor.",
         ["LauncherPage_CustomStartExecutable"] = "Ejecutable personalizado",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "Advertencia de desinstalación del juego",
         ["LauncherPage_RepairGame"] = "Reparar juego",

@@ -429,7 +429,7 @@ internal static class LangHant
         ["GameLauncherSettingDialog_StartRepairing"] = "開始修復",
         ["GameLauncherSettingDialog_StartupArguments"] = "啟動參數",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "命令列參數",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "該服遊戲未設定或 exe 缺失時，點「開始遊戲」將改為啟動此程式；遊戲本體可用時不生效。",
+        ["GameLauncherSettingDialog_CustomProgramTip"] = "\u555f\u7528\u5f8c\uff0c\u9ede\u300c\u958b\u59cb\u904a\u6232\u300d\u5c07\u555f\u52d5\u6b64\u7a0b\u5f0f\uff08\u4e0d\u518d\u555f\u52d5\u904a\u6232\u672c\u9ad4\uff09\uff1b\u95dc\u6389\u958b\u95dc\u5373\u6062\u5fa9\u555f\u52d5\u672c\u9ad4\u3002\u5404\u670d\u7368\u7acb\u8a2d\u5b9a\u3002",
         ["LauncherPage_CustomStartExecutable"] = "自訂啟動程式",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "解除安裝遊戲警告",
         ["LauncherPage_RepairGame"] = "修復遊戲",
