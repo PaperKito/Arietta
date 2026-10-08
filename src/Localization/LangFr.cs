@@ -410,7 +410,6 @@ internal static class LangFr
         ["GameLauncherSettingDialog_StartRepairing"] = "Démarrer la réparation",
         ["GameLauncherSettingDialog_StartupArguments"] = "Arguments de lancement",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "Arguments de ligne de commande",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "Une fois activ\u00e9, cliquer sur \u00ab Lancer le jeu \u00bb lancera ce programme \u00e0 la place du jeu ; d\u00e9sactivez l'interrupteur pour lancer \u00e0 nouveau le jeu. Configuration propre \u00e0 chaque serveur.",
         ["LauncherPage_CustomStartExecutable"] = "Exécutable personnalisé",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "Avertissement de désinstallation",
         ["LauncherPage_RepairGame"] = "Réparer le jeu",

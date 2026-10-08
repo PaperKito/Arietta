@@ -410,7 +410,6 @@ internal static class LangDe
         ["GameLauncherSettingDialog_StartRepairing"] = "Reparatur starten",
         ["GameLauncherSettingDialog_StartupArguments"] = "Startargumente",
         ["GameLauncherSettingDialog_CommandLineArgument"] = "Befehlszeilenargumente",
-        ["GameLauncherSettingDialog_CustomProgramTip"] = "Wenn aktiviert, startet ein Klick auf \u201eSpiel starten\u201c dieses Programm statt des Spiels selbst; zum Starten des Spiels den Schalter wieder ausschalten. Pro Server getrennt konfiguriert.",
         ["LauncherPage_CustomStartExecutable"] = "Eigene Programmdatei",
         ["GameLauncherSettingDialog_UninstallGameWarning"] = "Deinstallationswarnung",
         ["LauncherPage_RepairGame"] = "Spiel reparieren",

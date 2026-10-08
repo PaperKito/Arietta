@@ -384,13 +384,6 @@
                             </Grid>
                         </Grid>
 
-                        <TextBlock MaxWidth="480"
-                                   HorizontalAlignment="Left"
-                                   FontSize="12"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                   Text="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_CustomProgramTip, Mode=OneWay}"
-                                   TextWrapping="Wrap" />
-
                     </StackPanel>
                 </FlipViewItem>
 

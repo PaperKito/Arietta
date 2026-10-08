@@ -612,7 +612,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameLauncherSettingDialog_StartRepairing => T("开始修复");
     public string GameLauncherSettingDialog_StartupArguments => T("启动参数");
     public string GameLauncherSettingDialog_CommandLineArgument => T("命令行参数");
-    public string GameLauncherSettingDialog_CustomProgramTip => T("启用后，点「开始游戏」将启动此程序（不再启动游戏本体）；关掉开关即恢复启动本体。各服独立配置。");
     public string GameLauncherSettingDialog_UninstallGameWarning => T("卸载游戏警告");
     public string GameLauncherSettingDialog_CannotDeleteDriveRoot => T("不能删除驱动器根目录");
     public string GameLauncherSettingDialog_ScreenshotsFound => T("游戏目录中发现 {0} 张截图，可先备份再卸载（「确认卸载」不备份截图）");
