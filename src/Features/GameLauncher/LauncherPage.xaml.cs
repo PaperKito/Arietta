@@ -182,7 +182,9 @@ public sealed partial class LauncherPage : PageBase
             return;
         }
         string? exe = GameRegistry.GetConfiguredExePath(biz);
-        if (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe))
+        
+        bool isGameExe = !string.IsNullOrWhiteSpace(exe) && File.Exists(exe);
+        if (!isGameExe)
         {
             
             exe = GameRegistry.GetEnabledThirdPartyToolPath(biz);
@@ -195,7 +197,7 @@ public sealed partial class LauncherPage : PageBase
         try
         {
             Button_StartGame.GameCommand = null;
-            var process = StartGameProcess(exe, biz);
+            var process = StartGameProcess(exe, biz, isGameExe);
             if (process != null)
             {
                 
@@ -1662,14 +1664,20 @@ public sealed partial class LauncherPage : PageBase
     
     
     
-    private Process? StartGameProcess(string exePath, GameBiz biz)
+    
+    
+    
+    
+    private Process? StartGameProcess(string exePath, GameBiz biz, bool isGameExe)
     {
         string args = AppConfig.GetConfig(GameRegistry.GetStartGameArgumentConfigKey(biz)) ?? "";
         
         
         
         
-        if (biz is GameBiz.WutheringWaves or GameBiz.WutheringWavesGlobal or GameBiz.WutheringWavesBilibili
+        
+        if (isGameExe
+            && biz is GameBiz.WutheringWaves or GameBiz.WutheringWavesGlobal or GameBiz.WutheringWavesBilibili
             && !args.Contains("krqlv", StringComparison.OrdinalIgnoreCase)
             && Path.GetDirectoryName(exePath) is { } gameDir)
         {
