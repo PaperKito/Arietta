@@ -4,14 +4,21 @@ English | [简体中文](./README.md)
 
 > The name comes from Italian *arietta* — the diminutive of *aria* ("a little aria"); the word also means "a light breeze".
 
-Arietta aims to make up for what the official launcher is missing. It supports all Kuro Games PC titles (Wuthering Waves, Punishing: Gray Raven).
+Arietta is an unofficial, non-commercial community launcher for Kuro Games titles. It fills in the gaps the official launcher leaves behind, and it supports every PC game Kuro Games ships — Wuthering Waves and Punishing: Gray Raven — across 8 servers (CN, B, global, and more), with per-server data isolation.
 
-Besides the launcher basics, I added extra features driven by my own needs, for example:
+On top of the basics — picking a server, launching, updating — I added a fair amount around my own needs:
 
-- **Playtime tracking**
-- **Screenshot management**
-- **Account switching**
-- **KuroBBS community**
+- **Playtime tracking** — counts only the sessions launched from this launcher; total time, launch count, active days, longest single session, plus bar charts for the last 15 days / 12 weeks / 12 months
+- **Gacha log** — import an aqua link and it pulls the records for you; banner analytics with pity counters and 5★ / 4★ breakdowns, matching paimon.moe's definitions
+- **KuroBBS community** — daily check-in and monthly calendar, character builds, Wuthering Waves Tower of Adversity / Echoes / Endless Binance, and PGR resource reports plus combat records
+- **Screenshot management** — auto-locates the game's screenshot folder, groups them by date, batch-deletes to the system recycle bin
+- **Install & update** — pick your resource tier (UHD / HD / SD), differential and krzip group patches, resumable downloads, multi-connection segmented acceleration, pre-download, and file verification with one-click repair
+- **In-game settings** — display mode, resolution, HDR, voice language, plus gamepad key mapping
+- **Dynamic background** — pulls the official animated backgrounds, or bring your own image / video; dominant-color extraction retints the whole UI accent
+- **WebDAV sync** — single-database incremental sync with dual-anchor fingerprints, with automatic timestamped backups kept as history
+- **Toolbox** — ADB serial emulator, KuroBBS token / did capture
+
+The UI ships in 10 languages (Simplified Chinese, Traditional Chinese, English, Japanese, Korean, French, German, Spanish, Thai, Brazilian Portuguese) and switches instantly without a restart.
 
 And there is more to explore.
 
