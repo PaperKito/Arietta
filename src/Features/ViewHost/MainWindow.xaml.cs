@@ -25,7 +25,12 @@ public sealed partial class MainWindow : WindowEx
     private void InitializeMainWindow()
     {
         
+        
+#if DEBUG
         Title = $"Arietta ({File.GetLastWriteTime(typeof(MainWindow).Assembly.Location):MM-dd HH:mm})";
+#else
+        Title = "Arietta";
+#endif
         AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
         AppWindow.TitleBar.IconShowOptions = IconShowOptions.ShowIconAndSystemMenu;
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
