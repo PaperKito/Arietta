@@ -14,12 +14,6 @@ using Windows.ApplicationModel.DataTransfer;
 
 namespace Arietta.Features.ViewHost;
 
-
-
-
-
-
-
 public sealed partial class AdbToolPage : PageBase
 {
     private readonly AdbClient _adbClient = new();
@@ -44,7 +38,6 @@ public sealed partial class AdbToolPage : PageBase
 
     #region 导航
 
-    
     private void Button_Back_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -141,8 +134,7 @@ public sealed partial class AdbToolPage : PageBase
             var sockets = await _adbClient.GetWebViewSocketsAsync(serial);
             if (sockets.Count == 0)
             {
-                
-                
+
                 SetCapturing(false);
                 AppendLog("没有找到任何 devtools socket（WebView 远程调试未开启）");
                 string report = await _adbClient.CollectDiagnosticsAsync(serial);
@@ -204,7 +196,7 @@ public sealed partial class AdbToolPage : PageBase
         _sniffer.Log += AppendLog;
         _sniffer.DidCaptured += did => DispatcherQueue.TryEnqueue(() => TextBox_Did.Text = did);
         _sniffer.TokenCaptured += token => DispatcherQueue.TryEnqueue(() => TextBox_Token.Text = token);
-        
+
         _sniffer.UserIdCaptured += userId => AppendLog($"捕获 userId：{userId}");
         _sniffer.Disconnected += () => DispatcherQueue.TryEnqueue(() =>
         {
@@ -245,8 +237,6 @@ public sealed partial class AdbToolPage : PageBase
         Button_Capture.Content = capturing ? Lang.Instance.KuroAccount_StopCapture : Lang.Instance.KuroAccount_StartCapture;
     }
 
-
-    
     private async Task ShowDiagnosticsDialogAsync(string report)
     {
         try
@@ -263,7 +253,7 @@ public sealed partial class AdbToolPage : PageBase
                 MinHeight = 180,
                 MaxHeight = 280,
             };
-            
+
             ScrollViewer.SetHorizontalScrollBarVisibility(reportBox, ScrollBarVisibility.Auto);
             ScrollViewer.SetVerticalScrollBarVisibility(reportBox, ScrollBarVisibility.Auto);
             var panel = new StackPanel { Spacing = 10, MaxWidth = 460 };
@@ -295,7 +285,7 @@ public sealed partial class AdbToolPage : PageBase
         }
         catch (Exception ex)
         {
-            
+
             AppendLog($"诊断窗口打开失败：{ex.Message}");
         }
     }
@@ -313,7 +303,7 @@ public sealed partial class AdbToolPage : PageBase
             InAppToast.MainWindow?.Warning(Lang.Instance.KuroAccount_Invalid, Lang.Instance.KuroAccount_SaveNeedTokenDid);
             return;
         }
-        
+
         SaveAccount(account);
     }
 
@@ -334,11 +324,6 @@ public sealed partial class AdbToolPage : PageBase
         InAppToast.MainWindow?.Success(Lang.Instance.KuroAccount_Cleared);
     }
 
-
-    
-    
-    
-    
     private KuroBbsAccount ReadAccountFromInputs()
     {
         string token = TextBox_Token.Text.Trim();

@@ -7,12 +7,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.Sync;
 
-
-
-
-
-
-
 public sealed partial class CloudSyncServerPage : PageBase
 {
     private readonly CloudSyncService _cloudSync = AppConfig.GetService<CloudSyncService>();
@@ -27,7 +21,7 @@ public sealed partial class CloudSyncServerPage : PageBase
 
     protected override void OnLoaded()
     {
-        
+
         LoadConfig();
         base.OnLoaded();
     }
@@ -38,7 +32,7 @@ public sealed partial class CloudSyncServerPage : PageBase
         CloudSyncConfig config = _cloudSync.Config;
         TextBox_ServerUrl.Text = config.ServerUrl;
         TextBox_UserName.Text = config.UserName;
-        
+
         PasswordBox_Password.Password = config.Password;
 
         TextBlock_Status.Text = config.IsConfigured
@@ -47,8 +41,6 @@ public sealed partial class CloudSyncServerPage : PageBase
         Border_Status.Visibility = Visibility.Visible;
     }
 
-
-    
     private void Button_TogglePasswordReveal_Click(object sender, RoutedEventArgs e)
     {
         bool reveal = PasswordBox_Password.Visibility == Visibility.Visible;
@@ -62,12 +54,10 @@ public sealed partial class CloudSyncServerPage : PageBase
         }
         PasswordBox_Password.Visibility = reveal ? Visibility.Collapsed : Visibility.Visible;
         TextBox_PasswordRevealed.Visibility = reveal ? Visibility.Visible : Visibility.Collapsed;
-        
+
         FontIcon_Reveal.Glyph = reveal ? "\uED1A" : "\uE7B3";
     }
 
-
-    
     private void TextBox_PasswordRevealed_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (TextBox_PasswordRevealed.Visibility == Visibility.Visible)
@@ -76,8 +66,6 @@ public sealed partial class CloudSyncServerPage : PageBase
         }
     }
 
-
-    
     private void Button_Back_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -99,7 +87,7 @@ public sealed partial class CloudSyncServerPage : PageBase
         }
 
         string serverUrl = TextBox_ServerUrl.Text.Trim();
-        
+
         if (serverUrl.Length > 0 &&
             !(Uri.TryCreate(serverUrl, UriKind.Absolute, out Uri? uri)
               && uri.Scheme is "http" or "https"
@@ -112,8 +100,7 @@ public sealed partial class CloudSyncServerPage : PageBase
         SetBusy(true);
         try
         {
-            
-            
+
             _cloudSync.ApplySettings(
                 serverUrl,
                 TextBox_UserName.Text.Trim(),
@@ -154,11 +141,6 @@ public sealed partial class CloudSyncServerPage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private void SetStatus(string message, bool? success)
     {
         TextBlock_Status.Text = message;

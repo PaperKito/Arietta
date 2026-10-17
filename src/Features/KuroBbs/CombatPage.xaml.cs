@@ -19,48 +19,27 @@ using Windows.UI;
 
 namespace Arietta.Features.KuroBbs;
 
-
 public sealed class CombatPeriodItem
 {
-    
+
     public string DateLabel { get; init; } = "";
 
-    
     public string ValueLabel { get; init; } = "";
 
-    
     public Visibility StarIconVisibility { get; init; } = Visibility.Collapsed;
 
-    
     public Visibility ValueVisibility { get; init; } = Visibility.Visible;
 
-    
     public ImageSource? RankSource { get; init; }
 
-    
     public Visibility RankIconVisibility { get; init; } = Visibility.Collapsed;
 
-    
-    
-    
-    
     public double RankIconSize { get; init; } = 18;
 
-    
     public long StartTs { get; init; }
 
     public CombatRecordEntry Entry { get; init; } = new();
 }
-
-
-
-
-
-
-
-
-
-
 
 public sealed partial class CombatPage : PageBase
 {
@@ -68,28 +47,21 @@ public sealed partial class CombatPage : PageBase
 
     private string _mode = CombatRecordStore.ModeTower;
 
-    
     private long _selectedPeriodEnd = -1;
-
-    
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = false };
 
 
     #region 海墟（冥歌海墟）资源与状态
 
-    
     private const int SlashKindForbidden = 0;
     private const int SlashKindRift = 1;
     private const int SlashKindTurbulence = 2;
 
-    
     private const double SlashRowHeight = 56;
 
-    
     private const double SlashRankColumnWidth = 38;
 
-    
     private static readonly Dictionary<string, string> SlashRankIconFiles = new(StringComparer.OrdinalIgnoreCase)
     {
         ["B"] = "SlashRankB.png",
@@ -99,23 +71,14 @@ public sealed partial class CombatPage : PageBase
         ["SSS"] = "SlashRankSSS.png",
     };
 
-    
-    
-    
-    
-    
     private const double SlashRolePhotoSize = 84;
 
-    
     private const double SlashBranchIconSize = 20;
 
-    
     private const double SlashRoleRowSpacing = 6;
 
-    
     private const string SlashBranchIconFile = "SlashBranchIcon.png";
 
-    
     private static readonly Dictionary<int, string> SlashBuffLvFiles = new()
     {
         [1] = "SlashBuffLv1.png",
@@ -125,23 +88,14 @@ public sealed partial class CombatPage : PageBase
         [5] = "SlashBuffLv5.png",
     };
 
-    
     private KuroSlashData? _slashCache;
 
-    
     private Dictionary<int, int>? _slashChainMap;
 
-    
     private Dictionary<int, int>? _matrixChainMap;
 
-    
     private Dictionary<int, int>? _matrixStarMap;
 
-    
-    
-    
-    
-    
     private int _loadGeneration;
 
     #endregion
@@ -185,11 +139,8 @@ public sealed partial class CombatPage : PageBase
         DispatcherQueue.TryEnqueue(async () =>
         {
             _selectedPeriodEnd = -1;
-            _loadGeneration++; 
-            
-            
-            
-            
+            _loadGeneration++;
+
             StackPanel_Content.Children.Clear();
             TextBlock_SeasonTime.Text = "";
             await LoadAsync();
@@ -212,7 +163,7 @@ public sealed partial class CombatPage : PageBase
         InfoBar_NoAccount.IsOpen = false;
 
         int generation = _loadGeneration;
-        
+
         PopulatePeriodList(account, _selectedPeriodEnd);
         ProgressRing_Loading.IsActive = true;
         try
@@ -244,21 +195,12 @@ public sealed partial class CombatPage : PageBase
 
     #region 当期拉取 + 落库（三个玩法）
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private async Task<T?> FetchCombatDataAsync<T>(Func<Task<KuroBbsResponse<T>>> fetch, Func<T, bool> unlocked, int generation) where T : class
     {
         var result = await fetch();
         if (generation != _loadGeneration)
         {
-            return default; 
+            return default;
         }
         if (result is { IsSuccess: true } && result.Data is null)
         {
@@ -287,7 +229,6 @@ public sealed partial class CombatPage : PageBase
             return;
         }
 
-        
         var difficulty = data.DifficultyList?.FirstOrDefault(d => d.DifficultyName == "深境区")
             ?? data.DifficultyList?.FirstOrDefault(d => d.Difficulty == 3)
             ?? data.DifficultyList?.FirstOrDefault();
@@ -297,23 +238,19 @@ public sealed partial class CombatPage : PageBase
             return;
         }
 
-        
-        
         var (chainMap, _) = await BuildRoleAuxMapsAsync(account);
         var widget = await ResolveTowerWidgetAsync(account, data.SeasonEndTime);
 
-        
         int star = widget.Max > 0 ? widget.Cur : areas.Sum(a => a.Star);
         int maxStar = widget.Max > 0 ? widget.Max : areas.Sum(a => a.MaxStar);
         long periodEnd = ResolvePeriodEnd(widget.RefreshAt, data.SeasonEndTime);
         if (generation != _loadGeneration)
         {
-            return; 
+            return;
         }
         SaveRecord(account, CombatRecordStore.ModeTower, periodEnd,
             star, maxStar, 0, JsonSerializer.Serialize(data, JsonOptions), JsonSerializer.Serialize(chainMap, JsonOptions));
 
-        
         CombatRecordStore.SaveTowerFloors(account.RoleId, periodEnd, data);
 
         PopulatePeriodList(account, _selectedPeriodEnd);
@@ -335,15 +272,13 @@ public sealed partial class CombatPage : PageBase
         }
 
         long periodEnd = await ResolveWidgetPeriodEndAsync(account, _mode, data.EndTime);
-        
-        
+
         var (chainMap, starMap) = await BuildRoleAuxMapsAsync(account);
         if (generation != _loadGeneration)
         {
-            return; 
+            return;
         }
-        
-        
+
         var headline = modes.FirstOrDefault(m => m.ModeId == MatrixModeSingularity && m.HasRecord)
             ?? modes.FirstOrDefault(m => m.HasRecord);
         SaveRecord(account, _mode, periodEnd, 0, 0, headline?.Score ?? 0,
@@ -369,22 +304,19 @@ public sealed partial class CombatPage : PageBase
         }
 
         long periodEnd = await ResolveWidgetPeriodEndAsync(account, _mode, data.SeasonEndTime);
-        
+
         var (chainMap, _) = await BuildRoleAuxMapsAsync(account);
         if (generation != _loadGeneration)
         {
-            return; 
+            return;
         }
-        
-        
+
         SaveRecord(account, _mode, periodEnd, 0, 0, ResolveSlashHeadlineScore(data),
             JsonSerializer.Serialize(data, JsonOptions), JsonSerializer.Serialize(chainMap, JsonOptions));
 
         PopulatePeriodList(account, _selectedPeriodEnd);
     }
 
-
-    
     private static void SaveRecord(KuroBbsAccount account, string mode, long periodEnd,
         int star, int maxStar, int score, string detail, string? chain)
     {
@@ -402,13 +334,10 @@ public sealed partial class CombatPage : PageBase
         });
     }
 
-
-    
-    
     private static long ResolvePeriodEnd(long primary, long fallback)
     {
         long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        const long min = 1_704_067_200; 
+        const long min = 1_704_067_200;
         long max = now + 2L * 366 * 86400;
         bool Plausible(long v) => v > min && v < max;
         if (Plausible(primary))
@@ -418,8 +347,6 @@ public sealed partial class CombatPage : PageBase
         return Plausible(fallback) ? fallback : 0;
     }
 
-
-    
     private static async Task<long> ResolveWidgetPeriodEndAsync(KuroBbsAccount account, string mode, long fallbackEndTime)
     {
         long primary = 0;
@@ -433,7 +360,7 @@ public sealed partial class CombatPage : PageBase
         }
         catch
         {
-            
+
         }
         return ResolvePeriodEnd(primary, fallbackEndTime);
     }
@@ -443,7 +370,6 @@ public sealed partial class CombatPage : PageBase
 
     #region 期次列表 + 快照渲染
 
-    
     private void PopulatePeriodList(KuroBbsAccount account, long selectPeriodEnd)
     {
         var records = CombatRecordStore.GetList(_mode, account.RoleId);
@@ -459,22 +385,19 @@ public sealed partial class CombatPage : PageBase
         for (int i = 0; i < records.Count; i++)
         {
             var record = records[i];
-            
-            
+
             var rankSource = _mode == CombatRecordStore.ModeSlash ? ResolveSlashPeriodRank(record) : null;
             var rankSize = 18.0;
             var valueScore = record.Score;
             if (_mode == CombatRecordStore.ModeNewTower)
             {
-                
-                
+
                 (valueScore, rankSource) = ResolveMatrixPeriodInfo(record);
                 rankSize = MatrixPeriodRankSize;
             }
             else if (_mode == CombatRecordStore.ModeSlash)
             {
-                
-                
+
                 valueScore = ResolveSlashPeriodScore(record);
             }
             items.Add(new CombatPeriodItem
@@ -504,7 +427,7 @@ public sealed partial class CombatPage : PageBase
     {
         try
         {
-            
+
             long labelTs = startTs > 0 && record.PeriodEnd > startTs ? startTs
                 : record.PeriodEnd > 0 ? record.PeriodEnd
                 : DateTimeOffset.FromUnixTimeMilliseconds(record.UpdateTime).ToUnixTimeSeconds();
@@ -516,8 +439,6 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
     private static ImageSource? ResolveSlashPeriodRank(CombatRecordEntry record)
     {
         try
@@ -530,16 +451,11 @@ public sealed partial class CombatPage : PageBase
         }
         catch
         {
-            
+
         }
         return null;
     }
 
-
-    
-    
-    
-    
     private static (int Score, ImageSource? Rank) ResolveMatrixPeriodInfo(CombatRecordEntry record)
     {
         int score = record.Score;
@@ -560,7 +476,7 @@ public sealed partial class CombatPage : PageBase
         }
         catch
         {
-            
+
         }
         return (score, rank);
     }
@@ -574,8 +490,6 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
     private void RenderFromEntry(CombatPeriodItem item)
     {
         var entry = item.Entry;
@@ -589,8 +503,7 @@ public sealed partial class CombatPage : PageBase
                 case CombatRecordStore.ModeNewTower:
                     if (JsonSerializer.Deserialize<KuroNewTowerData>(entry.Detail, JsonOptions) is { } newTower)
                     {
-                        
-                        
+
                         _matrixChainMap = [];
                         _matrixStarMap = [];
                         if (entry.Chain is string aux)
@@ -610,7 +523,7 @@ public sealed partial class CombatPage : PageBase
                             }
                             catch
                             {
-                                
+
                             }
                         }
                         ShowPeriodRange(item);
@@ -620,7 +533,7 @@ public sealed partial class CombatPage : PageBase
                 case CombatRecordStore.ModeSlash:
                     if (JsonSerializer.Deserialize<KuroSlashData>(entry.Detail, JsonOptions) is { } slash)
                     {
-                        
+
                         var slashChain = entry.Chain is string slashChainJson
                             ? JsonSerializer.Deserialize<Dictionary<int, int>>(slashChainJson, JsonOptions) ?? []
                             : [];
@@ -635,7 +548,7 @@ public sealed partial class CombatPage : PageBase
                             ? JsonSerializer.Deserialize<Dictionary<int, int>>(chain, JsonOptions) ?? []
                             : [];
                         var widget = new TowerWidgetInfo(entry.PeriodEnd, entry.Star, entry.MaxStar);
-                        
+
                         CombatRecordStore.MergeAccumulatedFloors(tower, entry.RoleId, entry.PeriodEnd);
                         ShowPeriodRange(item);
                         RenderTower(tower, widget, chainMap);
@@ -650,8 +563,6 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
     private void ShowPeriodRange(CombatPeriodItem item)
     {
         try
@@ -674,7 +585,7 @@ public sealed partial class CombatPage : PageBase
 
     private void RenderTower(KuroTowerData data, TowerWidgetInfo widget, Dictionary<int, int> chainMap)
     {
-        
+
         var difficulty = data.DifficultyList?.FirstOrDefault(d => d.DifficultyName == "深境区")
             ?? data.DifficultyList?.FirstOrDefault(d => d.Difficulty == 3)
             ?? data.DifficultyList?.FirstOrDefault();
@@ -688,22 +599,9 @@ public sealed partial class CombatPage : PageBase
         StackPanel_Content.Children.Add(CreateTowerAreasGrid(areas, chainMap));
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private void RenderNewTower(KuroNewTowerData data)
     {
-        
-        
+
         var modes = (data.ModeDetails ?? []).Where(m => m.IsUnlock).ToList();
         var mode = modes.FirstOrDefault(m => m.ModeId == MatrixModeSingularity)
             ?? modes.FirstOrDefault();
@@ -718,19 +616,11 @@ public sealed partial class CombatPage : PageBase
         StackPanel_Content.Children.Add(CreateMatrixTeamList(mode));
     }
 
-
-    
-    
-    
-    
-    
     private FrameworkElement CreateMatrixOverview(KuroNewTowerModeDetail mode)
     {
         var root = new Grid();
         root.Children.Add(BuildMatrixOverviewCard(mode));
 
-        
-        
         var button = new Button
         {
             Height = 32,
@@ -747,23 +637,19 @@ public sealed partial class CombatPage : PageBase
         return root;
     }
 
-
-    
     private FrameworkElement BuildMatrixOverviewCard(KuroNewTowerModeDetail mode) =>
         KuroBbsUi.KuroCard(BuildMatrixOverviewContent(mode), cornerRadius: 12);
 
-    
     private Grid BuildMatrixOverviewContent(KuroNewTowerModeDetail mode)
     {
-        
-        
+
         var grid = new Grid { Height = MatrixOverviewHeight, Padding = new Thickness(16, 0, 24, 0), ColumnSpacing = 16 };
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });                       
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); 
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         if (MatrixRankDetailImageSource(mode.Rank) is { } rankSrc)
         {
-            
+
             grid.Children.Add(new Image
             {
                 Source = rankSrc,
@@ -774,13 +660,12 @@ public sealed partial class CombatPage : PageBase
         }
         else
         {
-            
+
             grid.Children.Add(new Grid { Width = MatrixOverviewHeight, Height = MatrixOverviewHeight });
         }
 
         var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 8 };
 
-        
         var scoreRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         scoreRow.Children.Add(new TextBlock
         {
@@ -801,7 +686,6 @@ public sealed partial class CombatPage : PageBase
         });
         info.Children.Add(scoreRow);
 
-        
         var progressRow = new Grid();
         progressRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         progressRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -822,7 +706,7 @@ public sealed partial class CombatPage : PageBase
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        
+
         if (mode.Round > 0)
         {
             right.Children.Add(new TextBlock
@@ -858,8 +742,6 @@ public sealed partial class CombatPage : PageBase
         progressRow.Children.Add(right);
         info.Children.Add(progressRow);
 
-        
-        
         var track = new Grid { Height = 8, CornerRadius = new CornerRadius(4) };
         track.Background = new SolidColorBrush(Color.FromArgb(0x26, 0xFF, 0xFF, 0xFF));
         double ratio = mode.BossCount > 0 ? Math.Clamp((double)mode.PassBoss / mode.BossCount, 0, 1) : 0;
@@ -868,7 +750,7 @@ public sealed partial class CombatPage : PageBase
             CornerRadius = new CornerRadius(4),
             Background = MatrixGoldBrush,
         };
-        
+
         track.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(ratio, GridUnitType.Star) });
         track.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(Math.Max(1 - ratio, 0.02), GridUnitType.Star) });
         Grid.SetColumn(fill, 0);
@@ -880,60 +762,32 @@ public sealed partial class CombatPage : PageBase
         return grid;
     }
 
-
-    
     private const int MatrixModeSingularity = 1;
 
-    
     private const double MatrixOverviewHeight = 120;
 
-    
-    
-    
-    
-    
     private const int MatrixRankSize = 128;
 
-    
-    
-    
     private const int MatrixPeriodRankSize = 18;
 
-    
     private const double MatrixTeamRowHeight = 92;
 
-    
     private const double MatrixTeamIndexWidth = 36;
 
-    
-    
-    
-    
-    
     private const double MatrixRolePhotoSize = 80;
 
-    
     private const double MatrixBuffSize = 64;
 
-    
     private const double MatrixOverviewAvatarSize = 40;
     private const double MatrixOverviewBuffSize = 28;
 
-    
     private const double MatrixShareImageWidth = 686;
 
-    
     private static readonly SolidColorBrush MatrixGoldBrush = new(Color.FromArgb(0xFF, 0xFF, 0xF3, 0xB9));
 
-
-    
-    
-    
-    
     private static ImageSource? MatrixRankImageSource(int rank) =>
         rank is < 1 or > 7 ? null : MatrixRankImageSourceCore($"ms-appx:///Assets/Image/Combat/MatrixRank{rank}.png");
 
-    
     private static ImageSource? MatrixRankDetailImageSource(int rank) =>
         rank is < 1 or > 7 ? null : MatrixRankImageSourceCore($"ms-appx:///Assets/Image/Combat/MatrixRankDetail{rank}.png");
 
@@ -944,7 +798,7 @@ public sealed partial class CombatPage : PageBase
             return new BitmapImage(new Uri(uri))
             {
                 DecodePixelType = DecodePixelType.Logical,
-                
+
                 DecodePixelWidth = MatrixRankSize,
             };
         }
@@ -954,12 +808,6 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
-    
-    
-    
-    
     private FrameworkElement CreateMatrixTeamList(KuroNewTowerModeDetail mode)
     {
         var list = new StackPanel { Spacing = 8 };
@@ -981,8 +829,6 @@ public sealed partial class CombatPage : PageBase
         return list;
     }
 
-
-    
     private static double MeasureRoundColumnWidth(List<KuroNewTowerTeam> teams, double fontSize)
     {
         double max = 0;
@@ -996,7 +842,6 @@ public sealed partial class CombatPage : PageBase
         return Math.Ceiling(max);
     }
 
-    
     private FrameworkElement CreateMatrixTeamRow(KuroNewTowerTeam team, int index, double roundColumnWidth)
     {
         var row = new Grid
@@ -1005,17 +850,14 @@ public sealed partial class CombatPage : PageBase
             Padding = new Thickness(14, 0, 24, 0),
             ColumnSpacing = 8,
         };
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(MatrixTeamIndexWidth) }); 
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });                       
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });  
-        
-        
-        
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(roundColumnWidth) });      
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110) });                   
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(76) });                    
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(MatrixTeamIndexWidth) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-        
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(roundColumnWidth) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(76) });
+
         row.Children.Add(new TextBlock
         {
             Text = index.ToString("D2"),
@@ -1026,7 +868,6 @@ public sealed partial class CombatPage : PageBase
             Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
         });
 
-        
         var left = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
         var roles = (team.RoleList ?? []).Where(r => !string.IsNullOrEmpty(r.IconUrl)).ToList();
         if (roles.Count == 0)
@@ -1045,7 +886,7 @@ public sealed partial class CombatPage : PageBase
                 left.Children.Add(CreateRolePhoto(role.IconUrl, chain, star, role.SkillBranchIndex, MatrixRolePhotoSize, 24, decodeToSize: true, showRarityBar: true, placeholderBackground: true));
             }
         }
-        
+
         var buffs = (team.Buffs ?? []).Where(b => !string.IsNullOrEmpty(b.BuffIcon) || !string.IsNullOrEmpty(b.BuffName)).ToList();
         if (buffs.Count > 0)
         {
@@ -1058,7 +899,6 @@ public sealed partial class CombatPage : PageBase
         Grid.SetColumn(left, 1);
         row.Children.Add(left);
 
-        
         if (team.Round > 0)
         {
             var round = new TextBlock
@@ -1071,14 +911,12 @@ public sealed partial class CombatPage : PageBase
             Grid.SetColumn(round, 3);
             row.Children.Add(round);
         }
-        
-        
+
         var capsule = CreateMatrixBossCapsule(team);
         capsule.Margin = new Thickness(20, 0, 0, 0);
         Grid.SetColumn(capsule, 4);
         row.Children.Add(capsule);
 
-        
         var scoreRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 1, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Right };
         scoreRow.Children.Add(new TextBlock
         {
@@ -1099,19 +937,15 @@ public sealed partial class CombatPage : PageBase
         Grid.SetColumn(scoreRow, 5);
         row.Children.Add(scoreRow);
 
-        
-        
         var root = new Grid();
         root.Children.Add(KuroBbsUi.KuroCard());
         root.Children.Add(row);
         return root;
     }
 
-
-    
     private static FrameworkElement CreateMatrixBossCapsule(KuroNewTowerTeam team)
     {
-        
+
         var grid = new Grid { ColumnSpacing = 4 };
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -1151,12 +985,6 @@ public sealed partial class CombatPage : PageBase
         };
     }
 
-
-    
-    
-    
-    
-    
     private async Task GenerateMatrixShareImageAsync(KuroNewTowerModeDetail mode)
     {
         InMemoryRandomAccessStream? png = null;
@@ -1164,10 +992,6 @@ public sealed partial class CombatPage : PageBase
         {
             var image = BuildMatrixShareImage(mode);
 
-            
-            
-            
-            
             var pageRoot = (Grid)Content;
             var host = new Canvas
             {
@@ -1180,7 +1004,7 @@ public sealed partial class CombatPage : PageBase
             try
             {
                 host.UpdateLayout();
-                
+
                 await Task.Delay(400);
 
                 rtb = new RenderTargetBitmap();
@@ -1207,16 +1031,10 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private FrameworkElement BuildMatrixShareImage(KuroNewTowerModeDetail mode)
     {
         var body = new StackPanel { Spacing = 12 };
 
-        
         body.Children.Add(new Border
         {
             HorizontalAlignment = HorizontalAlignment.Left,
@@ -1232,7 +1050,6 @@ public sealed partial class CombatPage : PageBase
             },
         });
 
-        
         body.Children.Add(new Border
         {
             CornerRadius = new CornerRadius(12),
@@ -1270,18 +1087,16 @@ public sealed partial class CombatPage : PageBase
         };
     }
 
-
-    
     private FrameworkElement CreateMatrixShareRow(KuroNewTowerTeam team, int index, double roundColumnWidth)
     {
         var row = new Grid { ColumnSpacing = 10 };
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(MatrixTeamIndexWidth) }); 
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });                      
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); 
-        
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(roundColumnWidth) });      
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(48) });                   
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(58) });                   
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(MatrixTeamIndexWidth) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(roundColumnWidth) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(48) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(58) });
 
         row.Children.Add(new TextBlock
         {
@@ -1292,8 +1107,6 @@ public sealed partial class CombatPage : PageBase
             Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
         });
 
-        
-        
         var left = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
         var roles = (team.RoleList ?? []).Where(r => !string.IsNullOrEmpty(r.IconUrl)).ToList();
         if (roles.Count == 0)
@@ -1319,7 +1132,6 @@ public sealed partial class CombatPage : PageBase
         Grid.SetColumn(left, 1);
         row.Children.Add(left);
 
-        
         if (team.Round > 0)
         {
             var round = new TextBlock
@@ -1378,8 +1190,6 @@ public sealed partial class CombatPage : PageBase
         };
     }
 
-
-    
     private async Task ShowMatrixSharePreviewAsync(RenderTargetBitmap rtb, InMemoryRandomAccessStream png)
     {
         var dialog = new ContentDialog
@@ -1417,8 +1227,6 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
     private async Task SaveMatrixShareImageAsync(InMemoryRandomAccessStream png)
     {
         var picker = new Windows.Storage.Pickers.FileSavePicker
@@ -1442,12 +1250,6 @@ public sealed partial class CombatPage : PageBase
         InAppToast.MainWindow?.Success(Lang.Instance.Common_Save);
     }
 
-
-    
-    
-    
-    
-    
     private FrameworkElement CreateRolePhoto(string? url, int chain, int star, int? branchIndex,
         double size, double starIconSize, bool decodeToSize, bool showRarityBar, bool placeholderBackground,
         double badgeFontSize = 11)
@@ -1473,8 +1275,7 @@ public sealed partial class CombatPage : PageBase
                 var source = new BitmapImage(new Uri(url));
                 if (decodeToSize)
                 {
-                    
-                    
+
                     source.DecodePixelType = DecodePixelType.Logical;
                     source.DecodePixelWidth = (int)size;
                     source.DecodePixelHeight = (int)size;
@@ -1483,12 +1284,11 @@ public sealed partial class CombatPage : PageBase
             }
             catch
             {
-                
+
             }
         }
         root.Children.Add(photo);
 
-        
         if (showRarityBar && star > 0)
         {
             root.Children.Add(new Border
@@ -1502,7 +1302,6 @@ public sealed partial class CombatPage : PageBase
             });
         }
 
-        
         if (chain > 0)
         {
             root.Children.Add(KuroBbsUi.MakeCornerBadge(chain.ToString(), badgeFontSize, new Thickness(4, 0, 4, 1)));
@@ -1517,7 +1316,7 @@ public sealed partial class CombatPage : PageBase
                 Height = starIconSize,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Bottom,
-                
+
                 Margin = new Thickness(0, 0, -3, -3),
             };
             if (branchIndex == 1)
@@ -1529,14 +1328,6 @@ public sealed partial class CombatPage : PageBase
         return root;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     private static FrameworkElement CreateMatrixBuffBox(KuroNewTowerBuff buff, double? size = null)
     {
         var s = size ?? MatrixBuffSize;
@@ -1553,7 +1344,7 @@ public sealed partial class CombatPage : PageBase
             {
                 box.Child = new Image
                 {
-                    
+
                     Source = new BitmapImage(new Uri(buff.BuffIcon))
                     {
                         DecodePixelType = DecodePixelType.Logical,
@@ -1565,7 +1356,7 @@ public sealed partial class CombatPage : PageBase
             }
             catch
             {
-                
+
             }
         }
 
@@ -1589,11 +1380,6 @@ public sealed partial class CombatPage : PageBase
         return root;
     }
 
-
-    
-    
-    
-    
     private void RenderSlash(KuroSlashData data, Dictionary<int, int>? chainMap = null)
     {
         _slashCache = data;
@@ -1601,8 +1387,6 @@ public sealed partial class CombatPage : PageBase
         BuildSlashContent();
     }
 
-
-    
     private static (KuroSlashDifficulty Difficulty, KuroSlashChallenge Challenge)? FindSlashHeadline(KuroSlashData data)
     {
         var pool = (data.DifficultyList ?? [])
@@ -1623,8 +1407,6 @@ public sealed partial class CombatPage : PageBase
         return best;
     }
 
-
-    
     private static int ResolveSlashHeadlineScore(KuroSlashData data)
     {
         if (FindSlashHeadline(data) is { } headline)
@@ -1638,27 +1420,23 @@ public sealed partial class CombatPage : PageBase
         return 0;
     }
 
-
-    
     private static int ResolveSlashPeriodScore(CombatRecordEntry record)
     {
         try
         {
             if (JsonSerializer.Deserialize<KuroSlashData>(record.Detail, JsonOptions) is { } slash)
             {
-                
+
                 return ResolveSlashHeadlineScore(slash);
             }
         }
         catch
         {
-            
+
         }
         return record.Score;
     }
 
-
-    
     private void BuildSlashContent()
     {
         StackPanel_Content.Children.Clear();
@@ -1667,8 +1445,6 @@ public sealed partial class CombatPage : PageBase
             return;
         }
 
-        
-        
         var difficulties = (data.DifficultyList ?? [])
             .Where(d => d.ChallengeList is { Count: > 0 })
             .OrderByDescending(d => d.Difficulty)
@@ -1688,9 +1464,6 @@ public sealed partial class CombatPage : PageBase
         AddSlashGroup(regenerative);
     }
 
-
-    
-    
     private void AddSlashGroup(List<KuroSlashDifficulty> group)
     {
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, VerticalAlignment = VerticalAlignment.Center };
@@ -1724,7 +1497,7 @@ public sealed partial class CombatPage : PageBase
             {
                 var block = new StackPanel { Spacing = 4 };
                 block.Children.Add(CreateSlashChallengeRow(challenge));
-                
+
                 block.Children.Add(CreateSlashTeamList(challenge));
                 rows.Children.Add(block);
             }
@@ -1732,21 +1505,15 @@ public sealed partial class CombatPage : PageBase
         StackPanel_Content.Children.Add(rows);
     }
 
-
-    
-    
-    
-    
     private FrameworkElement CreateSlashChallengeRow(KuroSlashChallenge challenge)
     {
         var grid = new Grid { ColumnSpacing = 8 };
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(SlashRankColumnWidth) }); 
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });                       
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); 
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });                       
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });                       
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(SlashRankColumnWidth) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-        
         var rank = CreateSlashRankIcon(challenge.Rank);
         if (rank is not null)
         {
@@ -1755,7 +1522,6 @@ public sealed partial class CombatPage : PageBase
             grid.Children.Add(rank);
         }
 
-        
         var score = new TextBlock
         {
             Text = string.Format(Lang.Instance.SlashPage_ScoreLabel, challenge.Score),
@@ -1767,7 +1533,6 @@ public sealed partial class CombatPage : PageBase
         Grid.SetColumn(score, 1);
         grid.Children.Add(score);
 
-        
         var floor = new TextBlock
         {
             Text = string.Format(Lang.Instance.TowerPage_Floor, challenge.ChallengeId),
@@ -1794,11 +1559,6 @@ public sealed partial class CombatPage : PageBase
         return KuroBbsUi.KuroCard(grid, padding: new Thickness(12, 0, 16, 0), height: SlashRowHeight);
     }
 
-
-    
-    
-    
-    
     private static ImageSource? SlashRankImageSource(string? rank)
     {
         string text = (rank ?? "").Trim().ToUpperInvariant();
@@ -1809,8 +1569,6 @@ public sealed partial class CombatPage : PageBase
         return BundledImage(file);
     }
 
-
-    
     private static FrameworkElement? CreateSlashRankIcon(string? rank)
     {
         if (SlashRankImageSource(rank) is not { } src)
@@ -1826,12 +1584,6 @@ public sealed partial class CombatPage : PageBase
         };
     }
 
-
-    
-    
-    
-    
-    
     private FrameworkElement CreateSlashTeamList(KuroSlashChallenge challenge)
     {
         var halves = challenge.HalfList ?? [];
@@ -1845,7 +1597,6 @@ public sealed partial class CombatPage : PageBase
             };
         }
 
-        
         var teams = new Grid { ColumnSpacing = 24 };
         int cols = halves.Count >= 2 ? 2 : 1;
         for (int c = 0; c < cols; c++)
@@ -1863,14 +1614,9 @@ public sealed partial class CombatPage : PageBase
         return KuroBbsUi.KuroCard(teams, padding: new Thickness(12, 10, 12, 10), secondaryBackground: true, margin: new Thickness(0, 2, 0, 0));
     }
 
-
-    
-    
-    
-    
     private FrameworkElement CreateSlashTeamBlock(KuroSlashHalf half, int index)
     {
-        
+
         var head = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         head.Children.Add(new TextBlock
         {
@@ -1894,8 +1640,6 @@ public sealed partial class CombatPage : PageBase
         var root = new StackPanel { Spacing = 4 };
         root.Children.Add(head);
 
-        
-        
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = SlashRoleRowSpacing, VerticalAlignment = VerticalAlignment.Center };
         foreach (var role in half.RoleList ?? [])
         {
@@ -1910,26 +1654,16 @@ public sealed partial class CombatPage : PageBase
         return root;
     }
 
-
-    
-    
-    
-    
-    
-    
     private static FrameworkElement CreateSlashBuffBox(KuroSlashHalf half)
     {
-        
-        
+
         const double size = 44;
 
-        
         const double barHeight = size * 0.20;
         const double iconSize = size - (2 * barHeight) - 4;
 
         var root = new Grid { Width = size, Height = size };
 
-        
         var box = new Border
         {
             CornerRadius = new CornerRadius(4),
@@ -1946,7 +1680,7 @@ public sealed partial class CombatPage : PageBase
                 },
             },
         };
-        
+
         if (!string.IsNullOrEmpty(half.BuffIcon))
         {
             try
@@ -1963,12 +1697,11 @@ public sealed partial class CombatPage : PageBase
             }
             catch
             {
-                
+
             }
         }
         root.Children.Add(box);
 
-        
         if (half.BuffQuality > 0 && SlashBuffLvFiles.TryGetValue(half.BuffQuality, out var lvFile) && BundledImage(lvFile) is { } lv)
         {
             root.Children.Add(new Image
@@ -1990,8 +1723,6 @@ public sealed partial class CombatPage : PageBase
         return root;
     }
 
-
-    
     private static int SlashKind(KuroSlashDifficulty difficulty)
     {
         string name = difficulty.DifficultyName ?? "";
@@ -2023,8 +1754,6 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
     private static string SlashGroupTitle(List<KuroSlashDifficulty> group)
     {
         foreach (var difficulty in group)
@@ -2043,8 +1772,6 @@ public sealed partial class CombatPage : PageBase
         return Lang.Instance.KuroBbs_SongOfVoidSea;
     }
 
-
-    
     private static string SlashShortName(KuroSlashDifficulty difficulty)
     {
         string name = (difficulty.DifficultyName ?? "").Trim();
@@ -2068,34 +1795,14 @@ public sealed partial class CombatPage : PageBase
 
     #region 逆境深塔（深境区）
 
-    
-    
-    
-    
     private const string TowerStarFile = "TowerStar.png";
 
-    
     private const string TowerStarEmptyFile = "TowerStarEmpty.png";
 
-    
-    
-    
     private const double TowerStarSize = 16;
 
-    
-    
-    
-    
     private readonly record struct TowerWidgetInfo(long RefreshAt, int Cur, int Max);
 
-
-    
-    
-    
-    
-    
-    
-    
     private static async Task<TowerWidgetInfo> ResolveTowerWidgetAsync(KuroBbsAccount account, long seasonEndTime)
     {
         try
@@ -2114,7 +1821,7 @@ public sealed partial class CombatPage : PageBase
         }
         catch
         {
-            
+
         }
 
         long nowTs = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -2122,9 +1829,6 @@ public sealed partial class CombatPage : PageBase
         return new TowerWidgetInfo(fallback, 0, 0);
     }
 
-
-    
-    
     private static async Task<(Dictionary<int, int> Chain, Dictionary<int, int> Star)> BuildRoleAuxMapsAsync(KuroBbsAccount account)
     {
         var chain = new Dictionary<int, int>();
@@ -2140,17 +1844,15 @@ public sealed partial class CombatPage : PageBase
         }
         catch
         {
-            
+
         }
         return (chain, star);
     }
 
-
-    
     private FrameworkElement CreateTowerHeader(KuroTowerDifficulty difficulty, TowerWidgetInfo widget)
     {
         var areas = difficulty.TowerAreaList ?? [];
-        
+
         int totalStar = difficulty.Difficulty == 3 && widget.Max > 0 ? widget.Cur : areas.Sum(a => a.Star);
         int maxStar = difficulty.Difficulty == 3 && widget.Max > 0 ? widget.Max : areas.Sum(a => a.MaxStar);
         if (maxStar <= 0) maxStar = areas.Count * 12;
@@ -2193,7 +1895,6 @@ public sealed partial class CombatPage : PageBase
         Grid.SetColumn(left, 0);
         grid.Children.Add(left);
 
-        
         var countdown = FormatTowerRefreshCountdown(widget.RefreshAt);
         if (!string.IsNullOrEmpty(countdown))
         {
@@ -2252,8 +1953,6 @@ public sealed partial class CombatPage : PageBase
         }
     }
 
-
-    
     private FrameworkElement CreateTowerAreasGrid(List<KuroTowerArea> areas, Dictionary<int, int> chainMap)
     {
         var grid = new Grid { ColumnSpacing = 12 };
@@ -2275,8 +1974,6 @@ public sealed partial class CombatPage : PageBase
     {
         var accent = GetTowerAreaAccentColor(index);
 
-        
-        
         var floors = (area.FloorList ?? [])
             .Where(f => (f.Floor ?? 0) > 0)
             .OrderBy(f => f.Floor)
@@ -2290,7 +1987,7 @@ public sealed partial class CombatPage : PageBase
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             HorizontalAlignment = HorizontalAlignment.Center,
         });
-        
+
         var starCount = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -2339,8 +2036,6 @@ public sealed partial class CombatPage : PageBase
         return KuroBbsUi.KuroCard(root, cornerRadius: 10, padding: new Thickness(14), borderBrush: new SolidColorBrush(accent));
     }
 
-
-    
     private FrameworkElement CreateTowerFloorRow(KuroTowerFloor floor, Dictionary<int, int> chainMap)
     {
         int floorNo = floor.Floor ?? 0;
@@ -2355,9 +2050,6 @@ public sealed partial class CombatPage : PageBase
             Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
         });
 
-        
-        
-        
         var starsPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 1 };
         for (int i = 0; i < 3; i++)
         {
@@ -2371,7 +2063,6 @@ public sealed partial class CombatPage : PageBase
         }
         left.Children.Add(starsPanel);
 
-        
         var avatars = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -2407,8 +2098,6 @@ public sealed partial class CombatPage : PageBase
         };
     }
 
-
-    
     private FrameworkElement CreateTowerAvatar(string? url, int chain)
     {
         var root = new Grid { Width = 38, Height = 38 };
@@ -2446,7 +2135,6 @@ public sealed partial class CombatPage : PageBase
             });
         }
 
-        
         if (!string.IsNullOrEmpty(url) && chain > 0)
         {
             root.Children.Add(new Border
@@ -2480,9 +2168,9 @@ public sealed partial class CombatPage : PageBase
     {
         return index switch
         {
-            0 => Color.FromArgb(0xFF, 0x5B, 0x9B, 0xD5), 
-            1 => Color.FromArgb(0xFF, 0x9E, 0x6F, 0xDD), 
-            2 => Color.FromArgb(0xFF, 0x70, 0xAD, 0x47), 
+            0 => Color.FromArgb(0xFF, 0x5B, 0x9B, 0xD5),
+            1 => Color.FromArgb(0xFF, 0x9E, 0x6F, 0xDD),
+            2 => Color.FromArgb(0xFF, 0x70, 0xAD, 0x47),
             _ => Color.FromArgb(0xFF, 0x9E, 0x9E, 0x9E),
         };
     }
@@ -2500,7 +2188,7 @@ public sealed partial class CombatPage : PageBase
 
     private void AddLockedCard(string title)
     {
-        
+
         if (StackPanel_Content.Children.Count > 0)
         {
             return;
@@ -2513,11 +2201,9 @@ public sealed partial class CombatPage : PageBase
         });
     }
 
-
-    
     private void AddNoDataCard()
     {
-        
+
         if (StackPanel_Content.Children.Count > 0)
         {
             return;
@@ -2536,14 +2222,10 @@ public sealed partial class CombatPage : PageBase
 
 }
 
-
-
-
 internal sealed class MatrixRoleAuxMaps
 {
-    
+
     public Dictionary<int, int>? Chain { get; set; }
 
-    
     public Dictionary<int, int>? Star { get; set; }
 }

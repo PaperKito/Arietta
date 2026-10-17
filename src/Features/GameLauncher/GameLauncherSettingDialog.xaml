@@ -67,7 +67,6 @@
                     </ItemsPanelTemplate>
                 </FlipView.ItemsPanel>
 
-                
                 <FlipViewItem>
                     <StackPanel Spacing="12">
 
@@ -77,7 +76,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            
+
                             <Grid Width="40"
                                   Height="40"
                                   CornerRadius="8">
@@ -166,7 +165,7 @@
                             <Button Grid.Column="1" Command="{x:Bind UninstallGameCommand}">
                                 <TextBlock Foreground="{ThemeResource SystemFillColorCriticalBrush}" Text="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_ConfirmUninstall, Mode=OneWay}" />
                             </Button>
-                            
+
                             <StackPanel Grid.Row="1"
                                         Grid.ColumnSpan="2"
                                         Orientation="Horizontal"
@@ -189,7 +188,6 @@
                                    TextWrapping="Wrap"
                                    Visibility="{x:Bind UninstallError, Converter={StaticResource ObjectToVisibilityConverter}}" />
 
-                        
                         <Grid Height="40"
                               CornerRadius="8"
                               Visibility="{x:Bind InstallPath, Converter={StaticResource ObjectToVisibilityConverter}}">
@@ -236,13 +234,11 @@
                             </Button>
                         </Grid>
 
-                        
                         <TextBlock Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                                    Text="{x:Bind LocateError}"
                                    TextWrapping="Wrap"
                                    Visibility="{x:Bind LocateErrorVisibility, Mode=OneWay}" />
 
-                        
                         <StackPanel Orientation="Horizontal" Spacing="12">
                             <Button Height="36"
                                     CornerRadius="8"
@@ -280,7 +276,6 @@
                                     Visibility="Collapsed" />
                         </StackPanel>
 
-                        
                         <Grid x:Name="Panel_RepairProgress"
                               ColumnSpacing="12"
                               Visibility="Collapsed">
@@ -387,11 +382,10 @@
                     </StackPanel>
                 </FlipViewItem>
 
-                
                 <FlipViewItem>
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
                                   VerticalScrollMode="Auto">
-                    
+
                     <StackPanel Spacing="12" Margin="0,0,16,0">
                         <ToggleSwitch Margin="0,0,0,-8"
                                       IsOn="{x:Bind EnableCustomBg, Mode=TwoWay}"
@@ -450,7 +444,6 @@
                             </Grid>
                         </Grid>
 
-                        
                         <Grid Margin="0,-4,0,-8"
                               ColumnSpacing="12"
                               Visibility="Visible">
@@ -512,7 +505,6 @@
                             </StackPanel>
                         </Grid>
 
-                        
                         <StackPanel Spacing="0">
                             <ToggleSwitch Margin="0,0,0,-4"
                                           IsOn="{x:Bind FpsCapEnabled, Mode=TwoWay}"
@@ -529,7 +521,7 @@
                                             TickFrequency="10"
                                             ValueChanged="Slider_FpsCap_ValueChanged"
                                             Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
-                                    
+
                                     <Border x:Name="FpsBubble"
                                             Background="{ThemeResource ToolTipBackgroundThemeBrush}"
                                             CornerRadius="4"
@@ -546,7 +538,7 @@
                                                    TextAlignment="Center" />
                                     </Border>
                                 </Grid>
-                                
+
                                 <Grid>
                                     <TextBlock FontSize="11"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -561,7 +553,6 @@
                             </StackPanel>
                         </StackPanel>
 
-                        
                         <ComboBox MinWidth="200"
                                   Header="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_BgQuality, Mode=OneWay}"
                                   SelectedIndex="{x:Bind BgQualityIndex, Mode=TwoWay}">
@@ -571,7 +562,6 @@
                             <ComboBoxItem Content="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_QualityLow, Mode=OneWay}" />
                         </ComboBox>
 
-                        
                         <ToggleSwitch Margin="0,0,0,-8"
                                       IsOn="{x:Bind PauseOnGameRun, Mode=TwoWay}"
                                       OffContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_PauseOnGameRun, Mode=OneWay}"
@@ -585,7 +575,6 @@
 
         </NavigationView>
 
-        
         <Button Width="32"
                 Height="32"
                 Margin="-20"

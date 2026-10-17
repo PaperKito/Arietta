@@ -5,8 +5,8 @@ public enum GameState
     StartGame,
     GameIsRunning,
     InstallGame,
-    
+
     UpdateGame,
-    
+
     Installing,
 }

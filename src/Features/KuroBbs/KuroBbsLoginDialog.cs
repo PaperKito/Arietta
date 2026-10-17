@@ -9,11 +9,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
 public sealed class KuroBbsLoginDialog
 {
     private readonly ContentDialog _dialog;
@@ -39,13 +34,12 @@ public sealed class KuroBbsLoginDialog
     private readonly StackPanel _panelSms;
     private int _busy;
 
-    
     public int ResultIndex { get; private set; } = -1;
 
 
     public KuroBbsLoginDialog(XamlRoot xamlRoot)
     {
-        
+
         _panelToken = new StackPanel { Spacing = 12 };
         _panelToken.Children.Add(FormRow(Lang.Instance.KuroAccount_Token, _textBoxToken));
         _panelToken.Children.Add(FormRow(Lang.Instance.KuroAccount_Did, _textBoxDid));
@@ -57,7 +51,6 @@ public sealed class KuroBbsLoginDialog
             TextWrapping = TextWrapping.Wrap,
         });
 
-        
         var phoneRow = new Grid { ColumnSpacing = 8 };
         phoneRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         phoneRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -78,7 +71,6 @@ public sealed class KuroBbsLoginDialog
             TextWrapping = TextWrapping.Wrap,
         });
 
-        
         var radioRow = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -123,8 +115,6 @@ public sealed class KuroBbsLoginDialog
         UpdatePanels();
     }
 
-
-    
     private static Grid FormRow(string label, FrameworkElement control)
     {
         var row = new Grid { ColumnSpacing = 10 };
@@ -162,7 +152,7 @@ public sealed class KuroBbsLoginDialog
         }
         catch (Exception ex)
         {
-            
+
             throw new InvalidOperationException($"登录窗口打开失败：{ex.Message} (0x{ex.HResult:X8})", ex);
         }
         return ResultIndex;
@@ -227,13 +217,13 @@ public sealed class KuroBbsLoginDialog
             _textHint.Text = Lang.Instance.Login_Working;
             string token;
             string did;
-            
+
             string phoneUsed = "";
             KuroLoginResult? loginData = null;
 
             if (!ByToken)
             {
-                
+
                 string phone = _textBoxPhone.Text.Trim();
                 string code = _textBoxCode.Text.Trim();
                 if (!Regex.IsMatch(phone, @"^1[3-9]\d{9}$"))
@@ -259,7 +249,7 @@ public sealed class KuroBbsLoginDialog
             }
             else
             {
-                
+
                 token = _textBoxToken.Text.Trim();
                 if (token.Length < 20)
                 {
@@ -273,7 +263,6 @@ public sealed class KuroBbsLoginDialog
                 }
             }
 
-            
             var roles = await KuroBbsClient.Instance.SeekGameRoleAsync(token);
             if (roles is not { IsSuccess: true, Data: { Count: > 0 } roleList })
             {

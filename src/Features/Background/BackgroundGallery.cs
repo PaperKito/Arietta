@@ -10,73 +10,45 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.Background;
 
-
 public enum BackgroundKind
 {
     Image,
     Video,
 }
 
-
-
-
-
 public sealed class BackgroundItem
 {
-    
+
     public string Id { get; set; } = "";
 
     public string Name { get; set; } = "";
 
-    
     public string? FilePath { get; set; }
 
     public BackgroundKind Kind { get; set; }
 
-    
     public bool IsOfficial { get; set; }
 
-    
     public bool IsCustom { get; set; }
 
-    
     public ImageSource? Thumbnail { get; set; }
 
     public bool IsVideo => Kind == BackgroundKind.Video;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class BackgroundGallery
 {
     public const string OfficialId = "official";
 
-    
     public const string OfficialStaticId = "official_static";
 
-    
     public const string DefaultId = "default";
 
     private static readonly string[] ImageExtensions = { ".jpg", ".jpeg", ".png", ".bmp", ".webp", ".gif" };
     private static readonly string[] VideoExtensions = { ".mp4", ".mkv", ".webm" };
 
-    
     public static event EventHandler<GameBiz>? SelectionChanged;
 
-
-    
     public static bool IsVideoPath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -86,8 +58,6 @@ public static class BackgroundGallery
         return VideoExtensions.Contains(Path.GetExtension(path).ToLowerInvariant());
     }
 
-
-    
     public static bool IsSupportedFile(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -98,28 +68,14 @@ public static class BackgroundGallery
         return ImageExtensions.Contains(ext) || VideoExtensions.Contains(ext);
     }
 
-
-    
     public static string Folder => AppConfig.BackgroundFolder;
 
-
-    
-    
-    
-    
-    
     public static string GetFolder(GameBiz biz) => Path.Combine(AppConfig.BackgroundFolder, biz.ToString());
 
-
-    
-    
-    
-    
     public static List<BackgroundItem> GetItems(GameBiz biz)
     {
         var items = new List<BackgroundItem>();
 
-        
         var local = GameRegistry.IsDynamicBgEnabled(biz) ? DynamicBackground.DynamicBackgroundStore.GetLocal(biz) : null;
         if (local is not null)
         {
@@ -133,7 +89,6 @@ public static class BackgroundGallery
                 Thumbnail = BuildThumbnail(local.PosterPath ?? local.VideoPath),
             });
 
-            
             if (local.PosterPath is { Length: > 0 })
             {
                 items.Add(new BackgroundItem
@@ -148,7 +103,6 @@ public static class BackgroundGallery
             }
         }
 
-        
         foreach (string file in ListBackgroundFiles(biz))
         {
             items.Add(new BackgroundItem
@@ -165,11 +119,6 @@ public static class BackgroundGallery
         return items;
     }
 
-
-    
-    
-    
-    
     public static BackgroundItem? Resolve(GameBiz biz)
     {
         var items = GetItems(biz);
@@ -180,7 +129,7 @@ public static class BackgroundGallery
             {
                 return picked;
             }
-            
+
             if (id.Equals("poster.webp", StringComparison.OrdinalIgnoreCase)
                 && items.FirstOrDefault(x => x.Id == OfficialStaticId) is { } legacyStatic)
             {
@@ -189,7 +138,7 @@ public static class BackgroundGallery
         }
         else
         {
-            
+
             string? legacyCustom = GameRegistry.GetCustomBgPath(biz);
             if (legacyCustom is { Length: > 0 })
             {
@@ -204,16 +153,12 @@ public static class BackgroundGallery
         return items.FirstOrDefault(x => x.Id == OfficialId);
     }
 
-
-    
     public static string? GetSelectedId(GameBiz biz)
     {
         string? id = AppConfig.GetConfig(GameRegistry.GetSelectedBgConfigKey(biz));
         return string.IsNullOrWhiteSpace(id) ? null : id;
     }
 
-
-    
     public static void SetSelectedId(GameBiz biz, string? id, bool notify = true)
     {
         AppConfig.SetConfig(GameRegistry.GetSelectedBgConfigKey(biz), string.IsNullOrWhiteSpace(id) ? null : id);
@@ -223,11 +168,6 @@ public static class BackgroundGallery
         }
     }
 
-
-    
-    
-    
-    
     public static async Task<string> AddFileAsync(string sourcePath, GameBiz biz)
     {
         string name = Path.GetFileName(sourcePath);
@@ -245,12 +185,6 @@ public static class BackgroundGallery
         return name;
     }
 
-
-    
-    
-    
-    
-    
     private static IEnumerable<string> ListBackgroundFiles(GameBiz biz)
     {
         var files = new List<string>();
@@ -269,7 +203,7 @@ public static class BackgroundGallery
         {
             if (Directory.Exists(Folder))
             {
-                
+
                 files.AddRange(Directory.GetFiles(Folder)
                                        .Where(IsSupportedFile)
                                        .Where(x => !DynamicBackground.DynamicBackgroundStore.IsOwnedFile(x))
@@ -280,8 +214,6 @@ public static class BackgroundGallery
         return files.OrderBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
-
-    
     private static GameBiz OwnerOf(string fileName)
     {
         const string prefix = "custom_bg_";
@@ -291,24 +223,21 @@ public static class BackgroundGallery
         {
             return biz;
         }
-        
-        
+
         return GameBiz.WutheringWaves;
     }
 
-
-    
     private static ImageSource? BuildThumbnail(string? path)
     {
         try
         {
             const int decodeWidth = 232;
-            
+
             if (string.IsNullOrWhiteSpace(path) || IsVideoPath(path) || !File.Exists(path))
             {
                 return null;
             }
-            
+
             return new BitmapImage(new Uri(path))
             {
                 DecodePixelWidth = decodeWidth,

@@ -37,8 +37,6 @@ public sealed partial class GamepadSetting : PageBase
         }
     }
 
-
-    
     private void UpdateRedistInfoBar()
     {
         try
@@ -91,12 +89,8 @@ public sealed partial class GamepadSetting : PageBase
         UpdateKeys(TextBox_ShareKeys, TextBlock_ShareError, GamepadController.SetShareKeys);
     }
 
-
-    
     private delegate bool KeysSetter(string? value, out string keysTextOrErrorKey);
 
-
-    
     private void UpdateKeys(TextBox box, TextBlock error, KeysSetter setter)
     {
         if (_restoring)

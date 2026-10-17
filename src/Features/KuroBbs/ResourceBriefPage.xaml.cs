@@ -13,15 +13,9 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
 public sealed partial class ResourceBriefPage : PageBase
 {
-    
+
     internal static readonly Windows.UI.Color[] Palette =
     [
         Windows.UI.Color.FromArgb(0xFF, 0xE8, 0x6A, 0x6A),
@@ -38,7 +32,6 @@ public sealed partial class ResourceBriefPage : PageBase
     private string _periodType = "month";
     private bool _loading;
 
-    
     private HashSet<int> _serverPeriodIndexes = [];
 
 
@@ -106,8 +99,6 @@ public sealed partial class ResourceBriefPage : PageBase
         await LoadSelectedPeriodAsync();
     }
 
-
-    
     private async Task LoadBriefingAsync()
     {
         var account = KuroBbsAccountStore.Load();
@@ -148,11 +139,6 @@ public sealed partial class ResourceBriefPage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private void FillPeriodList()
     {
         var titles = _periodType switch
@@ -174,9 +160,8 @@ public sealed partial class ResourceBriefPage : PageBase
             }
         }
 
-        
         ListView_Periods.ItemsSource = items.OrderByDescending(i => i.Index).ToList();
-        
+
         if (items.Count > 0 && ListView_Periods.SelectedIndex < 0)
         {
             ListView_Periods.SelectedIndex = 0;
@@ -193,7 +178,6 @@ public sealed partial class ResourceBriefPage : PageBase
         var account = KuroBbsAccountStore.Load();
         if (account is null) return;
 
-        
         if (!_serverPeriodIndexes.Contains(item.Index))
         {
             var archived = ResourceRecordStore.GetBriefing(account.RoleId, _periodType, item.Index);
@@ -211,7 +195,7 @@ public sealed partial class ResourceBriefPage : PageBase
             var result = await KuroBbsClient.Instance.GetBriefingDetailAsync(account, item.Index, _periodType);
             if (result is { IsSuccess: true, Data: { } record })
             {
-                
+
                 ResourceRecordStore.SaveBriefing(account.RoleId, _periodType, item.Index, item.Title, record);
                 FillDetail(item.Title, record);
             }
@@ -245,8 +229,6 @@ public sealed partial class ResourceBriefPage : PageBase
         FillItemList(record.StarList);
     }
 
-
-    
     private void FillCompositionBar(StackPanel barHost, StackPanel legend, List<KuroBriefingItem>? items)
     {
         barHost.Children.Clear();
@@ -261,7 +243,6 @@ public sealed partial class ResourceBriefPage : PageBase
             return;
         }
 
-        
         var plan = new List<(Border Segment, double Share)>();
         void AnimateSegments(double totalWidth)
         {
@@ -288,7 +269,6 @@ public sealed partial class ResourceBriefPage : PageBase
             barHost.Children.Add(segment);
             plan.Add((segment, (double)item.Num / total));
 
-            
             var legendItem = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };
             legendItem.Children.Add(new Border
             {
@@ -326,8 +306,6 @@ public sealed partial class ResourceBriefPage : PageBase
         }
     }
 
-
-    
     private void FillItemList(List<KuroBriefingItem>? items)
     {
         StackPanel_Items.Children.Clear();
@@ -376,8 +354,7 @@ public sealed partial class ResourceBriefPage : PageBase
             row.Children.Add(bar);
             if (item.Num > 0)
             {
-                
-                
+
                 int delayMs = 250 + i * 100;
                 double ratio = (double)item.Num / max;
                 SizeChangedEventHandler handler = null;
@@ -398,8 +375,6 @@ public sealed partial class ResourceBriefPage : PageBase
 
 }
 
-
-
 public sealed class PeriodItem
 {
     public string Title { get; init; } = "";
@@ -411,7 +386,6 @@ public sealed class PeriodItem
         Index = title.Index;
     }
 
-    
     public PeriodItem(int index, string title)
     {
         Index = index;

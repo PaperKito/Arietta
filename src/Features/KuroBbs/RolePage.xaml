@@ -15,7 +15,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,4,0,10">
             <Button Style="{StaticResource KuroBbsEdgeButtonStyle}" Click="Button_Refresh_Click">
                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -30,7 +29,6 @@
                           IsActive="False" />
         </StackPanel>
 
-        
         <InfoBar x:Name="InfoBar_NoAccount"
                  Grid.Row="1"
                  HorizontalAlignment="Center"
@@ -41,7 +39,6 @@
                  Title="{x:Bind lang:Lang.Instance.RolePage_NoAccount, Mode=OneWay}"
                  Message="{x:Bind lang:Lang.Instance.RolePage_NoAccountDesc, Mode=OneWay}" />
 
-        
         <InfoBar x:Name="InfoBar_Error"
                  Grid.Row="1"
                  VerticalAlignment="Top"
@@ -50,7 +47,6 @@
                  Severity="Error"
                  Title="{x:Bind lang:Lang.Instance.RolePage_LoadFailed, Mode=OneWay}" />
 
-        
         <ScrollView Grid.Row="1" x:Name="ScrollView_Roles" VerticalScrollMode="Disabled" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Hidden">
             <GridView x:Name="GridView_Roles"
                       SelectionMode="Single"
@@ -63,14 +59,14 @@
                                 <Border CornerRadius="8" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
                                     <Image Stretch="UniformToFill" Source="{Binding IconSource}" />
                                 </Border>
-                                
+
                                 <Border VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,0,0"
                                         Padding="5,1" CornerRadius="0,8,0,6"
                                         Background="{ThemeResource AccentFillColorDefaultBrush}"
                                         Visibility="{Binding ChainVisibility}">
                                     <TextBlock FontSize="11" FontWeight="Bold" Foreground="White" Text="{Binding ChainText}" />
                                 </Border>
-                                
+
                                 <Border Height="3" VerticalAlignment="Bottom" CornerRadius="0,0,8,8"
                                         Background="{Binding StarBrush}" />
                             </Grid>
@@ -86,7 +82,6 @@
             </GridView>
         </ScrollView>
 
-        
         <Grid Grid.Row="1" x:Name="Grid_Detail" Visibility="Collapsed" Background="{ThemeResource CustomOverlayAcrylicBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -106,7 +101,6 @@
             <ScrollViewer Grid.Row="1" Padding="16,0,24,24">
                 <StackPanel Spacing="16" MaxWidth="1200" HorizontalAlignment="Left">
 
-                    
                     <Border Padding="16"
                             CornerRadius="12"
                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -114,14 +108,12 @@
                             BorderThickness="1">
                         <Grid ColumnSpacing="12">
                             <Grid.ColumnDefinitions>
-                                
+
                                 <ColumnDefinition Width="*" MinWidth="380" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            
-                            
                             <StackPanel x:Name="StackPanel_Info"
                                         Grid.Column="0"
                                         MaxWidth="520"
@@ -129,7 +121,6 @@
                                         VerticalAlignment="Top"
                                         Spacing="10">
 
-                                
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <TextBlock x:Name="TextBlock_DetailName"
                                                VerticalAlignment="Bottom"
@@ -144,14 +135,13 @@
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
 
-                                
                                 <Border x:Name="Border_Weapon"
                                         Padding="10,8"
                                         CornerRadius="8"
                                         Background="{ThemeResource ControlFillColorSecondaryBrush}">
                                     <StackPanel Spacing="8">
                                         <StackPanel x:Name="Panel_Weapon" Orientation="Horizontal" Spacing="10">
-                                            
+
                                             <Border x:Name="Border_WeaponIcon"
                                                     Width="52"
                                                     Height="52"
@@ -183,14 +173,12 @@
                                     </StackPanel>
                                 </Border>
 
-                                
                                 <Border Padding="12,10"
                                         CornerRadius="8"
                                         Background="{ThemeResource ControlFillColorSecondaryBrush}">
                                     <StackPanel x:Name="StackPanel_Attributes" Spacing="5" />
                                 </Border>
 
-                                
                                 <Border x:Name="Border_Skills"
                                         Padding="10,8"
                                         CornerRadius="8"
@@ -199,14 +187,12 @@
                                 </Border>
                             </StackPanel>
 
-                            
                             <Image x:Name="Image_DetailRole"
                                    Grid.Column="1"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Top"
                                    Stretch="Fill" />
 
-                            
                             <StackPanel x:Name="StackPanel_ChainIcons"
                                         Grid.Column="2"
                                         Margin="0,0,6,0"
@@ -217,7 +203,6 @@
                         </Grid>
                     </Border>
 
-                    
                     <StackPanel x:Name="Panel_Phantoms" Spacing="6">
                         <TextBlock FontSize="16" FontWeight="Bold" Text="{x:Bind lang:Lang.Instance.RolePage_Phantoms, Mode=OneWay}" />
                         <TextBlock x:Name="TextBlock_PhantomCost" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />

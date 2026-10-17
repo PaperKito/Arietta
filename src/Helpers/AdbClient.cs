@@ -13,10 +13,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Helpers;
 
-
-
-
-
 public sealed class AdbClient : IDisposable
 {
     private readonly HttpClient _httpClient = new();
@@ -30,7 +26,6 @@ public sealed class AdbClient : IDisposable
         AdbPath = ResolveAdbExecutablePath();
     }
 
-    
     public void InitAdbServer(string exePath)
     {
         if (string.IsNullOrWhiteSpace(exePath))
@@ -41,7 +36,6 @@ public sealed class AdbClient : IDisposable
         AdbPath = exePath;
     }
 
-    
     public static string ResolveAdbExecutablePath()
     {
         var current = new DirectoryInfo(AppContext.BaseDirectory);
@@ -65,18 +59,10 @@ public sealed class AdbClient : IDisposable
         return ParseDevices(result.StandardOutput);
     }
 
-    
     private const string KuroBbsPackage = "com.kurogame.kjq";
 
-    
     private static readonly string[] RelatedSocketKeywords = ["webview", "chrom", "x5", "tbs", "xweb"];
 
-    
-    
-    
-    
-    
-    
     public async Task<IReadOnlyList<WebViewSocketInfo>> GetWebViewSocketsAsync(string deviceSerial, CancellationToken ct = default)
     {
         IReadOnlyList<string> names = await ReadUnixSocketNamesAsync(deviceSerial, ct);
@@ -95,7 +81,7 @@ public sealed class AdbClient : IDisposable
             .Where(s => pids.Contains(s.ProcessId))
             .Select(static s => s with { IsKuroBbsProcess = true })
             .ToArray();
-        
+
         WebViewSocketInfo[] candidates = owned.Length > 0 ? owned : sockets;
         return candidates
             .OrderByDescending(static s => s.SocketName.Contains("webview_devtools_remote", StringComparison.Ordinal))
@@ -103,7 +89,6 @@ public sealed class AdbClient : IDisposable
             .ToArray();
     }
 
-    
     private async Task<IReadOnlyList<string>> ReadUnixSocketNamesAsync(string deviceSerial, CancellationToken ct)
     {
         CommandResult result = await RunAdbAsync($"-s {Quote(deviceSerial)} shell cat /proc/net/unix", ct);
@@ -122,7 +107,6 @@ public sealed class AdbClient : IDisposable
             .ToArray();
     }
 
-    
     public async Task<string> CollectDiagnosticsAsync(string deviceSerial, CancellationToken ct = default)
     {
         var sb = new StringBuilder();
@@ -171,7 +155,7 @@ public sealed class AdbClient : IDisposable
         }
         catch (Exception ex)
         {
-            
+
             sb.AppendLine($"读取失败：{ex.Message}（该状态下 ADB 抓取在本机不可用）");
             return sb.ToString();
         }
@@ -197,7 +181,6 @@ public sealed class AdbClient : IDisposable
         return sb.ToString();
     }
 
-    
     private async Task<IReadOnlyList<int>> GetProcessIdsAsync(string deviceSerial, string packageName, CancellationToken ct)
     {
         string output = await TryShellAsync(deviceSerial, "ps -A", ct);
@@ -212,7 +195,7 @@ public sealed class AdbClient : IDisposable
             {
                 continue;
             }
-            
+
             string[] parts = line.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length >= 2 && int.TryParse(parts[1], out int pid))
             {
@@ -222,7 +205,6 @@ public sealed class AdbClient : IDisposable
         return pids;
     }
 
-    
     private async Task<string> TryShellAsync(string deviceSerial, string shellCommand, CancellationToken ct)
     {
         try
@@ -286,7 +268,6 @@ public sealed class AdbClient : IDisposable
         }
     }
 
-    
     public async Task<IReadOnlyList<DevToolsTargetInfo>> GetDevToolsTargetsAsync(
         string deviceSerial, string socketName, int localPort, CancellationToken ct = default)
     {
@@ -464,7 +445,6 @@ public sealed record AdbDeviceInfo(
 
 public sealed record WebViewSocketInfo(string SocketName, int ProcessId, bool IsKuroBbsProcess = false);
 
-
 public sealed record DevToolsTargetInfo(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("type")] string Type,
@@ -472,7 +452,7 @@ public sealed record DevToolsTargetInfo(
     [property: JsonPropertyName("url")] string Url,
     [property: JsonPropertyName("webSocketDebuggerUrl")] string WebSocketDebuggerUrl)
 {
-    
+
     [JsonIgnore]
     public bool IsPageLike => Type is "page" or "iframe" or "webview";
 

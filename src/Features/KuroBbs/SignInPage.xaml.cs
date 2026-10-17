@@ -14,11 +14,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
 public sealed partial class SignInPage : PageBase
 {
 
@@ -52,21 +47,17 @@ public sealed partial class SignInPage : PageBase
 
     private async void Button_Refresh_Click(object sender, RoutedEventArgs e) => await LoadAllAsync();
 
-
-    
     private static bool IsPgr => MainView.CurrentGameBiz.IsPunishingGrayRaven();
 
     private static string AutoSignConfigKey => IsPgr ? "KuroBbs_AutoSign_Pgr" : "KuroBbs_AutoSign_Wuwa";
 
-
-    
     private async Task<(string gameId, string serverId, string roleId)?> GetSignTargetAsync(KuroBbsAccount account)
     {
         if (!IsPgr)
         {
             return (KuroBbsClient.ParamGameId, KuroBbsClient.ParamServerId, account.RoleId);
         }
-        
+
         return await KuroBbsAccountStore.EnsurePgrRoleAsync(account)
             ? ("2", account.PgrServerId, account.PgrRoleId)
             : null;
@@ -75,7 +66,7 @@ public sealed partial class SignInPage : PageBase
 
     private async Task LoadAllAsync()
     {
-        
+
         var account = KuroBbsAccountStore.Load(IsPgr);
         if (account is null || !account.IsValid)
         {
@@ -103,11 +94,6 @@ public sealed partial class SignInPage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private void FillSignGoods(KuroBbsResponse<KuroSignInitData> result)
     {
         if (result is not { IsSuccess: true, Data: { } data })
@@ -128,7 +114,6 @@ public sealed partial class SignInPage : PageBase
         TextBlock_SignProgress.Text = string.Format(Lang.Instance.SignPage_SignedDaysFormat, data.SignInNum);
         Button_SignIn.IsEnabled = !data.IsSignIn;
 
-        
         List<KuroSignGood> goods = data.SignInGoodsConfigs ?? [];
         GridView_Goods.ItemsSource = goods
             .Select((g, i) => new SignGoodItem(g, i + 1, !data.IsSignIn && i == data.SignInNum))
@@ -163,8 +148,6 @@ public sealed partial class SignInPage : PageBase
 
 }
 
-
-
 public sealed class SignGoodItem
 {
     public ImageSource? IconSource { get; init; }
@@ -176,10 +159,8 @@ public sealed class SignGoodItem
     public Visibility SignedVisibility => IsSign ? Visibility.Visible : Visibility.Collapsed;
     public Visibility NextVisibility => IsNext ? Visibility.Visible : Visibility.Collapsed;
 
-    
     public double DimOpacity => IsSign ? 0.45 : 1.0;
 
-    
     public Brush DayBrush { get; init; } = new SolidColorBrush(Microsoft.UI.Colors.Gray);
 
     public SignGoodItem(KuroSignGood good, int dayNumber, bool isNext)
@@ -196,14 +177,11 @@ public sealed class SignGoodItem
         IsSign = good.IsSign;
         IsNext = isNext;
 
-        
         int day = good.SerialNum is > 0 ? good.SerialNum!.Value : dayNumber;
         DayText = string.Format(Lang.Instance.SignPage_DayFormat, day);
         DayBrush = FindBrush(isNext ? "AccentTextFillColorPrimaryBrush" : "TextFillColorTertiaryBrush");
     }
 
-
-    
     private static Brush FindBrush(string key)
     {
         try

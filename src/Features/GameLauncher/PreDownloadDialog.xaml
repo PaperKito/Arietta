@@ -22,13 +22,11 @@
 
         <StackPanel>
 
-            
             <TextBlock FontSize="18"
                        FontWeight="Bold"
                        IsTextScaleFactorEnabled="False"
                        Text="{x:Bind TitleText}" />
 
-            
             <Border Margin="0,20,0,0"
                     Padding="12,8"
                     Background="{ThemeResource DateTimePickerFlyoutButtonBackgroundPointerOver}"
@@ -40,7 +38,7 @@
                         <Run Text="{x:Bind SizeLabel}" />
                         <Run Text="{x:Bind PackageSizeText}" />
                     </TextBlock>
-                    
+
                     <TextBlock FontSize="12"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                IsTextScaleFactorEnabled="False"
@@ -57,7 +55,6 @@
                 </StackPanel>
             </Border>
 
-            
             <TextBlock Margin="1,8,1,0"
                        FontSize="12"
                        Foreground="{ThemeResource SystemFillColorCautionBrush}"
@@ -66,7 +63,6 @@
                        TextWrapping="Wrap"
                        Visibility="{x:Bind ErrorMessage, Converter={StaticResource ObjectToVisibilityConverter}}" />
 
-            
             <Button x:Name="Button_StartPredownload"
                     Margin="0,20,0,0"
                     HorizontalAlignment="Right"
@@ -79,7 +75,6 @@
 
         </StackPanel>
 
-        
         <Button Width="32"
                 Height="32"
                 Margin="-20"

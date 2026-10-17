@@ -4,10 +4,6 @@ using System.IO;
 
 namespace Arietta.Helpers;
 
-
-
-
-
 internal sealed class FileLoggerProvider : ILoggerProvider
 {
     private readonly string _folder;

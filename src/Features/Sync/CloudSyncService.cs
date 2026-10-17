@@ -19,7 +19,6 @@ internal enum CloudSyncAction
     Skipped,
 }
 
-
 internal sealed record CloudSyncResult(bool Success, CloudSyncAction Action, string Message, Exception? Exception = null)
 {
     public static CloudSyncResult Ok(CloudSyncAction action, string message) => new(true, action, message);
@@ -29,13 +28,6 @@ internal sealed record CloudSyncResult(bool Success, CloudSyncAction Action, str
 
     public static CloudSyncResult Skip(string message) => new(true, CloudSyncAction.Skipped, message);
 }
-
-
-
-
-
-
-
 
 internal sealed class CloudSyncService
 {
@@ -58,13 +50,11 @@ internal sealed class CloudSyncService
 
     public DateTimeOffset? LastSyncTime => _config.LastSyncTime;
 
-    
     public event EventHandler<CloudSyncResult>? StatusChanged;
 
 
     #region 配置
 
-    
     public void ApplySettings(string serverUrl, string userName, string password,
         bool autoSync, SyncPreference preference)
     {
@@ -74,7 +64,7 @@ internal sealed class CloudSyncService
         {
             _config.Password = password;
         }
-        
+
         _config.AutoSync = autoSync;
         _config.Preference = preference;
         _config.EnsureDeviceId();
@@ -83,11 +73,6 @@ internal sealed class CloudSyncService
 
     public void Save() => _config.Save();
 
-    
-    
-    
-    
-    
     public void ApplyAutoSync(bool autoSync)
     {
         _config.AutoSync = autoSync;
@@ -121,8 +106,6 @@ internal sealed class CloudSyncService
         }
     }
 
-
-    
     public async Task<CloudSyncResult> SyncAsync(CancellationToken ct = default)
     {
         if (!IsConfigured)
@@ -145,12 +128,12 @@ internal sealed class CloudSyncService
             CloudSyncResult result;
             if (!hasRemote)
             {
-                
+
                 result = await PushInternalAsync(client, allowMergeRetry: false, ct);
             }
             else if (firstTime)
             {
-                
+
                 result = await PullInternalAsync(client, ct);
                 if (result.Success)
                 {
@@ -194,8 +177,6 @@ internal sealed class CloudSyncService
         }
     }
 
-
-    
     public async Task<CloudSyncResult> PushAsync(CancellationToken ct = default)
     {
         if (!IsConfigured)
@@ -223,8 +204,6 @@ internal sealed class CloudSyncService
         }
     }
 
-
-    
     public async Task<CloudSyncResult> PullAsync(CancellationToken ct = default)
     {
         if (!IsConfigured)
@@ -252,11 +231,6 @@ internal sealed class CloudSyncService
         }
     }
 
-
-    
-    
-    
-    
     public async Task<CloudSyncResult> ForceRestoreAsync(CancellationToken ct = default)
     {
         if (!IsConfigured)
@@ -325,8 +299,6 @@ internal sealed class CloudSyncService
     {
         await client.EnsureFolderAsync(CloudSyncConfig.RemoteFolder, ct);
 
-        
-        
         WebDavResource? existing = await client.GetResourceAsync(RemoteFilePath, ct);
         if (existing is not null)
         {
@@ -344,7 +316,7 @@ internal sealed class CloudSyncService
 
         if (upload.PreconditionFailed && allowMergeRetry)
         {
-            
+
             _logger.LogInformation("ETag mismatch, merge remote then retry upload");
             var pull = await PullInternalAsync(client, ct);
             if (!pull.Success)
@@ -361,9 +333,7 @@ internal sealed class CloudSyncService
 
         SaveLocalBackup();
         _config.LastLocalVersion = DatabaseService.GetContentVersion();
-        
-        
-        
+
         _config.LastRemoteETag = upload.ETag ?? "";
         _config.LastSyncTime = DateTimeOffset.Now;
         _config.Save();
@@ -413,8 +383,6 @@ internal sealed class CloudSyncService
         }
     }
 
-
-    
     private void SaveLocalBackup()
     {
         try
@@ -461,7 +429,7 @@ internal sealed class CloudSyncService
         }
         catch (Exception ex)
         {
-            
+
             _logger.LogWarning(ex, "Prune remote history failed");
         }
     }

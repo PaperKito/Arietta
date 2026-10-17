@@ -16,13 +16,6 @@ using Windows.UI;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
 public sealed partial class PgrRolePage : PageBase
 {
 
@@ -30,12 +23,10 @@ public sealed partial class PgrRolePage : PageBase
     {
         this.InitializeComponent();
         this.Loaded += PgrRolePage_Loaded;
-        
-        
+
         this.ActualThemeChanged += PgrRolePage_ActualThemeChanged;
     }
 
-    
     private KuroPgrCharacter? _lastChar;
     private KuroPgrCharacterDetail? _lastDetail;
 
@@ -104,8 +95,6 @@ public sealed partial class PgrRolePage : PageBase
         },
         Lang.Instance.KuroBbs_PgrRole);
 
-
-    
     private void ResetDetailLayer()
     {
         Grid_Detail.Visibility = Visibility.Collapsed;
@@ -113,10 +102,6 @@ public sealed partial class PgrRolePage : PageBase
         StackPanel_TopBar.Visibility = Visibility.Visible;
     }
 
-
-    
-    
-    
     private async Task FillHeaderAsync(KuroBbsAccount account)
     {
         var acc = await KuroBbsClient.Instance.GetPgrAccountDataAsync(account);
@@ -143,7 +128,6 @@ public sealed partial class PgrRolePage : PageBase
 
     #region 角色详情（点列表项钻取：概览先用 roleIndex 字段即时渲染，深层分区再走 roleDetail）
 
-    
     private CancellationTokenSource? _detailCts;
 
     private void GridView_Roles_ItemClick(object sender, ItemClickEventArgs e)
@@ -160,15 +144,10 @@ public sealed partial class PgrRolePage : PageBase
         _detailCts?.Cancel();
         Grid_Detail.Visibility = Visibility.Collapsed;
         ScrollViewer_Roles.Visibility = Visibility.Visible;
-        
+
         StackPanel_TopBar.Visibility = Visibility.Visible;
     }
 
-
-    
-    
-    
-    
     private async Task OpenDetailAsync(KuroPgrCharacter c)
     {
         _detailCts?.Cancel();
@@ -177,13 +156,12 @@ public sealed partial class PgrRolePage : PageBase
         var ct = cts.Token;
         _lastChar = c;
 
-        
         FillOverview(c, null);
         StackPanel_Deep.Children.Clear();
         KuroBbsUi.ShowInfoBar(InfoBar_DetailError, false);
         ScrollViewer_Roles.Visibility = Visibility.Collapsed;
         Grid_Detail.Visibility = Visibility.Visible;
-        
+
         StackPanel_TopBar.Visibility = Visibility.Collapsed;
 
         var account = KuroBbsAccountStore.Load(pgr: true);
@@ -192,12 +170,11 @@ public sealed partial class PgrRolePage : PageBase
             return;
         }
 
-        
         ProgressRing_Detail.IsActive = true;
         try
         {
             var result = await KuroBbsClient.Instance.GetPgrRoleDetailAsync(account, c.BodyId, ct);
-            
+
             if (ct.IsCancellationRequested || !ReferenceEquals(_detailCts, cts))
             {
                 return;
@@ -248,18 +225,15 @@ public sealed partial class PgrRolePage : PageBase
         }
     }
 
-
-    
     private void FillOverview(KuroPgrCharacter c, KuroPgrCharacterDetail? d)
     {
         var body = d?.Body;
-        
+
         string bodyName = body?.BodyName ?? c.BodyName ?? "";
         string roleName = body?.RoleName ?? "";
         TextBlock_DetailName.Text = string.IsNullOrEmpty(roleName) ? bodyName : $"{roleName}·{bodyName}";
         TextBlock_DetailLevel.Text = c.Level.HasValue ? $"LV.{c.Level}" : "";
 
-        
         string? portrait = string.IsNullOrEmpty(body?.ImgUrl) ? c.IconUrl : body!.ImgUrl;
         Image_DetailRole.Source = null;
         try
@@ -271,8 +245,6 @@ public sealed partial class PgrRolePage : PageBase
         }
         catch { }
 
-        
-        
         string gradeDisplay = !string.IsNullOrEmpty(d?.Grade)
             ? d!.Grade!
             : (!string.IsNullOrEmpty(c.Grade) ? c.Grade! : (c.RoleRank ?? ""));
@@ -282,7 +254,6 @@ public sealed partial class PgrRolePage : PageBase
         TextBlock_DetailGrade.Foreground = gradeBrush;
         TextBlock_DetailFight.Text = (d?.FightAbility ?? c.FightAbility).ToString("N0");
 
-        
         string? career = body?.Career;
         string? element = string.IsNullOrEmpty(body?.Element) ? c.Element : body!.Element;
         StackPanel_DetailBadges.Children.Clear();
@@ -292,7 +263,7 @@ public sealed partial class PgrRolePage : PageBase
         }
         if (!string.IsNullOrEmpty(element))
         {
-            
+
             foreach (var raw in element!.Split(',', '，'))
             {
                 var name = raw.Trim();
@@ -314,7 +285,6 @@ public sealed partial class PgrRolePage : PageBase
             StackPanel_DetailBadges.Children.Add(MakeIconBadge(null, $"{Lang.Instance.PgrRoleDetail_Overrun}{body!.OverrunState!.Value}"));
         }
 
-        
         FillGearIcons(d);
         FillEquipIcons(d);
 
@@ -332,16 +302,13 @@ public sealed partial class PgrRolePage : PageBase
 
     #region 装备一览（只有图标：武器 / 辅助机 / 意识×6）与共鸣角标
 
-    
     private enum ChevronKind
     {
-        
+
         Red,
 
-        
         Light,
 
-        
         Blue,
     }
 
@@ -353,11 +320,6 @@ public sealed partial class PgrRolePage : PageBase
         [ChevronKind.Red] = "PgrChevronRed.png",
     };
 
-
-    
-    
-    
-    
     private void FillGearIcons(KuroPgrCharacterDetail? d)
     {
         StackPanel_GearIcons.Children.Clear();
@@ -366,7 +328,6 @@ public sealed partial class PgrRolePage : PageBase
             return;
         }
 
-        
         if (d.WeaponInfo?.Weapon is { } w)
         {
             int resCount = d.WeaponInfo!.ResonanceList?.Count ?? 0;
@@ -376,7 +337,6 @@ public sealed partial class PgrRolePage : PageBase
             StackPanel_GearIcons.Children.Add(icon);
         }
 
-        
         if (d.Partner?.Partner is { } p)
         {
             var icon = MakeIcon(p.IconUrl, 64);
@@ -390,18 +350,12 @@ public sealed partial class PgrRolePage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private void FillEquipIcons(KuroPgrCharacterDetail? d)
     {
         Grid_EquipIcons.Children.Clear();
         Grid_EquipIcons.ColumnDefinitions.Clear();
         Grid_EquipIcons.RowDefinitions.Clear();
 
-        
         for (int c = 0; c < PgrChipColumns; c++)
         {
             Grid_EquipIcons.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -428,15 +382,10 @@ public sealed partial class PgrRolePage : PageBase
         }
     }
 
-
-    
     private const int PgrChipSlotCount = 6;
 
-    
     private const int PgrChipColumns = 3;
 
-
-    
     private StackPanel BuildChipSlot(int slot, KuroPgrChipResonance? chip)
     {
         const double iconSize = 52;
@@ -463,8 +412,6 @@ public sealed partial class PgrRolePage : PageBase
         return sp;
     }
 
-
-    
     private static List<ChevronKind> ChipChevrons(KuroPgrChipResonance chip)
     {
         var list = new List<ChevronKind>();
@@ -491,8 +438,6 @@ public sealed partial class PgrRolePage : PageBase
         return list;
     }
 
-
-    
     private static Grid MakeIconWithChevrons(string? iconUrl, double size, List<ChevronKind> chevrons)
     {
         var grid = new Grid();
@@ -526,7 +471,6 @@ public sealed partial class PgrRolePage : PageBase
 
     #region 深层分区构建（专属武器 / 辅助机 / 意识套装 / 意识共鸣）
 
-    
     private void FillDeepSections(KuroPgrCharacterDetail d)
     {
         StackPanel_Deep.Children.Clear();
@@ -549,17 +493,11 @@ public sealed partial class PgrRolePage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private static Border BuildWeaponSection(KuroPgrWeaponInfo wi)
     {
         var (card, content) = MakeSectionCard(Lang.Instance.PgrDetail_Weapon, null);
         var w = wi.Weapon!;
 
-        
         var details = new StackPanel { Spacing = 6, Margin = new Thickness(0, 8, 0, 0), Visibility = Visibility.Collapsed };
 
         if (!string.IsNullOrEmpty(w.SkillDescription))
@@ -567,7 +505,6 @@ public sealed partial class PgrRolePage : PageBase
             details.Children.Add(MakeDescText(w.SkillDescription!));
         }
 
-        
         if (wi.Suit is { } suit)
         {
             details.Children.Add(MakeDivider());
@@ -576,7 +513,6 @@ public sealed partial class PgrRolePage : PageBase
             AddSuitLines(details, suit.SkillDescriptionTwo, suit.SkillDescriptionFour, suit.SkillDescriptionSix);
         }
 
-        
         if (wi.WeaponOverrun2 is { } ov2)
         {
             details.Children.Add(MakeDivider());
@@ -584,7 +520,6 @@ public sealed partial class PgrRolePage : PageBase
             details.Children.Add(MakeIconRow(ov2.IconUrl, ov2.Name ?? "-", null, ov2.Desc));
         }
 
-        
         if (wi.ResonanceList is { Count: > 0 } res)
         {
             details.Children.Add(MakeDivider());
@@ -595,7 +530,6 @@ public sealed partial class PgrRolePage : PageBase
             }
         }
 
-        
         string? badge = (wi.MaxOverRunLevel ?? 0) > 0
             ? string.Format(Lang.Instance.PgrDetail_OverrunLevel, wi.OverRunLevel ?? 0, wi.MaxOverRunLevel ?? 0)
             : null;
@@ -609,7 +543,7 @@ public sealed partial class PgrRolePage : PageBase
             Title = w.Name ?? "",
             Subtitle = string.IsNullOrEmpty(w.SkillName) ? null : $"{Lang.Instance.PgrDetail_WeaponSkill} {w.SkillName}",
             Badge = badge,
-            
+
             Chevrons = Enumerable.Repeat(ChevronKind.Blue, wi.ResonanceList?.Count ?? 0).ToList(),
             Details = details,
             Tooltip = tooltip,
@@ -619,11 +553,6 @@ public sealed partial class PgrRolePage : PageBase
         return card;
     }
 
-
-    
-    
-    
-    
     private static Border BuildPartnerSection(KuroPgrPartnerInfo p)
     {
         var (card, content) = MakeSectionCard(Lang.Instance.PgrDetail_Partner, null);
@@ -643,7 +572,6 @@ public sealed partial class PgrRolePage : PageBase
             subtitle = (subtitle is null ? "" : subtitle + " · ") + p.Grade!;
         }
 
-        
         var details = new StackPanel { Spacing = 6, Margin = new Thickness(0, 8, 0, 0), Visibility = Visibility.Collapsed };
         if (p.SkillList is { Count: > 0 } skills)
         {
@@ -670,8 +598,6 @@ public sealed partial class PgrRolePage : PageBase
         return card;
     }
 
-
-    
     private static Border BuildChipSuitSection(List<KuroPgrChipSuit> list)
     {
         var (card, content) = MakeSectionCard(Lang.Instance.PgrDetail_ChipSuit, null);
@@ -684,11 +610,6 @@ public sealed partial class PgrRolePage : PageBase
         return card;
     }
 
-
-    
-    
-    
-    
     private static Border BuildChipResonanceSection(List<KuroPgrChipResonance> list, string? exDamage)
     {
         string? right = string.IsNullOrEmpty(exDamage) ? null : $"{Lang.Instance.PgrDetail_ChipExDamage} {exDamage}";
@@ -702,7 +623,6 @@ public sealed partial class PgrRolePage : PageBase
         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-        
         var bySlot = new Dictionary<int, KuroPgrChipResonance>();
         for (int i = 0; i < list.Count; i++)
         {
@@ -721,7 +641,6 @@ public sealed partial class PgrRolePage : PageBase
             };
             var sp = new StackPanel { Spacing = 4 };
 
-            
             var head = new Grid { ColumnSpacing = 8 };
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -770,8 +689,6 @@ public sealed partial class PgrRolePage : PageBase
         return card;
     }
 
-
-    
     private static void AddSuitLines(StackPanel parent, string? two, string? four, string? six)
     {
         AddSuitLine(parent, Lang.Instance.PgrDetail_Suit2, two);
@@ -798,8 +715,6 @@ public sealed partial class PgrRolePage : PageBase
         parent.Children.Add(sp);
     }
 
-
-    
     private static StackPanel MakeSlotLine(string label, string? iconUrl, bool awake, string? desc)
     {
         var sp = new StackPanel { Spacing = 1, Opacity = awake ? 1 : 0.45 };
@@ -837,8 +752,6 @@ public sealed partial class PgrRolePage : PageBase
         return sp;
     }
 
-
-    
     private static (Border Card, StackPanel Content) MakeSectionCard(string header, string? rightText)
     {
         var content = new StackPanel { Spacing = 6 };
@@ -871,8 +784,6 @@ public sealed partial class PgrRolePage : PageBase
         return (card, content);
     }
 
-
-    
     private static StackPanel MakeIconRow(string? iconUrl, string title, string? subtitle, string? desc)
     {
         var panel = new StackPanel { Spacing = 4 };
@@ -913,8 +824,6 @@ public sealed partial class PgrRolePage : PageBase
         return panel;
     }
 
-
-    
     private static Border MakeIcon(string? url, double size)
     {
         var img = new Image { Width = size, Height = size, Stretch = Stretch.Uniform };
@@ -973,8 +882,6 @@ public sealed partial class PgrRolePage : PageBase
 
     private static Brush SecondaryBrush() => (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
 
-
-    
     private static readonly Dictionary<string, string> PgrElementIcons = new()
     {
         ["物理"] = "Element_Physical",
@@ -986,7 +893,6 @@ public sealed partial class PgrRolePage : PageBase
         ["独域"] = "Element_Uniframe",
     };
 
-    
     private static readonly Dictionary<string, string> PgrEffectIcons = new()
     {
         ["紊乱"] = "Effect_Clutter",
@@ -998,8 +904,6 @@ public sealed partial class PgrRolePage : PageBase
         ["熠光"] = "Effect_Glow",
     };
 
-
-    
     private Border MakeIconBadge(string? iconKey, string text)
     {
         var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };
@@ -1019,8 +923,6 @@ public sealed partial class PgrRolePage : PageBase
         };
     }
 
-
-    
     private sealed class CollapsibleHeaderInfo
     {
         public string? IconUrl { get; init; }
@@ -1033,11 +935,6 @@ public sealed partial class PgrRolePage : PageBase
         public string? Tooltip { get; init; }
     }
 
-
-    
-    
-    
-    
     private static Grid MakeCollapsibleHeader(CollapsibleHeaderInfo info)
     {
         var head = new Grid { ColumnSpacing = 10 };
@@ -1087,7 +984,6 @@ public sealed partial class PgrRolePage : PageBase
         Grid.SetColumn(chevron, 3);
         head.Children.Add(chevron);
 
-        
         if (!string.IsNullOrEmpty(info.Tooltip))
         {
             ToolTipService.SetToolTip(head, new TextBlock
@@ -1099,7 +995,6 @@ public sealed partial class PgrRolePage : PageBase
             });
         }
 
-        
         bool open = false;
         head.Background = (Brush)Application.Current.Resources["SubtleFillColorTransparentBrush"];
         head.Tapped += (_, _) =>
@@ -1113,12 +1008,6 @@ public sealed partial class PgrRolePage : PageBase
 
     #endregion
 
-
-    
-    
-    
-    
-    
     private static Brush PgrGradeBrush(string? grade, int quality)
     {
         var g = grade?.Trim();
@@ -1133,15 +1022,8 @@ public sealed partial class PgrRolePage : PageBase
         };
     }
 
-
-    
-    
-    
-    
     private static Brush PgrQualityBrush(int quality) => new SolidColorBrush(PgrQualityColor(quality));
 
-
-    
     private static Color PgrQualityColor(int quality) => quality switch
     {
         6 => Color.FromArgb(0xFF, 0xFA, 0x58, 0x26),

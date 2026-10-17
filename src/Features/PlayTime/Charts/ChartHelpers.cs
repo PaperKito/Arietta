@@ -3,15 +3,9 @@ using System.Collections.Generic;
 
 namespace Arietta.Features.PlayTime;
 
-
-
-
 internal static class ChartHelpers
 {
 
-    
-    
-    
     public static T GetResource<T>(string key) where T : class
     {
         if (Application.Current.Resources.TryGetValue(key, out var value) && value is T t)

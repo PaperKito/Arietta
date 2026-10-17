@@ -19,10 +19,8 @@ namespace Arietta.Features.ViewHost;
 public sealed partial class MainView : UserControl
 {
 
-    
     public static GameBiz CurrentGameBiz { get; private set; } = GameBiz.WutheringWavesGlobal;
 
-    
     public static event EventHandler<GameBiz>? GameChanged;
 
 
@@ -30,25 +28,16 @@ public sealed partial class MainView : UserControl
     {
         this.InitializeComponent();
         CurrentGameBiz = GameSelectorControl.CurrentGameBiz;
-        
+
         UpdateNavVisibility();
         LoadCustomBackground(null, null);
         GameLauncherSettingDialog.CustomBackgroundChanged += LoadCustomBackground;
-        
+
         BackgroundGallery.SelectionChanged += OnBackgroundChanged;
         DynamicBackgroundStore.Updated += OnBackgroundChanged;
         NavigateTo(typeof(LauncherPage), null, new SuppressNavigationTransitionInfo());
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     private async void LoadCustomBackground(object? sender, string? path)
     {
         try
@@ -57,13 +46,13 @@ public sealed partial class MainView : UserControl
 
             if (item is { Kind: BackgroundKind.Video } && item.FilePath is { Length: > 0 } video)
             {
-                
+
                 string? poster = item.IsOfficial ? DynamicBackgroundStore.GetLocal(CurrentGameBiz)?.PosterPath : null;
                 Image_Background.Source = poster is { Length: > 0 }
                     ? new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(poster))
                     : null;
                 DynamicBgHost.Play(video);
-                
+
                 BackgroundAccentService.Apply(poster, DispatcherQueue);
                 return;
             }
@@ -79,7 +68,7 @@ public sealed partial class MainView : UserControl
                 }
                 Image_Background.Source = bitmap;
             }
-            
+
             BackgroundAccentService.Apply(item?.FilePath, DispatcherQueue);
         }
         catch
@@ -88,10 +77,6 @@ public sealed partial class MainView : UserControl
         }
     }
 
-
-    
-    
-    
     private void OnBackgroundChanged(object? sender, GameBiz biz)
     {
         if (biz.GetBaseBiz() != CurrentGameBiz.GetBaseBiz())
@@ -108,29 +93,25 @@ public sealed partial class MainView : UserControl
         }
     }
 
-
-    
     private void GameSelector_CurrentGameChanged(object? sender, GameBiz biz)
     {
         CurrentGameBiz = biz;
-        
+
         LoadCustomBackground(null, null);
-        
+
         _ = DynamicBackgroundStore.SyncAllAsync(biz);
-        
+
         UpdateNavVisibility();
         GameChanged?.Invoke(this, biz);
         NavigateTo(typeof(LauncherPage));
     }
 
-
-    
     private void UpdateNavVisibility()
     {
         NavigationViewItem_GachaLog.Visibility = GameRegistry.GetEntry(CurrentGameBiz).HasGachaPage
             ? Visibility.Visible
             : Visibility.Collapsed;
-        
+
         NavigationViewItem_KuroBbs.Visibility = CurrentGameBiz.IsOverseas()
             ? Visibility.Collapsed
             : Visibility.Visible;

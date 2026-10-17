@@ -17,17 +17,10 @@ using Windows.Storage.Pickers;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
 [ObservableObject]
 public sealed partial class InstallGameDialog : ContentDialog
 {
-    
+
     public delegate Task<GameUpdate.GameUpdateService.DownloadPlan?> TierPlanFactory(string tierName);
 
     public InstallGameDialog(GameBiz biz, GameUpdate.GameUpdateService.DownloadPlan plan, long totalBytes,
@@ -37,7 +30,7 @@ public sealed partial class InstallGameDialog : ContentDialog
         _plan = plan;
         TotalBytes = totalBytes;
         InstallationPath = initialPath ?? "";
-        
+
         HardLinkVisibility = AppConfig.GetConfig(GameUpdateService.UseHardLinkConfigKey) == "1"
             ? Visibility.Visible
             : Visibility.Collapsed;
@@ -46,8 +39,7 @@ public sealed partial class InstallGameDialog : ContentDialog
         InitializeComponent();
         if (tiers is { Count: > 0 })
         {
-            
-            
+
             foreach (var tier in tiers)
             {
                 _tierSizes[tier.Name] = tier.SizeBytes;
@@ -57,7 +49,7 @@ public sealed partial class InstallGameDialog : ContentDialog
                 ?? tiers[0].Name;
             Segmented_Tier.SelectedIndex = tiers.FindIndex(t => t.Name.Equals(SelectedTier, StringComparison.OrdinalIgnoreCase));
             Segmented_Tier.SelectionChanged += Segmented_Tier_SelectionChanged;
-            _ = ApplyTierAsync();   
+            _ = ApplyTierAsync();
         }
         RefreshSpace();
     }
@@ -66,44 +58,28 @@ public sealed partial class InstallGameDialog : ContentDialog
     private GameUpdate.GameUpdateService.DownloadPlan _plan;
     private readonly TierPlanFactory? _tierPlanFactory;
 
-    
     private readonly Dictionary<string, long> _tierSizes = new();
 
-    
     private int _tierGen;
 
-    
     private long _linkedBytes;
 
-    
     private bool _estimateDone;
 
     private CancellationTokenSource? _estimateCts;
 
-    
     public bool Confirmed { get; private set; }
 
-    
     public string? SelectedTier { get; private set; }
 
     public Visibility TierVisibility { get; private set; }
 
-    
     public long TotalBytes { get; private set; }
 
-    
-    
-    
-    
     public string RequiredBytesText { get; private set => SetProperty(ref field, value); } = "";
 
-    
-    
-    
-    
     public string HardLinkAfterBytesText { get; private set => SetProperty(ref field, value); } = "--";
 
-    
     public string? HardLinkEstimateText { get; private set => SetProperty(ref field, value); }
 
     public string InstallationPath { get => field; set { SetProperty(ref field, value); RefreshSpace(); _ = RecomputeEstimateAsync(); } }
@@ -112,7 +88,6 @@ public sealed partial class InstallGameDialog : ContentDialog
 
     public bool CanStart => ErrorMessage is null;
 
-    
     public string? ErrorMessage { get; private set => SetProperty(ref field, value); }
 
     public Visibility HardLinkVisibility { get; private set; }
@@ -144,7 +119,6 @@ public sealed partial class InstallGameDialog : ContentDialog
         Hide();
     }
 
-    
     private void RefreshSpace()
     {
         string? error = null;
@@ -166,7 +140,7 @@ public sealed partial class InstallGameDialog : ContentDialog
             }
             catch (Exception)
             {
-                
+
             }
         }
         else
@@ -175,25 +149,21 @@ public sealed partial class InstallGameDialog : ContentDialog
         }
         AvailableSpaceText = available;
         RequiredBytesText = GameUpdateSession.FormatSize(TotalBytes);
-        
+
         HardLinkAfterBytesText = _estimateDone
             ? GameUpdateSession.FormatSize(TotalBytes - _linkedBytes)
             : "---------";
-        
+
         string spaceDesc = Lang.Instance.InstallGameDialog_SpaceDesc;
         HardLinkEstimateText = _linkedBytes > 0
             ? spaceDesc + "\n" + string.Format(Lang.Instance.InstallGameDialog_HardLinkEstimateDesc,
                 GameUpdateSession.FormatSize(TotalBytes - _linkedBytes))
             : spaceDesc;
         ErrorMessage = error;
-        
+
         OnPropertyChanged(nameof(CanStart));
     }
 
-    
-    
-    
-    
     private async Task RecomputeEstimateAsync()
     {
         _estimateCts?.Cancel();
@@ -229,7 +199,6 @@ public sealed partial class InstallGameDialog : ContentDialog
     {
     }
 
-    
     private static string TierLabel(string name) => name.ToUpperInvariant() switch
     {
         "UHD" => Lang.Instance.InstallGameDialog_TierUHD,
@@ -238,11 +207,6 @@ public sealed partial class InstallGameDialog : ContentDialog
         _ => name,
     };
 
-    
-    
-    
-    
-    
     private async Task ApplyTierAsync()
     {
         if (Segmented_Tier.SelectedItem is not SegmentedItem { Tag: string name })

@@ -6,20 +6,6 @@ using System.Text.Json.Serialization;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class LenientJson
 {
     public static readonly JsonSerializerOptions Options = CreateOptions();
@@ -34,7 +20,6 @@ public static class LenientJson
         return options;
     }
 
-    
     private static bool TryReadNumber(ref Utf8JsonReader reader, out long value)
     {
         value = 0;
@@ -53,7 +38,7 @@ public static class LenientJson
                 }
 
                 var span = raw!.Trim().TrimEnd('%');
-                
+
                 var comma = span.IndexOf(',');
                 if (comma >= 0)
                 {
@@ -69,7 +54,7 @@ public static class LenientJson
                 return long.TryParse(span, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out value);
             }
             default:
-                
+
                 reader.Skip();
                 return false;
         }
@@ -126,7 +111,7 @@ public static class LenientJson
 
     private sealed class LenientStringConverter : JsonConverter<string>
     {
-        
+
         public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             switch (reader.TokenType)
@@ -137,7 +122,7 @@ public static class LenientJson
                     return reader.GetString()!;
                 case JsonTokenType.Number:
                 {
-                    
+
                     var span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
                     return System.Text.Encoding.UTF8.GetString(span);
                 }

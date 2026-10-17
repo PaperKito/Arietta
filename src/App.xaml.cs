@@ -21,8 +21,7 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
-        
-        
+
         RequestedTheme = Frameworks.WindowEx.ShouldAppsUseDarkMode() ? ApplicationTheme.Dark : ApplicationTheme.Light;
         _uiDispatcherQueue = DispatcherQueue.GetForCurrentThread();
         UnhandledException += App_UnhandledException;
@@ -46,16 +45,13 @@ public partial class App : Application
 
     protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        
-        
+
         if (AppConfig.IsPlayTimeHelperProcess)
         {
             _ = RunPlayTimeLoggerAsync();
             return;
         }
 
-        
-        
         m_AppInstance = AppInstance.GetCurrent();
         m_AppInstance.Activated += AppInstance_Activated;
         AppInstance main = AppInstance.FindOrRegisterForKey(MainInstanceKey);
@@ -68,23 +64,17 @@ public partial class App : Application
 
         m_MainWindow = new MainWindow();
         m_MainWindow.Activate();
-        
+
         _ = Features.KuroBbs.KuroBbsAutoSignService.RunDailyOnceAsync();
-        
+
         m_TrayWindow = new Features.ViewHost.SystemTrayWindow();
-        
+
         _ = Task.Run(Features.Gamepad.GamepadController.Initialize);
-        
-        
-        
+
         _ = Features.DynamicBackground.DynamicBackgroundStore.SyncAllAsync(
             Features.ViewHost.MainView.CurrentGameBiz);
     }
 
-
-    
-    
-    
     private static async Task RunPlayTimeLoggerAsync()
     {
         try
@@ -102,17 +92,14 @@ public partial class App : Application
                 }
                 else
                 {
-                    
-                    
-                    
-                    
+
                     await service.WaitGameProcessAndLogAsync(biz, anchorPid > 0 ? anchorPid : 0);
                 }
             }
         }
         catch
         {
-            
+
         }
         finally
         {
@@ -133,15 +120,12 @@ public partial class App : Application
         return int.TryParse(GetStringArgument(args, name), out int value) ? value : 0;
     }
 
-
-    
     private const string MainInstanceKey = "main";
 
     private AppInstance? m_AppInstance;
 
     private MainWindow m_MainWindow;
 
-    
     public MainWindow? MainWindow => m_MainWindow;
 
 
@@ -150,16 +134,10 @@ public partial class App : Application
         m_MainWindow ??= new MainWindow();
         m_MainWindow.Activate();
         m_MainWindow.Show();
-        
-        
+
         _ = Features.KuroBbs.KuroBbsAutoSignService.RunDailyOnceAsync();
     }
 
-
-    
-    
-    
-    
     private void AppInstance_Activated(object? sender, AppActivationArguments e)
     {
         _uiDispatcherQueue.TryEnqueue(EnsureMainWindow);
@@ -168,28 +146,16 @@ public partial class App : Application
 
     private Features.ViewHost.SystemTrayWindow? m_TrayWindow;
 
-
-    
-    
-    
-    
-    
     public void ExitApp()
     {
         try { m_TrayWindow?.DisposeTrayIcon(); } catch { }
-        
+
         try { m_AppInstance?.UnregisterKey(); } catch { }
-        
+
         try { Features.Gamepad.GamepadController.RestoreGameBarRegistry(); } catch { }
         ExitProcess(0);
     }
 
-
-    
-    
-    
-    
-    
     public void RestartApp()
     {
         try { m_TrayWindow?.DisposeTrayIcon(); } catch { }
@@ -208,7 +174,7 @@ public partial class App : Application
         }
         catch
         {
-            
+
         }
         ExitProcess(0);
     }

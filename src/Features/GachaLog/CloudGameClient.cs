@@ -9,24 +9,15 @@ using Arietta.Helpers;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
 public static class CloudGameClient
 {
-    
+
     public const string CloudHomePage = "https://mc.kurogames.com/cloud/index.html";
 
     private const string CloudApiBase = "https://cloud-game-sh.aki-game.com/";
 
-    
     public const string CloudCardPoolId = "5c13a63f85465e9fcc0f24d6efb15083";
 
-    
     public const string CloudServerId = "76402e5b20be2c39f095a152090afddc";
 
     public const string CloudLanguageCode = "zh-Hans";
@@ -36,11 +27,6 @@ public static class CloudGameClient
 
     private static readonly HttpClient Client = SharedHttp.Default;
 
-
-    
-    
-    
-    
     public static Task<(GachaParams? Params, string? Error)> TryBuildParamsAsync(IReadOnlyDictionary<string, string> cookies)
     {
         cookies.TryGetValue("token", out string? cloudToken);
@@ -48,19 +34,12 @@ public static class CloudGameClient
         return TryRequestRecordInfoAsync(cookieHeader, cloudToken, null);
     }
 
-
-    
-    
-    
-    
     public static Task<(GachaParams? Params, string? Error)> TryBuildParamsWithCapturedHeadersAsync(
         string? cookieHeader, string? xToken, string? traceId)
     {
         return TryRequestRecordInfoAsync(cookieHeader ?? "", xToken, traceId);
     }
 
-
-    
     private static async Task<(GachaParams?, string?)> TryRequestRecordInfoAsync(
         string cookieHeader, string? xToken, string? traceId)
     {
@@ -136,8 +115,6 @@ public static class CloudGameClient
 
     private static string Truncate(string s) => s.Length <= 120 ? s : s[..120] + "…";
 }
-
-
 
 public class CloudRecordResponse
 {

@@ -11,13 +11,6 @@ using Windows.UI;
 
 namespace Arietta.Features.Background;
 
-
-
-
-
-
-
-
 internal static class BackgroundAccentService
 {
 
@@ -27,20 +20,12 @@ internal static class BackgroundAccentService
 
     private static readonly object _cacheLock = new();
 
-    
     private const uint DecodeWidth = 128;
 
-    
     private static Color? _appliedColor;
 
     private static bool _appliedColorKnown;
 
-
-    
-    
-    
-    
-    
     public static void Apply(string? accentSourcePath, DispatcherQueue? dispatcher)
     {
         _ = Task.Run(async () =>
@@ -61,7 +46,7 @@ internal static class BackgroundAccentService
             Color effective = color ?? AccentColorHelper.DefaultAccent;
             if (_appliedColorKnown && _appliedColor == effective)
             {
-                
+
                 return;
             }
             _appliedColor = effective;
@@ -72,11 +57,10 @@ internal static class BackgroundAccentService
                 try
                 {
                     AccentColorHelper.ApplyAccentColor(effective);
-                    
-                    
+
                     MainWindow? window = MainWindow.Current;
                     window?.ChangeAccentColor();
-                    
+
                     _logger.LogInformation("背景主题色 {Color}（来源 {Source}）；{Resolved}",
                                            ToHex(effective),
                                            accentSourcePath ?? "无（还原默认）",
@@ -99,8 +83,6 @@ internal static class BackgroundAccentService
         });
     }
 
-
-    
     public static void Invalidate(string filePath)
     {
         lock (_cacheLock)

@@ -1,16 +1,13 @@
-﻿
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Arietta.Features.GachaLog;
-
 
 public sealed record GachaNameRow(
     int Id, string Key,
     string ZhHans, string ZhHant, string En, string Ja, string Ko,
     string Fr, string Es, string PtBr, string Th)
 {
-    
+
     public string Get(int column)
     {
         return column switch

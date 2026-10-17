@@ -4,10 +4,6 @@ using System.Runtime.CompilerServices;
 
 namespace Arietta.Helpers;
 
-
-
-
-
 public class PointerCursor : DependencyObject
 {
 

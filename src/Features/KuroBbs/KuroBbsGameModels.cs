@@ -5,7 +5,6 @@ namespace Arietta.Features.KuroBbs;
 
 #region 签到（initSignInV2 / signIn/v2）
 
-
 public sealed class KuroSignGood
 {
     [JsonPropertyName("goodsId")] public long? GoodsId { get; set; }
@@ -17,10 +16,8 @@ public sealed class KuroSignGood
     [JsonPropertyName("serialNum")] public int? SerialNum { get; set; }
     [JsonPropertyName("signId")] public int? SignId { get; set; }
 
-    
     [JsonIgnore] public bool IsSign { get; set; }
 }
-
 
 public sealed class KuroSignInitData
 {
@@ -37,8 +34,7 @@ public sealed class KuroTowerSimpleRole
 {
     [JsonPropertyName("roleId")] public int? RoleId { get; set; }
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
-    
-    
+
     [JsonPropertyName("skillBranchIndex")] public int? SkillBranchIndex { get; set; }
 }
 
@@ -65,7 +61,6 @@ public sealed class KuroTowerDifficulty
     [JsonPropertyName("difficultyName")] public string? DifficultyName { get; set; }
     [JsonPropertyName("towerAreaList")] public List<KuroTowerArea>? TowerAreaList { get; set; }
 }
-
 
 public sealed class KuroTowerData
 {
@@ -117,7 +112,6 @@ public sealed class KuroNewTowerModeDetail
     [JsonPropertyName("teams")] public List<KuroNewTowerTeam>? Teams { get; set; }
 }
 
-
 public sealed class KuroNewTowerData
 {
     [JsonPropertyName("endTime")] public long EndTime { get; set; }
@@ -158,7 +152,6 @@ public sealed class KuroSlashDifficulty
     [JsonPropertyName("difficultyName")] public string? DifficultyName { get; set; }
     [JsonPropertyName("maxScore")] public int MaxScore { get; set; }
 }
-
 
 public sealed class KuroSlashData
 {

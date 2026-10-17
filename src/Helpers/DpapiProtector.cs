@@ -4,11 +4,6 @@ using System.Text;
 
 namespace Arietta.Helpers;
 
-
-
-
-
-
 internal static class DpapiProtector
 {
     private const int CRYPTPROTECT_UI_FORBIDDEN = 0x1;
@@ -31,8 +26,6 @@ internal static class DpapiProtector
     [DllImport("kernel32.dll")]
     private static extern IntPtr LocalFree(IntPtr hMem);
 
-
-    
     public static string Protect(string plainText)
     {
         if (string.IsNullOrEmpty(plainText))
@@ -43,8 +36,6 @@ internal static class DpapiProtector
         return result is null ? "" : Convert.ToBase64String(result);
     }
 
-
-    
     public static string? Unprotect(string protectedBase64)
     {
         if (string.IsNullOrWhiteSpace(protectedBase64))

@@ -12,10 +12,8 @@ public sealed class KuroBbsResponse<T>
     [JsonPropertyName("success")] public bool Success { get; set; }
     [JsonPropertyName("data")] public T? Data { get; set; }
 
-    
     [JsonIgnore] public bool IsSuccess => Code is 200 or 10902;
 
-    
     [JsonIgnore] public bool IsTokenExpired => Code == 220
         || (Msg?.Contains("登录已过期") ?? false) || (Msg?.Contains("Token") ?? false);
 }
@@ -52,7 +50,6 @@ public sealed class KuroRoleDetail
     [JsonPropertyName("skillList")] public List<KuroSkillData>? SkillList { get; set; }
     [JsonPropertyName("roleAttributeList")] public List<KuroRoleAttribute>? RoleAttributeList { get; set; }
 }
-
 
 public sealed class KuroChain
 {
@@ -100,7 +97,6 @@ public sealed class KuroPhantom
     [JsonPropertyName("propStatus")] public string? PropStatus { get; set; }
 }
 
-
 public sealed class KuroPhantomProp
 {
     [JsonPropertyName("phantomPropId")] public int PhantomPropId { get; set; }
@@ -112,7 +108,6 @@ public sealed class KuroPhantomProp
     [JsonPropertyName("skillDescription")] public string? SkillDescription { get; set; }
 }
 
-
 public sealed class KuroPhantomPropEntry
 {
     [JsonPropertyName("attributeName")] public string? AttributeName { get; set; }
@@ -122,7 +117,6 @@ public sealed class KuroPhantomPropEntry
     [JsonPropertyName("attributeMaxValue")] public double AttributeMaxValue { get; set; }
     [JsonPropertyName("percent")] public double Percent { get; set; }
 }
-
 
 public sealed class KuroFetterDetail
 {
@@ -147,7 +141,6 @@ public sealed class KuroSkill
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
 }
 
-
 public sealed class KuroRoleAttribute
 {
     [JsonPropertyName("attributeId")] public int AttributeId { get; set; }
@@ -160,7 +153,6 @@ public sealed class KuroRoleAttribute
 #endregion
 
 #region 资源简报（aki/resource/period/list + month|week|version）
-
 
 public sealed class KuroBriefingTitle
 {
@@ -175,21 +167,11 @@ public sealed class KuroBriefing
     [JsonPropertyName("versions")] public List<KuroBriefingTitle>? Versions { get; set; }
 }
 
-
 public sealed class KuroBriefingItem
 {
     [JsonPropertyName("type")] public string? Type { get; set; }
     [JsonPropertyName("num")] public long Num { get; set; }
 }
-
-
-
-
-
-
-
-
-
 
 public sealed class KuroWuwaWidgetData
 {
@@ -200,32 +182,27 @@ public sealed class KuroWuwaWidgetData
     [JsonPropertyName("serverName")] public string? ServerName { get; set; }
     [JsonPropertyName("roleId")] public string? RoleId { get; set; }
     [JsonPropertyName("roleName")] public string? RoleName { get; set; }
-    
+
     [JsonPropertyName("energyData")] public KuroWidgetItem? EnergyData { get; set; }
-    
+
     [JsonPropertyName("livenessData")] public KuroWidgetItem? LivenessData { get; set; }
-    
+
     [JsonPropertyName("storeEnergyData")] public KuroWidgetItem? StoreEnergyData { get; set; }
-    
+
     [JsonPropertyName("towerData")] public KuroWidgetItem? TowerData { get; set; }
-    
+
     [JsonPropertyName("newTowerData")] public KuroWidgetItem? NewTowerData { get; set; }
-    
+
     [JsonPropertyName("slashTowerData")] public KuroWidgetItem? SlashTowerData { get; set; }
-    
+
     [JsonPropertyName("weeklyData")] public KuroWidgetItem? WeeklyData { get; set; }
-    
+
     [JsonPropertyName("weeklyFrameData")] public KuroWidgetItem? WeeklyFrameData { get; set; }
-    
+
     [JsonPropertyName("weeklyRougeData")] public KuroWidgetItem? WeeklyRougeData { get; set; }
-    
+
     [JsonPropertyName("battlePassData")] public List<KuroWidgetItem>? BattlePassData { get; set; }
 }
-
-
-
-
-
 
 public sealed class KuroWidgetItem
 {
@@ -237,8 +214,6 @@ public sealed class KuroWidgetItem
     [JsonPropertyName("cur")] public int Cur { get; set; }
     [JsonPropertyName("total")] public int Total { get; set; }
 }
-
-
 
 public sealed class KuroBriefingRecord
 {
@@ -252,14 +227,6 @@ public sealed class KuroBriefingRecord
 #endregion
 
 #region 养成计算器（aki/calculator/listRole | listWeapon）
-
-
-
-
-
-
-
-
 
 public sealed class KuroCalculatorRole
 {
@@ -277,7 +244,6 @@ public sealed class KuroCalculatorRole
     [JsonPropertyName("priority")] public int Priority { get; set; }
 }
 
-
 public sealed class KuroCalculatorRoleAim
 {
     [JsonPropertyName("roleId")] public int RoleId { get; set; }
@@ -287,15 +253,8 @@ public sealed class KuroCalculatorRoleAim
     [JsonPropertyName("weaponStartLevel")] public int WeaponStartLevel { get; set; } = 1;
     [JsonPropertyName("weaponEndLevel")] public int WeaponEndLevel { get; set; } = 90;
 
-    
-    
-    
-    
-    
     [JsonPropertyName("category")] public string Category { get; set; } = "all";
 }
-
-
 
 public sealed class KuroCalculatorResult
 {
@@ -304,8 +263,6 @@ public sealed class KuroCalculatorResult
     [JsonPropertyName("costList")] public List<KuroCalculatorCostList>? CostList { get; set; }
 }
 
-
-
 public sealed class KuroCalculatorCostList
 {
     [JsonPropertyName("roleId")] public int? RoleId { get; set; }
@@ -313,11 +270,6 @@ public sealed class KuroCalculatorCostList
     [JsonPropertyName("allCost")] public List<KuroCalculatorCost>? AllCost { get; set; }
     [JsonPropertyName("missingCost")] public List<KuroCalculatorCost>? MissingCost { get; set; }
 }
-
-
-
-
-
 
 public sealed class KuroCalculatorCost
 {
@@ -328,8 +280,6 @@ public sealed class KuroCalculatorCost
     [JsonPropertyName("type")] public int Type { get; set; }
     [JsonPropertyName("quality")] public int Quality { get; set; }
 }
-
-
 
 public sealed class KuroCalculatorWeapon
 {
@@ -346,13 +296,11 @@ public sealed class KuroCalculatorWeapon
 
 #region 登录（sdkLogin / getSmsCodeForH5）
 
-
 public sealed class KuroLoginResult
 {
     public string Token { get; init; } = "";
     public string Did { get; init; } = "";
 
-    
     public string HeadPhotoUrl { get; init; } = "";
 }
 

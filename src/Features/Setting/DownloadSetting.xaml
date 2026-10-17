@@ -8,7 +8,6 @@
              xmlns:mf="using:Arietta.Frameworks"
              mc:Ignorable="d">
 
-    
     <mf:PageBase.Resources>
         <Style TargetType="Thumb">
             <Setter Property="Template">
@@ -26,7 +25,6 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
         <StackPanel Spacing="28" MaxWidth="1000" HorizontalAlignment="Left" Padding="0,0,0,24">
 
-            
             <StackPanel Spacing="8">
                 <TextBlock FontSize="18"
                            FontWeight="Bold"
@@ -46,7 +44,6 @@
                               Toggled="Toggle_HardLink_Toggled" />
             </StackPanel>
 
-            
             <StackPanel Spacing="8">
                 <TextBlock FontSize="18"
                            FontWeight="Bold"
@@ -76,7 +73,6 @@
                 </StackPanel>
             </StackPanel>
 
-            
             <StackPanel Spacing="8">
                 <TextBlock FontSize="18"
                            FontWeight="Bold"
@@ -89,7 +85,7 @@
                            IsTextScaleFactorEnabled="False"
                            Text="{x:Bind lang:Lang.Instance.FilePage_DownloadThreadsDesc, Mode=OneWay}"
                            TextWrapping="Wrap" />
-                
+
                 <StackPanel Orientation="Horizontal"
                             Spacing="12"
                             Margin="0,4,0,-6">

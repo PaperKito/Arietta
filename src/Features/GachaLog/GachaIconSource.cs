@@ -12,34 +12,17 @@ using Arietta.Features.KuroBbs;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class GachaIconSource
 {
 
     private static readonly ILogger _logger = AppConfig.GetLogger<LogTag>();
 
-    
     private sealed class LogTag;
 
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(20) };
 
-    
     private static readonly TimeSpan IndexLifetime = TimeSpan.FromHours(24);
 
-    
     public static string CacheFolder => Path.Combine(AppConfig.LocalFolder, "GachaIcons");
 
     private static string IndexFolder => Path.Combine(AppConfig.LocalFolder, "KuroBbs");
@@ -55,10 +38,6 @@ public static class GachaIconSource
 
     #region 索引：内存 → 磁盘 → 库街区
 
-    
-    
-    
-    
     public static async Task<Dictionary<string, string>?> GetIndexAsync(bool force = false, CancellationToken ct = default)
     {
         if (!force && _index is not null)
@@ -91,7 +70,6 @@ public static class GachaIconSource
                 return fresh;
             }
 
-            
             if (disk is not null)
             {
                 _index = disk.Items;
@@ -106,8 +84,6 @@ public static class GachaIconSource
         }
     }
 
-
-    
     private static async Task<Dictionary<string, string>?> FetchIndexAsync(CancellationToken ct)
     {
         var account = KuroBbsAccountStore.Load();
@@ -120,7 +96,6 @@ public static class GachaIconSource
         {
             var client = KuroBbsClient.Instance;
 
-            
             _ = await client.RefreshCalculatorDataAsync(account, ct).ConfigureAwait(false);
 
             var index = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -134,7 +109,7 @@ public static class GachaIconSource
                 {
                     Add(index, role.RoleName, role.RoleIconUrl);
                 }
-                
+
                 foreach (var role in roleList)
                 {
                     Add(index, role.Acronym, role.RoleIconUrl);
@@ -158,8 +133,6 @@ public static class GachaIconSource
                 }
             }
 
-            
-            
             await HarvestMaterialIconsAsync(account, index, roleList, ct).ConfigureAwait(false);
 
             if (index.Count == 0)
@@ -176,11 +149,6 @@ public static class GachaIconSource
         }
     }
 
-
-    
-    
-    
-    
     private static async Task HarvestMaterialIconsAsync(KuroBbsAccount account,
         Dictionary<string, string> index, List<KuroCalculatorRole> roles, CancellationToken ct)
     {
@@ -220,7 +188,7 @@ public static class GachaIconSource
         }
         catch (Exception e)
         {
-            
+
             _logger.LogDebug(e, "收集养成材料图标失败");
         }
     }
@@ -232,7 +200,7 @@ public static class GachaIconSource
         {
             return;
         }
-        
+
         index.TryAdd(name.Trim(), url.Trim());
     }
 
@@ -241,16 +209,13 @@ public static class GachaIconSource
 
     #region 解析与下载
 
-    
-    
-    
     public static async Task<string?> ResolveUrlAsync(string name, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             return null;
         }
-        
+
         var index = await GetIndexAsync(false, ct).ConfigureAwait(false);
         if (index is not null && index.TryGetValue(name.Trim(), out string? url))
         {
@@ -259,11 +224,6 @@ public static class GachaIconSource
         return await GachaIconService.LookupWikiUrlAsync(name, ct).ConfigureAwait(false);
     }
 
-
-    
-    
-    
-    
     public static async Task<string?> EnsureCachedAsync(int resourceId, string name, bool overwrite = false, CancellationToken ct = default)
     {
         if (resourceId <= 0 || string.IsNullOrWhiteSpace(name))
@@ -328,7 +288,7 @@ public static class GachaIconSource
         }
         catch
         {
-            
+
         }
     }
 

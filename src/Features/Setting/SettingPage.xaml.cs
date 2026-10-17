@@ -31,7 +31,7 @@ public sealed partial class SettingPage : PageBase
                     nameof(DownloadSetting) => typeof(DownloadSetting),
                     nameof(FileManagementSetting) => typeof(FileManagementSetting),
                     nameof(GamepadSetting) => typeof(GamepadSetting),
-                    
+
                     "ToolboxSetting" => typeof(Arietta.Features.ViewHost.ToolboxPage),
                     _ => null,
                 };

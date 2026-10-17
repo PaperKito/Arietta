@@ -6,19 +6,13 @@ using System.Text.Json.Serialization;
 
 namespace Arietta.Features.Sync;
 
-
 public enum SyncPreference
 {
-    
+
     LocalFirst = 0,
 
-    
     RemoteFirst = 1,
 }
-
-
-
-
 
 internal sealed class CloudSyncConfig
 {
@@ -30,28 +24,16 @@ internal sealed class CloudSyncConfig
 
     #region 用户配置
 
-    
     public string ServerUrl { get; set; } = "";
 
     public string UserName { get; set; } = "";
 
-    
-    
-    
-    
     public const string RemoteFolder = "AriettaSync";
 
-    
     public bool AutoSync { get; set; } = true;
 
-    
-    
-    
-    
-    
     public SyncPreference Preference { get; set; } = SyncPreference.LocalFirst;
 
-    
     public string ProtectedPassword { get; set; } = "";
 
     #endregion
@@ -60,18 +42,14 @@ internal sealed class CloudSyncConfig
 
     public string DeviceId { get; set; } = "";
 
-    
     public string LastLocalVersion { get; set; } = "";
 
-    
     public string LastRemoteETag { get; set; } = "";
 
     public DateTimeOffset? LastSyncTime { get; set; }
 
     #endregion
 
-
-    
     [JsonIgnore]
     public string Password
     {
@@ -86,8 +64,6 @@ internal sealed class CloudSyncConfig
         !string.IsNullOrWhiteSpace(UserName) &&
         !string.IsNullOrWhiteSpace(Password);
 
-
-    
     public const string RemoteFileName = "Arietta.db";
 
 
@@ -127,8 +103,6 @@ internal sealed class CloudSyncConfig
         catch { }
     }
 
-
-    
     public string EnsureDeviceId()
     {
         if (string.IsNullOrWhiteSpace(DeviceId))

@@ -2,26 +2,18 @@
 
 namespace Arietta.Localization;
 
-
-
-
-
-
-
-
 internal static class LangHant
 {
 
     public static readonly Dictionary<string, string> Map = new()
     {
-        
+
         ["MainPage_Launcer"] = "啟動器",
         ["LauncherPage_GameSetting"] = "遊戲設定",
         ["MainPage_GameScreenshot"] = "遊戲截圖",
         ["GachaLogPage_ConveneRecords"] = "調頻記錄",
         ["Toolbox"] = "工具箱",
 
-        
         ["ScreenshotPage_MultiSelect"] = "多選",
         ["ScreenshotPage_OpenFolder"] = "開啟資料夾",
         ["ScreenshotPage_Total0Files"] = "共 {0} 張",
@@ -36,25 +28,21 @@ internal static class LangHant
         ["ScreenshotPage_OpenImage"] = "開啟圖片",
         ["ScreenshotPage_DeletedPartial"] = "已刪除 {0} / {1} 張，其餘可能正被佔用",
 
-        
         ["KuroBbs"] = "庫街區",
         ["KuroBbs_SignIn"] = "簽到",
         ["KuroBbs_Role"] = "角色",
         ["KuroBbs_ResourceBrief"] = "資源簡報",
 
-        
         ["PgrData_NoRole"] = "該庫街區帳號還沒設定戰雙角色，請在庫街區 App 的「我的」裡設定後再查看。",
         ["PgrData_Locked"] = "未解鎖",
         ["PgrData_FullIn"] = "{0} 後回滿",
 
-        
         ["KuroBbs_DataTerminal"] = "資料終端",
         ["KuroBbs_CombatData"] = "作戰資料",
         ["DataTerminal_NoAccount"] = "還沒有登入庫街區，請點上方帳號箭頭登入後查看。",
         ["DataTerminal_NoRole"] = "該庫街區帳號還沒有綁定{0}角色，請先在庫街區 App 裡綁定。",
         ["DataTerminal_LoadFailed"] = "頁面載入失敗：{0}",
 
-        
         ["KuroBbs_PgrRole"] = "角色",
         ["KuroBbs_PgrResource"] = "資源月報",
         ["KuroBbs_PgrCage"] = "幻痛囚籠",
@@ -78,7 +66,6 @@ internal static class LangHant
         ["PgrWarArea_Waves"] = "波次 {0}",
         ["PgrCommon_LoadFailed"] = "資料取得失敗",
 
-        
         ["DailyBriefing"] = "簡報",
         ["DailyBriefing_Desc"] = "遊戲內日常資料",
         ["DailyBriefing_Refresh"] = "重新整理",
@@ -97,7 +84,6 @@ internal static class LangHant
         ["KuroBbs_TokenExpired"] = "庫街區登入已過期",
         ["KuroBbs_TokenExpiredDesc"] = "請到 設定 → 庫街區帳號 重新擷取或填寫 token",
 
-        
         ["KuroAccount_UsbTitle"] = "ADB 工具",
         ["KuroAccount_UsbShortDesc"] = "連接 Android 手機，擷取庫街區 Token 和 Did",
         ["KuroAccount_UsbDesc"] = "用傳輸線連接手機並開啟 USB 偵錯：在手機上開啟庫街區 App 並進入「資料終端」或「養成計算器」，然後點擊「開始擷取」，工具會自動擷取 token 和 did。需提供 adb.exe（可從 ",
@@ -144,7 +130,6 @@ internal static class LangHant
         ["KuroAccount_Saved"] = "帳號已儲存",
         ["KuroAccount_Cleared"] = "已清除帳號",
 
-        
         ["RolePage_Refresh"] = "重新整理",
         ["RolePage_NoAccount"] = "尚未設定庫街區帳號",
         ["RolePage_NoAccountDesc"] = "請到 設定 → 庫街區帳號 完成設定後重新整理",
@@ -152,7 +137,6 @@ internal static class LangHant
         ["RolePage_Back"] = "返回列表",
         ["RolePage_Phantoms"] = "聲骸",
 
-        
         ["GachaLogPage_Refresh"] = "更新記錄",
         ["GachaLogPage_ImportUrl"] = "貼上連結匯入",
         ["GachaLogPage_ImportUrlDesc"] = "貼上喚取記錄頁連結（遊戲內開啟「喚取記錄」後從日誌取得，或從其他工具複製），雲手機玩家也可使用",
@@ -210,7 +194,6 @@ internal static class LangHant
         ["GachaLogPage_EmptyTitle"] = "暫無調頻記錄",
         ["GachaLogPage_EmptyDesc"] = "先在設定中定位遊戲目錄，然後進入遊戲開啟一次「喚取記錄」頁面，回到這裡點擊「更新記錄」即可同步資料。",
 
-        
         ["LauncherPage_StartGame"] = "開始遊戲",
         ["LauncherPage_InstallGame"] = "安裝遊戲",
         ["LauncherPage_ResumeInstall"] = "繼續安裝",
@@ -228,10 +211,8 @@ internal static class LangHant
         ["Notice_LoadFailed"] = "公告載入失敗",
         ["LauncherPage_UpdateGame"] = "更新遊戲",
 
-        
         ["SettingPage_Language"] = "語言",
 
-        
         ["GameUpdate_PredownloadAvailable"] = "新版本 {0} 開放預先下載",
         ["GameUpdate_Predownloaded"] = "{0} 已預先下載，開放更新後可直接安裝",
         ["GameUpdate_PredownloadButton"] = "預先下載",
@@ -257,7 +238,6 @@ internal static class LangHant
         ["GameUpdate_RepairDone"] = "已修復 {0} 個檔案",
         ["GameUpdate_RepairNoBaseUrl"] = "當前版本不支援線上修復，請先將遊戲更新到最新版本後再試",
 
-        
         ["GameLauncherPage_Gallery"] = "圖庫",
         ["Common_Copy"] = "複製",
         ["ImageViewWindow2_SaveAs"] = "另存新檔",
@@ -271,15 +251,12 @@ internal static class LangHant
         ["InstallGameDialog_LocateGame"] = "定位遊戲",
         ["GameLauncherPage_GameIsRunning"] = "遊戲正在執行",
 
-        
         ["SettingPage_Download"] = "下載",
 
-        
         ["DownloadGamePage_Downloading"] = "下載中",
         ["DownloadGamePage_Verifying"] = "驗證中",
         ["DownloadGamePage_Pause"] = "暫停",
 
-        
         ["Common_Confirm"] = "確認",
         ["Common_Cancel"] = "取消",
         ["Common_Close"] = "關閉",
@@ -290,13 +267,11 @@ internal static class LangHant
         ["Common_Apply"] = "套用",
         ["Common_Exit"] = "結束",
 
-        
         ["SettingPage_AppSettings"] = "設定",
         ["SettingPage_About"] = "關於",
         ["SettingPage_General"] = "一般",
         ["SettingPage_FileManagement"] = "檔案管理",
 
-        
         ["FilePage_DataFolder"] = "資料資料夾",
         ["FilePage_DataFolderDesc"] = "您的個人資料保存在下面的資料夾中，它很重要，請不要隨意刪除。",
         ["FilePage_ReselectDataFolder"] = "重新選擇資料資料夾",
@@ -313,7 +288,6 @@ internal static class LangHant
         ["FilePage_CleanCache"] = "清理快取",
         ["FilePage_CleanBackgroundCache"] = "清理啟動器背景檔案",
 
-        
         ["FilePage_HardLink"] = "硬連結",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "同磁碟其它區服客戶端的相同檔案將直接硬連結複用，預計實際需下載約 {0}；該值僅為預估值，實際以下載時逐檔案校驗為準。",
         ["InstallGameDialog_HardLinkAfterSize"] = "硬連結後大小：",
@@ -327,12 +301,10 @@ internal static class LangHant
         ["FilePage_DownloadThreads"] = "多線程",
         ["FilePage_DownloadThreadsDesc"] = "同時建立的下載連線數，機械硬碟上過高並行會因尋道而變慢。改動對下次生效。",
 
-        
         ["KuroBbs_RefreshInfo"] = "重新整理資訊",
         ["KuroBbs_Login"] = "登入",
         ["KuroBbs_Settings"] = "庫街區設定",
 
-        
         ["Login_Title"] = "登入庫街區",
         ["Login_ByToken"] = "Token 登入",
         ["Login_BySms"] = "驗證碼登入",
@@ -357,7 +329,6 @@ internal static class LangHant
         ["Login_SeekRoleFailed"] = "查詢綁定角色失敗：{0}",
         ["Login_Success"] = "庫街區帳號「{0}」登入成功",
 
-        
         ["ResourceBrief_Month"] = "月度",
         ["ResourceBrief_Week"] = "週度",
         ["ResourceBrief_Version"] = "版本",
@@ -368,7 +339,6 @@ internal static class LangHant
         ["ResourceBrief_Detail"] = "取得明細",
         ["ResourceBrief_Empty"] = "本週期暫無資料",
 
-        
         ["SignPage_DoSignIn"] = "簽到",
         ["SignPage_MonthlySign"] = "本月簽到",
         ["SignPage_SignedToday"] = "今日已簽到",
@@ -400,9 +370,6 @@ internal static class LangHant
         ["CombatPage_ClearRecordsConfirm"] = "將刪除本機儲存的「{0}」全部歷史期次記錄，無法復原。確定清除？",
         ["CombatPage_Clear"] = "清除",
 
-        
-
-        
         ["PlayTimeStatsDialog_TotalPlaytime"] = "總遊戲時長",
         ["PlayTimeStatsDialog_Started0Times"] = "啟動 {0} 次",
         ["PlayTimeStatsDialog_AverageDailyPlaytime"] = "每日平均遊戲時間",
@@ -419,7 +386,6 @@ internal static class LangHant
         ["PlayTimeStatsDialog_PlaytimeStatistics"] = "遊戲時長統計",
         ["PlayTimeStatsDialog_StatsTip"] = "統計僅包含透過本啟動器啟動遊戲的時長。",
 
-        
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "最小化到系統列",
         ["GameLauncherSettingDialog_BasicInformation"] = "基本資訊",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "確認解除安裝",
@@ -436,11 +402,9 @@ internal static class LangHant
         ["LauncherPage_UninstallGame"] = "解除安裝遊戲",
         ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "不支援對應的網路磁碟機，請使用以雙反斜線開頭的網路共用路徑",
 
-        
         ["SettingPage_BgSizeTip"] = "背景圖尺寸提示",
         ["SettingPage_CustomBackgroundSupportVideo"] = "自訂背景支援影片",
 
-        
         ["GameSettingPage_Resolution"] = "解析度",
         ["GameSettingPage_FullScreen"] = "全螢幕",
         ["GameSettingPage_PgrFullscreenBlockedTip"] = "目前顯示器解析度超過遊戲支援上限，全螢幕無法正常使用",
@@ -462,9 +426,6 @@ internal static class LangHant
         ["GameSettingPage_ApplyFailed"] = "套用遊戲設定失敗",
         ["GameSettingPage_Applied"] = "已套用，下次啟動遊戲時生效",
 
-        
-
-        
         ["SettingPage_WindowBehavior"] = "視窗行為",
         ["SettingPage_CloseWindowOption"] = "關閉視窗選項",
         ["SettingPage_ExitApp"] = "完全結束",
@@ -479,19 +440,16 @@ internal static class LangHant
         ["SettingPage_TransparencyEffects"] = "透明效果",
         ["SettingPage_AnimationEffects"] = "動畫效果",
 
-        
         ["GameSelector_Subtitle"] = "點擊左上角的圖示即可選擇或切換遊戲",
         ["GameSelector_AutoFind"] = "自動搜尋本機遊戲",
         ["GameSelector_SelectServer"] = "選擇伺服器",
         ["GameSelector_InstalledSize"] = "已安裝遊戲實際佔用空間 ",
         ["GameSelector_Calculating"] = "統計中",
 
-        
         ["KuroBbs_AccountLevelLabel"] = "聯覺等級 ",
         ["KuroBbs_SwitchRole"] = "切換角色",
         ["KuroBbs_ClearAccount"] = "清除帳號",
 
-        
         ["GameBiz_Wuwa"] = "鳴潮",
         ["GameBiz_WuwaCn"] = "鳴潮 · 中國服",
         ["GameBiz_WuwaGlobal"] = "鳴潮 · 國際服",
@@ -510,7 +468,6 @@ internal static class LangHant
         ["GameBiz_PgrTaiwan"] = "戰雙帕彌什 · 台服",
         ["GameBiz_ShortTaiwan"] = "台服",
 
-        
         ["GachaPool_CharacterEvent"] = "角色活動喚取",
         ["GachaPool_WeaponEvent"] = "武器活動喚取",
         ["GachaPool_CharacterStandard"] = "角色常駐喚取",
@@ -526,11 +483,9 @@ internal static class LangHant
         ["GachaPool_WeaponRevisit"] = "武器憶旅喚取",
         ["GachaPool_Unknown"] = "卡池 {0}",
 
-        
         ["Adb_DeviceOnline"] = "線上",
         ["Adb_DeviceUnauthorized"] = "未授權",
 
-        
         ["Sync_Title"] = "WebDAV",
         ["Sync_Description"] = "透過雲端同步來保存資料",
         ["Sync_ServerUrl"] = "伺服器地址",
@@ -554,7 +509,6 @@ internal static class LangHant
         ["Sync_LastSync"] = "上次同步",
         ["Sync_Working"] = "正在處理…",
 
-        
         ["CloudGame_ErrNoLogin"] = "沒有可用的登入資訊",
         ["CloudGame_ErrHttp"] = "雲端遊戲服務傳回 HTTP {0}",
         ["CloudGame_ErrRequest"] = "對雲端遊戲服務的請求失敗：{0}",
@@ -562,16 +516,13 @@ internal static class LangHant
         ["CloudGame_ErrEmpty"] = "雲端遊戲服務傳回內容為空：{0}",
         ["CloudGame_ErrCode"] = "雲端遊戲介面傳回錯誤 code={0}：{1}",
 
-        
         ["GachaLogPage_ExportEmpty"] = "當前帳號沒有可匯出的調頻記錄",
         ["GachaLog_PityBuilt"] = "已墊",
 
-        
         ["GameLauncherSettingDialog_PathRemoved"] = "已移除遊戲路徑設定",
         ["GameLauncherSettingDialog_WrongServerExe"] = "所選的遊戲 exe 不屬於當前伺服器，請重新選擇",
         ["GameLauncherSettingDialog_ExpectExe"] = "請選擇遊戲主程式：{0}",
 
-        
         ["KrSdk_ErrNoUserCache"] = "未找到 KRSDKUserCache.json，請先在遊戲內登入過一次。",
         ["KrSdk_ErrEmptyContent"] = "內容為空",
         ["KrSdk_ErrParseFailed"] = "KRSDKUserCache.json 解析失敗，已放棄寫入以免破壞登入狀態。",
@@ -579,7 +530,6 @@ internal static class LangHant
         ["KrSdk_ErrAccountNotInCache"] = "本機快取中沒有此帳號。",
         ["KrSdk_ErrVerifyFailed"] = "寫入後驗證失敗，已還原為改動前的快取。",
 
-        
         ["GameUpdate_ErrNoPlan"] = "下載計畫缺失",
         ["GameUpdate_ErrNoTarget"] = "目標版本缺失",
         ["GameUpdate_ErrNoGamePath"] = "未設定遊戲路徑，無法更新",
@@ -587,11 +537,9 @@ internal static class LangHant
         ["GameUpdate_ErrFileMissing"] = "更新檔案缺失：{0}",
         ["GameUpdate_ErrFileChecksum"] = "更新檔案驗證失敗：{0}",
 
-        
         ["GameSetting_ErrNoLocalStorage"] = "未找到遊戲的 LocalStorage.db",
         ["GameSetting_ErrNoGameUserSettings"] = "未找到遊戲的 GameUserSettings.ini",
 
-        
         ["KuroBbs_ErrConnection"] = "連線失敗，回應狀態碼:{0}",
         ["KuroBbs_ErrAccessTokenEmpty"] = "requestToken 傳回的 accessToken 為空",
         ["KuroBbs_ErrAccessToken"] = "取得 B-At accessToken 失敗（code={0}）：{1}",
@@ -601,18 +549,11 @@ internal static class LangHant
         ["KuroBbs_SignAlready"] = "今日已簽到",
         ["KuroBbs_SignFail"] = "簽到失敗",
 
-        
-
-        
         ["Ugf_ErrNoUid"] = "UGF 檔案缺少帳號 uid",
         ["Ugf_ErrUnknownFormat"] = "無法識別的檔案格式：需要 UGF 或卡池記錄 JSON",
 
-        
-
-        
         ["CombatPage_AreaFallback"] = "區域 {0}",
 
-        
         ["KuroBbs_UnionLevel"] = "聯覺等級",
         ["KuroBbs_CommanderLevel"] = "指揮官等級",
         ["KuroBbs_NoLevel"] = "暫無等級",
@@ -624,10 +565,8 @@ internal static class LangHant
         ["KuroBbs_AutoSignDoneToast"] = "每日簽到完成",
         ["KuroBbs_AutoSignFailedToast"] = "每日簽到失敗",
 
-        
         ["RolePage_WeaponLevel"] = "LV.{0} · 突破{1}",
 
-        
         ["Common_UnknownError"] = "未知錯誤",
     };
 

@@ -4,9 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
 public class GachaRecord
 {
     [JsonPropertyName("cardPoolType")]
@@ -31,10 +28,6 @@ public class GachaRecord
     public string Time { get; set; } = "";
 }
 
-
-
-
-
 public class GachaParams
 {
     [JsonPropertyName("playerId")]
@@ -56,10 +49,6 @@ public class GachaParams
     public string LanguageCode { get; set; } = "";
 }
 
-
-
-
-
 public class GachaQueryResponse
 {
     [JsonPropertyName("code")]
@@ -72,37 +61,24 @@ public class GachaQueryResponse
     public List<GachaRecord>? Data { get; set; }
 }
 
-
-
-
-
-
 public sealed record GachaFetchResult(Dictionary<string, List<GachaRecord>> Data, int Code, string? Message);
-
-
-
-
 
 public static class GachaPools
 {
-    public const string CharacterEvent = "1";      
-    public const string WeaponEvent = "2";         
-    public const string CharacterStandard = "3";   
-    public const string WeaponStandard = "4";      
-    public const string Novice = "5";              
-    public const string NoviceChoice = "6";        
-    public const string NoviceGratitude = "7";     
-    public const string CharacterRookie = "8";     
-    public const string WeaponRookie = "9";        
-    public const string CharacterCollab = "10";    
-    public const string WeaponCollab = "11";       
-    public const string CharacterRevisit = "12";   
-    public const string WeaponRevisit = "13";      
+    public const string CharacterEvent = "1";
+    public const string WeaponEvent = "2";
+    public const string CharacterStandard = "3";
+    public const string WeaponStandard = "4";
+    public const string Novice = "5";
+    public const string NoviceChoice = "6";
+    public const string NoviceGratitude = "7";
+    public const string CharacterRookie = "8";
+    public const string WeaponRookie = "9";
+    public const string CharacterCollab = "10";
+    public const string WeaponCollab = "11";
+    public const string CharacterRevisit = "12";
+    public const string WeaponRevisit = "13";
 
-    
-    
-    
-    
     public static readonly string[] DisplayOrder =
     [
         CharacterEvent, WeaponEvent, CharacterStandard, WeaponStandard,
@@ -111,7 +87,6 @@ public static class GachaPools
         CharacterRevisit, WeaponRevisit,
     ];
 
-    
     private static readonly Dictionary<string, string> CnNameToId = new()
     {
         ["角色活动唤取"] = CharacterEvent,
@@ -129,10 +104,6 @@ public static class GachaPools
         ["武器忆旅唤取"] = WeaponRevisit,
     };
 
-    
-    
-    
-    
     private static readonly Dictionary<string, string> LegacyNameToId = new()
     {
         ["Character Event Convene"] = CharacterEvent,
@@ -152,7 +123,6 @@ public static class GachaPools
         ["อัญเชิญอีเวนต์อาวุธ"] = WeaponEvent,
     };
 
-    
     public static string GetName(string poolId)
     {
         return poolId switch
@@ -174,7 +144,6 @@ public static class GachaPools
         };
     }
 
-    
     public static bool IsPoolId(string poolId)
     {
         return poolId is CharacterEvent or WeaponEvent or CharacterStandard or WeaponStandard
@@ -182,7 +151,6 @@ public static class GachaPools
             or CharacterRookie or WeaponRookie or CharacterRevisit or WeaponRevisit;
     }
 
-    
     public static string ResolvePoolId(string nameOrId)
     {
         if (IsPoolId(nameOrId))
@@ -207,7 +175,6 @@ public static class GachaPools
         return "";
     }
 
-    
     public static bool IsEventPool(string poolId)
     {
         return poolId is CharacterEvent or WeaponEvent or CharacterCollab or WeaponCollab
@@ -217,11 +184,6 @@ public static class GachaPools
 
     private const string DisplayPoolsConfigKey = "display_gacha_pools_wuwa";
 
-
-    
-    
-    
-    
     public static HashSet<string>? GetVisiblePools()
     {
         string? saved = AppConfig.GetConfig(DisplayPoolsConfigKey);

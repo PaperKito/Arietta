@@ -14,70 +14,23 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class DailyBriefingPanel
 {
 
-    
     public static string IconFolder => Path.Combine(AppConfig.LocalFolder, "widget-icons");
 
-    
-    
-    
-    
-    
-    
-    
-    
     private const string BundledIconWuwa = "ms-appx:///Assets/Image/Common/1789406285416.png";
 
     private const string BundledIconPgr = "ms-appx:///Assets/Image/Common/actionIcon.png";
 
-    
-    
-    
-    
     private const string BattlePassIconUrl = "https://web-static.kurobbs.com/gamerdata/widget/game3/battlePass.png";
 
-    
-    
-    
-    
-    
     private const string IconWuwaEnergy = "https://web-static.kurobbs.com/gamerdata/widget/game3/energy.png";
 
     private const string IconWuwaLiveness = "https://web-static.kurobbs.com/gamerdata/widget/game3/liveness.png";
 
     private const string IconWuwaStoreEnergy = "https://web-static.kurobbs.com/gamerdata/widget/game3/storeEnergy.png";
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private const string IconPgrActionPoint = "https://web-static.kurobbs.com/gamerdata/widget/game2/actionIcon.png";
 
     private const string IconPgrActive = "https://web-static.kurobbs.com/gamerdata/widget/game2/activeIcon.png";
@@ -86,39 +39,20 @@ public static class DailyBriefingPanel
 
     private const string IconPgrArena = "https://web-static.kurobbs.com/gamerdata/widget/game2/arenaIcon.png";
 
-
-    
     public static ImageSource IconSource(GameBiz biz)
     {
         bool pgr = biz.IsPunishingGrayRaven();
         return new BitmapImage(new Uri(pgr ? BundledIconPgr : BundledIconWuwa));
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     private static readonly Dictionary<string, DailyBriefingData> _cache = new();
 
-    
     private static string CacheKey(GameBiz biz, KrSdkAccount? account)
         => $"{(int)biz}|{account?.Cuid ?? ""}";
 
-    
     public static DailyBriefingData? GetCached(GameBiz biz, KrSdkAccount? account)
         => _cache.TryGetValue(CacheKey(biz, account), out var data) ? data : null;
 
-    
-    
-    
-    
-    
-    
-    
     public static async Task PrefetchAsync(GameBiz biz, KrSdkAccount? account)
     {
         try
@@ -127,24 +61,17 @@ public static class DailyBriefingPanel
         }
         catch
         {
-            
+
         }
     }
 
-    
-    
-    
-    
-    
-    
-    
     public static async Task<DailyBriefingData> FetchAsync(GameBiz biz, KrSdkAccount? gameAccount)
     {
         var result = new DailyBriefingData();
         string? oauthCode = KrSdkAccountService.GetOauthCode(biz, gameAccount);
         if (oauthCode is null)
         {
-            
+
             result.NoGameAccount = true;
             return result;
         }
@@ -152,7 +79,7 @@ public static class DailyBriefingPanel
         string region = gameAccount?.ServerName ?? "";
         if (playerId.Length == 0 || region.Length == 0)
         {
-            
+
             result.NoRole = true;
             return result;
         }
@@ -171,8 +98,6 @@ public static class DailyBriefingPanel
         return result;
     }
 
-
-    
     private static IEnumerable<BriefingItem> WuwaItems(KuroSdkBriefing data)
     {
         long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -180,7 +105,7 @@ public static class DailyBriefingPanel
         {
             Title = Lang.Instance.SignPage_Energy,
             ValueText = $"{data.Energy}/{data.MaxEnergy}",
-            
+
             StatusText = FullInText((data.EnergyRecoverMs - nowMs) / 1000),
             IconUrl = IconWuwaEnergy,
         };
@@ -205,8 +130,6 @@ public static class DailyBriefingPanel
         };
     }
 
-
-    
     private static IEnumerable<BriefingItem> PgrItems(KuroSdkBriefing data)
     {
         long nowSeconds = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -239,13 +162,9 @@ public static class DailyBriefingPanel
         };
     }
 
-
-    
     private static string FullInText(long leftSeconds)
         => leftSeconds > 0 ? string.Format(Lang.Instance.PgrData_FullIn, FormatDuration(leftSeconds)) : "";
 
-
-    
     public static async Task ShowAsync(FrameworkElement target, GameBiz biz, KrSdkAccount? gameAccount)
     {
         var panel = new StackPanel { MinWidth = 300, MaxWidth = 340, Spacing = 8 };
@@ -298,7 +217,6 @@ public static class DailyBriefingPanel
         FlyoutBase.SetAttachedFlyout(target, flyout);
         flyout.ShowAt(target);
 
-        
         var cached = GetCached(biz, gameAccount);
         if (cached is { IsSuccess: true })
         {
@@ -311,8 +229,6 @@ public static class DailyBriefingPanel
         }
     }
 
-
-    
     private static void FillBody(StackPanel body, DailyBriefingData data, out string? hint)
     {
         hint = null;
@@ -334,7 +250,6 @@ public static class DailyBriefingPanel
             return;
         }
 
-        
         var head = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         head.Children.Add(new TextBlock { Text = data.RoleName ?? "", FontSize = 14, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
         if (!string.IsNullOrWhiteSpace(data.ServerName))
@@ -365,8 +280,6 @@ public static class DailyBriefingPanel
         }
     }
 
-
-    
     private static Grid BuildRow(BriefingItem item)
     {
         var row = new Grid { ColumnSpacing = 10, Margin = new Thickness(0, 3, 0, 3) };
@@ -422,11 +335,6 @@ public static class DailyBriefingPanel
         return row;
     }
 
-
-    
-    
-    
-    
     private static ImageSource? LocalIconSource(string? url)
     {
         if (string.IsNullOrEmpty(url))
@@ -461,8 +369,6 @@ public static class DailyBriefingPanel
 
 }
 
-
-
 public sealed class BriefingItem
 {
     public string Title { get; init; } = "";
@@ -471,16 +377,12 @@ public sealed class BriefingItem
     public string? IconUrl { get; init; }
 }
 
-
-
 public sealed class DailyBriefingData
 {
     public bool IsSuccess { get; set; }
 
-    
     public bool NoGameAccount { get; set; }
 
-    
     public bool NoRole { get; set; }
 
     public string? Message { get; set; }

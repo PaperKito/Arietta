@@ -15,19 +15,11 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
 public sealed partial class PgrChallengePage : PageBase
 {
-    
+
     private string _mode = "cage";
 
-    
     private string _moduleTitle = "";
 
 
@@ -131,9 +123,7 @@ public sealed partial class PgrChallengePage : PageBase
             AddHint(Lang.Instance.PgrChallenge_NoArea);
             return;
         }
-        
 
-        
         if (data.PrisonerCage is null && data.FightHardZone is null)
         {
             AddHint(Lang.Instance.PgrChallenge_NoRecord);
@@ -154,11 +144,6 @@ public sealed partial class PgrChallengePage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private static string? CageAreaIconUrl(string? area) => area?.Trim() switch
     {
         "初级区" => "https://web-static.kurobbs.com/pns-box/assets/area-level1-2d36089f.png",
@@ -168,15 +153,10 @@ public sealed partial class PgrChallengePage : PageBase
         _ => null,
     };
 
-
-    
-    
-    
-    
     private FrameworkElement BuildCageHeader(KuroPgrCageInfo cage, string? area, string? level)
     {
         var left = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, VerticalAlignment = VerticalAlignment.Center };
-        
+
         var medal = new Image { Width = 34, Height = 45, VerticalAlignment = VerticalAlignment.Center };
         try
         {
@@ -205,7 +185,6 @@ public sealed partial class PgrChallengePage : PageBase
         }
         left.Children.Add(nameStack);
 
-        
         var right = new StackPanel { Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
         right.Children.Add(MakeStatLine(Lang.Instance.PgrCage_TotalPoint, string.Format("{0:N0}", cage.TotalPoint), 16));
         right.Children.Add(MakeStatLine(Lang.Instance.PgrWarArea_TotalTimesLabel, string.Format("{0:N0}", cage.TotalChallengeTimes), 16));
@@ -221,8 +200,6 @@ public sealed partial class PgrChallengePage : PageBase
         return KuroBbsUi.KuroCard(grid, padding: new Thickness(18, 14, 18, 14));
     }
 
-
-    
     private static StackPanel MakeStatLine(string label, string value, double valueFontSize, bool centerPanel = false, double spacing = 8, double labelFontSize = 13)
     {
         var line = centerPanel
@@ -246,8 +223,6 @@ public sealed partial class PgrChallengePage : PageBase
         return line;
     }
 
-
-    
     private static StackPanel MakeStatBlock(string label, string value, double valueFontSize,
         double labelFontSize = 12, HorizontalAlignment? panelHAlign = null, string? suffix = null)
     {
@@ -298,13 +273,9 @@ public sealed partial class PgrChallengePage : PageBase
         return block;
     }
 
-
-    
-    
-    
     private FrameworkElement BuildCageBossCard(KuroPgrCageBossFight boss)
     {
-        
+
         var artBrush = new ImageBrush { Stretch = Stretch.UniformToFill };
         try
         {
@@ -330,7 +301,7 @@ public sealed partial class PgrChallengePage : PageBase
             FontSize = 16,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
         });
-        
+
         var weakness = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, VerticalAlignment = VerticalAlignment.Center };
         foreach (var w in boss.Boss?.WeaknessList ?? [])
         {
@@ -353,13 +324,12 @@ public sealed partial class PgrChallengePage : PageBase
         Grid.SetColumn(nameStack, 0);
         info.Children.Add(nameStack);
 
-        
         var rightStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, VerticalAlignment = VerticalAlignment.Center };
         rightStack.Children.Add(MakeStatBlock(Lang.Instance.PgrCage_TotalPoint, boss.TotalPoint > 0 ? string.Format("{0:N0}", boss.TotalPoint) : "-", 17));
 
         var chevron = new FontIcon
         {
-            Glyph = "\uE70E", 
+            Glyph = "\uE70E",
             FontSize = 12,
             FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Segoe Fluent Icons"),
             Foreground = (Brush)Application.Current.Resources["AccentTextFillColorPrimaryBrush"],
@@ -397,7 +367,7 @@ public sealed partial class PgrChallengePage : PageBase
         var stages = boss.StageInfoList ?? [];
         if (stages.Count > 0)
         {
-            
+
             var stageList = new StackPanel { Spacing = 8, Margin = new Thickness(0, 0, 0, 12), Visibility = Visibility.Collapsed };
             foreach (var stage in stages)
             {
@@ -413,7 +383,7 @@ public sealed partial class PgrChallengePage : PageBase
             {
                 bool expand = stageList.Visibility == Visibility.Collapsed;
                 stageList.Visibility = expand ? Visibility.Visible : Visibility.Collapsed;
-                chevron.Glyph = expand ? "\uE70D" : "\uE70E"; 
+                chevron.Glyph = expand ? "\uE70D" : "\uE70E";
             };
         }
         else
@@ -435,13 +405,10 @@ public sealed partial class PgrChallengePage : PageBase
         return KuroBbsUi.KuroCard(root);
     }
 
-
-    
     private FrameworkElement BuildCageStageRow(KuroPgrCageStage stage, double badgeScale = 1.0)
     {
         var left = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, VerticalAlignment = VerticalAlignment.Center };
 
-        
         var avatars = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
         foreach (var body in stage.BodyList ?? [])
         {
@@ -503,7 +470,7 @@ public sealed partial class PgrChallengePage : PageBase
             AddHint(Lang.Instance.PgrChallenge_NotOpen);
             return;
         }
-        
+
         SetSubtitle("");
         StackPanel_Body.Children.Add(BuildWarAreaHeader(data));
 
@@ -519,11 +486,6 @@ public sealed partial class PgrChallengePage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private static readonly Dictionary<string, string[]> WarAreaElementKeys = new()
     {
         ["Lightning"] = ["雷", "镭", "电"],
@@ -552,8 +514,6 @@ public sealed partial class PgrChallengePage : PageBase
         return null;
     }
 
-
-    
     private FrameworkElement BuildWarAreaHeader(KuroPgrWarAreaData data)
     {
         var left = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 16, VerticalAlignment = VerticalAlignment.Center };
@@ -607,8 +567,6 @@ public sealed partial class PgrChallengePage : PageBase
         return KuroBbsUi.KuroCard(grid, padding: new Thickness(18, 14, 18, 14));
     }
 
-
-    
     private FrameworkElement BuildWarAreaStageCard(KuroPgrStageFightInfo stage)
     {
         var head = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12, VerticalAlignment = VerticalAlignment.Center };
@@ -642,7 +600,6 @@ public sealed partial class PgrChallengePage : PageBase
         }
         head.Children.Add(title);
 
-        
         var headGrid = new Grid();
         headGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         headGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -681,8 +638,6 @@ public sealed partial class PgrChallengePage : PageBase
         return KuroBbsUi.KuroCard(root, padding: new Thickness(16, 12, 16, 14));
     }
 
-
-    
     private FrameworkElement BuildWarAreaRow(KuroPgrStageFightInfo stage, KuroPgrBuffFightInfo buff)
     {
         var avatars = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, VerticalAlignment = VerticalAlignment.Center };
@@ -691,7 +646,7 @@ public sealed partial class PgrChallengePage : PageBase
             avatars.Children.Add(BuildWarAreaAvatar(body, 84));
         }
         var buffStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12, VerticalAlignment = VerticalAlignment.Center };
-        
+
         var elementKey = MatchWarAreaElementKey(buff.BuffName) ?? MatchWarAreaElementKey(stage.StageName);
         FrameworkElement buffIcon;
         if (elementKey is not null)
@@ -714,7 +669,7 @@ public sealed partial class PgrChallengePage : PageBase
         buffStack.Children.Add(buffIcon);
 
         var nameStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
-        
+
         var supportNames = (buff.SupportBuffList ?? [])
             .Select(s => s.Name)
             .Where(n => !string.IsNullOrEmpty(n))
@@ -729,7 +684,7 @@ public sealed partial class PgrChallengePage : PageBase
         buffStack.Children.Add(nameStack);
 
         var right = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Right };
-        
+
         var waves = buff.NpcGroup ?? stage.NpcGroup;
         if (waves is > 0)
         {
@@ -752,7 +707,6 @@ public sealed partial class PgrChallengePage : PageBase
         Grid.SetColumn(right, 2);
         grid.Children.Add(avatars);
 
-        
         if (avatars.Children.Count > 0)
         {
             var divider = KuroBbsUi.MakeDivider("DividerStrokeColorDefaultBrush", 44, new Thickness(14, 0, 14, 0), width: 1, verticalCenter: true);
@@ -763,18 +717,12 @@ public sealed partial class PgrChallengePage : PageBase
         grid.Children.Add(buffStack);
         grid.Children.Add(right);
 
-        
         return grid;
     }
 
-
-    
-    
     private FrameworkElement BuildWarAreaAvatar(KuroPgrWarAreaBodyEntry body, double size, double badgeScale = 1.0)
     {
-        
-        
-        
+
         var brush = new ImageBrush { Stretch = Stretch.UniformToFill };
         try
         {
@@ -803,7 +751,7 @@ public sealed partial class PgrChallengePage : PageBase
         var grade = body.Grade?.Trim();
         if (!string.IsNullOrEmpty(grade))
         {
-            
+
             root.Children.Add(KuroBbsUi.MakeCornerBadge(
                 grade,
                 11 * badgeScale,
@@ -841,7 +789,7 @@ public sealed partial class PgrChallengePage : PageBase
             AddHint(Lang.Instance.PgrChallenge_NotOpen);
             return;
         }
-        
+
         SetSubtitle("");
 
         StackPanel_Body.Children.Add(BuildTransfiniteHeader(data));
@@ -855,11 +803,6 @@ public sealed partial class PgrChallengePage : PageBase
         StackPanel_Body.Children.Add(BuildTransfiniteTeam(characters));
     }
 
-
-    
-    
-    
-    
     private FrameworkElement BuildTransfiniteHeader(KuroPgrTransfiniteData data)
     {
         var left = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, VerticalAlignment = VerticalAlignment.Center };
@@ -889,8 +832,6 @@ public sealed partial class PgrChallengePage : PageBase
         }
         left.Children.Add(nameStack);
 
-        
-        
         var right = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 18, VerticalAlignment = VerticalAlignment.Center };
         var pair = new StackPanel { Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
         pair.Children.Add(MakeStatLine(Lang.Instance.PgrTransfinite_MaxProgress, string.Format("{0} / 14", data.Process), 16));
@@ -901,13 +842,13 @@ public sealed partial class PgrChallengePage : PageBase
                 ? string.Format("{0:d1\\.hh\\:mm\\:ss}", ts)
                 : string.Format("{0:m\\:ss}", ts);
             var timeLine = MakeStatLine(Lang.Instance.PgrTransfinite_TimeCost, text, 16);
-            
+
             ((TextBlock)timeLine.Children[1]).Foreground =
                 (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"];
             pair.Children.Add(timeLine);
         }
         right.Children.Add(pair);
-        
+
         right.Children.Add(MakeStatBlock(Lang.Instance.PgrTransfinite_OperatorLabel, string.Format("{0:N0}", data.OperatorCount), 18, labelFontSize: 13, suffix: " / 1500"));
 
         var grid = new Grid();
@@ -921,11 +862,6 @@ public sealed partial class PgrChallengePage : PageBase
         return KuroBbsUi.KuroCard(grid, padding: new Thickness(18, 14, 18, 14));
     }
 
-
-    
-    
-    
-    
     private FrameworkElement BuildTransfiniteTeam(List<KuroPgrCharacter> characters)
     {
         var root = new StackPanel { Spacing = 8, Margin = new Thickness(0, 4, 0, 0) };
@@ -940,8 +876,7 @@ public sealed partial class PgrChallengePage : PageBase
         foreach (var c in characters)
         {
             const double size = 132;
-            
-            
+
             var brush = new ImageBrush { Stretch = Stretch.UniformToFill };
             try
             {
@@ -970,7 +905,7 @@ public sealed partial class PgrChallengePage : PageBase
 
             if (!string.IsNullOrEmpty(c.Grade))
             {
-                
+
                 cell.Children.Add(KuroBbsUi.MakeCornerBadge(
                     c.Grade!,
                     13,
@@ -1010,8 +945,6 @@ public sealed partial class PgrChallengePage : PageBase
         });
     }
 
-
-    
     private void AddSection(string title, JsonElement element)
     {
         if (element.ValueKind != JsonValueKind.Object)

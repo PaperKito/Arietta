@@ -6,16 +6,7 @@ using System.Collections.Generic;
 
 namespace Arietta.Features.Sync;
 
-
 internal sealed record MergeResult(bool Success, string Message, int RowsAdded, int SettingInserted, IReadOnlyList<string> ConflictingKeys);
-
-
-
-
-
-
-
-
 
 internal static class DatabaseMergeService
 {
@@ -28,11 +19,6 @@ internal static class DatabaseMergeService
     private static readonly string[] GachaLogItemColumns =
         ["PlayerId", "CardPoolType", "ResourceId", "QualityLevel", "ResourceType", "Name", "Count", "Time", "SubSeq"];
 
-
-    
-    
-    
-    
     public static MergeResult MergeFromFile(string remoteDatabaseFile, SyncPreference preference = SyncPreference.LocalFirst)
     {
         using var connection = DatabaseService.CreateConnection();
@@ -44,17 +30,15 @@ internal static class DatabaseMergeService
 
             using (var transaction = connection.BeginTransaction())
             {
-                
+
                 MergeAppendOnly(connection, transaction, DatabaseSchema.Tables.PlayTimeItem, PlayTimeItemColumns);
                 MergeAppendOnly(connection, transaction, DatabaseSchema.Tables.PlayTimeStats, PlayTimeStatsColumns);
                 MergeAppendOnly(connection, transaction, DatabaseSchema.Tables.GachaLogItem, GachaLogItemColumns);
 
-                
                 MergeResourceRecord(connection, transaction);
                 MergeCombatRecord(connection, transaction);
                 MergeTowerFloorRecord(connection, transaction);
 
-                
                 settingInserted = MergeSetting(connection, transaction, preference);
 
                 transaction.Commit();
@@ -87,7 +71,7 @@ internal static class DatabaseMergeService
     {
         if (!RemoteTableExists(connection, table))
         {
-            
+
             return;
         }
         string columnList = string.Join(", ", columns);
@@ -96,15 +80,6 @@ internal static class DatabaseMergeService
             transaction: transaction);
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     private static void MergeResourceRecord(SqliteConnection connection, SqliteTransaction transaction)
     {
         string table = DatabaseSchema.Tables.ResourceRecord;
@@ -124,12 +99,6 @@ internal static class DatabaseMergeService
             """, transaction: transaction);
     }
 
-
-    
-    
-    
-    
-    
     private static void MergeCombatRecord(SqliteConnection connection, SqliteTransaction transaction)
     {
         string table = DatabaseSchema.Tables.CombatRecord;
@@ -152,12 +121,6 @@ internal static class DatabaseMergeService
             """, transaction: transaction);
     }
 
-
-    
-    
-    
-    
-    
     private static void MergeTowerFloorRecord(SqliteConnection connection, SqliteTransaction transaction)
     {
         string table = DatabaseSchema.Tables.TowerFloorRecord;
@@ -186,15 +149,11 @@ internal static class DatabaseMergeService
             return 0;
         }
 
-        
         int inserted = connection.Execute("""
             INSERT OR IGNORE INTO main.Setting (Key, Value, UpdateTime)
             SELECT r.Key, r.Value, r.UpdateTime FROM remote.Setting r;
             """, transaction: transaction);
 
-        
-        
-        
         int updated = 0;
         if (preference == SyncPreference.RemoteFirst)
         {

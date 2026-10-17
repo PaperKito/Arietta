@@ -9,89 +9,42 @@ using Arietta.Helpers;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
 public sealed class KuroBbsAccount
 {
-    
+
     public string Token { get; set; } = "";
 
-    
-    
-    
-    
-    
-    
-    
     public string Phone { get; set; } = "";
 
-    
     public string Did { get; set; } = "";
 
-    
     public string UserId { get; set; } = "";
 
-    
     public string RoleId { get; set; } = "";
 
-    
     public string ServerId { get; set; } = "";
 
-    
     public string PgrRoleId { get; set; } = "";
 
-    
     public string PgrServerId { get; set; } = "";
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public bool? HasPgrRole { get; set; }
 
-    
-    
-    
-    
-    
     [System.Text.Json.Serialization.JsonIgnore]
     public DateTimeOffset PgrRoleCheckedAt { get; set; }
 
-    
     public string PgrRoleName { get; set; } = "";
 
-    
     public int PgrLevel { get; set; }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public string PgrAvatarUrl { get; set; } = "";
 
-    
     public string RoleName { get; set; } = "";
 
-    
     public string AvatarUrl { get; set; } = "";
 
-    
     public string KuroAvatarUrl { get; set; } = "";
 
-    
     public int Level { get; set; }
 
     public bool IsValid => !string.IsNullOrWhiteSpace(Token)
@@ -100,47 +53,26 @@ public sealed class KuroBbsAccount
         && !string.IsNullOrWhiteSpace(RoleId);
 }
 
-
-
-
-
 public static class KuroBbsAccountStore
 {
     private const string KeyAccounts = "KuroBbs_Accounts";
 
-    
     private const string KeyCurrent = "KuroBbs_Current";
 
-    
-    
-    
-    
-    
-    
-    
-    
     private const string KeyCurrentPgr = "KuroBbs_Current_Pgr";
 
     private static readonly Microsoft.Extensions.Logging.ILogger Log = AppConfig.GetLogger("KuroBbsAccountStore");
 
-    
-    
-    
-    
     private static readonly TimeSpan PgrRoleRecheckInterval = TimeSpan.FromMinutes(10);
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = false };
 
     private static List<KuroBbsAccount> _accounts = [];
 
-    
     private static int _currentIndex;
 
-    
     private static int _pgrIndex;
 
-
-    
     public static IReadOnlyList<KuroBbsAccount> Accounts
     {
         get
@@ -150,7 +82,6 @@ public static class KuroBbsAccountStore
         }
     }
 
-    
     public static int CurrentIndex
     {
         get
@@ -160,29 +91,18 @@ public static class KuroBbsAccountStore
         }
     }
 
-    
     public static int GetIndex(bool pgr)
     {
         EnsureLoaded();
         return Math.Clamp(pgr ? _pgrIndex : _currentIndex, 0, Math.Max(_accounts.Count - 1, 0));
     }
 
-    
     public static KuroBbsAccount? Load()
     {
         EnsureLoaded();
         return _accounts.Count == 0 ? null : _accounts[Math.Clamp(_currentIndex, 0, _accounts.Count - 1)];
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static KuroBbsAccount? Load(bool pgr)
     {
         EnsureLoaded();
@@ -210,8 +130,6 @@ public static class KuroBbsAccountStore
         SwitchTo(index, pgr: false);
     }
 
-
-    
     public static void SwitchTo(int index, bool pgr)
     {
         EnsureLoaded();
@@ -230,28 +148,19 @@ public static class KuroBbsAccountStore
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     public static void AddOrUpdate(KuroBbsAccount account, bool setCurrent = true)
     {
         EnsureLoaded();
         var existing = _accounts.FindIndex(a => SameAccount(a, account));
         if (existing < 0)
         {
-            
+
             existing = _accounts.FindIndex(a => a.Token == account.Token
                 && (string.IsNullOrEmpty(a.RoleId) || string.IsNullOrEmpty(account.RoleId)));
         }
         if (existing >= 0)
         {
-            
+
             if (string.IsNullOrEmpty(account.Phone))
             {
                 account.Phone = _accounts[existing].Phone;
@@ -285,32 +194,11 @@ public static class KuroBbsAccountStore
             || string.IsNullOrEmpty(a.RoleId) || string.IsNullOrEmpty(b.RoleId);
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static async Task<bool> EnsurePgrRoleAsync(KuroBbsAccount account)
     {
         if (!string.IsNullOrEmpty(account.PgrRoleId))
         {
-            
+
             if (account.HasPgrRole != true)
             {
                 account.HasPgrRole = true;
@@ -322,7 +210,7 @@ public static class KuroBbsAccountStore
         {
             return false;
         }
-        
+
         if (account.HasPgrRole == false
             && DateTimeOffset.UtcNow - account.PgrRoleCheckedAt < PgrRoleRecheckInterval)
         {
@@ -341,12 +229,11 @@ public static class KuroBbsAccountStore
             account.PgrRoleName = role.RoleName;
             account.PgrLevel = role.Level;
             account.HasPgrRole = true;
-            
-            
+
             AddOrUpdate(account, setCurrent: false);
             return true;
         }
-        
+
         if (roles is { IsSuccess: true })
         {
             account.HasPgrRole = false;
@@ -356,15 +243,6 @@ public static class KuroBbsAccountStore
         return false;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     public static async Task EnsurePgrRolesAsync()
     {
         EnsureLoaded();
@@ -376,7 +254,7 @@ public static class KuroBbsAccountStore
             }
             catch
             {
-                
+
             }
         }
     }
@@ -390,13 +268,12 @@ public static class KuroBbsAccountStore
             return;
         }
         _accounts.RemoveAt(index);
-        
+
         _currentIndex = FixIndexAfterRemove(_currentIndex, index);
         _pgrIndex = FixIndexAfterRemove(_pgrIndex, index);
         Persist();
     }
 
-    
     private static int FixIndexAfterRemove(int currentIndex, int removedIndex)
     {
         if (currentIndex > removedIndex)
@@ -406,7 +283,6 @@ public static class KuroBbsAccountStore
         return Math.Min(currentIndex, Math.Max(_accounts.Count - 1, 0));
     }
 
-    
     public static void Clear()
     {
         _accounts = [];
@@ -446,14 +322,14 @@ public static class KuroBbsAccountStore
             if (!string.IsNullOrEmpty(json))
             {
                 _accounts = JsonSerializer.Deserialize<List<KuroBbsAccount>>(json) ?? [];
-                
+
                 _accounts = _accounts
                     .GroupBy(a => $"{a.Token}|{a.RoleId}", StringComparer.OrdinalIgnoreCase)
                     .Select(g => g.First())
                     .ToList();
             }
             _ = int.TryParse(AppConfig.GetConfig(KeyCurrent), out _currentIndex);
-            
+
             _pgrIndex = _currentIndex;
             _ = int.TryParse(AppConfig.GetConfig(KeyCurrentPgr), out _pgrIndex);
         }

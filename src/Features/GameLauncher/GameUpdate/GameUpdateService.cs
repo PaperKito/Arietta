@@ -16,33 +16,14 @@ using Arietta.Core;
 
 namespace Arietta.Features.GameLauncher.GameUpdate;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class GameUpdateService
 {
-    
-    
-    
-    
-    
-    
+
     private sealed record BizApi(string GameId, string AppIdKey, string? TierIndexKey = null);
 
     private static readonly Dictionary<GameBiz, BizApi> Configs = new()
     {
-        
-        
+
         [GameBiz.WutheringWaves] = new("G152", "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5",
             "10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ"),
         [GameBiz.WutheringWavesBilibili] = new("G152", "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y",
@@ -50,18 +31,13 @@ public static class GameUpdateService
         [GameBiz.WutheringWavesGlobal] = new("G153", "50004_obOHXFrFanqsaIEOmuKroCcbZkQRBC7c",
             "50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e"),
         [GameBiz.PunishingGrayRaven] = new("G148", "10012_RnIUKs3r59Csliu3N0rl5uRWWBOFDaJL"),
-        
-        
+
         [GameBiz.PunishingGrayRavenGlobal] = new("G143", "50015_LWdk9D2Ep9mpJmqBZZkcPBU2YNraEWBQ"),
         [GameBiz.PunishingGrayRavenJapan] = new("G282", "50007_NxWGZ0d254oWqZKuuL6szOK7WRLPt668"),
         [GameBiz.PunishingGrayRavenKorea] = new("G286", "50011_XefwDdpgPxxLABoTOD0yuqTFBC3koJZ0"),
         [GameBiz.PunishingGrayRavenTaiwan] = new("G279", "50016_i2n5NLmdCAmOGP3J1tJOlWKNSMQuyWL7"),
     };
 
-    
-    
-    
-    
     private static readonly string[] IndexBases =
     [
         "https://prod-cn-alicdn-gamestarter.kurogame.com",
@@ -71,15 +47,10 @@ public static class GameUpdateService
 
     private static readonly HttpClient Client = SharedHttp.GameUpdateJson;
 
-    
-    
-    
-    
     private static readonly HttpClient DownloadClient = SharedHttp.GameUpdateDownload;
 
     private static readonly ILogger _logger = AppConfig.GetLogger<LogTag>();
 
-    
     private sealed class LogTag;
 
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
@@ -91,14 +62,13 @@ public static class GameUpdateService
 
     #region 索引获取
 
-    
     public static async Task<GameUpdateIndex?> GetIndexAsync(GameBiz biz, CancellationToken ct = default)
     {
         if (_cache.TryGetValue(biz, out var cached) && DateTimeOffset.Now - cached.Time < CacheLifetime)
         {
             return cached.Index;
         }
-        
+
         if (!Configs.TryGetValue(biz, out var cfg) && !Configs.TryGetValue(biz.GetBaseBiz(), out cfg))
         {
             return null;
@@ -113,7 +83,7 @@ public static class GameUpdateService
                 {
                     continue;
                 }
-                
+
                 await using var stream = await resp.Content.ReadAsStreamAsync(ct);
                 var index = await System.Text.Json.JsonSerializer.DeserializeAsync<GameUpdateIndex>(stream, JsonOptions, ct);
                 if (index?.Default?.Version is null)
@@ -137,14 +107,6 @@ public static class GameUpdateService
 
     private static readonly Dictionary<GameBiz, (GameUpdateIndex Index, DateTimeOffset Time)> _tierCache = new();
 
-    
-    
-    
-    
-    
-    
-    
-    
     public static async Task<GameUpdateIndex?> GetTierIndexAsync(GameBiz biz, CancellationToken ct = default)
     {
         if (_tierCache.TryGetValue(biz, out var cached) && DateTimeOffset.Now - cached.Time < CacheLifetime)
@@ -172,12 +134,12 @@ public static class GameUpdateService
                     {
                         continue;
                     }
-                    
+
                     await using var stream = await resp.Content.ReadAsStreamAsync(ct);
                     var index = await System.Text.Json.JsonSerializer.DeserializeAsync<GameUpdateIndex>(stream, JsonOptions, ct);
                     if (index?.ResourcePacks is not { Count: > 0 } || index.Bundles is not { Count: > 0 })
                     {
-                        
+
                         _logger.LogInformation("分档索引 {Url}：200 但无 resourcePacks/bundles（旧格式内容）", url);
                         continue;
                     }
@@ -196,7 +158,7 @@ public static class GameUpdateService
                 }
             }
         }
-        
+
         _logger.LogInformation("分档索引 {Biz}：所有探测点均无分档内容，按无分档处理", biz);
         return null;
     }
@@ -206,27 +168,18 @@ public static class GameUpdateService
 
     #region 本地版本
 
-    
     public static string? GetGameDir(GameBiz biz)
     {
         string? exe = GameRegistry.GetConfiguredExePath(biz);
         return Path.GetDirectoryName(string.IsNullOrWhiteSpace(exe) ? null : exe);
     }
 
-    
-    
-    
-    
     public static string? GetPersistedInstallDir(GameBiz biz)
     {
         string? dir = AppConfig.GetConfig(GameRegistry.GetInstallDirConfigKey(biz));
         return string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir) ? null : dir;
     }
 
-    
-    
-    
-    
     public static bool HasResumableInstall(GameBiz biz)
     {
         string? dir = GetPersistedInstallDir(biz);
@@ -234,7 +187,6 @@ public static class GameUpdateService
         return Directory.Exists(root) && Directory.EnumerateDirectories(root).Any();
     }
 
-    
     public static string? GetLocalVersion(GameBiz biz)
     {
         string? dir = GetGameDir(biz);
@@ -253,7 +205,7 @@ public static class GameUpdateService
                     return parsed.Version;
                 }
             }
-            
+
             string versionFile = Path.Combine(dir, "version.json");
             if (File.Exists(versionFile))
             {
@@ -272,7 +224,6 @@ public static class GameUpdateService
         return null;
     }
 
-    
     private static void WriteLocalVersion(GameBiz biz, string version)
     {
         string? dir = GetGameDir(biz);
@@ -283,7 +234,6 @@ public static class GameUpdateService
         WriteLocalVersion(dir, version);
     }
 
-    
     private static void WriteLocalVersion(string dir, string version)
     {
         try
@@ -308,13 +258,12 @@ public static class GameUpdateService
 
     #region 更新状态
 
-    
     public enum UpdateKind
     {
         None,
-        
+
         Update,
-        
+
         Predownload,
     }
 
@@ -322,43 +271,31 @@ public static class GameUpdateService
     {
         public UpdateKind Kind { get; init; }
 
-        
         public string? LocalVersion { get; init; }
 
-        
         public string? TargetVersion { get; init; }
 
-        
         public GameVersionNode? Target { get; init; }
 
-        
         public string? Changelog { get; init; }
 
-        
         public List<GameResourceEntry>? Plan { get; init; }
 
-        
         public DownloadPlan? PlanInfo { get; init; }
 
-        
         public long TotalBytes { get; init; }
 
-        
         public int PredownloadedCount { get; init; }
 
-        
         public long PredownloadedBytes { get; init; }
 
-        
         public bool HasStagedProgress { get; init; }
 
-        
         public long RequiredDiskSpace { get; init; }
 
         public bool HasUpdate => Kind != UpdateKind.None;
     }
 
-    
     public static int CompareVersion(string? a, string? b)
     {
         if (a == b)
@@ -392,16 +329,9 @@ public static class GameUpdateService
         }
     }
 
-    
-    
-    
-    
     public static async Task<GameUpdateState> GetStateAsync(GameBiz biz)
     {
-        
-        
-        
-        
+
         if (GetGameDir(biz) is null)
         {
             return new GameUpdateState { Kind = UpdateKind.None, LocalVersion = null };
@@ -410,7 +340,7 @@ public static class GameUpdateService
         string? local = GetLocalVersion(biz);
         if (local is not null)
         {
-            
+
             _ = Task.Run(() => CleanOrphanStaging(biz, local));
         }
         if (index?.Default is not { } latest)
@@ -418,17 +348,14 @@ public static class GameUpdateService
             return new GameUpdateState { Kind = UpdateKind.None, LocalVersion = local };
         }
 
-        
-        
         bool localIsLatest = CompareVersion(latest.Version, local) <= 0;
 
-        
         var pre = index.Predownload;
         if (localIsLatest && index.PredownloadSwitch == 1 && pre != null && CompareVersion(pre.Version, local) > 0)
         {
             var plan = await BuildPlanAsync(biz, pre, local);
             var staged = plan is null ? (0, 0L) : await CountStagedAsync(biz, pre.Version!, plan.StagedFiles);
-            
+
             long partBytes = GetStagedPartBytes(biz, pre.Version!);
             return new GameUpdateState
             {
@@ -481,7 +408,6 @@ public static class GameUpdateService
             ?? node.Changelog.Values.FirstOrDefault();
     }
 
-    
     private static async Task<DownloadPlan?> BuildPlanAsync(GameBiz biz, GameVersionNode target, string? localVersion)
     {
         string? manifestPath;
@@ -489,12 +415,7 @@ public static class GameUpdateService
         long total;
 
         var patch = target.Config?.PatchConfig?.FirstOrDefault(p => p.Version == localVersion);
-        
-        
-        
-        
-        
-        
+
         baseUrl = target.Config?.BaseUrl ?? "";
         if (patch?.IndexFile != null)
         {
@@ -512,15 +433,11 @@ public static class GameUpdateService
         {
             return null;
         }
-        
-        
-        
+
         var packageDests = list.ZipInfos is { Count: > 0 }
             ? list.ZipInfos.Select(z => z.Dest).Where(d => !string.IsNullOrWhiteSpace(d)).ToHashSet(StringComparer.OrdinalIgnoreCase)
             : [];
-        
-        
-        
+
         var krdiffDests = list.GroupInfos is { Count: > 0 }
             ? list.GroupInfos.Select(g => g.Dest).Where(d => !string.IsNullOrWhiteSpace(d)).ToHashSet(StringComparer.OrdinalIgnoreCase)
             : [];
@@ -534,25 +451,21 @@ public static class GameUpdateService
         {
             total = files.Sum(f => f.Size) + (patchFiles?.Sum(f => f.Size) ?? 0);
         }
-        
+
         string? zipBaseUrl = patch?.BaseUrl;
-        
-        
+
         long requiredDiskSpace = patch?.Ext?.RequiredDiskSpace ?? 0;
         return new DownloadPlan(files, baseUrl, total, zipBaseUrl, list.ZipInfos, target.Version,
             list.GroupInfos is { Count: > 0 } ? list.GroupInfos : null, patchFiles, requiredDiskSpace);
     }
 
-    
     internal static string BuildFileUrl(string cdn, string baseUrl, string dest)
     {
         return $"{cdn}{baseUrl}{dest}";
     }
 
-    
     internal static HttpClient SharedClient => DownloadClient;
 
-    
     private static async Task<string> GetDownloadCdnAsync(GameBiz biz)
     {
         var index = await GetIndexAsync(biz);
@@ -577,23 +490,6 @@ public static class GameUpdateService
         return IndexBases[0] + "/";
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public sealed record DownloadPlan(
         List<GameResourceEntry> Files,
         string BaseUrl,
@@ -607,36 +503,23 @@ public static class GameUpdateService
     {
         public bool HasZipPackages => ZipPackages is { Count: > 0 };
 
-        
         public bool HasKrdiffGroups => KrdiffGroups is { Count: > 0 };
 
-        
         public List<GameResourceEntry> ZipEntries =>
             ZipPackages is null ? [] : ZipPackages.SelectMany(z => z.Entries ?? []).ToList();
 
-        
         public List<GameResourceEntry> PatchFiles => KrdiffFiles ?? [];
 
-        
         public List<GameResourceEntry> DirectFiles => [.. Files, .. PatchFiles];
 
-        
         public List<GameResourceEntry> StagedFiles => [.. DirectFiles, .. ZipEntries];
 
-        
-        
         public List<GameResourceEntry> AllFiles => [.. Files, .. ZipEntries];
 
-        
         public List<GameResourceEntry> KrdiffDstFiles =>
             HasKrdiffGroups ? [.. KrdiffGroups!.SelectMany(g => g.DstFiles ?? [])] : [];
     }
 
-    
-    
-    
-    
-    
     internal static async Task<GameResourceList?> FetchResourceListAsync(GameBiz biz, string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -667,7 +550,7 @@ public static class GameUpdateService
                 {
                     continue;
                 }
-                
+
                 byte[] bytes = await resp.Content.ReadAsByteArrayAsync();
                 if (bytes.Length > 2 && bytes[0] == 0x1F && bytes[1] == 0x8B)
                 {
@@ -696,15 +579,8 @@ public static class GameUpdateService
 
     #region 预下载暂存与应用更新
 
-    
     private delegate void ReportFileProgress(int done, int total, long doneBytes = -1, bool force = false);
 
-    
-    
-    
-    
-    
-    
     private static ReportFileProgress MakeThrottledReporter(
         IProgress<GameDownloadProgress>? progress, long totalBytes, DownloadPhase phase)
     {
@@ -742,13 +618,6 @@ public static class GameUpdateService
         };
     }
 
-    
-    
-    
-    
-    
-    
-    
     public static string GetStagingDir(GameBiz biz, string version)
     {
         string? dir = GetGameDir(biz)
@@ -756,14 +625,6 @@ public static class GameUpdateService
         return Path.Combine(dir, "predownload", version);
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     private static long GetStagedPartBytes(GameBiz biz, string version)
     {
         try
@@ -802,7 +663,7 @@ public static class GameUpdateService
                 }
                 catch
                 {
-                    
+
                 }
             }
             return total;
@@ -813,47 +674,28 @@ public static class GameUpdateService
         }
     }
 
-
-    
     public const string UseHardLinkConfigKey = "GameUpdateUseHardLink";
 
-
-    
     private static bool UseHardLink => AppConfig.GetConfig(UseHardLinkConfigKey) == "1";
 
-    
     public const string SpeedLimitConfigKey = "GameUpdateDownloadSpeedLimitMBps";
 
-    
     internal static long DownloadSpeedLimitBytesPerSec =>
         long.TryParse(AppConfig.GetConfig(SpeedLimitConfigKey), out long mb) && mb > 0
             ? mb * 1024 * 1024
             : 0;
 
-    
     public const string DownloadThreadsConfigKey = "GameUpdateDownloadThreads";
 
-    
-    
-    
-    
     public const int DownloadThreadsMin = 1;
     public const int DownloadThreadsMax = 16;
     public const int DownloadThreadsDefault = 16;
 
-    
-    
-    
-    
     internal static int DownloadThreads =>
         int.TryParse(AppConfig.GetConfig(DownloadThreadsConfigKey), out int value)
             ? Math.Clamp(value, DownloadThreadsMin, DownloadThreadsMax)
             : DownloadThreadsDefault;
 
-    
-    
-    
-    
     public static async Task<long> PredownloadAsync(
         GameBiz biz, GameUpdateState state, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
@@ -870,14 +712,6 @@ public static class GameUpdateService
         return await PrepareStagingAsync(biz, plan, stageDir, GetGameDir(biz), progress, ct);
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     private static async Task<long> PrepareStagingAsync(
         GameBiz biz, DownloadPlan plan, string stageDir, string? gameDir,
         IProgress<GameDownloadProgress>? progress, CancellationToken ct)
@@ -885,13 +719,8 @@ public static class GameUpdateService
         string cdn = await GetDownloadCdnAsync(biz);
         long downloaded = 0;
 
-        
-        
-        
         var reportVerifying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Verifying);
 
-        
-        
         var directFiles = plan.DirectFiles;
         _logger.LogInformation("PrepareStaging: 开始校验暂存区 {Count} 个文件 {Dir}", directFiles.Count, stageDir);
         var todo = await Task.Run(() => FilterOutdated(stageDir, directFiles,
@@ -899,7 +728,6 @@ public static class GameUpdateService
         reportVerifying(directFiles.Count, directFiles.Count, force: true);
         _logger.LogInformation("PrepareStaging: 待下载 {Todo}/{Total}", todo.Count, directFiles.Count);
 
-        
         if (todo.Count > 0)
         {
             var linked = await Task.Run(() => TryHardLinkFromSiblings(biz, todo, stageDir,
@@ -914,22 +742,19 @@ public static class GameUpdateService
 
         if (todo.Count > 0)
         {
-            
-            
+
             long remainingTotal = todo.Sum(f => f.Size);
             var downloader = new GameUpdateDownloader(cdn, plan.BaseUrl, stageDir, todo, 0, remainingTotal, plan.ZipBaseUrl);
             downloaded += await downloader.DownloadAsync(progress, ct);
         }
 
-        
         if (plan.HasZipPackages)
         {
             var entries = plan.ZipEntries;
-            
+
             await Task.Run(() => TryHardLinkFromSiblings(biz, entries, stageDir,
                 (done, total) => reportVerifying(done, total), ct), ct);
-            
-            
+
             _logger.LogInformation("PrepareStaging: 校验 {Count} 个分包内文件是否就位", entries.Count);
             bool allThere = await Task.Run(() => AllPresent(stageDir, gameDir, entries,
                 (done, total) => reportVerifying(done, total), ct), ct);
@@ -942,17 +767,6 @@ public static class GameUpdateService
         return downloaded;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static List<GameResourceEntry> TryHardLinkFromSiblings(
         GameBiz biz, List<GameResourceEntry> files, string stageDir, Action<int, int>? onChecked = null, CancellationToken ct = default)
     {
@@ -978,7 +792,7 @@ public static class GameUpdateService
                     try
                     {
                         string candidate = Path.Combine(src, file.Dest);
-                        
+
                         if (!File.Exists(candidate) || new FileInfo(candidate).Length != file.Size
                             || !GameUpdateDownloader.VerifyMd5(candidate, file.Md5, ct))
                         {
@@ -1006,24 +820,8 @@ public static class GameUpdateService
         return linked;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static readonly ConcurrentDictionary<string, long> HardLinkEstimateCache = new();
 
-    
     private static readonly object _verifiedLock = new();
     private static Dictionary<string, HashSet<string>>? _verifiedDests;
     private static string HardLinkCacheFile => Path.Combine(AppConfig.LocalFolder, "hardlink-estimate.json");
@@ -1047,7 +845,7 @@ public static class GameUpdateService
         }
         long linked = 0;
         int done = 0;
-        
+
         var verified = GetVerifiedDests(cacheKey);
         foreach (var file in plan.Files)
         {
@@ -1057,7 +855,7 @@ public static class GameUpdateService
                 linked += file.Size;
                 onRefined?.Report(linked);
             }
-            
+
             if (++done % 64 == 0)
             {
                 MergeVerifiedDests(cacheKey, verified);
@@ -1083,7 +881,6 @@ public static class GameUpdateService
         return linked;
     }
 
-    
     private static bool IsLinkable(List<string> sources, GameResourceEntry file, HashSet<string> verified, CancellationToken ct = default)
     {
         string? candidate = FindSizeMatchSource(sources, file);
@@ -1091,7 +888,7 @@ public static class GameUpdateService
         {
             return false;
         }
-        
+
         if (!verified.Contains(file.Dest) && !GameUpdateDownloader.VerifyMd5(candidate, file.Md5, ct))
         {
             return false;
@@ -1100,7 +897,6 @@ public static class GameUpdateService
         return true;
     }
 
-    
     private static HashSet<string> GetVerifiedDests(string cacheKey)
     {
         lock (_verifiedLock)
@@ -1127,7 +923,6 @@ public static class GameUpdateService
         }
     }
 
-    
     private static void MergeVerifiedDests(string cacheKey, HashSet<string> verified)
     {
         lock (_verifiedLock)
@@ -1150,7 +945,6 @@ public static class GameUpdateService
         }
     }
 
-    
     private static List<string> CollectSiblingSources(GameBiz biz, string? selfDir, string? selfRoot)
     {
         var sources = new List<string>();
@@ -1177,7 +971,6 @@ public static class GameUpdateService
         return sources;
     }
 
-    
     private static string? FindSizeMatchSource(List<string> sources, GameResourceEntry file)
     {
         foreach (string src in sources)
@@ -1192,21 +985,12 @@ public static class GameUpdateService
             }
             catch
             {
-                
+
             }
         }
         return null;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     private static async Task<long> DownloadAndExtractPackagesAsync(
         GameBiz biz, DownloadPlan plan, string stageDir, string cdn,
         IProgress<GameDownloadProgress>? progress, CancellationToken ct)
@@ -1226,7 +1010,7 @@ public static class GameUpdateService
             string path = Path.Combine(stageDir, info.Dest);
             if (File.Exists(path))
             {
-                
+
                 if (GameUpdateDownloader.FileLengthMatches(path, size))
                 {
                     alreadyOnDisk += size;
@@ -1239,13 +1023,10 @@ public static class GameUpdateService
             packages.Add(new GameResourceEntry { Dest = info.Dest, Size = size });
         }
 
-        
         long zipTotal = packages.Sum(p => p.Size);
         var downloader = new GameUpdateDownloader(cdn, zipBase, stageDir, packages, alreadyOnDisk, zipTotal);
         long downloaded = await downloader.DownloadAsync(progress, ct);
 
-        
-        
         var reportApplying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Applying);
 
         int zipEntryTotal = plan.ZipPackages!.Sum(z => z.Entries?.Count ?? 0);
@@ -1253,7 +1034,6 @@ public static class GameUpdateService
         await Task.Run(() => ExtractPackages(stageDir, plan.ZipPackages!,
             (done, total, bytes) => reportApplying(done, total, bytes), ct), ct);
 
-        
         foreach (var info in plan.ZipPackages!)
         {
             try
@@ -1268,14 +1048,6 @@ public static class GameUpdateService
         return downloaded;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     private static void ExtractPackages(string stageDir, List<GameResourceZipInfo> packages, Action<int, int, long>? onProgress = null, CancellationToken ct = default)
     {
         int total = packages.Sum(p => p.Entries?.Count ?? 0);
@@ -1316,15 +1088,12 @@ public static class GameUpdateService
                         string.Format(Localization.Lang.Instance.GameUpdate_ErrFileChecksum, entry.Dest));
                 }
                 done++;
-                bytes += zipEntry.Length;   
+                bytes += zipEntry.Length;
                 onProgress?.Invoke(done, total, bytes);
             }
         }
     }
 
-
-    
-    
     private static bool AllPresent(string stageDir, string? gameDir, List<GameResourceEntry> files, Action<int, int>? onChecked = null, CancellationToken ct = default)
     {
         int done = 0;
@@ -1345,8 +1114,6 @@ public static class GameUpdateService
         return true;
     }
 
-
-    
     private static async Task<long> GetRemoteFileSizeAsync(string cdn, string baseUrl, string dest, CancellationToken ct)
     {
         string url = BuildFileUrl(cdn, baseUrl, dest);
@@ -1375,18 +1142,13 @@ public static class GameUpdateService
         return rangeResp.Content.Headers.ContentRange?.Length ?? 0;
     }
 
-
-    
-    
-    
     private static List<GameResourceEntry> FilterOutdated(string dir, List<GameResourceEntry> files, Action<int, int>? onChecked = null, CancellationToken ct = default)
     {
         var todo = new List<GameResourceEntry>();
         int done = 0;
         foreach (var f in files)
         {
-            
-            
+
             ct.ThrowIfCancellationRequested();
             if (!VerifyFile(Path.Combine(dir, f.Dest), f, ct))
             {
@@ -1397,17 +1159,6 @@ public static class GameUpdateService
         return todo;
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static async Task<(int Count, long Bytes)> CountStagedAsync(GameBiz biz, string version, List<GameResourceEntry> plan)
     {
         string dir = GetStagingDir(biz, version);
@@ -1439,12 +1190,6 @@ public static class GameUpdateService
         return (count, bytes);
     }
 
-    
-    
-    
-    
-    
-    
     public static async Task<long> ApplyUpdateAsync(
         GameBiz biz, GameVersionNode target, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
@@ -1457,28 +1202,21 @@ public static class GameUpdateService
         EnsureGameNotRunning(biz);
         string stageDir = GetStagingDir(biz, version);
 
-        
-        
         var plan = await BuildPlanAsync(biz, target, GetLocalVersion(biz))
             ?? throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_ErrNoManifest);
         long downloaded = await PrepareStagingAsync(biz, plan, stageDir, gameDir, progress, ct);
 
-        
-        
         var allFiles = plan.AllFiles;
         var reportApplying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Applying);
         reportApplying(0, allFiles.Count, 0, force: true);
         bool keepStaging = await Task.Run(() => ApplyStagedToGame(gameDir, stageDir, allFiles, ct,
             (done, total, bytes) => reportApplying(done, total, bytes)), ct);
 
-        
-        
         if (plan.HasKrdiffGroups)
         {
             await ApplyKrdiffGroupsAsync(biz, gameDir, stageDir, plan, progress, ct);
         }
 
-        
         var fullList = await FetchResourceListAsync(biz, target.Config?.IndexFile);
         if (fullList != null)
         {
@@ -1497,7 +1235,6 @@ public static class GameUpdateService
             WriteLocalGameResources(gameDir, fullList);
         }
 
-        
         WriteLocalVersion(biz, version);
         if (keepStaging)
         {
@@ -1511,20 +1248,9 @@ public static class GameUpdateService
         return downloaded;
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static bool ApplyStagedToGame(string gameDir, string stageDir, List<GameResourceEntry> files, CancellationToken ct, Action<int, int, long>? onProgress = null)
     {
-        
+
         bool linkMode = UseHardLink
             && string.Equals(Path.GetPathRoot(stageDir), Path.GetPathRoot(gameDir), StringComparison.OrdinalIgnoreCase)
             && !stageDir.StartsWith(gameDir.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
@@ -1538,7 +1264,7 @@ public static class GameUpdateService
             string destPath = Path.Combine(gameDir, file.Dest);
             if (!File.Exists(staged))
             {
-                
+
                 if (VerifyFile(destPath, file, ct))
                 {
                     done++;
@@ -1566,7 +1292,7 @@ public static class GameUpdateService
                     Report();
                     continue;
                 }
-                
+
             }
             File.Move(staged, destPath, true);
             done++;
@@ -1576,7 +1302,6 @@ public static class GameUpdateService
         return linkMode;
     }
 
-    
     private static bool CreateHardLinkSafe(string existingFile, string newLink)
     {
         try
@@ -1600,11 +1325,6 @@ public static class GameUpdateService
     [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
     private static extern bool CreateHardLinkW(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);
 
-    
-    
-    
-    
-    
     private static void EnsureGameNotRunning(GameBiz biz)
     {
         using var running = GameProcessMonitor.FindRunningProcess(biz);
@@ -1620,24 +1340,6 @@ public static class GameUpdateService
         }
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static async Task ApplyKrdiffGroupsAsync(
         GameBiz biz, string gameDir, string stageDir, DownloadPlan plan,
         IProgress<GameDownloadProgress>? progress, CancellationToken ct)
@@ -1646,7 +1348,6 @@ public static class GameUpdateService
         int total = groups.Count;
         long maxGroupBytes = groups.Max(g => (g.DstFiles ?? []).Sum(f => f.Size));
 
-        
         long free = new DriveInfo(Path.GetPathRoot(gameDir)!).AvailableFreeSpace;
         if (free < maxGroupBytes)
         {
@@ -1655,7 +1356,7 @@ public static class GameUpdateService
         }
 
         string tempDir = Path.Combine(stageDir, "apply_tmp");
-        Directory.CreateDirectory(tempDir);   
+        Directory.CreateDirectory(tempDir);
         string hpatchz = LocateHpatchz();
         var patchMd5 = plan.PatchFiles.ToDictionary(f => f.Dest, f => f.Md5, StringComparer.OrdinalIgnoreCase);
         var dstSet = plan.KrdiffDstFiles.Select(f => f.Dest).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -1672,7 +1373,7 @@ public static class GameUpdateService
             string marker = Path.Combine(tempDir, $"g_{i}");
             if (!File.Exists(marker))
             {
-                
+
                 if (dstFiles.Count > 0 && !dstFiles.All(f => VerifyFile(Path.Combine(gameDir, f.Dest), f, ct)))
                 {
                     string patchPath = Path.Combine(stageDir, group.Dest);
@@ -1697,11 +1398,10 @@ public static class GameUpdateService
                     i + 1, total, group.Dest, dstFiles.Count);
             }
             patchBytes += dstFiles.Sum(f => f.Size);
-            try { File.Delete(Path.Combine(stageDir, group.Dest)); } catch { }   
+            try { File.Delete(Path.Combine(stageDir, group.Dest)); } catch { }
             report(i + 1, total, patchBytes, force: true);
         }
 
-        
         foreach (var group in groups)
         {
             foreach (var src in group.SrcFiles ?? [])
@@ -1721,9 +1421,6 @@ public static class GameUpdateService
         _logger.LogInformation("krpdiff: {Count} 组补丁应用完成", total);
     }
 
-    
-    
-    
     private static string LocateHpatchz()
     {
         string path = Path.Combine(AppContext.BaseDirectory, "Assets", "Hpatchz", "hpatchz.exe");
@@ -1762,10 +1459,6 @@ public static class GameUpdateService
         }
     }
 
-    
-    
-    
-    
     private static void DeleteStaging(GameBiz biz)
     {
         DeleteStaging(GetGameDir(biz));
@@ -1791,21 +1484,11 @@ public static class GameUpdateService
         }
     }
 
-    
-    
-    
-    
-    
     private static void CleanStagingRoots(GameBiz biz, string? keepVersion)
     {
         CleanStagingRoots(GetGameDir(biz), keepVersion);
     }
 
-    
-    
-    
-    
-    
     private static void CleanOrphanStaging(GameBiz biz, string localVersion)
     {
         try
@@ -1879,7 +1562,6 @@ public static class GameUpdateService
         }
     }
 
-    
     private static void WriteLocalGameResources(string? gameDir, GameResourceList list)
     {
         try
@@ -1896,11 +1578,6 @@ public static class GameUpdateService
 
     #region 全新安装（本地没有任何版本记录时，把最新版全量下载并落位）
 
-    
-    
-    
-    
-    
     public static async Task<GameUpdateState?> GetInstallStateAsync(GameBiz biz)
     {
         if (GetLocalVersion(biz) is not null)
@@ -1930,13 +1607,8 @@ public static class GameUpdateService
         };
     }
 
-    
     public sealed record GameTierOption(string Name, long SizeBytes);
 
-    
-    
-    
-    
     public static async Task<List<GameTierOption>?> GetTierOptionsAsync(GameBiz biz)
     {
         var index = await GetTierIndexAsync(biz);
@@ -1945,9 +1617,7 @@ public static class GameUpdateService
         {
             return null;
         }
-        
-        
-        
+
         var packMap = new Dictionary<string, GameResourcePack>(packs, StringComparer.OrdinalIgnoreCase);
         return bundles.Keys
             .Where(packMap.ContainsKey)
@@ -1956,11 +1626,6 @@ public static class GameUpdateService
             .ToList();
     }
 
-    
-    
-    
-    
-    
     public static async Task<DownloadPlan?> BuildTierPlanAsync(GameBiz biz, string tierName)
     {
         var index = await GetTierIndexAsync(biz);
@@ -2004,7 +1669,6 @@ public static class GameUpdateService
         return new DownloadPlan(files, common.BaseUrl ?? "", total, null, null, version, null, null);
     }
 
-    
     public static string? GetInstallTier(GameBiz biz)
     {
         string v = AppConfig.GetConfig($"InstallTier_{biz}") ?? "";
@@ -2016,14 +1680,6 @@ public static class GameUpdateService
         AppConfig.SetConfig($"InstallTier_{biz}", tier ?? "");
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
     public static async Task<long> InstallAsync(
         GameBiz biz, string installDir, GameVersionNode target, IProgress<GameDownloadProgress>? progress, CancellationToken ct,
         string? tierName = null)
@@ -2043,12 +1699,10 @@ public static class GameUpdateService
         var allFiles = plan.AllFiles;
         var reportApplying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Applying);
         reportApplying(0, allFiles.Count, 0, force: true);
-        
+
         bool keepStaging = await Task.Run(() => ApplyStagedToGame(installDir, stageDir, allFiles, ct,
             (done, total, bytes) => reportApplying(done, total, bytes)), ct);
 
-        
-        
         var localList = tierName is null
             ? await FetchResourceListAsync(biz, target.Config?.IndexFile)
             : new GameResourceList { Resource = plan.Files };
@@ -2057,7 +1711,6 @@ public static class GameUpdateService
             WriteLocalGameResources(installDir, localList);
         }
 
-        
         if (FindGameExe(installDir, biz) is { } exe)
         {
             AppConfig.SetConfig(GameRegistry.GetExePathConfigKey(biz), exe);
@@ -2067,8 +1720,7 @@ public static class GameUpdateService
         {
             _logger.LogWarning("Install: 安装目录里没找到游戏 exe {Biz}，请到设置里手动定位", biz);
         }
-        
-        
+
         GameAutoSearch.WriteOfficialLedger(biz, installDir, elevateForHklm: true);
 
         WriteLocalVersion(installDir, target.Version!);
@@ -2084,7 +1736,6 @@ public static class GameUpdateService
         return downloaded;
     }
 
-    
     private static string? FindGameExe(string installDir, GameBiz biz)
     {
         string[] names = GameRegistry.GetEntry(biz).ExeNames;
@@ -2115,38 +1766,24 @@ public static class GameUpdateService
 
     #region 校验 / 修复游戏
 
-    
     public sealed class VerifyResult
     {
-        
+
         public List<GameResourceEntry> Damaged { get; } = new();
 
-        
         public int TotalFiles { get; init; }
 
-        
         public int CheckedFiles { get; init; }
 
-        
         public long DamagedBytes { get; set; }
 
-        
         public string? Version { get; init; }
 
-        
         public bool CanRepair { get; init; }
 
-        
         public string? BaseUrl { get; init; }
     }
 
-    
-    
-    
-    
-    
-    
-    
     public static async Task<VerifyResult?> VerifyAsync(
         GameBiz biz, bool quick, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
@@ -2162,8 +1799,6 @@ public static class GameUpdateService
         List<GameResourceEntry>? files = null;
         bool canRepair = false;
 
-        
-        
         if (index?.Default != null && CompareVersion(local, index.Default.Version) == 0)
         {
             var cfg = index.Default.Config;
@@ -2179,7 +1814,6 @@ public static class GameUpdateService
             }
         }
 
-        
         if (files is null)
         {
             files = ReadLocalGameResources(gameDir);
@@ -2194,13 +1828,11 @@ public static class GameUpdateService
             }
         }
 
-        
         if (files is null)
         {
             return null;
         }
 
-        
         List<GameResourceEntry> toCheck = files;
         if (quick && index?.KeyFileCheckList is { } keyFiles)
         {
@@ -2266,11 +1898,6 @@ public static class GameUpdateService
         });
     }
 
-    
-    
-    
-    
-    
     public static async Task<long> RepairAsync(
         GameBiz biz, VerifyResult result, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
@@ -2288,7 +1915,6 @@ public static class GameUpdateService
         var downloader = new GameUpdateDownloader(cdn, result.BaseUrl, gameDir, result.Damaged);
         long downloaded = await downloader.DownloadAsync(progress, ct);
 
-        
         var index = await GetIndexAsync(biz);
         if (index?.Default?.Config?.IndexFile is { } manifestPath)
         {
@@ -2301,7 +1927,6 @@ public static class GameUpdateService
         return downloaded;
     }
 
-    
     internal static bool VerifyFile(string path, GameResourceEntry entry, CancellationToken ct = default)
     {
         if (!File.Exists(path))
@@ -2315,7 +1940,6 @@ public static class GameUpdateService
         return GameUpdateDownloader.VerifyMd5(path, entry.Md5, ct);
     }
 
-    
     private static string NormalizeDest(string dest) =>
         dest.Replace('\\', '/').Trim('/');
 

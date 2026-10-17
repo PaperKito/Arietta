@@ -9,37 +9,15 @@ using Windows.Foundation;
 
 namespace Arietta.Features.PlayTime;
 
-
-
-
-
-
-
-
-
 public sealed class CalendarHeatmap : Grid
 {
 
-
-    
-    
-    
-    
     public double CellSize { get; set; } = double.NaN;
 
-
-    
     public double CellGap { get; set; } = 1.0;
 
-
-    
-    
-    
     public double? ScaleMax { get; set; }
 
-    
-    
-    
     public bool ShowMonthSplit { get; set; }
 
     private const double WeekdayLabelRightMargin = 6;
@@ -64,20 +42,11 @@ public sealed class CalendarHeatmap : Grid
     private readonly Grid _weekdayColumn = new();
     private readonly HoverCard _hoverCard = new();
 
-
-    
-    
-    
-    
     private double AvailablePixelWidth => ActualWidth > 0 ? ActualWidth : Width > 0 ? Width : 0;
 
 
     private bool HasLayoutWidth() => AvailablePixelWidth > 0;
 
-
-    
-    
-    
     public List<HeatmapDayItem>? Days
     {
         get => _days;
@@ -111,9 +80,6 @@ public sealed class CalendarHeatmap : Grid
         SetColumn(_weekdayColumn, 0);
         Children.Add(_weekdayColumn);
 
-        
-        
-        
         SetRow(_plate, 0);
         SetColumn(_plate, 1);
         Children.Add(_plate);
@@ -122,7 +88,6 @@ public sealed class CalendarHeatmap : Grid
         SetColumn(_dividerLayer, 1);
         Children.Add(_dividerLayer);
 
-        
         SetRow(_hoverCard, 0);
         SetColumn(_hoverCard, 0);
         SetRowSpan(_hoverCard, 2);
@@ -136,9 +101,7 @@ public sealed class CalendarHeatmap : Grid
 
     private void OnLayoutUpdated(object? sender, object e)
     {
-        
-        
-        
+
         if (_days is { Count: > 0 })
         {
             double realLabelWidth = _weekdayColumn.ActualWidth;
@@ -175,7 +138,7 @@ public sealed class CalendarHeatmap : Grid
         {
             return false;
         }
-        
+
         return _itemSlots.Count > 7
             && _itemSlots[0].ActualWidth > 0
             && _itemSlots[1].ActualWidth > 0
@@ -195,7 +158,7 @@ public sealed class CalendarHeatmap : Grid
 
     private void Rebuild()
     {
-        
+
         _hoverCard.Clear();
         _plate.Children.Clear();
         _monthLayer.Children.Clear();
@@ -213,21 +176,17 @@ public sealed class CalendarHeatmap : Grid
         }
 
         var start = days[0].Date;
-        int pad = ((int)start.DayOfWeek + 6) % 7; 
+        int pad = ((int)start.DayOfWeek + 6) % 7;
         int total = pad + days.Count;
         int columnCount = (int)Math.Ceiling(total / 7.0);
 
-        
-        
-        
         double labelColumnWidth = _weekdayColumn.ActualWidth > 0 ? _weekdayColumn.ActualWidth : 24;
         _lastLabelWidthUsed = labelColumnWidth;
         double avail = AvailablePixelWidth;
         ComputeMetrics(columnCount, Math.Max(0, avail - labelColumnWidth - 1));
         double cellPitch = _pitch;
 
-        
-        var monday = new DateTime(2024, 1, 1); 
+        var monday = new DateTime(2024, 1, 1);
         for (int r = 0; r < 7; r++)
         {
             _weekdayColumn.RowDefinitions.Add(new RowDefinition { Height = new GridLength(cellPitch) });
@@ -249,7 +208,6 @@ public sealed class CalendarHeatmap : Grid
             _weekdayColumn.Children.Add(label);
         }
 
-        
         double scaleMax = ScaleMax ?? ComputeScaleMax(days);
         EnsureLevelBrushes();
         Brush transparent = new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
@@ -271,9 +229,7 @@ public sealed class CalendarHeatmap : Grid
             if (month != currentMonth)
             {
                 currentMonth = month;
-                
-                
-                
+
                 if (day.Date.Day == 1)
                 {
                     var label = new TextBlock
@@ -289,7 +245,7 @@ public sealed class CalendarHeatmap : Grid
                 }
                 if (ShowMonthSplit && lastK >= 0)
                 {
-                    
+
                     var polyline = new Polyline
                     {
                         Stroke = ChartHelpers.GetResource<Brush>("ControlStrongStrokeColorDefaultBrush"),
@@ -310,7 +266,6 @@ public sealed class CalendarHeatmap : Grid
             _itemSlots.Add(daySlot);
         }
 
-        
         for (int i = 0; i < _itemSlots.Count; i++)
         {
             var slot = _itemSlots[i];
@@ -328,11 +283,6 @@ public sealed class CalendarHeatmap : Grid
         }
     }
 
-
-    
-    
-    
-    
     private FrameworkElement CreateSlot(HeatmapDayItem? day, double scaleMax, Brush transparent)
     {
         var slot = new Grid
@@ -358,18 +308,13 @@ public sealed class CalendarHeatmap : Grid
         return slot;
     }
 
-
-    
-    
-    
-    
     private void ComputeMetrics(int columnCount, double itemWidth)
     {
         if (double.IsNaN(CellSize))
         {
             if (itemWidth > 0 && columnCount > 0)
             {
-                
+
                 double pitch = Math.Clamp(Math.Floor(itemWidth / columnCount * 100) / 100, 8, 44);
                 _cellSize = Math.Max(2, pitch - CellGap * 2);
                 _pitch = _cellSize + CellGap * 2;
@@ -388,16 +333,6 @@ public sealed class CalendarHeatmap : Grid
         _lastAutoWidth = ActualWidth;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private void PlaceMonthOverlays()
     {
         var p0 = _itemSlots[0].TransformToVisual(_dividerLayer).TransformPoint(new Point(0, 0));
@@ -416,11 +351,11 @@ public sealed class CalendarHeatmap : Grid
 
         foreach (var (firstK, label) in _monthLabels)
         {
-            
+
             int colA = firstK / 7;
             double left = Math.Floor(baseX + colA * colW) + CellGap;
             Canvas.SetLeft(label, left);
-            Canvas.SetTop(label, 2); 
+            Canvas.SetTop(label, 2);
         }
         for (int i = 0; i < _monthBoundaries.Count; i++)
         {
@@ -464,11 +399,6 @@ public sealed class CalendarHeatmap : Grid
         return max > 0 ? max : 1;
     }
 
-
-    
-    
-    
-    
     private void EnsureLevelBrushes()
     {
         if (_levelBrushes.Length == 8)
@@ -499,12 +429,6 @@ public sealed class CalendarHeatmap : Grid
         return new SolidColorBrush(ParseHex(fallbackHex));
     }
 
-
-    
-    
-    
-    
-    
     public Brush? LevelBrush(double value, double scaleMax)
     {
         EnsureLevelBrushes();

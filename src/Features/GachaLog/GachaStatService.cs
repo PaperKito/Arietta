@@ -4,26 +4,16 @@ using System.Linq;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
 public static class GachaStatService
 {
-    
+
     private static readonly HashSet<int> BaseStandardIds =
     [
-        1104, 1203, 1301, 1503, 1405,                     
-        21010015, 21020015, 21030015, 21040015, 21050015, 
+        1104, 1203, 1301, 1503, 1405,
+        21010015, 21020015, 21030015, 21040015, 21050015,
         21010045, 21020045, 21030045, 21040045, 21050045,
     ];
 
-
-    
-    
-    
-    
     public static PoolStat ComputePool(
         string poolId,
         List<GachaRecord> recordsDesc,
@@ -36,7 +26,6 @@ public static class GachaStatService
             return stat;
         }
 
-        
         var chronological = recordsDesc.AsEnumerable().Reverse().ToList();
         stat.Total = chronological.Count;
         stat.StartTime = chronological[0].Time;
@@ -59,8 +48,7 @@ public static class GachaStatService
                     bool isUp = isEventPool && !standardIds.Contains(record.ResourceId);
                     items5.Add(new PoolItem(record.Name, record.ResourceId, since5, isUp, record.Time));
                     since5 = 0;
-                    
-                    
+
                     since4 = 0;
                     break;
                 case 4:
@@ -77,7 +65,6 @@ public static class GachaStatService
         stat.CurrentPity4 = since4;
         stat.Avg5 = stat.Count5 > 0 ? (double)(stat.Total - since5) / stat.Count5 : 0;
 
-        
         var upItems = items5.Where(i => i.IsUp).ToList();
         stat.UpCount = upItems.Count;
         stat.UpAvg = upItems.Count > 0 ? (double)upItems.Sum(i => i.Pity) / upItems.Count : 0;
@@ -89,10 +76,6 @@ public static class GachaStatService
         return stat;
     }
 
-
-    
-    
-    
     private static HashSet<int> ResolveStandardIds(string poolId, Func<string, List<GachaRecord>?>? standardPoolProvider)
     {
         var ids = new HashSet<int>(BaseStandardIds);

@@ -5,59 +5,25 @@ using System.Net.Http;
 
 namespace Arietta.Helpers;
 
-
-
-
-
-
-
-
-
-
-
-
 internal static class SharedHttp
 {
-    
-    
-    
-    
-    
+
     public static HttpClient Default { get; } =
         Create(decompression: false, timeout: TimeSpan.FromSeconds(15));
 
-    
-    
-    
     public static HttpClient Sdk { get; } =
         Create(decompression: false, timeout: TimeSpan.FromSeconds(10));
 
-    
-    
-    
     public static HttpClient Notice { get; } =
         Create(decompression: true, timeout: TimeSpan.FromSeconds(15), userAgent: ChromeUserAgent);
 
-    
-    
-    
     public static HttpClient LauncherBackground { get; } =
         Create(decompression: true, timeout: TimeSpan.FromMinutes(10), userAgent: LauncherUserAgent);
 
-    
-    
-    
-    
     public static HttpClient GameUpdateJson { get; } =
         Create(decompression: true, timeout: TimeSpan.FromSeconds(30), userAgent: ChromeUserAgent,
             pooledConnectionLifetime: TimeSpan.FromMinutes(10));
 
-    
-    
-    
-    
-    
-    
     public static HttpClient GameUpdateDownload { get; } =
         Create(decompression: false, timeout: Timeout.InfiniteTimeSpan, userAgent: ChromeUserAgent,
             pooledConnectionLifetime: TimeSpan.FromMinutes(10));

@@ -13,16 +13,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
-
-
-
 [INotifyPropertyChanged]
 public sealed partial class GameBannerAndPost : UserControl
 {
@@ -40,14 +30,12 @@ public sealed partial class GameBannerAndPost : UserControl
 
     public List<GamePostGroup> PostGroups { get; set => SetProperty(ref field, value); }
 
-
-    
     public GameBiz CurrentGameBiz { get; set; }
 
 
     private void GameBannerAndPost_Loaded(object sender, RoutedEventArgs e)
     {
-        
+
         GameLauncherSettingDialog.AnnouncementSettingChanged += OnAnnouncementSettingChanged;
         _ = ReloadAsync();
     }
@@ -58,8 +46,6 @@ public sealed partial class GameBannerAndPost : UserControl
         GameLauncherSettingDialog.AnnouncementSettingChanged -= OnAnnouncementSettingChanged;
     }
 
-
-    
     private void OnAnnouncementSettingChanged(object? sender, EventArgs e)
     {
         if (DispatcherQueue.HasThreadAccess)
@@ -72,11 +58,6 @@ public sealed partial class GameBannerAndPost : UserControl
         }
     }
 
-
-    
-    
-    
-    
     public async Task ReloadAsync()
     {
         try
@@ -90,7 +71,7 @@ public sealed partial class GameBannerAndPost : UserControl
             if (data is null || (data.Value.Banners.Count == 0 && data.Value.Groups.Count == 0))
             {
                 Show(false);
-                
+
                 var kind = GameNoticeService.LastFailure;
                 if (kind is not GameNoticeService.NoticeFailureKind.Offline
                          and not GameNoticeService.NoticeFailureKind.NotSupported)
@@ -105,15 +86,13 @@ public sealed partial class GameBannerAndPost : UserControl
         }
         catch (Exception ex)
         {
-            
+
             AppConfig.GetLogger<GameBannerAndPost>().LogError(ex, "公告加载出现未预期异常");
             InAppToast.MainWindow?.Warning(Lang.Instance.Notice_LoadFailed);
             Show(false);
         }
     }
 
-
-    
     private void Show(bool visible)
     {
         IsHitTestVisible = visible;

@@ -145,9 +145,7 @@ public abstract partial class WindowEx : Window
     public virtual void ChangeAccentColor(Color? backColor = null, Color? foreColor = null)
     {
         FoldTheme(Content as FrameworkElement);
-        
-        
-        
+
         if (Content is FrameworkElement root && root.XamlRoot is { } xamlRoot)
         {
             try
@@ -160,13 +158,11 @@ public abstract partial class WindowEx : Window
             }
             catch
             {
-                
+
             }
         }
     }
 
-
-    
     private static void FoldTheme(FrameworkElement? element)
     {
         if (element is null)

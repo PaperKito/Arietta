@@ -17,7 +17,7 @@ public enum GameBiz
 
 public static class GameBizExtensions
 {
-    
+
     public static bool IsPunishingGrayRaven(this GameBiz biz)
     {
         return biz is GameBiz.PunishingGrayRaven
@@ -27,7 +27,6 @@ public static class GameBizExtensions
             or GameBiz.PunishingGrayRavenTaiwan;
     }
 
-    
     public static bool IsOverseas(this GameBiz biz)
     {
         return biz is GameBiz.WutheringWavesGlobal
@@ -37,11 +36,6 @@ public static class GameBizExtensions
             or GameBiz.PunishingGrayRavenTaiwan;
     }
 
-    
-    
-    
-    
-    
     public static GameBiz GetBaseBiz(this GameBiz biz)
     {
         if (biz.IsPunishingGrayRaven())
@@ -54,9 +48,6 @@ public static class GameBizExtensions
     }
 }
 
-
-
-
 public static class GameRegistry
 {
 
@@ -68,7 +59,7 @@ public static class GameRegistry
         string? CloudUrl = null,
         string? DirHint = null)
     {
-        
+
         public string ShortName => Biz switch
         {
             GameBiz.WutheringWaves => Localization.Lang.Instance.GameBiz_ShortCn,
@@ -82,11 +73,6 @@ public static class GameRegistry
             _ => Name,
         };
 
-        
-        
-        
-        
-        
         public string GameIconPath => Biz switch
         {
             GameBiz.PunishingGrayRaven or GameBiz.PunishingGrayRavenGlobal or GameBiz.PunishingGrayRavenKorea
@@ -96,20 +82,12 @@ public static class GameRegistry
             _ => "ms-appx:///Assets/Image/Game/gameicon_wuwa.png",
         };
 
-        
-        
-        
-        
         public string? ServerIconPath => Biz switch
         {
             GameBiz.WutheringWavesBilibili => "ms-appx:///Assets/Image/Game/gameicon_bilibili.png",
             _ => null,
         };
 
-        
-        
-        
-        
         public string ServerCode => Biz switch
         {
             GameBiz.WutheringWaves => "CN",
@@ -122,7 +100,6 @@ public static class GameRegistry
             _ => "",
         };
 
-        
         public string[] ExeNames => Biz switch
         {
             GameBiz.PunishingGrayRaven or GameBiz.PunishingGrayRavenGlobal or GameBiz.PunishingGrayRavenKorea
@@ -131,21 +108,16 @@ public static class GameRegistry
             _ => new[] { "Client-Win64-Shipping.exe", "Wuthering Waves.exe" },
         };
 
-        
         public string[] MarkerDirs => Biz switch
         {
             GameBiz.PunishingGrayRaven => new[] { "Punishing Gray Raven" },
-            
+
             GameBiz.PunishingGrayRavenGlobal or GameBiz.PunishingGrayRavenKorea
                 or GameBiz.PunishingGrayRavenJapan or GameBiz.PunishingGrayRavenTaiwan
                 => Array.Empty<string>(),
             _ => new[] { "Wuthering Waves" },
         };
 
-        
-        
-        
-        
         public string DefaultInstallDirName => Biz switch
         {
             GameBiz.WutheringWavesGlobal => "Wuthering Waves Global",
@@ -156,11 +128,6 @@ public static class GameRegistry
             _ => "Wuthering Waves",
         };
 
-        
-        
-        
-        
-        
         public string[] RegistryKeys => Biz switch
         {
             GameBiz.WutheringWaves => new[]
@@ -186,18 +153,13 @@ public static class GameRegistry
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\KuroGames\Punishing Gray Raven",
                 @"HKEY_LOCAL_MACHINE\SOFTWARE\Punishing Gray Raven",
             },
-            
-            
+
             GameBiz.PunishingGrayRavenGlobal or GameBiz.PunishingGrayRavenKorea
                 or GameBiz.PunishingGrayRavenJapan or GameBiz.PunishingGrayRavenTaiwan
                 => Array.Empty<string>(),
             _ => Array.Empty<string>(),
         };
 
-        
-        
-        
-        
         public string? DirHint => Biz switch
         {
             GameBiz.WutheringWavesGlobal => "global",
@@ -206,15 +168,6 @@ public static class GameRegistry
         };
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static GameEntry[] Games => _games ??= BuildGames();
 
     private static GameEntry[]? _games;
@@ -246,21 +199,8 @@ public static class GameRegistry
         return Games[0];
     }
 
-    
-    
-    
-    
-    
-    
-    
     public record GameGroup(string Game, string IconPath, GameEntry[] Servers);
 
-    
-    
-    
-    
-    
-    
     public static string WuwaLogoPath => Localization.UiLanguage.Current switch
     {
         Localization.UiLanguageKind.Korean => "ms-appx:///Assets/Image/Game/logoWuwa_ko.png",
@@ -269,10 +209,6 @@ public static class GameRegistry
         _ => "ms-appx:///Assets/Image/Game/logoWuwa_en.png",
     };
 
-    
-    
-    
-    
     public static string PgrLogoPath => Localization.UiLanguage.Current switch
     {
         Localization.UiLanguageKind.SimplifiedChinese => "ms-appx:///Assets/Image/Game/logoPgr_zh-Hans.png",
@@ -282,7 +218,6 @@ public static class GameRegistry
         _ => "ms-appx:///Assets/Image/Game/logoPgr_en.png",
     };
 
-    
     public static GameGroup[] Groups => _groups ??= BuildGroups();
 
     private static GameGroup[]? _groups;
@@ -291,7 +226,7 @@ public static class GameRegistry
     {
         return
         [
-            
+
             new(Localization.Lang.Instance.GameBiz_Wuwa, WuwaLogoPath, new[]
             {
                 Games[1],
@@ -318,7 +253,6 @@ public static class GameRegistry
         };
     }
 
-    
     public static string GetExePathConfigKey(GameBiz biz)
     {
         return biz switch
@@ -328,10 +262,6 @@ public static class GameRegistry
         };
     }
 
-    
-    
-    
-    
     public static string GetInstallDirConfigKey(GameBiz biz)
     {
         return biz switch
@@ -341,9 +271,6 @@ public static class GameRegistry
         };
     }
 
-    
-    
-    
     public static string GetCustomBgConfigKey(GameBiz biz)
     {
         return biz switch
@@ -353,9 +280,6 @@ public static class GameRegistry
         };
     }
 
-    
-    
-    
     public static string GetEnableCustomBgConfigKey(GameBiz biz)
     {
         return biz switch
@@ -365,9 +289,6 @@ public static class GameRegistry
         };
     }
 
-    
-    
-    
     public static string GetStartGameArgumentConfigKey(GameBiz biz)
     {
         return biz switch
@@ -377,7 +298,6 @@ public static class GameRegistry
         };
     }
 
-    
     public static string GetEnableThirdPartyToolConfigKey(GameBiz biz)
     {
         return biz switch
@@ -387,7 +307,6 @@ public static class GameRegistry
         };
     }
 
-    
     public static string GetThirdPartyToolPathConfigKey(GameBiz biz)
     {
         return biz switch
@@ -397,14 +316,6 @@ public static class GameRegistry
         };
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
     public static string? GetEnabledThirdPartyToolPath(GameBiz biz)
     {
         if (AppConfig.GetConfig(GetEnableThirdPartyToolConfigKey(biz)) != "1")
@@ -415,9 +326,6 @@ public static class GameRegistry
         return path is { Length: > 0 } && File.Exists(path) ? path : null;
     }
 
-    
-    
-    
     public static string GetSelectedBgConfigKey(GameBiz biz)
     {
         return biz switch
@@ -427,12 +335,6 @@ public static class GameRegistry
         };
     }
 
-    
-    
-    
-    
-    
-    
     public static string GetEnableDynamicBgConfigKey(GameBiz biz)
     {
         return biz.GetBaseBiz() switch
@@ -443,11 +345,6 @@ public static class GameRegistry
         };
     }
 
-        
-        
-        
-        
-        
         public static bool IsExePathMatchBiz(GameBiz biz, string? path)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -461,7 +358,7 @@ public static class GameRegistry
             }
             if (biz.IsPunishingGrayRaven())
             {
-                
+
                 return true;
             }
             return !path.Contains("bilibili", StringComparison.OrdinalIgnoreCase)
@@ -469,25 +366,17 @@ public static class GameRegistry
                 && !path.Contains("global", StringComparison.OrdinalIgnoreCase);
         }
 
-        
-        
-        
-        
         public static string? GetConfiguredExePath(GameBiz biz)
         {
             string? path = AppConfig.GetConfig(GetExePathConfigKey(biz));
             return IsExePathMatchBiz(biz, path) ? path : null;
         }
 
-        
     public static bool IsDynamicBgEnabled(GameBiz biz)
     {
         return AppConfig.GetConfig(GetEnableDynamicBgConfigKey(biz)) != "0";
     }
 
-    
-    
-    
     public static string? GetCustomBgPath(GameBiz biz)
     {
         string? path = AppConfig.GetConfig(GetCustomBgConfigKey(biz));
@@ -495,7 +384,7 @@ public static class GameRegistry
         {
             return null;
         }
-        
+
         if (AppConfig.GetConfig(GetEnableCustomBgConfigKey(biz)) == "0")
         {
             return null;

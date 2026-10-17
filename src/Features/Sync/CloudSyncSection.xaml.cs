@@ -7,13 +7,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.Sync;
 
-
-
-
-
-
-
-
 public sealed partial class CloudSyncSection : UserControl
 {
     private readonly CloudSyncService _cloudSync = AppConfig.GetService<CloudSyncService>();
@@ -32,7 +25,7 @@ public sealed partial class CloudSyncSection : UserControl
 
     private void ToggleSwitch_EnableSync_Toggled(object sender, RoutedEventArgs e)
     {
-        
+
         CloudSyncHost.SetAutoSync(ToggleSwitch_EnableSync.IsOn);
         RefreshFeedback();
     }
@@ -63,12 +56,10 @@ public sealed partial class CloudSyncSection : UserControl
         {
             return;
         }
-        
+
         _cloudSync.ApplyAutoSync(ToggleSwitch_EnableSync.IsOn);
     }
 
-
-    
     private static string GetServerSummary(CloudSyncConfig config)
     {
         if (string.IsNullOrWhiteSpace(config.ServerUrl))
@@ -80,11 +71,6 @@ public sealed partial class CloudSyncSection : UserControl
             : config.ServerUrl;
     }
 
-
-    
-    
-    
-    
     private void RefreshFeedback(CloudSyncConfig? config = null)
     {
         config ??= _cloudSync.Config;
@@ -95,11 +81,6 @@ public sealed partial class CloudSyncSection : UserControl
                 : Lang.Instance.Sync_NeverSynced;
     }
 
-
-    
-    
-    
-    
     private void Button_ServerEntry_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -165,7 +146,7 @@ public sealed partial class CloudSyncSection : UserControl
         {
             result = CloudSyncResult.Fail(CloudSyncAction.None, ex.Message);
         }
-        
+
         SetBusy(false);
         SetStatus(result.Message, result.Success);
     }

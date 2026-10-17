@@ -2,26 +2,18 @@
 
 namespace Arietta.Localization;
 
-
-
-
-
-
-
-
 internal static class LangFr
 {
 
     public static readonly Dictionary<string, string> Map = new()
     {
-        
+
         ["MainPage_Launcer"] = "Lanceur",
         ["LauncherPage_GameSetting"] = "Paramètres du jeu",
         ["MainPage_GameScreenshot"] = "Captures d'écran",
         ["GachaLogPage_ConveneRecords"] = "Registres de convocation",
         ["Toolbox"] = "Boîte à outils",
 
-        
         ["ScreenshotPage_MultiSelect"] = "Sélection multiple",
         ["ScreenshotPage_OpenFolder"] = "Ouvrir le dossier",
         ["ScreenshotPage_Total0Files"] = "{0} éléments",
@@ -36,25 +28,21 @@ internal static class LangFr
         ["ScreenshotPage_OpenImage"] = "Ouvrir l'image",
         ["ScreenshotPage_DeletedPartial"] = "{0} / {1} supprimées ; le reste est peut-être en cours d'utilisation",
 
-        
         ["KuroBbs"] = "Kuro BBS",
         ["KuroBbs_SignIn"] = "Présence",
         ["KuroBbs_Role"] = "Personnages",
         ["KuroBbs_ResourceBrief"] = "Résumé des ressources",
 
-        
         ["PgrData_NoRole"] = "Ce compte Kuro BBS n'a pas encore défini de personnage PGR. Définissez-en un dans « Mon profil » de l'application Kuro BBS, puis revenez ici.",
         ["PgrData_Locked"] = "Verrouillé",
         ["PgrData_FullIn"] = "Recharge complète dans {0}",
 
-        
         ["KuroBbs_DataTerminal"] = "Terminal de données",
         ["KuroBbs_CombatData"] = "Données de combat",
         ["DataTerminal_NoAccount"] = "Vous n'êtes pas encore connecté à Kuro BBS. Appuyez sur la flèche de compte ci-dessus pour vous connecter.",
         ["DataTerminal_NoRole"] = "Ce compte Kuro BBS n'a pas encore lié de personnage {0}. Liez-en un d'abord dans l'application Kuro BBS.",
         ["DataTerminal_LoadFailed"] = "Échec du chargement de la page : {0}",
 
-        
         ["KuroBbs_PgrRole"] = "Personnages",
         ["KuroBbs_PgrResource"] = "Rapport des ressources",
         ["KuroBbs_PgrCage"] = "Cage de la Douleur",
@@ -76,7 +64,6 @@ internal static class LangFr
         ["PgrWarArea_Waves"] = "Vagues {0}",
         ["PgrCommon_LoadFailed"] = "Échec de la récupération des données",
 
-        
         ["DailyBriefing"] = "Briefing",
         ["DailyBriefing_Desc"] = "Données quotidiennes du jeu",
         ["DailyBriefing_Refresh"] = "Actualiser",
@@ -95,7 +82,6 @@ internal static class LangFr
         ["KuroBbs_TokenExpired"] = "Connexion Kuro BBS expirée",
         ["KuroBbs_TokenExpiredDesc"] = "Allez dans Paramètres → Compte Kuro BBS pour recapturer ou ressaisir le token",
 
-        
         ["KuroAccount_UsbTitle"] = "Outil ADB",
         ["KuroAccount_UsbShortDesc"] = "Connecter un téléphone Android pour capturer le Token et le Did de Kuro BBS",
         ["KuroAccount_UsbDesc"] = "Connectez le téléphone par câble USB et activez le débogage USB : ouvrez l'application Kuro BBS sur le téléphone et accédez à la page « Terminal de données » ou « Calculateur de développement », puis appuyez sur « Démarrer la capture » ; l'outil capture automatiquement le token et le did. Nécessite adb.exe (téléchargeable depuis la ",
@@ -142,7 +128,6 @@ internal static class LangFr
         ["KuroAccount_Saved"] = "Compte enregistré",
         ["KuroAccount_Cleared"] = "Compte effacé",
 
-        
         ["RolePage_Refresh"] = "Actualiser",
         ["RolePage_NoAccount"] = "Compte Kuro BBS pas encore configuré",
         ["RolePage_NoAccountDesc"] = "Terminez la configuration dans Paramètres → Compte Kuro BBS, puis actualisez",
@@ -150,7 +135,6 @@ internal static class LangFr
         ["RolePage_Back"] = "Retour à la liste",
         ["RolePage_Phantoms"] = "Échos",
 
-        
         ["GachaLogPage_Refresh"] = "Mettre à jour les relevés",
         ["GachaLogPage_ImportUrl"] = "Importer via un lien",
         ["GachaLogPage_ImportUrlDesc"] = "Collez le lien de la page de détails de convocation (ouvrez « Détails de convocation » en jeu puis récupérez-le depuis le journal, ou copiez-le depuis d'autres outils). Fonctionne aussi avec les téléphones cloud.",
@@ -208,7 +192,6 @@ internal static class LangFr
         ["GachaLogPage_EmptyTitle"] = "Aucun relevé de convocation",
         ["GachaLogPage_EmptyDesc"] = "Indiquez le dossier du jeu dans les paramètres, ouvrez une fois la page « Détails de convocation » en jeu, puis revenez ici et appuyez sur « Mettre à jour les relevés » pour synchroniser.",
 
-        
         ["LauncherPage_StartGame"] = "Lancer le jeu",
         ["LauncherPage_InstallGame"] = "Installer le jeu",
         ["LauncherPage_ResumeInstall"] = "Reprendre l'installation",
@@ -226,10 +209,8 @@ internal static class LangFr
         ["Notice_LoadFailed"] = "Échec du chargement des annonces",
         ["LauncherPage_UpdateGame"] = "Mettre à jour le jeu",
 
-        
         ["SettingPage_Language"] = "Langue",
 
-        
         ["GameUpdate_PredownloadAvailable"] = "Pré-téléchargement de la version {0} disponible",
         ["GameUpdate_Predownloaded"] = "{0} pré-téléchargé ; il pourra être installé directement dès l'ouverture de la mise à jour",
         ["GameUpdate_PredownloadButton"] = "Pré-télécharger",
@@ -255,7 +236,6 @@ internal static class LangFr
         ["GameUpdate_RepairDone"] = "{0} fichiers réparés",
         ["GameUpdate_RepairNoBaseUrl"] = "La version actuelle ne prend pas en charge la réparation en ligne. Mettez d'abord le jeu à jour vers la dernière version.",
 
-        
         ["GameLauncherPage_Gallery"] = "Galerie",
         ["Common_Copy"] = "Copier",
         ["ImageViewWindow2_SaveAs"] = "Enregistrer sous",
@@ -268,15 +248,12 @@ internal static class LangFr
         ["InstallGameDialog_LocateGame"] = "Localiser le jeu",
         ["GameLauncherPage_GameIsRunning"] = "Le jeu est en cours d'exécution",
 
-        
         ["SettingPage_Download"] = "Télécharger",
 
-        
         ["DownloadGamePage_Downloading"] = "Téléchargement",
         ["DownloadGamePage_Verifying"] = "Vérification",
         ["DownloadGamePage_Pause"] = "Pause",
 
-        
         ["Common_Confirm"] = "Confirmer",
         ["Common_Cancel"] = "Annuler",
         ["Common_Error"] = "Erreur",
@@ -285,13 +262,11 @@ internal static class LangFr
         ["Common_Apply"] = "Appliquer",
         ["Common_Exit"] = "Quitter",
 
-        
         ["SettingPage_AppSettings"] = "Paramètres",
         ["SettingPage_About"] = "À propos",
         ["SettingPage_General"] = "Général",
         ["SettingPage_FileManagement"] = "Gestion des fichiers",
 
-        
         ["FilePage_DataFolder"] = "Dossier de données",
         ["FilePage_DataFolderDesc"] = "Vos données personnelles sont stockées dans le dossier ci-dessous. Elles sont importantes — ne les supprimez pas à la légère.",
         ["FilePage_ReselectDataFolder"] = "Resélectionner le dossier de données",
@@ -308,7 +283,6 @@ internal static class LangFr
         ["FilePage_CleanCache"] = "Nettoyer le cache",
         ["FilePage_CleanBackgroundCache"] = "Nettoyer les fichiers de fond du lanceur",
 
-        
         ["FilePage_HardLink"] = "Liens matériels",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "Les fichiers identiques d’autres clients de région sur le même disque seront réutilisés par liens physiques. Téléchargement estimé : environ {0}. Valeur indicative ; la vérification fichier par fichier lors de l’installation fait foi.",
         ["InstallGameDialog_HardLinkAfterSize"] = "Taille après lien physique : ",
@@ -322,12 +296,10 @@ internal static class LangFr
         ["FilePage_DownloadThreads"] = "Multithreading",
         ["FilePage_DownloadThreadsDesc"] = "Nombre de connexions de téléchargement simultanées. Trop de parallélisme ralentit les HDD à cause des déplacements de tête. Les changements prennent effet dès le prochain téléchargement.",
 
-        
         ["KuroBbs_RefreshInfo"] = "Actualiser les infos",
         ["KuroBbs_Login"] = "Se connecter",
         ["KuroBbs_Settings"] = "Paramètres de Kuro BBS",
 
-        
         ["Login_Title"] = "Connexion à Kuro BBS",
         ["Login_ByToken"] = "Connexion par Token",
         ["Login_BySms"] = "Connexion par code SMS",
@@ -352,7 +324,6 @@ internal static class LangFr
         ["Login_SeekRoleFailed"] = "Échec de la recherche du personnage lié : {0}",
         ["Login_Success"] = "Compte Kuro BBS « {0} » connecté",
 
-        
         ["ResourceBrief_Month"] = "Mensuel",
         ["ResourceBrief_Week"] = "Hebdomadaire",
         ["ResourceBrief_Version"] = "Version",
@@ -363,7 +334,6 @@ internal static class LangFr
         ["ResourceBrief_Detail"] = "Détails",
         ["ResourceBrief_Empty"] = "Aucune donnée pour cette période",
 
-        
         ["SignPage_DoSignIn"] = "Pointer",
         ["SignPage_MonthlySign"] = "Ce mois-ci",
         ["SignPage_SignedToday"] = "Présence enregistrée aujourd'hui",
@@ -381,9 +351,6 @@ internal static class LangFr
         ["CombatPage_Locked"] = "{0} est verrouillé cette période ou n'a pas de données",
         ["CombatPage_NoData"] = "Aucune donnée : le serveur n'a pas encore généré les relevés de cette période. Ouvrez la page « {0} » dans l'application Kuro BBS pour actualiser les données, puis réessayez.",
 
-        
-
-        
         ["PlayTimeStatsDialog_TotalPlaytime"] = "Temps de jeu total",
         ["PlayTimeStatsDialog_Started0Times"] = "Lancé {0} fois",
         ["PlayTimeStatsDialog_AverageDailyPlaytime"] = "Temps de jeu quotidien moyen",
@@ -400,7 +367,6 @@ internal static class LangFr
         ["PlayTimeStatsDialog_PlaytimeStatistics"] = "Statistiques de temps de jeu",
         ["PlayTimeStatsDialog_StatsTip"] = "Les statistiques ne comptent que les sessions lancées depuis ce lanceur.",
 
-        
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "Réduire dans la zone de notification",
         ["GameLauncherSettingDialog_BasicInformation"] = "Informations de base",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "Confirmer la désinstallation",
@@ -417,11 +383,9 @@ internal static class LangFr
         ["LauncherPage_UninstallGame"] = "Désinstaller le jeu",
         ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "Les lecteurs réseau mappés ne sont pas pris en charge. Utilisez un chemin de partage réseau commençant par une double barre oblique inverse.",
 
-        
         ["SettingPage_BgSizeTip"] = "Conseil sur la taille du fond",
         ["SettingPage_CustomBackgroundSupportVideo"] = "Le fond personnalisé prend en charge la vidéo",
 
-        
         ["GameSettingPage_Resolution"] = "Résolution",
         ["GameSettingPage_FullScreen"] = "Plein écran",
         ["GameSettingPage_PgrFullscreenBlockedTip"] = "La résolution de votre écran dépasse le maximum pris en charge par le jeu, le plein écran n'est donc pas disponible",
@@ -443,9 +407,6 @@ internal static class LangFr
         ["GameSettingPage_ApplyFailed"] = "Échec de l'application des paramètres du jeu",
         ["GameSettingPage_Applied"] = "Appliqué. Prendra effet au prochain lancement du jeu.",
 
-        
-
-        
         ["SettingPage_WindowBehavior"] = "Comportement de la fenêtre",
         ["SettingPage_CloseWindowOption"] = "À la fermeture de la fenêtre",
         ["SettingPage_ExitApp"] = "Quitter l'application",
@@ -460,19 +421,16 @@ internal static class LangFr
         ["SettingPage_TransparencyEffects"] = "Effets de transparence",
         ["SettingPage_AnimationEffects"] = "Effets d'animation",
 
-        
         ["GameSelector_Subtitle"] = "Appuyez sur l'icône en haut à gauche pour choisir ou changer de jeu",
         ["GameSelector_AutoFind"] = "Détecter les jeux installés",
         ["GameSelector_SelectServer"] = "Sélectionner le serveur",
         ["GameSelector_InstalledSize"] = "Espace disque réellement occupé par les jeux installés ",
         ["GameSelector_Calculating"] = "Calcul en cours",
 
-        
         ["KuroBbs_AccountLevelLabel"] = "Niveau d'union ",
         ["KuroBbs_SwitchRole"] = "Changer de personnage",
         ["KuroBbs_ClearAccount"] = "Effacer le compte",
 
-        
         ["GameBiz_Wuwa"] = "Wuthering Waves",
         ["GameBiz_WuwaCn"] = "Wuthering Waves · CN",
         ["GameBiz_WuwaGlobal"] = "Wuthering Waves · Global",
@@ -491,7 +449,6 @@ internal static class LangFr
         ["GameBiz_PgrTaiwan"] = "Punishing: Gray Raven · Taiwan",
         ["GameBiz_ShortTaiwan"] = "Serveur Taïwan",
 
-        
         ["GachaPool_CharacterEvent"] = "Convier des Personnages à durée limitée",
         ["GachaPool_WeaponEvent"] = "Convier des Armes à durée limitée",
         ["GachaPool_CharacterStandard"] = "Convocation standard de personnage",
@@ -507,11 +464,9 @@ internal static class LangFr
         ["GachaPool_WeaponRevisit"] = "Convocation commémorative d'arme",
         ["GachaPool_Unknown"] = "Bannière {0}",
 
-        
         ["Adb_DeviceOnline"] = "en ligne",
         ["Adb_DeviceUnauthorized"] = "non autorisé",
 
-        
         ["Sync_Title"] = "WebDAV",
         ["Sync_Description"] = "Sauvegardez vos données en les synchronisant avec le cloud",
         ["Sync_ServerUrl"] = "Adresse du serveur",
@@ -535,7 +490,6 @@ internal static class LangFr
         ["Sync_LastSync"] = "Dernière synchronisation",
         ["Sync_Working"] = "Traitement…",
 
-        
         ["CloudGame_ErrNoLogin"] = "Aucune information de connexion utilisable",
         ["CloudGame_ErrHttp"] = "Le service de jeu cloud a renvoyé HTTP {0}",
         ["CloudGame_ErrRequest"] = "Échec de la requête au service de jeu cloud : {0}",
@@ -543,16 +497,13 @@ internal static class LangFr
         ["CloudGame_ErrEmpty"] = "Le service de jeu cloud a renvoyé un contenu vide : {0}",
         ["CloudGame_ErrCode"] = "L'API du jeu cloud a renvoyé l'erreur code={0} : {1}",
 
-        
         ["GachaLogPage_ExportEmpty"] = "Le compte actuel n'a aucun relevé de convocation à exporter",
         ["GachaLog_PityBuilt"] = "Pitié",
 
-        
         ["GameLauncherSettingDialog_PathRemoved"] = "Configuration du chemin du jeu supprimée",
         ["GameLauncherSettingDialog_WrongServerExe"] = "L'exe du jeu sélectionné n'appartient pas au serveur actuel, veuillez choisir à nouveau",
         ["GameLauncherSettingDialog_ExpectExe"] = "Veuillez sélectionner l'exécutable principal du jeu : {0}",
 
-        
         ["KrSdk_ErrNoUserCache"] = "KRSDKUserCache.json introuvable. Connectez-vous une fois dans le jeu d'abord.",
         ["KrSdk_ErrEmptyContent"] = "Contenu vide",
         ["KrSdk_ErrParseFailed"] = "Échec de l'analyse de KRSDKUserCache.json ; écriture abandonnée pour ne pas corrompre l'état de connexion.",
@@ -560,7 +511,6 @@ internal static class LangFr
         ["KrSdk_ErrAccountNotInCache"] = "Ce compte n'est pas dans le cache local.",
         ["KrSdk_ErrVerifyFailed"] = "La vérification après écriture a échoué ; le cache a été restauré dans son état précédent.",
 
-        
         ["GameUpdate_ErrNoPlan"] = "Plan de téléchargement manquant",
         ["GameUpdate_ErrNoTarget"] = "Version cible manquante",
         ["GameUpdate_ErrNoGamePath"] = "Chemin du jeu non configuré ; mise à jour impossible",
@@ -568,11 +518,9 @@ internal static class LangFr
         ["GameUpdate_ErrFileMissing"] = "Fichier de mise à jour manquant : {0}",
         ["GameUpdate_ErrFileChecksum"] = "Échec de la somme de contrôle du fichier de mise à jour : {0}",
 
-        
         ["GameSetting_ErrNoLocalStorage"] = "LocalStorage.db du jeu introuvable",
         ["GameSetting_ErrNoGameUserSettings"] = "GameUserSettings.ini du jeu introuvable",
 
-        
         ["KuroBbs_ErrConnection"] = "Échec de la connexion, statut HTTP : {0}",
         ["KuroBbs_ErrAccessTokenEmpty"] = "requestToken a renvoyé un accessToken vide",
         ["KuroBbs_ErrAccessToken"] = "Échec de l'obtention du B-At accessToken (code={0}) : {1}",
@@ -582,18 +530,11 @@ internal static class LangFr
         ["KuroBbs_SignAlready"] = "Présence déjà enregistrée aujourd'hui",
         ["KuroBbs_SignFail"] = "Échec de la présence",
 
-        
-
-        
         ["Ugf_ErrNoUid"] = "Le fichier UGF n'a pas l'uid du compte",
         ["Ugf_ErrUnknownFormat"] = "Format de fichier non reconnu : UGF ou JSON de relevés de bannière attendu",
 
-        
-
-        
         ["CombatPage_AreaFallback"] = "Zone {0}",
 
-        
         ["KuroBbs_UnionLevel"] = "Niveau d'union",
         ["KuroBbs_CommanderLevel"] = "Niveau de commandant",
         ["KuroBbs_NoLevel"] = "Pas encore de niveau",
@@ -605,10 +546,8 @@ internal static class LangFr
         ["KuroBbs_AutoSignDoneToast"] = "Check-in quotidien terminé",
         ["KuroBbs_AutoSignFailedToast"] = "Échec du check-in quotidien",
 
-        
         ["RolePage_WeaponLevel"] = "NV.{0} · Ascension {1}",
 
-        
         ["Common_UnknownError"] = "Erreur inconnue",
     };
 

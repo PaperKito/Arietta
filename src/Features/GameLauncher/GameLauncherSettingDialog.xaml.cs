@@ -50,7 +50,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     public string? GameSize { get; set => SetProperty(ref field, value); }
     public string? UninstallError { get; set => SetProperty(ref field, value); }
 
-    
     public string? LocateError { get => field; set { SetProperty(ref field, value); OnPropertyChanged(nameof(LocateErrorVisibility)); } }
     public Visibility LocateErrorVisibility => LocateError is null ? Visibility.Collapsed : Visibility.Visible;
     public bool EnableBannerAndPost
@@ -60,7 +59,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         {
             if (SetProperty(ref _enableBannerAndPost, value))
             {
-                
+
                 GameNoticeSettings.SetShowBannerAndPost(value);
                 AnnouncementSettingChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -69,18 +68,10 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 
     private bool _enableBannerAndPost;
 
-    
     public static event EventHandler? AnnouncementSettingChanged;
 
-    
-    
-    
-    
     public static void RaiseAnnouncementSettingChanged() => AnnouncementSettingChanged?.Invoke(null, EventArgs.Empty);
 
-    
-    
-    
     private bool _enableCustomBg;
     public bool EnableCustomBg
     {
@@ -90,7 +81,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             if (SetProperty(ref _enableCustomBg, value))
             {
                 AppConfig.SetConfig(GameRegistry.GetEnableCustomBgConfigKey(CurrentGameBiz), value ? "1" : "0");
-                
+
                 BackgroundGallery.SetSelectedId(
                     CurrentGameBiz,
                     value && CustomBg is { Length: > 0 } ? Path.GetFileName(CustomBg) : null);
@@ -101,7 +92,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     public string? CustomBg { get; set => SetProperty(ref field, value); }
 
     private double _videoBgVolume;
-    
+
     public double VideoBgVolume
     {
         get => _videoBgVolume;
@@ -117,7 +108,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     public string VideoBgVolumeButtonIcon { get; set => SetProperty(ref field, "\uE767"); }
     public string? ChangeBgError { get; set => SetProperty(ref field, value); }
 
-    
     private bool _fpsCapEnabled;
     public bool FpsCapEnabled
     {
@@ -126,14 +116,13 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         {
             if (SetProperty(ref _fpsCapEnabled, value))
             {
-                
+
                 WriteFpsCap(value ? (int)Math.Round(_fpsSliderValue) : 0);
                 OnPropertyChanged(nameof(FpsHeaderText));
             }
         }
     }
 
-    
     private double _fpsSliderValue = 30;
     public double FpsSliderValue
     {
@@ -151,17 +140,12 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     public string FpsHeaderText => $"{Lang.Instance.GameLauncherSettingDialog_BgFps} ({FpsCapText})";
 
-    
     public string FpsCapText => _fpsCapEnabled
         ? $"{(int)Math.Round(_fpsSliderValue)} fps"
         : Lang.Instance.GameLauncherSettingDialog_FpsUnlimited;
 
-    
-    
-    
     private bool _fpsDragging;
 
     private void WireFpsBubble()
@@ -171,7 +155,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             _fpsDragging = false;
             FpsBubble.Visibility = Visibility.Collapsed;
         }
-        
+
         Slider_FpsCap.AddHandler(UIElement.PointerPressedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => { _fpsDragging = true; UpdateFpsBubble(); }), true);
         Slider_FpsCap.AddHandler(UIElement.PointerReleasedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
         Slider_FpsCap.AddHandler(UIElement.PointerCanceledEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
@@ -195,7 +179,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         double ratio = (Slider_FpsCap.Value - Slider_FpsCap.Minimum) / (Slider_FpsCap.Maximum - Slider_FpsCap.Minimum);
         double center = ratio * Math.Max(0, Slider_FpsCap.ActualWidth - 20) + 10;
         FpsBubbleText.Text = $"{(int)Math.Round(Slider_FpsCap.Value)} fps";
-        
+
         FpsBubble.Margin = new Thickness(Math.Max(0, center - 24), -30, 0, 0);
         FpsBubble.Visibility = Visibility.Visible;
     }
@@ -206,7 +190,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         DynamicBackgroundHost.Current?.SetFpsCap(fps);
     }
 
-    
     private string _bgQuality = "auto";
     public string BgQuality
     {
@@ -221,14 +204,12 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     public int BgQualityIndex
     {
         get => _bgQuality switch { "high" => 1, "medium" => 2, "low" => 3, _ => 0 };
         set => BgQuality = value switch { 1 => "high", 2 => "medium", 3 => "low", _ => "auto" };
     }
 
-    
     private bool _pauseOnGameRun;
     public bool PauseOnGameRun
     {
@@ -243,14 +224,12 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     public string? StartGameArgument
     {
         get => field;
         set { if (SetProperty(ref field, value)) AppConfig.SetConfig(GameRegistry.GetStartGameArgumentConfigKey(CurrentGameBiz), string.IsNullOrWhiteSpace(value) ? null : value); }
     }
 
-    
     private bool _enableThirdPartyTool;
     public bool EnableThirdPartyTool
     {
@@ -264,34 +243,34 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     {
         string configKey = GameRegistry.GetExePathConfigKey(CurrentGameBiz);
         string? exePath = GameRegistry.GetConfiguredExePath(CurrentGameBiz);
-        
+
         InstallPath = exePath ?? GameUpdateService.GetPersistedInstallDir(CurrentGameBiz);
-        
+
         if (exePath is null && AppConfig.GetConfig(configKey) is not null)
         {
             AppConfig.SetConfig(configKey, null);
         }
-        
+
         UninstallAndRepairEnabled = exePath is not null;
         _enableBannerAndPost = GameNoticeSettings.ShowBannerAndPost;
         OnPropertyChanged(nameof(EnableBannerAndPost));
-        
+
         CustomBg = AppConfig.GetConfig(GameRegistry.GetCustomBgConfigKey(CurrentGameBiz));
         _enableCustomBg = AppConfig.GetConfig(GameRegistry.GetEnableCustomBgConfigKey(CurrentGameBiz)) switch
         {
             "0" => false,
             "1" => true,
-            
+
             _ => CustomBg is { Length: > 0 } && File.Exists(CustomBg),
         };
         OnPropertyChanged(nameof(EnableCustomBg));
         _videoBgVolume = DynamicBackgroundHost.GetConfiguredVolume();
         VideoBgVolumeButtonIcon = _videoBgVolume <= 0 ? "\uE74F" : "\uE767";
         OnPropertyChanged(nameof(VideoBgVolume));
-        
+
         int fpsCap = int.TryParse(AppConfig.GetConfig(DynamicBackgroundStore.FpsCapConfigKey), out int v) ? v : 30;
         _fpsCapEnabled = fpsCap > 0;
-        
+
         _fpsSliderValue = fpsCap is >= 10 and <= 60 ? fpsCap : 30;
         OnPropertyChanged(nameof(FpsCapEnabled));
         OnPropertyChanged(nameof(FpsSliderValue));
@@ -379,13 +358,13 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         {
             return;
         }
-        
+
         if (!GameRegistry.IsExePathMatchBiz(CurrentGameBiz, path))
         {
             LocateError = Lang.Instance.GameLauncherSettingDialog_WrongServerExe;
             return;
         }
-        
+
         string exeName = Path.GetFileName(path);
         if (!GameRegistry.GetEntry(CurrentGameBiz).ExeNames.Contains(exeName, StringComparer.OrdinalIgnoreCase))
         {
@@ -410,7 +389,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             {
                 return;
             }
-            
+
             string dir = GetInstallDir()!;
             string[] shotDirs;
             try
@@ -431,7 +410,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     [RelayCommand]
     private async Task UninstallGame()
     {
@@ -454,7 +432,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
                 {
                     return false;
                 }
-                
+
                 foreach (string file in Directory.GetFiles(dir, "*", SearchOption.AllDirectories))
                 {
                     try { File.SetAttributes(file, FileAttributes.Normal); } catch { }
@@ -472,7 +450,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     [RelayCommand]
     private async Task BackupAndUninstall()
     {
@@ -502,7 +479,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     private static void MoveScreenshots(string[] folders, string dest)
     {
         Directory.CreateDirectory(dest);
@@ -519,7 +495,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     private string? GetInstallDir()
     {
         string? dir = Path.GetDirectoryName(InstallPath);
@@ -581,7 +556,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     [RelayCommand]
     private void DeleteGameInstllPath()
     {
@@ -594,11 +568,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     private System.Threading.CancellationTokenSource? _repairCts;
     private bool _repairBusy;
 
-    
-    
-    
-    
-    
     [RelayCommand]
     private async Task RepairGame()
     {
@@ -626,12 +595,12 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             _verifyResult = result;
             if (result.Damaged.Count == 0)
             {
-                
+
                 HideRepairProgress();
                 InAppToast.MainWindow?.Success($"{Lang.Instance.GameUpdate_VerifyReportTitle}：{Lang.Instance.GameUpdate_VerifyDoneNone}");
                 return;
             }
-            
+
             ProgressBar_Repair.Visibility = Visibility.Collapsed;
             Text_RepairStatus.Text = string.Format(Lang.Instance.GameUpdate_VerifyDoneDamage, result.Damaged.Count, FormatSize(result.DamagedBytes))
                 + (result.CanRepair ? "" : "\n" + Lang.Instance.GameUpdate_RepairNoBaseUrl);
@@ -661,7 +630,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     [RelayCommand]
     private async Task StartRepair()
     {
@@ -729,7 +697,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         catch { }
     }
 
-    
     private void StartRepairUi()
     {
         Button_RepairGame.Visibility = Visibility.Collapsed;
@@ -794,8 +761,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             {
                 return;
             }
-            
-            
+
             string target = Path.Combine(AppConfig.BackgroundFolder, $"custom_bg_{CurrentGameBiz}{Path.GetExtension(file.Name).ToLowerInvariant()}");
             BackgroundAccentService.Invalidate(target);
             await ApplyCustomBackgroundAsync(file.Path, Path.GetExtension(file.Name).ToLowerInvariant());
@@ -808,7 +774,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    
     private async Task<string> ApplyCustomBackgroundAsync(string source, string ext)
     {
         string target = await CopyBackgroundAsync(source, ext);
@@ -821,16 +786,12 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
         else
         {
-            
+
             EnableCustomBg = true;
         }
         return target;
     }
 
-    
-    
-    
-    
     private async Task<string> CopyBackgroundAsync(string source, string ext)
     {
         string prefix = $"custom_bg_{CurrentGameBiz}";
@@ -840,7 +801,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             Directory.CreateDirectory(AppConfig.BackgroundFolder);
             foreach (var old in Directory.GetFiles(AppConfig.BackgroundFolder, "custom_bg*"))
             {
-                
+
                 string name = Path.GetFileNameWithoutExtension(old);
                 if (name == prefix || (CurrentGameBiz == GameBiz.WutheringWaves && name == "custom_bg"))
                 {
@@ -852,7 +813,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         });
     }
 
-    
     public static event EventHandler<string>? CustomBackgroundChanged;
 
     [RelayCommand]
@@ -891,7 +851,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         CustomBg = null;
         if (EnableCustomBg)
         {
-            
+
             EnableCustomBg = false;
         }
         else
@@ -1002,11 +962,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 }
-
-
-
-
-
 
 public class GameSettingIcon
 {

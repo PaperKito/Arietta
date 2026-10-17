@@ -8,9 +8,7 @@ using System.Linq;
 
 namespace Arietta.Features.Screenshot;
 
-
 public sealed record ScreenshotFile(string Path, DateTime Time);
-
 
 public sealed class ScreenshotItem
 {
@@ -40,8 +38,6 @@ public sealed class ScreenshotItem
 
 }
 
-
-
 public sealed class ScreenshotGroup : List<ScreenshotItem>
 {
 
@@ -54,24 +50,15 @@ public sealed class ScreenshotGroup : List<ScreenshotItem>
 
 }
 
-
-
-
-
-
 public static class ScreenshotService
 {
 
     private static readonly string[] Extensions = [".png", ".jpg", ".jpeg", ".bmp", ".webp"];
 
-    
     private static readonly string[] FolderNames = ["Screenshots", "Screenshot", "ScreenShot"];
 
-    
     public static string GetConfigKey(GameBiz biz) => $"ScreenshotFolder_{biz}";
 
-
-    
     public static List<string> GetFolders(GameBiz biz)
     {
         var folders = new List<string>();
@@ -97,7 +84,6 @@ public static class ScreenshotService
             }
         }
 
-        
         try
         {
             string pictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
@@ -121,8 +107,6 @@ public static class ScreenshotService
         }
     }
 
-
-    
     public static List<ScreenshotFile> EnumerateImages(IEnumerable<string> folders)
     {
         var result = new List<ScreenshotFile>();

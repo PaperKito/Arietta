@@ -4,19 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace Arietta.Core;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 internal static class ProcessTree
 {
     private const uint TH32CS_SNAPPROCESS = 0x00000002;
@@ -40,11 +27,6 @@ internal static class ProcessTree
         public string szExeFile;
     }
 
-
-    
-    
-    
-    
     public static Dictionary<int, int> BuildParentMap()
     {
         var map = new Dictionary<int, int>();
@@ -68,7 +50,7 @@ internal static class ProcessTree
         }
         catch
         {
-            
+
         }
         finally
         {
@@ -77,11 +59,6 @@ internal static class ProcessTree
         return map;
     }
 
-
-    
-    
-    
-    
     public static bool IsSelfOrDescendant(int candidatePid, int ancestorPid, Dictionary<int, int> parentMap)
     {
         if (ancestorPid <= 0 || parentMap.Count == 0)

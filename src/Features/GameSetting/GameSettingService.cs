@@ -8,32 +8,17 @@ using System.Text;
 
 namespace Arietta.Features.GameSetting;
 
-
-
-
-
-
-
-
-
 public static class GameSettingService
 {
 
-    
-    
     public const string PcWindowMode = "PcWindowMode";
-    
+
     public const string PcResolutionIndex = "PcResolutionIndex";
-    
+
     public const string VoiceLanguage = "VoiceLanguage";
 
     private const string IniSectionGameUserSettings = "[/Script/Engine.GameUserSettings]";
 
-    
-    
-    
-    
-    
     private static readonly (int Width, int Height)[] StandardResolutions =
     {
         (3840, 2160),
@@ -76,7 +61,7 @@ public static class GameSettingService
         return GetGameDir(biz) is { } dir
             && biz switch
             {
-                
+
                 var b when b.IsPunishingGrayRaven() => Directory.Exists(dir),
                 _ => File.Exists(Path.Combine(dir, "Client", "Saved", "LocalStorage", "LocalStorage.db")),
             };
@@ -96,16 +81,10 @@ public static class GameSettingService
         string? ini = GetGameUserSettingsPath(biz);
         int width = ParseInt(GetIniValue(ini, IniSectionGameUserSettings, "ResolutionSizeX")) ?? 0;
         int height = ParseInt(GetIniValue(ini, IniSectionGameUserSettings, "ResolutionSizeY")) ?? 0;
-        
+
         return new GameResolutionSetting(mode == 0, false, width, height, index);
     }
 
-
-    
-    
-    
-    
-    
     public static void SetGameResolutionSetting(GameBiz biz, bool isFullScreen, bool useBorderless, int width, int height)
     {
         bool fullscreenMode = isFullScreen || useBorderless;
@@ -132,18 +111,11 @@ public static class GameSettingService
         });
     }
 
-
-    
-    
-    
-    
     public static List<(int Width, int Height)> GetAvailableResolutions()
     {
         return FilterByMonitor(StandardResolutions);
     }
 
-
-    
     private static List<(int Width, int Height)> FilterByMonitor(IEnumerable<(int Width, int Height)> candidates)
     {
         var supported = GetMonitorSupportedModes();
@@ -151,7 +123,7 @@ public static class GameSettingService
         var list = new List<(int Width, int Height)>();
         foreach (var (w, h) in candidates)
         {
-            
+
             if (supported.Count == 0 && (w > nativeW || h > nativeH))
             {
                 continue;
@@ -165,7 +137,7 @@ public static class GameSettingService
                 list.Add((w, h));
             }
         }
-        
+
         if (nativeW > 0 && nativeH > 0 && !list.Contains((nativeW, nativeH)))
         {
             list.Add((nativeW, nativeH));
@@ -173,8 +145,6 @@ public static class GameSettingService
         return list;
     }
 
-
-    
     private static HashSet<(int Width, int Height)> GetMonitorSupportedModes()
     {
         var set = new HashSet<(int Width, int Height)>();
@@ -195,7 +165,7 @@ public static class GameSettingService
 
     private static (int Width, int Height) GetMonitorResolution()
     {
-        
+
         return (GetSystemMetrics(0), GetSystemMetrics(1));
     }
 
@@ -270,32 +240,22 @@ public static class GameSettingService
 
     #region 战双（Unity / 注册表）
 
-    
-    
     private const string PgrRegistryPath = @"Software\kurogame\战双帕弥什";
 
-    
     private const string PgrKeyFullscreenMode = "Screenmanager Fullscreen mode_h3630240806";
     private const string PgrKeyResolutionWidth = "Screenmanager Resolution Width_h182942802";
     private const string PgrKeyResolutionHeight = "Screenmanager Resolution Height_h2627697771";
     private const string PgrKeyResolutionWindowWidth = "Screenmanager Resolution Window Width_h2524650974";
     private const string PgrKeyResolutionWindowHeight = "Screenmanager Resolution Window Height_h1684712807";
     private const string PgrKeyResolutionUseNative = "Screenmanager Resolution Use Native_h1405027254";
-    
-    private const string PgrKeyLastScreen = "LastScreen_h2228486371";                
-    private const string PgrKeyLastResolution = "LastResolution_h1893709025";        
-    private const string PgrKeyLastFullScreen = "LastFullScreen_h577202448";         
-    private const string PgrKeyLastFullScreenMode = "LastFullScreenMode_h1799216915"; 
-    
+
+    private const string PgrKeyLastScreen = "LastScreen_h2228486371";
+    private const string PgrKeyLastResolution = "LastResolution_h1893709025";
+    private const string PgrKeyLastFullScreen = "LastFullScreen_h577202448";
+    private const string PgrKeyLastFullScreenMode = "LastFullScreenMode_h1799216915";
+
     private const string PgrKeyUseHdr = "___X_QUALITY_USE_HDR___h2944275789";
 
-    
-
-    
-    
-    
-    
-    
     private static readonly (int Width, int Height)[] PgrResolutions =
     {
         (2560, 2048),
@@ -335,11 +295,6 @@ public static class GameSettingService
         return new List<(int Width, int Height)>(PgrResolutions);
     }
 
-
-    
-    
-    
-    
     public static bool IsPgrFullscreenBlocked()
     {
         var (w, h) = GetMonitorResolution();
@@ -352,15 +307,10 @@ public static class GameSettingService
         int mode = GetPgrInt(PgrKeyFullscreenMode) ?? 3;
         int width = GetPgrInt(PgrKeyResolutionWidth) ?? 0;
         int height = GetPgrInt(PgrKeyResolutionHeight) ?? 0;
-        
+
         return new GameResolutionSetting(mode == 0, mode == 1, width, height, -1);
     }
 
-
-    
-    
-    
-    
     public static void SetPgrResolutionSetting(GameBiz biz, bool isFullScreen, bool useBorderless, int width, int height)
     {
         int mode = isFullScreen ? 0 : useBorderless ? 1 : 3;
@@ -519,8 +469,6 @@ public static class GameSettingService
         return null;
     }
 
-
-    
     private static void SetIniValues(string? path, string section, IReadOnlyDictionary<string, string> values)
     {
         if (path is null || !File.Exists(path))
@@ -554,7 +502,7 @@ public static class GameSettingService
                 missing.Remove(key);
             }
         }
-        
+
         for (int i = 0; i < lines.Count && missing.Count > 0; i++)
         {
             if (string.Equals(lines[i].Trim(), section, StringComparison.OrdinalIgnoreCase))

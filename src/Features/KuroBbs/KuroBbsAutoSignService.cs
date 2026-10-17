@@ -11,42 +11,13 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class KuroBbsAutoSignService
 {
-    
+
     private const string KeySwitchCommunity = "KuroBbs_AutoSign_Community";
     private const string KeySwitchWuwa = "KuroBbs_AutoSign_Wuwa";
     private const string KeySwitchPgr = "KuroBbs_AutoSign_Pgr";
 
-    
     private const string PrefixDone = "KuroBbs_AutoSign_LastRun_";
     private const string ItemCommunity = "Community";
     private const string ItemWuwa = "Wuwa";
@@ -57,7 +28,6 @@ public static class KuroBbsAutoSignService
 
     private static int _running;
 
-    
     private static string Today => DateTime.Now.ToString("yyyyMMdd");
 
     private static bool SwitchOn(string key) => AppConfig.GetConfig(key) != "0";
@@ -68,12 +38,6 @@ public static class KuroBbsAutoSignService
     private static void MarkDone(KuroBbsAccount account, string item)
         => AppConfig.SetConfig(PrefixDone + item + "_" + AccountKey(account), Today);
 
-
-    
-    
-    
-    
-    
     private static string AccountKey(KuroBbsAccount account)
     {
         if (!string.IsNullOrEmpty(account.UserId))
@@ -84,11 +48,6 @@ public static class KuroBbsAutoSignService
         return Convert.ToHexString(hash)[..12];
     }
 
-
-    
-    
-    
-    
     private static string AccountLabel(KuroBbsAccount account, int index)
     {
         if (!string.IsNullOrEmpty(account.RoleName)) return account.RoleName;
@@ -97,11 +56,6 @@ public static class KuroBbsAutoSignService
         return index >= 0 ? $"#{index + 1}" : "?";
     }
 
-
-    
-    
-    
-    
     private sealed record SignResult(string Name, bool Ok, string Detail);
 
 
@@ -113,8 +67,6 @@ public static class KuroBbsAutoSignService
         }
     }
 
-
-    
     private static string SignMessage(string? msg, bool ok)
         => string.IsNullOrWhiteSpace(msg)
             ? (ok ? Lang.Instance.KuroBbs_SignOk : Lang.Instance.KuroBbs_SignFail)
@@ -123,20 +75,20 @@ public static class KuroBbsAutoSignService
 
     public static async Task RunDailyOnceAsync()
     {
-        
+
         if (Interlocked.Exchange(ref _running, 1) == 1)
         {
             return;
         }
         try
         {
-            
+
             var accounts = KuroBbsAccountStore.Accounts
                 .Where(a => !string.IsNullOrEmpty(a.Token))
                 .ToList();
             if (accounts.Count == 0)
             {
-                
+
                 return;
             }
 
@@ -154,13 +106,11 @@ public static class KuroBbsAutoSignService
                 return;
             }
 
-            
             await Task.Delay(4000);
 
             bool multi = accounts.Count > 1;
             List<SignResult> results = new();
 
-            
             for (int i = 0; i < accounts.Count; i++)
             {
                 var account = accounts[i];
@@ -179,7 +129,6 @@ public static class KuroBbsAutoSignService
                 }
             }
 
-            
             foreach (var account in accounts)
             {
                 await RunResourceCaptureAsync(account);
@@ -187,14 +136,14 @@ public static class KuroBbsAutoSignService
 
             if (results.Count == 0)
             {
-                
+
                 return;
             }
 
             var failed = results.Where(r => !r.Ok).ToList();
             if (failed.Count > 0)
             {
-                
+
                 string detail = string.Join("；", failed.Select(r => $"{r.Name}：{r.Detail}"));
                 InAppToast.MainWindow?.Error(Lang.Instance.KuroBbs_AutoSignFailedToast, detail);
             }
@@ -206,7 +155,7 @@ public static class KuroBbsAutoSignService
         }
         catch (Exception ex)
         {
-            
+
             Log.LogError(ex, "自动签到：本轮中途异常，未完成的项不记「今天已做」");
             InAppToast.MainWindow?.Error(ex, Lang.Instance.KuroBbs_AutoSignFailedToast);
         }
@@ -216,11 +165,6 @@ public static class KuroBbsAutoSignService
         }
     }
 
-
-    
-    
-    
-    
     private static async Task<SignResult?> RunCommunitySignInAsync(KuroBbsAccount account, string prefix)
     {
         if (DoneToday(account, ItemCommunity))
@@ -231,7 +175,7 @@ public static class KuroBbsAutoSignService
         try
         {
             var result = await KuroBbsClient.Instance.CommunitySignInAsync(account.Token);
-            bool ok = result.IsSuccess || result.Code == 1511; 
+            bool ok = result.IsSuccess || result.Code == 1511;
             if (ok)
             {
                 MarkDone(account, ItemCommunity);
@@ -247,8 +191,6 @@ public static class KuroBbsAutoSignService
         }
     }
 
-
-    
     private static async Task<SignResult?> RunWuwaSignInAsync(KuroBbsAccount account, string prefix)
     {
         if (DoneToday(account, ItemWuwa))
@@ -260,7 +202,7 @@ public static class KuroBbsAutoSignService
         {
             if (string.IsNullOrEmpty(account.RoleId))
             {
-                
+
                 Log.LogInformation("自动签到 · {Account} 鸣潮：账号尚未查到角色 id，本轮跳过", AccountLabel(account, -1));
                 return null;
             }
@@ -280,8 +222,6 @@ public static class KuroBbsAutoSignService
         }
     }
 
-
-    
     private static async Task<SignResult?> RunPgrSignInAsync(KuroBbsAccount account, string prefix)
     {
         if (DoneToday(account, ItemPgr))
@@ -292,19 +232,18 @@ public static class KuroBbsAutoSignService
         string name = prefix + "战双";
         try
         {
-            
+
             bool hasRole = await KuroBbsAccountStore.EnsurePgrRoleAsync(account);
             if (!hasRole)
             {
-                
-                
+
                 bool definite = account.HasPgrRole == false;
                 if (definite)
                 {
                     MarkDone(account, ItemPgr);
                 }
                 Log.LogInformation("自动签到 · {Account} 战双：没有可用的战双角色（结论确定={Definite}）", label, definite);
-                
+
                 return null;
             }
 
@@ -324,11 +263,6 @@ public static class KuroBbsAutoSignService
         }
     }
 
-
-    
-    
-    
-    
     private static async Task RunResourceCaptureAsync(KuroBbsAccount account)
     {
         if (DoneToday(account, ItemResource))
@@ -339,11 +273,6 @@ public static class KuroBbsAutoSignService
         MarkDone(account, ItemResource);
     }
 
-
-    
-    
-    
-    
     private static async Task CaptureResourceRecordsAsync(KuroBbsAccount account)
     {
         try
@@ -369,12 +298,10 @@ public static class KuroBbsAutoSignService
         }
         catch
         {
-            
+
         }
     }
 
-
-    
     private static async Task CaptureBriefingPeriodAsync(KuroBbsAccount account, string type, List<KuroBriefingTitle>? periods)
     {
         if (periods is not { Count: > 0 })

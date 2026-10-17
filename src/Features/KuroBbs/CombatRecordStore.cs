@@ -7,44 +7,33 @@ using System.Text.Json;
 
 namespace Arietta.Features.KuroBbs;
 
-
 public sealed class CombatRecordEntry
 {
-    
+
     public string Mode { get; init; } = "";
 
-    
     public string RoleId { get; init; } = "";
 
-    
     public long PeriodEnd { get; init; }
 
-    
     public int Star { get; init; }
 
-    
     public int MaxStar { get; init; }
 
-    
     public int Score { get; init; }
 
-    
     public string Detail { get; init; } = "";
 
-    
     public string? Chain { get; init; }
 
     public long UpdateTime { get; init; }
 }
-
-
 
 public sealed class TowerFloorRecordEntry
 {
     public string Mode { get; init; } = "";
     public string RoleId { get; init; } = "";
 
-    
     public long PeriodEnd { get; init; }
 
     public int Difficulty { get; init; }
@@ -53,24 +42,10 @@ public sealed class TowerFloorRecordEntry
     public int Floor { get; init; }
     public int Star { get; init; }
 
-    
     public string? Roles { get; init; }
 
     public long UpdateTime { get; init; }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 public static class CombatRecordStore
 {
@@ -80,17 +55,6 @@ public static class CombatRecordStore
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = false };
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static readonly Dictionary<string, int> FallbackSeasonDays = new()
     {
         [ModeTower] = 28,
@@ -98,8 +62,6 @@ public static class CombatRecordStore
         [ModeSlash] = 28,
     };
 
-
-    
     public static void Save(CombatRecordEntry entry)
     {
         try
@@ -119,12 +81,10 @@ public static class CombatRecordStore
         }
         catch
         {
-            
+
         }
     }
 
-
-    
     public static List<CombatRecordEntry> GetList(string mode, string roleId)
     {
         try
@@ -143,8 +103,6 @@ public static class CombatRecordStore
         }
     }
 
-
-    
     public static void Delete(string mode, string roleId)
     {
         try
@@ -165,12 +123,6 @@ public static class CombatRecordStore
         catch { }
     }
 
-
-    
-    
-    
-    
-    
     public static void SaveTowerFloors(string roleId, long periodEnd, KuroTowerData? data)
     {
         if (data?.DifficultyList is null || periodEnd <= 0)
@@ -179,7 +131,7 @@ public static class CombatRecordStore
         }
         try
         {
-            
+
             using var cleanup = DatabaseService.CreateConnection();
             cleanup.Execute(
                 $"DELETE FROM {DatabaseSchema.Tables.TowerFloorRecord} WHERE Mode = @mode AND RoleId = @roleId AND Difficulty != 3;",
@@ -191,7 +143,7 @@ public static class CombatRecordStore
         {
             if (difficulty.Difficulty != 3)
             {
-                continue; 
+                continue;
             }
             foreach (var area in difficulty.TowerAreaList ?? [])
             {
@@ -230,18 +182,13 @@ public static class CombatRecordStore
                     }
                     catch
                     {
-                        
+
                     }
                 }
             }
         }
     }
 
-
-    
-    
-    
-    
     public static void MergeAccumulatedFloors(KuroTowerData? data, string roleId, long periodEnd)
     {
         if (data?.DifficultyList is null || periodEnd <= 0)
@@ -294,7 +241,7 @@ public static class CombatRecordStore
                 if (area.FloorList is { Count: > 0 })
                 {
                     area.FloorList.Sort((a, b) => (a.Floor ?? 0) - (b.Floor ?? 0));
-                    
+
                     int mergedStar = area.FloorList.Sum(f => Math.Clamp(f.Star, 0, 3));
                     area.Star = Math.Max(area.Star, mergedStar);
                 }
@@ -302,14 +249,6 @@ public static class CombatRecordStore
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     public static long[] ComputePeriodStarts(IReadOnlyList<CombatRecordEntry> records, string mode)
     {
         var starts = new long[records.Count];
@@ -319,18 +258,15 @@ public static class CombatRecordStore
             long end = records[i].PeriodEnd;
             if (end <= 0)
             {
-                
+
                 starts[i] = DateTimeOffset.FromUnixTimeMilliseconds(records[i].UpdateTime).ToUnixTimeSeconds();
                 continue;
             }
 
-            
             long prev = records.Skip(i + 1).Select(r => r.PeriodEnd).FirstOrDefault(e => e > 0);
             long gapDays = prev > 0 ? (end - prev) / 86400 : long.MaxValue;
             long start = prev > 0 && gapDays is > 0 and <= 200 ? prev : end - fallbackDays * 86400L;
-            
-            
-            
+
             long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             while (start > now && start > end - 400L * 86400)
             {

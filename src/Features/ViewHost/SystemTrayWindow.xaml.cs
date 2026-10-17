@@ -48,13 +48,6 @@ public sealed partial class SystemTrayWindow : WindowEx
         Hide();
     }
 
-
-
-
-    
-    
-    
-    
     private void SetTrayIcon()
     {
         try
@@ -125,10 +118,6 @@ public sealed partial class SystemTrayWindow : WindowEx
         App.Current.ExitApp();
     }
 
-
-
-
-    
     public void DisposeTrayIcon()
     {
         trayIcon?.Dispose();

@@ -16,10 +16,6 @@ using Windows.Storage.Streams;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
 public sealed partial class RolePage : PageBase
 {
 
@@ -34,7 +30,7 @@ public sealed partial class RolePage : PageBase
     {
         this.Loaded -= RolePage_Loaded;
         KuroBbsEvents.AccountChanged += KuroBbsEvents_AccountChanged;
-        
+
         StackPanel_Info.SizeChanged += StackPanel_Info_SizeChanged;
         await LoadRolesAsync();
     }
@@ -117,11 +113,11 @@ public sealed partial class RolePage : PageBase
             if (result is { IsSuccess: true, Data: { } detail })
             {
                 await FillDetailAsync(detail);
-                
+
                 ScrollView_Roles.Visibility = Visibility.Collapsed;
                 InfoBar_NoAccount.IsOpen = false;
                 Grid_Detail.Visibility = Visibility.Visible;
-                
+
                 Grid_Detail.UpdateLayout();
                 ApplyPortraitStretch();
             }
@@ -150,7 +146,6 @@ public sealed partial class RolePage : PageBase
 
         FillAttributes(detail.RoleAttributeList);
 
-        
         var weapon = detail.WeaponData?.Weapon;
         Panel_Weapon.Visibility = weapon is null ? Visibility.Collapsed : Visibility.Visible;
         Border_Weapon.Visibility = weapon is null ? Visibility.Collapsed : Visibility.Visible;
@@ -177,8 +172,6 @@ public sealed partial class RolePage : PageBase
             Panel_WeaponEffect.Visibility = Visibility.Collapsed;
         }
 
-        
-        
         Border_Skills.Visibility = detail.SkillList is { Count: > 0 } ? Visibility.Visible : Visibility.Collapsed;
         Panel_Skills.Children.Clear();
         StackPanel? skillRow = null;
@@ -213,8 +206,6 @@ public sealed partial class RolePage : PageBase
             skillRow!.Children.Add(stack);
         }
 
-        
-        
         var phantomData = detail.PhantomData;
         List<KuroPhantom> phantoms = phantomData?.EquipPhantomList?.Where(p => p is not null).ToList() ?? [];
         Panel_Phantoms.Visibility = phantoms.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -237,7 +228,6 @@ public sealed partial class RolePage : PageBase
         }
         StackPanel_Phantoms.Children.Add(phantomGrid);
 
-        
         StackPanel_ChainIcons.Children.Clear();
         foreach (var chain in detail.ChainList ?? [])
         {
@@ -245,42 +235,18 @@ public sealed partial class RolePage : PageBase
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private const double DetailImageMaxWidth = 352;
 
-    
     private double _portraitWidth;
 
-    
     private const int SkillsPerRow = 8;
 
-    
     private const uint AlphaProbeSize = 128;
 
-    
     private const byte AlphaThreshold = 24;
 
-    
     private const int BackdropColorDistance = 36;
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     private async Task SetDetailImageAsync(string? url)
     {
         Image_DetailRole.Source = null;
@@ -308,13 +274,12 @@ public sealed partial class RolePage : PageBase
         }
         catch { }
 
-        
         try
         {
             var bitmap = new BitmapImage(new Uri(url));
             bitmap.ImageOpened += (_, _) =>
             {
-                
+
                 if (ReferenceEquals(Image_DetailRole.Source, bitmap))
                 {
                     ApplyDetailImageSize(bitmap.PixelWidth, bitmap.PixelHeight);
@@ -325,18 +290,6 @@ public sealed partial class RolePage : PageBase
         catch { }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static async Task<(SoftwareBitmapSource Source, int Width, int Height)?> TryCropImagePaddingAsync(byte[] bytes)
     {
         try
@@ -358,7 +311,6 @@ public sealed partial class RolePage : PageBase
                 return null;
             }
 
-            
             uint probeWidth = Math.Min(AlphaProbeSize, fullWidth);
             uint probeHeight = Math.Max(1, (uint)Math.Round((double)fullHeight * probeWidth / fullWidth));
             var probeData = await decoder.GetPixelDataAsync(
@@ -369,7 +321,6 @@ public sealed partial class RolePage : PageBase
                 ColorManagementMode.DoNotColorManage);
             byte[] pixels = probeData.DetachPixelData();
 
-            
             int sample = 4;
             long sumB = 0, sumG = 0, sumR = 0, sumA = 0, count = 0;
             foreach (var (ox, oy) in new[] { (0, 0), ((int)probeWidth - sample, 0), (0, (int)probeHeight - sample), ((int)probeWidth - sample, (int)probeHeight - sample) })
@@ -397,7 +348,7 @@ public sealed partial class RolePage : PageBase
                 for (int x = 0; x < probeWidth; x++)
                 {
                     int i = rowStart + (x * 4);
-                    
+
                     bool isContent = transparentBackdrop
                         ? pixels[i + 3] > AlphaThreshold
                         : Math.Abs(pixels[i] - bgB) + Math.Abs(pixels[i + 1] - bgG) + Math.Abs(pixels[i + 2] - bgR) > BackdropColorDistance;
@@ -412,15 +363,14 @@ public sealed partial class RolePage : PageBase
             }
             if (maxX < 0)
             {
-                return null;    
+                return null;
             }
-            
+
             if (minX * 2 > probeWidth || maxX * 2 < probeWidth || minY * 2 > probeHeight || maxY * 2 < probeHeight)
             {
                 return null;
             }
 
-            
             double scaleX = (double)fullWidth / probeWidth;
             double scaleY = (double)fullHeight / probeHeight;
             double marginX = fullWidth * 0.005;
@@ -436,7 +386,6 @@ public sealed partial class RolePage : PageBase
                 return null;
             }
 
-            
             var cropped = await decoder.GetSoftwareBitmapAsync(
                 BitmapPixelFormat.Bgra8,
                 BitmapAlphaMode.Premultiplied,
@@ -462,31 +411,18 @@ public sealed partial class RolePage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private void ApplyDetailImageSize(int pixelWidth, int pixelHeight)
     {
         if (pixelWidth <= 0 || pixelHeight <= 0)
         {
             return;
         }
-        
+
         double scale = Math.Min(DetailImageMaxWidth / pixelWidth, 1.0);
         _portraitWidth = Math.Round(pixelWidth * scale);
         ApplyPortraitStretch();
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     private void ApplyPortraitStretch()
     {
         if (Image_DetailRole.Source is null || _portraitWidth <= 0)
@@ -497,7 +433,7 @@ public sealed partial class RolePage : PageBase
         double bottom = 0;
         try
         {
-            
+
             bottom = Border_Skills
                 .TransformToVisual(StackPanel_Info)
                 .TransformPoint(new Point(0, Border_Skills.ActualHeight)).Y;
@@ -511,7 +447,7 @@ public sealed partial class RolePage : PageBase
         catch { }
         if (bottom <= 0 || bottom - top < 40)
         {
-            
+
             top = 0;
             bottom = StackPanel_Info.ActualHeight;
         }
@@ -527,8 +463,6 @@ public sealed partial class RolePage : PageBase
 
     private void StackPanel_Info_SizeChanged(object sender, SizeChangedEventArgs e) => ApplyPortraitStretch();
 
-
-    
     private static LinearGradientBrush BuildWeaponRarityBrush(int starLevel)
     {
         var brush = new LinearGradientBrush
@@ -554,8 +488,6 @@ public sealed partial class RolePage : PageBase
         return brush;
     }
 
-
-    
     private void FillAttributes(List<KuroRoleAttribute>? attributes)
     {
         StackPanel_Attributes.Children.Clear();
@@ -602,8 +534,6 @@ public sealed partial class RolePage : PageBase
         }
     }
 
-
-    
     private Border BuildChainIcon(KuroChain chain)
     {
         var image = new Image { Width = 32, Height = 32, Stretch = Stretch.Uniform };
@@ -621,7 +551,7 @@ public sealed partial class RolePage : PageBase
             Height = 40,
             CornerRadius = new CornerRadius(20),
             Opacity = chain.Unlocked ? 1.0 : 0.25,
-            
+
             Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0x59, 0x00, 0x00, 0x00)),
             Child = image,
         };
@@ -630,8 +560,6 @@ public sealed partial class RolePage : PageBase
         return border;
     }
 
-
-    
     private static readonly Windows.UI.Color[] PropColors =
     [
         Windows.UI.Color.FromArgb(0xFF, 0xD9, 0xB1, 0x4C),
@@ -641,15 +569,10 @@ public sealed partial class RolePage : PageBase
         Windows.UI.Color.FromArgb(0xFF, 0x9A, 0x6A, 0xB8),
     ];
 
-    
-    
-    
-    
     private Border BuildPhantomTag(KuroPhantom phantom)
     {
         var prop = phantom.PhantomProp;
 
-        
         var iconStack = new Grid { Width = 56, Height = 56, VerticalAlignment = VerticalAlignment.Top };
         try
         {
@@ -675,7 +598,6 @@ public sealed partial class RolePage : PageBase
 
         var content = new StackPanel { Spacing = 4 };
 
-        
         var head = new Grid { ColumnSpacing = 8 };
         head.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -700,7 +622,6 @@ public sealed partial class RolePage : PageBase
         content.Children.Add(head);
         content.Children.Add(BuildDivider());
 
-        
         foreach (var main in phantom.MainProps ?? [])
         {
             var row = new Grid { ColumnSpacing = 12 };
@@ -715,7 +636,6 @@ public sealed partial class RolePage : PageBase
             content.Children.Add(row);
         }
 
-        
         var subs = phantom.SubProps ?? [];
         if (subs.Count > 0)
         {
@@ -752,8 +672,6 @@ public sealed partial class RolePage : PageBase
         return KuroBbsUi.KuroCard(cardGrid, padding: new Thickness(12, 10, 12, 10));
     }
 
-
-    
     private static Border BuildDivider()
     {
         Brush brush = Application.Current.Resources.TryGetValue("DividerStrokeColorDefaultBrush", out var value) && value is Brush found
@@ -762,8 +680,6 @@ public sealed partial class RolePage : PageBase
         return KuroBbsUi.MakeDivider(brush, 1);
     }
 
-
-    
     private static string BuildPhantomSummary(int? cost, List<KuroPhantom> phantoms)
     {
         string text = $"COST {cost}";
@@ -780,7 +696,7 @@ public sealed partial class RolePage : PageBase
     private void Button_CloseDetail_Click(object sender, RoutedEventArgs e)
     {
         Grid_Detail.Visibility = Visibility.Collapsed;
-        
+
         if (KuroBbsAccountStore.Load() is { IsValid: true })
         {
             ScrollView_Roles.Visibility = Visibility.Visible;
@@ -788,8 +704,6 @@ public sealed partial class RolePage : PageBase
     }
 
 }
-
-
 
 public sealed class KuroRoleItem
 {

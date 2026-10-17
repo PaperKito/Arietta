@@ -4,31 +4,10 @@ using Arietta.Core;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class AnnouncementLanguageSettings
 {
     public const string ConfigKey = "AnnouncementLanguage";
 
-    
     public static readonly (string? Code, string Label)[] Options =
     [
         ("zh-Hans",  "简体中文"),
@@ -43,16 +22,12 @@ public static class AnnouncementLanguageSettings
         ("pt-BR",    "Português (Brasil)"),
     ];
 
-
-    
-    
-    
     public static string Selected
     {
         get
         {
             string? value = AppConfig.GetConfig(ConfigKey);
-            
+
             foreach (var (code, _) in Options)
             {
                 if (string.Equals(code, value, StringComparison.OrdinalIgnoreCase))
@@ -64,15 +39,6 @@ public static class AnnouncementLanguageSettings
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     public static string EffectiveLanguage => Normalize(Selected) ?? NormalizeSystemLanguage();
 
 
@@ -81,8 +47,6 @@ public static class AnnouncementLanguageSettings
         AppConfig.SetConfig(ConfigKey, string.IsNullOrWhiteSpace(code) ? null : code);
     }
 
-
-    
     public static string? Normalize(string? language)
     {
         if (string.IsNullOrWhiteSpace(language))
@@ -91,7 +55,6 @@ public static class AnnouncementLanguageSettings
         }
         string lang = language.Trim();
 
-        
         foreach (var (code, _) in Options)
         {
             if (code is not null && string.Equals(code, lang, StringComparison.OrdinalIgnoreCase))
@@ -102,14 +65,12 @@ public static class AnnouncementLanguageSettings
 
         string lower = lang.ToLowerInvariant();
 
-        
         if (lower.StartsWith("zh"))
         {
             bool traditional = lower.Contains("hant") || lower.Contains("tw") || lower.Contains("hk") || lower.Contains("mo");
             return traditional ? "zh-Hant" : "zh-Hans";
         }
 
-        
         string primary = lower.Split('-', '_')[0];
         foreach (var (code, _) in Options)
         {
@@ -123,12 +84,9 @@ public static class AnnouncementLanguageSettings
             }
         }
 
-        
         return null;
     }
 
-
-    
     private static string NormalizeSystemLanguage()
     {
         try

@@ -27,7 +27,6 @@
             <RowDefinition Height="124" />
         </Grid.RowDefinitions>
 
-        
         <Grid Name="Grid_BannerContainer"
               PointerEntered="Grid_BannerContainer_PointerEntered"
               PointerExited="Grid_BannerContainer_PointerExited">
@@ -60,7 +59,6 @@
             </Border>
         </Grid>
 
-        
         <Border Grid.Row="1">
             <Pivot x:Name="Pivot_Posts"
                    ItemsSource="{x:Bind PostGroups}">

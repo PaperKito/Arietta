@@ -8,18 +8,12 @@ using Windows.Foundation;
 
 namespace Arietta.Features.PlayTime;
 
-
-
-
 public sealed class BarChart : Grid
 {
 
 
     private List<BarChartItem>? _items;
 
-    
-    
-    
     public List<BarChartItem>? Items
     {
         get => _items;
@@ -30,16 +24,8 @@ public sealed class BarChart : Grid
         }
     }
 
-
-    
-    
-    
     public double PlotHeight { get; set; } = 180;
 
-
-    
-    
-    
     public double MaxBarWidth { get; set; } = 38;
 
 
@@ -59,7 +45,7 @@ public sealed class BarChart : Grid
         Children.Clear();
         RowDefinitions.Clear();
         ColumnDefinitions.Clear();
-        
+
         _hoverCard.Clear();
 
         var items = _items;
@@ -82,7 +68,6 @@ public sealed class BarChart : Grid
         Brush secondary = ChartHelpers.GetResource<Brush>("TextFillColorSecondaryBrush");
         Style? caption = Application.Current.Resources.TryGetValue("CaptionTextBlockStyle", out var v) ? v as Style : null;
 
-        
         string[] labelTexts = new string[3];
         for (int i = 0; i < 3; i++)
         {
@@ -98,7 +83,6 @@ public sealed class BarChart : Grid
         double labelBoxWidth = Math.Ceiling(labelWidth) + 2;
         ColumnDefinitions[0] = new ColumnDefinition { Width = new GridLength(labelBoxWidth + 4) };
 
-        
         var axisLabels = new Canvas();
         Grid.SetRow(axisLabels, 0);
         Grid.SetColumn(axisLabels, 0);
@@ -134,7 +118,6 @@ public sealed class BarChart : Grid
         Children.Add(axisLabels);
         Children.Add(axisLines);
 
-        
         double columnWidth = ActualWidth > 0
             ? Math.Max(12, (ActualWidth - labelBoxWidth - 4) / items.Count - 10)
             : 28;
@@ -143,7 +126,6 @@ public sealed class BarChart : Grid
         var barsHost = new Grid { VerticalAlignment = VerticalAlignment.Bottom };
         var labelsHost = new Grid();
 
-        
         var hoverHighlight = new Rectangle
         {
             Width = barWidth,
@@ -178,8 +160,7 @@ public sealed class BarChart : Grid
             barsHost.Children.Add(bar);
             if (!string.IsNullOrEmpty(item.Tooltip))
             {
-                
-                
+
                 var hit = new Rectangle
                 {
                     Width = barWidth,
@@ -218,16 +199,11 @@ public sealed class BarChart : Grid
         Children.Add(barsHost);
         Children.Add(labelsHost);
 
-        
         SetRowSpan(_hoverCard, 2);
         SetColumnSpan(_hoverCard, 2);
         Children.Add(_hoverCard);
     }
 
-
-    
-    
-    
     private static string FormatHours(double minutes)
     {
         double hours = minutes / 60.0;

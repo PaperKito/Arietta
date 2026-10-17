@@ -12,16 +12,6 @@ using static Vanara.PInvoke.User32;
 
 namespace Arietta.Features.Gamepad;
 
-
-
-
-
-
-
-
-
-
-
 internal static class GamepadController
 {
 
@@ -31,16 +21,12 @@ internal static class GamepadController
 
     private static IGameInput? _gameInput;
 
-    
     public static bool Initialized { get; private set; }
 
-    
     public static bool Enabled { get; private set; }
 
-    
     public static bool NeedInstallGameInputRedist { get; private set; }
 
-    
     public static bool GameInputRedistOutdate { get; private set; }
 
     private static VirtualKey[] _guideModifiers = [];
@@ -48,11 +34,6 @@ internal static class GamepadController
     private static VirtualKey[] _shareModifiers = [];
     private static VirtualKey[] _shareKeys = [];
 
-
-    
-    
-    
-    
     public static void Initialize()
     {
         lock (_initLock)
@@ -87,7 +68,7 @@ internal static class GamepadController
                 }
                 _gameInput.RegisterSystemButtonCallback(null, GameInputSystemButtons.Guide | GameInputSystemButtons.Share,
                                                         null, GameInputSystemButtonCallback, out _, out _);
-                
+
                 if (SharpGameInput.GameInput.TryCast(_gameInput, out SharpGameInput.V2.IGameInput? gameInputV2))
                 {
                     using (gameInputV2)
@@ -110,8 +91,6 @@ internal static class GamepadController
         }
     }
 
-
-    
     public static void SetEnabled(bool value)
     {
         AppConfig.SetConfig("GamepadEnabled", value ? "1" : "0");
@@ -123,8 +102,6 @@ internal static class GamepadController
         UpdateGameBarRegistry();
     }
 
-
-    
     public static bool SetGuideKeys(string? value, out string keysTextOrErrorKey)
     {
         if (!TryParseKeys(value, out var modifiers, out var keys, out keysTextOrErrorKey))
@@ -138,8 +115,6 @@ internal static class GamepadController
         return true;
     }
 
-
-    
     public static bool SetShareKeys(string? value, out string keysTextOrErrorKey)
     {
         if (!TryParseKeys(value, out var modifiers, out var keys, out keysTextOrErrorKey))
@@ -152,11 +127,6 @@ internal static class GamepadController
         return true;
     }
 
-
-    
-    
-    
-    
     public static void RestoreGameBarRegistry()
     {
         if (!_gameBarDisabledByUs)
@@ -181,7 +151,7 @@ internal static class GamepadController
             {
                 return;
             }
-            
+
             if (currentState.HasFlag(GameInputSystemButtons.Guide) && !previousState.HasFlag(GameInputSystemButtons.Guide))
             {
                 if (_guideKeys.Length > 0)
@@ -210,10 +180,6 @@ internal static class GamepadController
 
     private static bool _gameBarDisabledByUs;
 
-    
-    
-    
-    
     private static void UpdateGameBarRegistry()
     {
         bool needDisable = Initialized && Enabled && _guideKeys.Length > 0;
@@ -284,7 +250,7 @@ internal static class GamepadController
             ki = new KEYBDINPUT
             {
                 wVk = vk,
-                
+
                 wScan = (ushort)MapVirtualKey(vk, MAPVK.MAPVK_VK_TO_VSC),
                 dwFlags = flags,
             },

@@ -11,16 +11,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
-
-
-
 [INotifyPropertyChanged]
 public sealed partial class GameAccountSwitcher : UserControl
 {
@@ -32,11 +22,8 @@ public sealed partial class GameAccountSwitcher : UserControl
         this.Unloaded += GameAccountSwitcher_Unloaded;
     }
 
-
-    
     private bool _refreshing;
 
-    
     private string? _currentCuid;
 
 
@@ -61,18 +48,10 @@ public sealed partial class GameAccountSwitcher : UserControl
         DispatcherQueue.TryEnqueue(RefreshRunningState);
     }
 
-
-    
     public bool IsGameRunning { get; private set => SetProperty(ref field, value); }
 
-
-    
     public string? GameRunningHint { get; private set => SetProperty(ref field, value); }
 
-
-    
-    
-    
     public Core.GameBiz CurrentGameBiz
     {
         get;
@@ -100,22 +79,16 @@ public sealed partial class GameAccountSwitcher : UserControl
         }
     }
 
-
-    
     public bool ShowUnsavedHint { get; set => SetProperty(ref field, value); }
 
-
-    
     public bool CanSwitchAccount { get; set => SetProperty(ref field, value); }
 
-
-    
     private string? RecentlyLoginUid { get; set; }
 
 
     public void UpdateAccounts()
     {
-        
+
         _ = UpdateAccountsAsync();
     }
 
@@ -130,23 +103,21 @@ public sealed partial class GameAccountSwitcher : UserControl
         try
         {
             var biz = CurrentGameBiz;
-            
+
             var accounts = KrSdkAccountService.GetAccounts(biz);
             foreach (var acc in accounts)
             {
                 KrSdkAccountStore.ApplyTo(biz, acc);
             }
-            
+
             _currentCuid = KrSdkAccountService.GetCurrentCuid(biz);
             AccountList = FilterByRole(biz, accounts);
             SelectAccount = AccountList.FirstOrDefault(a => a.Cuid == _currentCuid) ?? AccountList.FirstOrDefault();
             UpdateCanSwitch();
 
-            
             string? recentUid = await Task.Run(() => KrSdkAccountService.GetRecentlyLoginUid(biz));
             RecentlyLoginUid = recentUid;
 
-            
             bool changed = await KrSdkAccountService.RefreshAccountInfosAsync(biz, accounts, recentUid);
             if (changed)
             {
@@ -154,7 +125,7 @@ public sealed partial class GameAccountSwitcher : UserControl
                 {
                     KrSdkAccountStore.ApplyTo(biz, acc);
                 }
-                
+
                 AccountList = FilterByRole(biz, accounts);
                 var selected = AccountList.FirstOrDefault(a => a.Cuid == _currentCuid) ?? AccountList.FirstOrDefault();
                 SelectAccount = selected;
@@ -172,21 +143,6 @@ public sealed partial class GameAccountSwitcher : UserControl
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private List<KrSdkAccount> FilterByRole(Core.GameBiz biz, List<KrSdkAccount> accounts)
     {
         if (accounts.Count == 0)
@@ -197,11 +153,6 @@ public sealed partial class GameAccountSwitcher : UserControl
         return kept.Count == 0 ? accounts : kept;
     }
 
-
-    
-    
-    
-    
     private void ComboBox_GameAccount_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var selected = SelectAccount;
@@ -209,16 +160,12 @@ public sealed partial class GameAccountSwitcher : UserControl
         UpdateCanSwitch();
     }
 
-
-    
     private void UpdateCanSwitch()
     {
         var selected = SelectAccount;
         CanSwitchAccount = !IsGameRunning && selected is not null && selected.Cuid != _currentCuid;
     }
 
-
-    
     private void RefreshRunningState()
     {
         bool running = GameProcessMonitor.IsRunning(CurrentGameBiz);
@@ -237,7 +184,7 @@ public sealed partial class GameAccountSwitcher : UserControl
     {
         try
         {
-            
+
             if (SelectAccount is not null && CanSwitchAccount && !IsGameRunning)
             {
                 KrSdkAccountService.SwitchTo(CurrentGameBiz, SelectAccount.Cuid);
@@ -259,7 +206,7 @@ public sealed partial class GameAccountSwitcher : UserControl
         {
             if (SelectAccount is not null)
             {
-                
+
                 KrSdkAccountStore.SetNickname(CurrentGameBiz, SelectAccount.Cuid, string.IsNullOrWhiteSpace(SelectAccount.Nickname) ? null : SelectAccount.Nickname);
                 ShowUnsavedHint = false;
                 UpdateAccounts();
@@ -279,7 +226,7 @@ public sealed partial class GameAccountSwitcher : UserControl
         {
             if (SelectAccount is not null)
             {
-                
+
                 KrSdkAccountStore.Remove(CurrentGameBiz, SelectAccount.Cuid);
                 SelectAccount.Nickname = null;
                 SelectAccount.RoleId = null;

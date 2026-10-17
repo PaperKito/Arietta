@@ -5,20 +5,9 @@ using System.IO;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
-
-
-
 public static class GachaIcon
 {
 
-    
     private static readonly System.Collections.Generic.Dictionary<int, ImageSource?> _cache = [];
 
     private static readonly object _lock = new();
@@ -45,8 +34,6 @@ public static class GachaIcon
         return image;
     }
 
-
-    
     public static ImageSource? FromFile(string file)
     {
         try
@@ -68,11 +55,11 @@ public static class GachaIcon
 
     private static ImageSource? LoadCore(int resourceId)
     {
-        
+
         string? file = Path.Combine(AppContext.BaseDirectory, "Assets", "Gacha", $"{resourceId}.png");
         if (!File.Exists(file))
         {
-            
+
             file = Path.Combine(AppConfig.LocalFolder, "GachaIcons", $"{resourceId}.png");
             if (!File.Exists(file))
             {

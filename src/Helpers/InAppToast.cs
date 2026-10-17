@@ -13,7 +13,6 @@ namespace Arietta.Helpers;
 public class InAppToast : Behavior<StackPanel>
 {
 
-    
     private const float SlideUpDistance = 64f;
 
     private readonly DispatcherQueueTimer _dismissTimer;
@@ -115,15 +114,11 @@ public class InAppToast : Behavior<StackPanel>
         });
     }
 
-
-    
     private void InfoBar_CloseButtonClick(InfoBar sender, object args)
     {
         _ = HideAsync(sender);
     }
 
-
-    
     public async Task HideAsync(InfoBar infoBar)
     {
         try
@@ -152,8 +147,6 @@ public class InAppToast : Behavior<StackPanel>
         catch { }
     }
 
-
-    
     private static void AnimateIn(UIElement element)
     {
         var visual = ElementCompositionPreview.GetElementVisual(element);

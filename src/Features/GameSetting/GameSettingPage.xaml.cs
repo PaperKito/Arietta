@@ -52,7 +52,6 @@ public sealed partial class GameSettingPage : PageBase
 
     public bool IsApplyButtonEnable { get; private set => SetProperty(ref field, value); }
 
-    
     public string ErrorMessage { get; set => SetProperty(ref field, value); } = Lang.Instance.GameSettingPage_SettingNotEffect;
 
 
@@ -63,7 +62,7 @@ public sealed partial class GameSettingPage : PageBase
         {
             if (SetProperty(ref field, value))
             {
-                
+
                 IsApplyButtonEnable = true;
                 UpdateResolutionInputState();
             }
@@ -73,8 +72,6 @@ public sealed partial class GameSettingPage : PageBase
 
     public bool IsPgrFullscreenBlocked { get; private set => SetProperty(ref field, value); }
 
-
-    
     public bool IsResolutionListEnabled { get; private set => SetProperty(ref field, value); }
 
     public bool IsCustomResInputEnabled { get; private set => SetProperty(ref field, value); }
@@ -171,7 +168,7 @@ public sealed partial class GameSettingPage : PageBase
             var entry = GameRegistry.GetEntry(biz);
             if (entry.CloudUrl is not null || !GameSettingService.IsGameInstalled(biz))
             {
-                
+
                 StackPanel_NotInstalled.Visibility = Visibility.Visible;
                 IsBaseSettingEnable = false;
                 IsLanguageSettingEnable = false;
@@ -182,7 +179,7 @@ public sealed partial class GameSettingPage : PageBase
                 return;
             }
             StackPanel_NotInstalled.Visibility = Visibility.Collapsed;
-            
+
             bool isPgr = biz.IsPunishingGrayRaven();
             IsBaseSettingEnable = true;
             IsLanguageSettingEnable = !isPgr;
@@ -215,7 +212,7 @@ public sealed partial class GameSettingPage : PageBase
             EnableHDR = isPgr ? GameSettingService.GetPgrHdrEnabled(biz) : GameSettingService.GetHdrEnabled(biz);
             if (isPgr)
             {
-                
+
                 DisposeDisplayInformation();
                 HDRNotSupported = false;
                 HDRNotEnabled = false;
@@ -244,7 +241,7 @@ public sealed partial class GameSettingPage : PageBase
         {
             _loading = true;
             ComboBox_Resolution.Items.Clear();
-            
+
             var list = ViewHost.MainView.CurrentGameBiz.IsPunishingGrayRaven()
                 ? GameSettingService.GetPgrAvailableResolutions()
                 : GameSettingService.GetAvailableResolutions();
@@ -266,9 +263,6 @@ public sealed partial class GameSettingPage : PageBase
         }
     }
 
-
-
-    
     private static bool TryParseSize(string text, out int width, out int height)
     {
         width = 0;
@@ -322,7 +316,7 @@ public sealed partial class GameSettingPage : PageBase
             {
                 if (ResolutionWidth <= 0 || ResolutionHeight <= 0)
                 {
-                    
+
                     ErrorMessage = Lang.Instance.GameSettingPage_ResolutionMustBeGreaterThan0;
                     return;
                 }

@@ -12,28 +12,12 @@ using System.Xml.Linq;
 
 namespace Arietta.Features.Sync;
 
-
 internal sealed record WebDavResource(string Href, string? ETag, DateTimeOffset? LastModified);
-
 
 internal sealed record WebDavUploadResult(bool Success, string? ETag, int StatusCode)
 {
     public bool PreconditionFailed => StatusCode is 412;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 internal sealed class WebDavClient : IDisposable
 {
@@ -67,13 +51,6 @@ internal sealed class WebDavClient : IDisposable
         _http.DefaultRequestHeaders.UserAgent.ParseAdd("Arietta");
     }
 
-    
-    
-    
-    
-    
-    
-    
     private Uri BuildUri(string relativePath, bool collection = false)
     {
         string encoded = Encode(relativePath);
@@ -104,7 +81,6 @@ internal sealed class WebDavClient : IDisposable
         return new Uri(url);
     }
 
-    
     private async Task<HttpResponseMessage> SendAsync(Func<HttpRequestMessage> factory, CancellationToken ct)
     {
         const int maxAttempts = 3;
@@ -132,7 +108,6 @@ internal sealed class WebDavClient : IDisposable
         return response!;
     }
 
-    
     public async Task<(bool Success, string Message)> TestAsync(CancellationToken ct = default)
     {
         try
@@ -158,12 +133,10 @@ internal sealed class WebDavClient : IDisposable
         }
     }
 
-    
     public async Task<WebDavResource?> GetResourceAsync(string relativePath, CancellationToken ct = default)
     {
         (HttpStatusCode status, string? xml, string reason) = await PropFindAsync(relativePath, collection: false, ct);
 
-        
         if ((status is HttpStatusCode.Unauthorized or HttpStatusCode.MovedPermanently or HttpStatusCode.Found)
             && !relativePath.EndsWith('/'))
         {
@@ -194,11 +167,6 @@ internal sealed class WebDavClient : IDisposable
         return (response.StatusCode, body, response.ReasonPhrase ?? "");
     }
 
-    
-    
-    
-    
-    
     private static List<WebDavResource> ParseResources(string xml, string hrefFallback)
     {
         var list = new List<WebDavResource>();
@@ -233,7 +201,6 @@ internal sealed class WebDavClient : IDisposable
         return ParseResources(xml, relativePath).FirstOrDefault();
     }
 
-    
     public static string? NormalizeETag(string? etag)
     {
         if (string.IsNullOrWhiteSpace(etag))
@@ -243,13 +210,6 @@ internal sealed class WebDavClient : IDisposable
         return etag.Trim().TrimStart('W', '/').Trim('"');
     }
 
-    
-    
-    
-    
-    
-    
-    
     public async Task EnsureFolderAsync(string relativePath, CancellationToken ct = default)
     {
         using (var response = await SendAsync(() => new HttpRequestMessage(new HttpMethod("MKCOL"), BuildUri(relativePath)), ct))
@@ -265,7 +225,6 @@ internal sealed class WebDavClient : IDisposable
             return;
         }
 
-        
         using (var retry = await SendAsync(() => new HttpRequestMessage(new HttpMethod("MKCOL"), BuildUri(relativePath, collection: true)), ct))
         {
             if (retry.IsSuccessStatusCode || retry.StatusCode == HttpStatusCode.MethodNotAllowed)
@@ -295,11 +254,6 @@ internal sealed class WebDavClient : IDisposable
         return (content, NormalizeETag(response.Headers.ETag?.Tag));
     }
 
-    
-    
-    
-    
-    
     public async Task<WebDavUploadResult> UploadAsync(string relativePath, byte[] content, string? ifMatch, CancellationToken ct = default)
     {
         int statusCode;
@@ -325,8 +279,6 @@ internal sealed class WebDavClient : IDisposable
             }
         }
 
-        
-        
         if (etag is null)
         {
             try
@@ -338,21 +290,18 @@ internal sealed class WebDavClient : IDisposable
         return new WebDavUploadResult(true, etag, statusCode);
     }
 
-    
     public async Task<bool> DeleteAsync(string relativePath, CancellationToken ct = default)
     {
         using var response = await SendAsync(() => new HttpRequestMessage(HttpMethod.Delete, BuildUri(relativePath)), ct);
         return response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound;
     }
 
-    
     public async Task<bool> DeleteCollectionAsync(string relativePath, CancellationToken ct = default)
     {
         using var response = await SendAsync(() => new HttpRequestMessage(HttpMethod.Delete, BuildUri(relativePath, collection: true)), ct);
         return response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound;
     }
 
-    
     public async Task<List<WebDavResource>> ListAsync(string relativePath, CancellationToken ct = default)
     {
         using var response = await SendAsync(() =>
@@ -374,7 +323,6 @@ internal sealed class WebDavClient : IDisposable
 
     public void Dispose() => _http.Dispose();
 }
-
 
 internal sealed class WebDavException : Exception
 {

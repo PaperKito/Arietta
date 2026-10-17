@@ -5,19 +5,11 @@ using System;
 
 namespace Arietta.Features.Setting;
 
-
-
-
-
-
-
 public sealed partial class DownloadSetting : PageBase
 {
 
-    
     private bool _restoringDownload;
 
-    
     private bool _threadsReady;
 
 
@@ -57,7 +49,7 @@ public sealed partial class DownloadSetting : PageBase
 
     private void RefreshThreads()
     {
-        
+
         Slider_Threads.Minimum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMin;
         Slider_Threads.Maximum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMax;
         Slider_Threads.Value = GameLauncher.GameUpdate.GameUpdateService.DownloadThreads;
@@ -83,7 +75,7 @@ public sealed partial class DownloadSetting : PageBase
         {
             return;
         }
-        
+
         double mb = double.IsNaN(sender.Value) ? 0 : Math.Floor(sender.Value);
         if (sender.Value != mb)
         {
@@ -97,7 +89,7 @@ public sealed partial class DownloadSetting : PageBase
 
     private void Slider_Threads_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs args)
     {
-        
+
         if (!_threadsReady)
         {
             return;

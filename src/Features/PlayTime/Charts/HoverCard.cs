@@ -8,10 +8,6 @@ using Windows.Foundation;
 
 namespace Arietta.Features.PlayTime;
 
-
-
-
-
 public sealed class HoverCard : Canvas
 {
 
@@ -34,10 +30,6 @@ public sealed class HoverCard : Canvas
 
     private const double HoverGap = 8.0;
 
-
-    
-    
-    
     public bool AlwaysAbove { get; set; }
 
 
@@ -50,11 +42,6 @@ public sealed class HoverCard : Canvas
         Visibility = Visibility.Collapsed;
     }
 
-
-
-    
-    
-    
     public void Bind(FrameworkElement element, Func<string?> textProvider)
     {
         if (_bindings.TryAdd(element, textProvider))
@@ -68,11 +55,6 @@ public sealed class HoverCard : Canvas
         }
     }
 
-
-    
-    
-    
-    
     public void Clear()
     {
         foreach (var element in _bindings.Keys)
@@ -124,7 +106,6 @@ public sealed class HoverCard : Canvas
             top = pos.Y + anchor.ActualHeight + HoverGap;
         }
 
-        
         double hostW = ActualWidth > 0 ? ActualWidth : 0;
         if (hostW > 0)
         {

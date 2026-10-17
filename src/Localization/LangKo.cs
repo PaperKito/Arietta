@@ -2,26 +2,18 @@
 
 namespace Arietta.Localization;
 
-
-
-
-
-
-
-
 internal static class LangKo
 {
 
     public static readonly Dictionary<string, string> Map = new()
     {
-        
+
         ["MainPage_Launcer"] = "런처",
         ["LauncherPage_GameSetting"] = "게임 설정",
         ["MainPage_GameScreenshot"] = "스크린샷",
         ["GachaLogPage_ConveneRecords"] = "소환 기록",
         ["Toolbox"] = "도구",
 
-        
         ["ScreenshotPage_MultiSelect"] = "다중 선택",
         ["ScreenshotPage_OpenFolder"] = "폴더 열기",
         ["ScreenshotPage_Total0Files"] = "총 {0}장",
@@ -36,25 +28,21 @@ internal static class LangKo
         ["ScreenshotPage_OpenImage"] = "이미지 열기",
         ["ScreenshotPage_DeletedPartial"] = "{0} / {1}장을 삭제했습니다. 나머지는 사용 중일 수 있습니다",
 
-        
         ["KuroBbs"] = "쿠로 BBS",
         ["KuroBbs_SignIn"] = "출석 체크",
         ["KuroBbs_Role"] = "캐릭터",
         ["KuroBbs_ResourceBrief"] = "자원 요약",
 
-        
         ["PgrData_NoRole"] = "이 쿠로 BBS 계정에는 아직 퍼니싱 캐릭터가 설정되어 있지 않습니다. 쿠로 BBS 앱의 '마이'에서 설정한 후 다시 확인하세요.",
         ["PgrData_Locked"] = "잠김",
         ["PgrData_FullIn"] = "{0} 후 전부 회복",
 
-        
         ["KuroBbs_DataTerminal"] = "데이터 터미널",
         ["KuroBbs_CombatData"] = "전투 데이터",
         ["DataTerminal_NoAccount"] = "아직 쿠로 BBS에 로그인하지 않았습니다. 위의 계정 화살표를 눌러 로그인한 후 확인하세요.",
         ["DataTerminal_NoRole"] = "이 쿠로 BBS 계정에는 아직 {0} 캐릭터가 연동되어 있지 않습니다. 먼저 쿠로 BBS 앱에서 연동해 주세요.",
         ["DataTerminal_LoadFailed"] = "페이지를 불러오지 못했습니다: {0}",
 
-        
         ["KuroBbs_PgrRole"] = "캐릭터",
         ["KuroBbs_PgrResource"] = "자원 리포트",
         ["KuroBbs_PgrCage"] = "통곡의 감옥",
@@ -76,7 +64,6 @@ internal static class LangKo
         ["PgrWarArea_Waves"] = "웨이브 {0}",
         ["PgrCommon_LoadFailed"] = "데이터를 가져오지 못했습니다",
 
-        
         ["DailyBriefing"] = "브리핑",
         ["DailyBriefing_Desc"] = "게임 내 일일 데이터",
         ["DailyBriefing_Refresh"] = "새로 고침",
@@ -95,7 +82,6 @@ internal static class LangKo
         ["KuroBbs_TokenExpired"] = "쿠로 BBS 로그인이 만료되었습니다",
         ["KuroBbs_TokenExpiredDesc"] = "설정 → 쿠로 BBS 계정에서 토큰을 다시 캡처하거나 입력하세요",
 
-        
         ["KuroAccount_UsbTitle"] = "ADB 도구",
         ["KuroAccount_UsbShortDesc"] = "안드로이드 폰을 연결해 쿠로 BBS 토큰과 Did를 캡처",
         ["KuroAccount_UsbDesc"] = "USB 케이블로 휴대폰을 연결하고 USB 디버깅을 켜세요. 휴대폰에서 쿠로 BBS 앱을 열고 '데이터 터미널' 또는 '육성 계산기' 페이지에 진입한 뒤 '캡처 시작'을 누르면 도구가 토큰과 did를 자동으로 캡처합니다. adb.exe가 필요합니다(",
@@ -142,7 +128,6 @@ internal static class LangKo
         ["KuroAccount_Saved"] = "계정이 저장되었습니다",
         ["KuroAccount_Cleared"] = "계정이 삭제되었습니다",
 
-        
         ["RolePage_Refresh"] = "새로 고침",
         ["RolePage_NoAccount"] = "쿠로 BBS 계정이 아직 설정되지 않았습니다",
         ["RolePage_NoAccountDesc"] = "설정 → 쿠로 BBS 계정에서 설정을 마친 뒤 새로 고치세요",
@@ -150,7 +135,6 @@ internal static class LangKo
         ["RolePage_Back"] = "목록으로 돌아가기",
         ["RolePage_Phantoms"] = "에코",
 
-        
         ["GachaLogPage_Refresh"] = "기록 업데이트",
         ["GachaLogPage_ImportUrl"] = "링크 붙여넣어 가져오기",
         ["GachaLogPage_ImportUrlDesc"] = "소환 상세 페이지 링크를 붙여넣으세요(게임 내 '소환 상세'를 연 뒤 로그에서 얻거나, 다른 도구에서 복사). 클라우드폰 유저도 사용할 수 있습니다.",
@@ -208,7 +192,6 @@ internal static class LangKo
         ["GachaLogPage_EmptyTitle"] = "아직 소환 기록이 없습니다",
         ["GachaLogPage_EmptyDesc"] = "먼저 설정에서 게임 폴더를 지정하고, 게임에 들어가 '소환 상세' 페이지를 한 번 연 뒤, 여기로 돌아와 '기록 업데이트'를 누르면 동기화됩니다.",
 
-        
         ["LauncherPage_StartGame"] = "게임 시작",
         ["LauncherPage_InstallGame"] = "게임 설치",
         ["LauncherPage_ResumeInstall"] = "설치 계속",
@@ -226,10 +209,8 @@ internal static class LangKo
         ["Notice_LoadFailed"] = "공지를 불러오지 못했습니다",
         ["LauncherPage_UpdateGame"] = "게임 업데이트",
 
-        
         ["SettingPage_Language"] = "언어",
 
-        
         ["GameUpdate_PredownloadAvailable"] = "새 버전 {0} 사전 다운로드 시작",
         ["GameUpdate_Predownloaded"] = "{0} 사전 다운로드 완료. 업데이트가 열리면 바로 설치할 수 있습니다",
         ["GameUpdate_PredownloadButton"] = "사전 다운로드",
@@ -255,7 +236,6 @@ internal static class LangKo
         ["GameUpdate_RepairDone"] = "파일 {0}개를 복구했습니다",
         ["GameUpdate_RepairNoBaseUrl"] = "현재 버전은 온라인 복구를 지원하지 않습니다. 먼저 게임을 최신 버전으로 업데이트한 뒤 다시 시도하세요",
 
-        
         ["GameLauncherPage_Gallery"] = "갤러리",
         ["Common_Copy"] = "복사",
         ["ImageViewWindow2_SaveAs"] = "다른 이름으로 저장",
@@ -268,15 +248,12 @@ internal static class LangKo
         ["InstallGameDialog_LocateGame"] = "게임 찾기",
         ["GameLauncherPage_GameIsRunning"] = "게임이 실행 중입니다",
 
-        
         ["SettingPage_Download"] = "다운로드",
 
-        
         ["DownloadGamePage_Downloading"] = "다운로드 중",
         ["DownloadGamePage_Verifying"] = "검증 중",
         ["DownloadGamePage_Pause"] = "일시정지",
 
-        
         ["Common_Confirm"] = "확인",
         ["Common_Cancel"] = "취소",
         ["Common_Error"] = "오류",
@@ -285,13 +262,11 @@ internal static class LangKo
         ["Common_Apply"] = "적용",
         ["Common_Exit"] = "종료",
 
-        
         ["SettingPage_AppSettings"] = "설정",
         ["SettingPage_About"] = "정보",
         ["SettingPage_General"] = "일반",
         ["SettingPage_FileManagement"] = "파일 관리",
 
-        
         ["FilePage_DataFolder"] = "데이터 폴더",
         ["FilePage_DataFolderDesc"] = "개인 데이터는 아래 폴더에 저장됩니다. 중요한 데이터이므로 함부로 삭제하지 마세요.",
         ["FilePage_ReselectDataFolder"] = "데이터 폴더 다시 선택",
@@ -308,7 +283,6 @@ internal static class LangKo
         ["FilePage_CleanCache"] = "캐시 정리",
         ["FilePage_CleanBackgroundCache"] = "런처 배경 파일 정리",
 
-        
         ["FilePage_HardLink"] = "하드 링크",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "같은 디스크의 다른 리전 클라이언트와 동일한 파일은 하드링크로 재사용됩니다. 예상 다운로드는 약 {0}이며, 실제는 설치 시 파일별 검증 기준입니다.",
         ["InstallGameDialog_HardLinkAfterSize"] = "하드링크 후 크기: ",
@@ -322,12 +296,10 @@ internal static class LangKo
         ["FilePage_DownloadThreads"] = "멀티스레드",
         ["FilePage_DownloadThreadsDesc"] = "동시 다운로드 연결 수. HDD에서는 병렬이 과하면 탐색 때문에 오히려 느려집니다. 변경은 다음부터 적용됩니다.",
 
-        
         ["KuroBbs_RefreshInfo"] = "정보 새로 고침",
         ["KuroBbs_Login"] = "로그인",
         ["KuroBbs_Settings"] = "쿠로 BBS 설정",
 
-        
         ["Login_Title"] = "쿠로 BBS 로그인",
         ["Login_ByToken"] = "토큰 로그인",
         ["Login_BySms"] = "인증번호 로그인",
@@ -352,7 +324,6 @@ internal static class LangKo
         ["Login_SeekRoleFailed"] = "연동 캐릭터 조회 실패: {0}",
         ["Login_Success"] = "쿠로 BBS 계정 '{0}' 로그인 성공",
 
-        
         ["ResourceBrief_Month"] = "월간",
         ["ResourceBrief_Week"] = "주간",
         ["ResourceBrief_Version"] = "버전",
@@ -363,7 +334,6 @@ internal static class LangKo
         ["ResourceBrief_Detail"] = "상세 내역",
         ["ResourceBrief_Empty"] = "이번 기간 데이터가 없습니다",
 
-        
         ["SignPage_DoSignIn"] = "출석 체크",
         ["SignPage_MonthlySign"] = "이번 달 출석",
         ["SignPage_SignedToday"] = "오늘 출석 완료",
@@ -381,9 +351,6 @@ internal static class LangKo
         ["CombatPage_Locked"] = "{0}은(는) 이번 기간에 잠겨 있거나 데이터가 없습니다",
         ["CombatPage_NoData"] = "데이터 없음: 서버가 아직 이번 기간 기록을 생성하지 않았습니다. 쿠로 BBS 앱에서 '{0}' 페이지를 열어 데이터를 새로 고친 뒤 다시 시도하세요",
 
-        
-
-        
         ["PlayTimeStatsDialog_TotalPlaytime"] = "총 플레이 시간",
         ["PlayTimeStatsDialog_Started0Times"] = "{0}회 실행",
         ["PlayTimeStatsDialog_AverageDailyPlaytime"] = "일평균 플레이 시간",
@@ -400,7 +367,6 @@ internal static class LangKo
         ["PlayTimeStatsDialog_PlaytimeStatistics"] = "플레이 시간 통계",
         ["PlayTimeStatsDialog_StatsTip"] = "통계는 이 런처로 게임을 시작한 시간만 포함합니다.",
 
-        
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "시스템 트레이로 최소화",
         ["GameLauncherSettingDialog_BasicInformation"] = "기본 정보",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "제거 확인",
@@ -417,11 +383,9 @@ internal static class LangKo
         ["LauncherPage_UninstallGame"] = "게임 제거",
         ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "매핑된 네트워크 드라이브는 지원되지 않습니다. 이중 백슬래시로 시작하는 네트워크 공유 경로를 사용하세요.",
 
-        
         ["SettingPage_BgSizeTip"] = "배경 이미지 크기 안내",
         ["SettingPage_CustomBackgroundSupportVideo"] = "사용자 지정 배경은 동영상 지원",
 
-        
         ["GameSettingPage_Resolution"] = "해상도",
         ["GameSettingPage_FullScreen"] = "전체 화면",
         ["GameSettingPage_PgrFullscreenBlockedTip"] = "현재 디스플레이 해상도가 게임 지원 상한을 초과하여 전체 화면을 정상적으로 사용할 수 없습니다",
@@ -443,9 +407,6 @@ internal static class LangKo
         ["GameSettingPage_ApplyFailed"] = "게임 설정 적용에 실패했습니다",
         ["GameSettingPage_Applied"] = "적용되었습니다. 다음 게임 시작 시 효과가 있습니다.",
 
-        
-
-        
         ["SettingPage_WindowBehavior"] = "창 동작",
         ["SettingPage_CloseWindowOption"] = "창 닫기 옵션",
         ["SettingPage_ExitApp"] = "완전 종료",
@@ -460,19 +421,16 @@ internal static class LangKo
         ["SettingPage_TransparencyEffects"] = "투명 효과",
         ["SettingPage_AnimationEffects"] = "애니메이션 효과",
 
-        
         ["GameSelector_Subtitle"] = "왼쪽 위 아이콘을 눌러 게임을 선택하거나 전환하세요",
         ["GameSelector_AutoFind"] = "설치된 게임 자동 찾기",
         ["GameSelector_SelectServer"] = "서버 선택",
         ["GameSelector_InstalledSize"] = "설치된 게임의 실제 디스크 사용량 ",
         ["GameSelector_Calculating"] = "계산 중",
 
-        
         ["KuroBbs_AccountLevelLabel"] = "공감 레벨 ",
         ["KuroBbs_SwitchRole"] = "캐릭터 전환",
         ["KuroBbs_ClearAccount"] = "계정 지우기",
 
-        
         ["GameBiz_Wuwa"] = "명조",
         ["GameBiz_WuwaCn"] = "명조 · 중국 서버",
         ["GameBiz_WuwaGlobal"] = "명조 · 글로벌 서버",
@@ -491,7 +449,6 @@ internal static class LangKo
         ["GameBiz_PgrTaiwan"] = "퍼니싱: 그레이 레이븐 · 대만 서버",
         ["GameBiz_ShortTaiwan"] = "대만 서버",
 
-        
         ["GachaPool_CharacterEvent"] = "캐릭터 이벤트 소환",
         ["GachaPool_WeaponEvent"] = "무기 이벤트 소환",
         ["GachaPool_CharacterStandard"] = "캐릭터 상시 소환",
@@ -507,11 +464,9 @@ internal static class LangKo
         ["GachaPool_WeaponRevisit"] = "무기 회귀 소환",
         ["GachaPool_Unknown"] = "배너 {0}",
 
-        
         ["Adb_DeviceOnline"] = "온라인",
         ["Adb_DeviceUnauthorized"] = "미승인",
 
-        
         ["Sync_Title"] = "WebDAV",
         ["Sync_Description"] = "클라우드 동기화로 데이터를 저장합니다",
         ["Sync_ServerUrl"] = "서버 주소",
@@ -535,7 +490,6 @@ internal static class LangKo
         ["Sync_LastSync"] = "마지막 동기화",
         ["Sync_Working"] = "처리 중…",
 
-        
         ["CloudGame_ErrNoLogin"] = "사용 가능한 로그인 정보가 없습니다",
         ["CloudGame_ErrHttp"] = "클라우드 게임 서비스가 HTTP {0}을(를) 반환했습니다",
         ["CloudGame_ErrRequest"] = "클라우드 게임 서비스 요청 실패: {0}",
@@ -543,16 +497,13 @@ internal static class LangKo
         ["CloudGame_ErrEmpty"] = "클라우드 게임 서비스가 빈 내용을 반환했습니다: {0}",
         ["CloudGame_ErrCode"] = "클라우드 게임 API가 오류 code={0}을(를) 반환했습니다: {1}",
 
-        
         ["GachaLogPage_ExportEmpty"] = "현재 계정에 내보낼 소환 기록이 없습니다",
         ["GachaLog_PityBuilt"] = "플티",
 
-        
         ["GameLauncherSettingDialog_PathRemoved"] = "게임 경로 설정이 제거되었습니다",
         ["GameLauncherSettingDialog_WrongServerExe"] = "선택한 게임 exe는 현재 서버에 속하지 않습니다. 다시 선택해 주세요",
         ["GameLauncherSettingDialog_ExpectExe"] = "게임 실행 파일을 선택해 주세요: {0}",
 
-        
         ["KrSdk_ErrNoUserCache"] = "KRSDKUserCache.json을 찾을 수 없습니다. 먼저 게임 내에서 한 번 로그인하세요.",
         ["KrSdk_ErrEmptyContent"] = "내용이 비어 있습니다",
         ["KrSdk_ErrParseFailed"] = "KRSDKUserCache.json 파싱에 실패했습니다. 로그인 상태 손상을 피하기 위해 쓰기를 중단했습니다.",
@@ -560,7 +511,6 @@ internal static class LangKo
         ["KrSdk_ErrAccountNotInCache"] = "로컬 캐시에 이 계정이 없습니다.",
         ["KrSdk_ErrVerifyFailed"] = "쓰기 후 검증에 실패하여 변경 전 캐시로 복원했습니다.",
 
-        
         ["GameUpdate_ErrNoPlan"] = "다운로드 계획이 없습니다",
         ["GameUpdate_ErrNoTarget"] = "대상 버전이 없습니다",
         ["GameUpdate_ErrNoGamePath"] = "게임 경로가 설정되지 않아 업데이트할 수 없습니다",
@@ -568,11 +518,9 @@ internal static class LangKo
         ["GameUpdate_ErrFileMissing"] = "업데이트 파일 누락: {0}",
         ["GameUpdate_ErrFileChecksum"] = "업데이트 파일 검증 실패: {0}",
 
-        
         ["GameSetting_ErrNoLocalStorage"] = "게임의 LocalStorage.db를 찾을 수 없습니다",
         ["GameSetting_ErrNoGameUserSettings"] = "게임의 GameUserSettings.ini를 찾을 수 없습니다",
 
-        
         ["KuroBbs_ErrConnection"] = "연결 실패, HTTP 상태: {0}",
         ["KuroBbs_ErrAccessTokenEmpty"] = "requestToken이 빈 accessToken을 반환했습니다",
         ["KuroBbs_ErrAccessToken"] = "B-At accessToken을 가져오지 못했습니다 (code={0}): {1}",
@@ -582,18 +530,11 @@ internal static class LangKo
         ["KuroBbs_SignAlready"] = "오늘 이미 출석했습니다",
         ["KuroBbs_SignFail"] = "출석 체크에 실패했습니다",
 
-        
-
-        
         ["Ugf_ErrNoUid"] = "UGF 파일에 계정 uid가 없습니다",
         ["Ugf_ErrUnknownFormat"] = "인식할 수 없는 파일 형식: UGF 또는 배너 기록 JSON이 필요합니다",
 
-        
-
-        
         ["CombatPage_AreaFallback"] = "구역 {0}",
 
-        
         ["KuroBbs_UnionLevel"] = "공감 레벨",
         ["KuroBbs_CommanderLevel"] = "지휘관 레벨",
         ["KuroBbs_NoLevel"] = "아직 레벨 없음",
@@ -605,10 +546,8 @@ internal static class LangKo
         ["KuroBbs_AutoSignDoneToast"] = "일일 출석 완료",
         ["KuroBbs_AutoSignFailedToast"] = "일일 출석 실패",
 
-        
         ["RolePage_WeaponLevel"] = "LV.{0} · 돌파 {1}",
 
-        
         ["Common_UnknownError"] = "알 수 없는 오류",
     };
 

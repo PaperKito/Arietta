@@ -13,7 +13,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        
         <Grid Background="{ThemeResource CustomAcrylicBrush}" Padding="16,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -48,7 +47,6 @@
             </Button>
         </Grid>
 
-        
         <WebView2 x:Name="Web" Grid.Row="1" />
     </Grid>
 

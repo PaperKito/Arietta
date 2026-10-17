@@ -6,32 +6,13 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.Sync;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 internal static class CloudSyncHost
 {
-    
+
     private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(8);
 
-    
     private static readonly TimeSpan SyncInterval = TimeSpan.FromMinutes(30);
 
-    
     private static readonly TimeSpan ExitBudget = TimeSpan.FromSeconds(2);
 
     private static readonly object _lock = new();
@@ -60,17 +41,12 @@ internal static class CloudSyncHost
         }
     }
 
-
-    
-    
-    
-    
     [ModuleInitializer]
     internal static void AutoStart()
     {
         try
         {
-            
+
             if (AppConfig.IsPlayTimeHelperProcess)
             {
                 return;
@@ -79,12 +55,10 @@ internal static class CloudSyncHost
         }
         catch
         {
-            
+
         }
     }
 
-
-    
     public static void Initialize()
     {
         lock (_lock)
@@ -112,8 +86,6 @@ internal static class CloudSyncHost
         catch { }
     }
 
-
-    
     public static void SetAutoSync(bool enabled)
     {
         try
@@ -130,10 +102,6 @@ internal static class CloudSyncHost
         catch { }
     }
 
-
-    
-    
-    
     public static void FlushOnExit()
     {
         try
@@ -200,7 +168,7 @@ internal static class CloudSyncHost
         }
         catch (OperationCanceledException)
         {
-            
+
         }
         catch (Exception ex)
         {
@@ -208,8 +176,6 @@ internal static class CloudSyncHost
         }
     }
 
-
-    
     private static async Task SyncQuietlyAsync(CancellationToken ct)
     {
         try

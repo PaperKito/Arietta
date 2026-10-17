@@ -5,21 +5,10 @@ using System.Text;
 
 namespace Arietta.Core;
 
-
-
-
-
-
-
-
-
-
-
 internal static class ProcessImage
 {
     private const int PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
 
-    
     public static string? GetPath(Process process)
     {
         try
@@ -32,7 +21,7 @@ internal static class ProcessImage
         }
         catch
         {
-            
+
         }
         return GetPathViaApi(process.Id);
     }

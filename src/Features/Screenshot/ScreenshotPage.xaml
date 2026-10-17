@@ -23,7 +23,6 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        
         <StackPanel x:Name="Panel_Empty"
                     Grid.Row="1"
                     MaxWidth="420"
@@ -46,7 +45,6 @@
                        TextWrapping="Wrap" />
         </StackPanel>
 
-        
         <GridView x:Name="GridView_Images"
                   Grid.Row="0"
                   Grid.RowSpan="2"
@@ -61,7 +59,7 @@
                         <Style TargetType="GridViewHeaderItem">
                             <Setter Property="Template">
                                 <Setter.Value>
-                                    
+
                                     <ControlTemplate TargetType="ContentControl">
                                         <ContentPresenter HorizontalAlignment="Stretch"
                                                           VerticalAlignment="Center"
@@ -102,7 +100,7 @@
                           Height="116"
                           CornerRadius="4">
                         <Grid.Resources>
-                            
+
                             <Storyboard x:Key="GridZoomInStoryboard">
                                 <DoubleAnimation EasingFunction="{StaticResource CircleEase}"
                                                  Storyboard.TargetName="Image_Thumb"
@@ -151,7 +149,6 @@
             </GridView.ItemTemplate>
         </GridView>
 
-        
         <StackPanel Grid.Row="0"
                     Margin="0,0,28,0"
                     HorizontalAlignment="Right"
@@ -167,7 +164,7 @@
                           Content="{x:Bind lang:Lang.Instance.ScreenshotPage_MultiSelect, Mode=OneWay}"
                           IsTextScaleFactorEnabled="False"
                           Unchecked="ToggleButton_MultiSelect_Changed" />
-            
+
             <Button x:Name="Button_DeleteSelected"
                     Click="Button_DeleteSelected_Click"
                     Visibility="Collapsed">

@@ -20,21 +20,16 @@ using Windows.UI;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
 public partial class GachaLogViewModel : ObservableObject
 {
     private readonly GachaApiClient _apiClient = new();
 
-    
     private const string LastPlayerKey = "gacha_last_player";
 
     public ObservableCollection<string> Players { get; } = [];
 
     public ObservableCollection<PoolViewModel> Pools { get; } = [];
 
-    
     public ObservableCollection<GachaItemStat> ItemStats { get; } = [];
 
     [ObservableProperty]
@@ -43,21 +38,19 @@ public partial class GachaLogViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsLoading { get; set; }
 
-    
     public Action? CloudGameFetchRequested { get; set; }
 
     public bool HasData => Pools.Count > 0;
 
     public bool HasItemStats => ItemStats.Count > 0;
 
-    
     [ObservableProperty]
     public partial bool IsPaneOpen { get; set; }
 
 
     public void Initialize()
     {
-        
+
         GachaStore.ImportAllLegacy();
         foreach (string player in GachaStore.LoadPlayers())
         {
@@ -65,7 +58,7 @@ public partial class GachaLogViewModel : ObservableObject
         }
         if (Players.Count > 0)
         {
-            
+
             SelectedPlayer = PickDefaultPlayer();
         }
         else
@@ -74,15 +67,9 @@ public partial class GachaLogViewModel : ObservableObject
         }
     }
 
-
-    
-    
-    
-    
-    
     private string PickDefaultPlayer()
     {
-        
+
         string? gameUid = null;
         try { gameUid = KrSdkAccountService.GetCurrentAccount(GameBiz.WutheringWaves)?.DisplayUid; } catch { }
         if (!string.IsNullOrEmpty(gameUid) && Players.Contains(gameUid))
@@ -93,11 +80,9 @@ public partial class GachaLogViewModel : ObservableObject
         return last is not null && Players.Contains(last) ? last : Players[^1];
     }
 
-
-    
     partial void OnSelectedPlayerChanged(string? value)
     {
-        
+
         if (value is not null)
         {
             DatabaseService.SetValue(LastPlayerKey, value);
@@ -105,12 +90,6 @@ public partial class GachaLogViewModel : ObservableObject
         LoadPlayerData(value);
     }
 
-
-    
-    
-    
-    
-    
     [RelayCommand]
     private async Task RefreshAsync(string? mode)
     {
@@ -118,7 +97,7 @@ public partial class GachaLogViewModel : ObservableObject
         {
             return;
         }
-        
+
         await RunBusyAsync(async () =>
         {
             GachaParams? parameters;
@@ -133,7 +112,7 @@ public partial class GachaLogViewModel : ObservableObject
             }
             else
             {
-                
+
                 GachaParams? fromLog = null;
                 string? logFile = GachaStore.FindGameLogFile();
                 if (logFile is not null)
@@ -159,8 +138,6 @@ public partial class GachaLogViewModel : ObservableObject
         }, "更新调频记录失败", Lang.Instance.GachaLogPage_UpdateFailed);
     }
 
-
-    
     [RelayCommand]
     private void ClearSavedUrl()
     {
@@ -179,35 +156,27 @@ public partial class GachaLogViewModel : ObservableObject
         }
     }
 
-
-    
-    
-    
-    
-    
-    
     [RelayCommand]
     private async Task ApplyGachaLanguageAsync(string? code)
     {
         GachaLanguageSettings.SetSelected(string.IsNullOrWhiteSpace(code) ? null : code);
 
-        
         LoadPlayerData(SelectedPlayer);
 
         var parameters = SelectedPlayer is { } playerId ? GachaStore.LoadParams(playerId) : null;
         if (parameters is null || string.IsNullOrEmpty(parameters.RecordId))
         {
-            
+
             InAppToast.MainWindow?.Success(Lang.Instance.GachaLogPage_Language, Lang.Instance.GachaLogPage_LanguageSaved);
             return;
         }
         await RunBusyAsync(async () =>
         {
-            
+
             int? renamed = await FetchAndSaveAsync(parameters, toastOnFailure: false);
             if (renamed is not null)
             {
-                
+
                 string display = code ?? GachaLanguageSettings.GetDisplayName(GachaLanguageSettings.Effective);
                 InAppToast.MainWindow?.Success(Lang.Instance.GachaLogPage_Language,
                     string.Format(Lang.Instance.GachaLogPage_LanguageApplied, renamed, display));
@@ -219,8 +188,6 @@ public partial class GachaLogViewModel : ObservableObject
         }, "应用抽卡语言失败", Lang.Instance.GachaLogPage_UpdateFailed);
     }
 
-
-    
     public async Task ImportFromUrlAsync(string? url)
     {
         if (IsLoading)
@@ -244,8 +211,6 @@ public partial class GachaLogViewModel : ObservableObject
         }, "导入唤取链接失败", Lang.Instance.GachaLogPage_UpdateFailed);
     }
 
-
-    
     public async Task ImportFromParamsAsync(GachaParams parameters)
     {
         if (IsLoading)
@@ -256,13 +221,9 @@ public partial class GachaLogViewModel : ObservableObject
             "导入云游戏唤取链接失败", Lang.Instance.GachaLogPage_UpdateFailed);
     }
 
-
-    
-    
     private async Task<int?> FetchAndSaveAsync(GachaParams parameters, bool toastOnFailure = true)
     {
-        
-        
+
         parameters.LanguageCode = GachaLanguageSettings.Effective;
         var result = await _apiClient.FetchAllPoolsAsync(parameters);
         if (result.Data.Count == 0)
@@ -273,8 +234,7 @@ public partial class GachaLogViewModel : ObservableObject
             }
             if (result.Code != 0)
             {
-                
-                
+
                 InAppToast.MainWindow?.ShowWithButton(InfoBarSeverity.Error,
                                                       Lang.Instance.GachaLogPage_LinkExpired,
                                                       string.Format(Lang.Instance.GachaLogPage_LinkExpiredDesc, result.Code, result.Message),
@@ -283,9 +243,7 @@ public partial class GachaLogViewModel : ObservableObject
             }
             else
             {
-                
-                
-                
+
                 InAppToast.MainWindow?.ShowWithButton(InfoBarSeverity.Warning,
                                                       Lang.Instance.GachaLogPage_FetchEmpty,
                                                       Lang.Instance.GachaLogPage_FetchEmptyDesc,
@@ -297,9 +255,7 @@ public partial class GachaLogViewModel : ObservableObject
 
         var newData = result.Data;
         string playerId = parameters.PlayerId;
-        
-        
-        
+
         int renamedCount = GachaStore.Save(playerId, newData, parameters);
 
         if (!Players.Contains(playerId))
@@ -307,14 +263,13 @@ public partial class GachaLogViewModel : ObservableObject
             Players.Add(playerId);
         }
 
-        
         bool isSamePlayer = playerId == SelectedPlayer;
         SelectedPlayer = playerId;
         if (isSamePlayer)
         {
             LoadPlayerData(playerId);
         }
-        
+
         return renamedCount;
     }
 
@@ -382,15 +337,11 @@ public partial class GachaLogViewModel : ObservableObject
         SetStatus(string.Format(Lang.Instance.GachaLogPage_PlayerDeleted, playerId), false);
     }
 
-
-    
     public void ApplyVisiblePools()
     {
         LoadPlayerData(SelectedPlayer);
     }
 
-
-    
     private void LoadPlayerData(string? playerId)
     {
         Pools.Clear();
@@ -398,7 +349,7 @@ public partial class GachaLogViewModel : ObservableObject
         if (data is not null)
         {
             var visiblePools = GachaPools.GetVisiblePools();
-            
+
             List<GachaRecord>? StandardProvider(string poolId) => data.TryGetValue(poolId, out var v) ? v : null;
 
             foreach (string poolId in GachaPools.DisplayOrder)
@@ -418,8 +369,6 @@ public partial class GachaLogViewModel : ObservableObject
         OnPropertyChanged(nameof(HasItemStats));
     }
 
-
-    
     private void BuildItemStats(Dictionary<string, List<GachaRecord>> data)
     {
         ItemStats.Clear();
@@ -452,11 +401,6 @@ public partial class GachaLogViewModel : ObservableObject
         }
     }
 
-
-    
-    
-    
-    
     private void SetStatus(string message, bool isError, string? title = null)
     {
         if (isError)
@@ -465,10 +409,6 @@ public partial class GachaLogViewModel : ObservableObject
         }
     }
 
-
-    
-    
-    
     private async Task RunBusyAsync(Func<Task> action, string logMessage, string failFormat, string? toastTitle = null)
     {
         IsLoading = true;
@@ -487,8 +427,6 @@ public partial class GachaLogViewModel : ObservableObject
         }
     }
 
-
-    
     public string? BuildExportJson(string? playerId)
     {
         if (string.IsNullOrEmpty(playerId))
@@ -496,19 +434,15 @@ public partial class GachaLogViewModel : ObservableObject
             return null;
         }
         var pool = GachaStore.LoadPool(playerId);
-        
+
         return pool is null ? null : UgfService.Export(playerId, pool, GachaStore.LoadParams(playerId));
     }
 
-
-    
     public Dictionary<string, List<GachaRecord>>? GetExportPool(string? playerId)
     {
         return string.IsNullOrEmpty(playerId) ? null : GachaStore.LoadPool(playerId);
     }
 
-
-    
     public async Task ImportRecordsAsync(string json)
     {
         if (IsLoading)
@@ -522,8 +456,6 @@ public partial class GachaLogViewModel : ObservableObject
         }, "导入抽卡记录失败", Lang.Instance.GachaLogPage_ImportFail, Lang.Instance.GachaLogPage_ImportExport);
     }
 
-
-    
     public async Task ImportTableRecordsAsync(string fileName, byte[] data)
     {
         if (IsLoading)
@@ -537,8 +469,6 @@ public partial class GachaLogViewModel : ObservableObject
         }, "导入抽卡记录失败", Lang.Instance.GachaLogPage_ImportFail, Lang.Instance.GachaLogPage_ImportExport);
     }
 
-
-    
     private async Task ApplyImportAsync(string filePlayerId, Dictionary<string, List<GachaRecord>> pool)
     {
         string playerId = string.IsNullOrEmpty(filePlayerId) ? SelectedPlayer ?? "" : filePlayerId;
@@ -565,8 +495,6 @@ public partial class GachaLogViewModel : ObservableObject
     }
 }
 
-
-
 public partial class PoolViewModel : ObservableObject
 {
     public string PoolId { get; }
@@ -583,7 +511,6 @@ public partial class PoolViewModel : ObservableObject
     public ObservableCollection<BarItemViewModel> Items5 { get; } = [];
     public ObservableCollection<BarItemViewModel> Items4 { get; } = [];
 
-    
     [ObservableProperty]
     public partial int SelectedRarityIndex { get; set; }
 
@@ -614,7 +541,6 @@ public partial class PoolViewModel : ObservableObject
         Count3Text = $"{stat.Count3} [{Percent(stat.Count3, stat.Total)}%]";
         Is5Selected = true;
 
-        
         if (stat.CurrentPity5 > 0)
         {
             Items5.Add(BarItemViewModel.Current(stat.CurrentPity5, isRarity5: true, stat.EndTime));
@@ -646,10 +572,6 @@ public partial class PoolViewModel : ObservableObject
     }
 }
 
-
-
-
-
 public abstract class GachaIconItem : System.ComponentModel.INotifyPropertyChanged
 {
     public ImageSource? Icon { get; protected set; }
@@ -661,8 +583,6 @@ public abstract class GachaIconItem : System.ComponentModel.INotifyPropertyChang
     protected void OnPropertyChanged(string propertyName) =>
         PropertyChanged?.Invoke(this, new(propertyName));
 
-
-    
     protected async Task LoadIconAsync(int resourceId, string name)
     {
         string? file = await GachaIconService.EnsureCachedAsync(resourceId, name).ConfigureAwait(true);
@@ -679,24 +599,14 @@ public abstract class GachaIconItem : System.ComponentModel.INotifyPropertyChang
         OnIconUpdated();
     }
 
-
-    
     protected virtual void OnIconUpdated()
     {
     }
 }
 
-
-
-
-
-
-
-
-
 public sealed class BarItemViewModel : GachaIconItem
 {
-    
+
     private const int Pity5Point = 66;
     private const int Pity5Guarantee = 80;
     private const int Pity4Point = 8;
@@ -715,8 +625,7 @@ public sealed class BarItemViewModel : GachaIconItem
 
     private BarItemViewModel(string name, int resourceId, int pity, bool isRarity5, bool isUp, string time)
     {
-        
-        
+
         Name = GachaNameTable.Translate(resourceId, name, GachaLanguageSettings.Effective) ?? name;
         Time = time;
         Pity = pity;
@@ -724,7 +633,7 @@ public sealed class BarItemViewModel : GachaIconItem
             isRarity5 ? Pity5Point : Pity4Point,
             isRarity5 ? Pity5Guarantee : Pity4Guarantee);
         UpVisibility = isUp ? Visibility.Visible : Visibility.Collapsed;
-        
+
         Icon = GachaIcon.Load(resourceId);
         IconVisibility = Icon is null ? Visibility.Collapsed : Visibility.Visible;
         if (Icon is null && resourceId > 0)
@@ -756,12 +665,9 @@ public sealed class BarItemViewModel : GachaIconItem
     }
 }
 
-
-
 public sealed class GachaItemStat : GachaIconItem
 {
 
-    
     private static readonly SolidColorBrush Star5QualityBrush = new(Microsoft.UI.ColorHelper.FromArgb(0xFF, 0xFF, 0xD7, 0x51));
     private static readonly SolidColorBrush Star4QualityBrush = new(Microsoft.UI.ColorHelper.FromArgb(0xFF, 0xA9, 0x7E, 0xE3));
 
@@ -769,7 +675,7 @@ public sealed class GachaItemStat : GachaIconItem
     public GachaItemStat(int resourceId, string name, int qualityLevel, int count)
     {
         ResourceId = resourceId;
-        
+
         Name = string.IsNullOrWhiteSpace(name)
             ? $"#{resourceId}"
             : GachaNameTable.Translate(resourceId, name, GachaLanguageSettings.Effective) ?? name;
@@ -785,8 +691,6 @@ public sealed class GachaItemStat : GachaIconItem
         Count = count;
     }
 
-
-    
     protected override void OnIconUpdated()
     {
         NameVisibility = Icon is null ? Visibility.Visible : Visibility.Collapsed;
@@ -801,7 +705,6 @@ public sealed class GachaItemStat : GachaIconItem
 
     private int _count;
 
-    
     public int Count
     {
         get => _count;
@@ -816,7 +719,6 @@ public sealed class GachaItemStat : GachaIconItem
 
     public string CountText { get; private set; } = "";
 
-    
     public Brush QualityBrush { get; }
 
     public Visibility NameVisibility { get; private set; }

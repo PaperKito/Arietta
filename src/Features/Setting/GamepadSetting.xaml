@@ -26,7 +26,6 @@
                               Toggled="Toggle_Enable_Toggled" />
             </StackPanel>
 
-            
             <InfoBar x:Name="InfoBar_Redist"
                      IsClosable="False"
                      IsOpen="False"
@@ -37,7 +36,6 @@
                 </InfoBar.Content>
             </InfoBar>
 
-            
             <StackPanel Margin="0,16,0,4"
                         Orientation="Horizontal"
                         Spacing="12">

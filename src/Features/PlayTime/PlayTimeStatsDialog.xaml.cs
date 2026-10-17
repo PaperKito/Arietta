@@ -67,78 +67,32 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
 
     private bool _playTimeLoaded;
 
-
-    
-    
-    
     public string TotalTimeText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string StartUpCountText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string AverageDayTimeText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string PlayDaysText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public int LongestContinuousDays { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string LongestContinuousDaysText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string LongestRunTimeText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string LongestRunStartText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string LastPlayDurationText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string LastPlayTimeText { get; set => SetProperty(ref field, value); }
 
-    
-    
-    
     public string MaxDayPlayTimeText { get; set => SetProperty(ref field, value); }
 
-
-    
-    
-    
     public string MaxDayPlayDateText { get; set => SetProperty(ref field, value); }
 
-
-    
-    
-    
     public string BarTotalText { get; set => SetProperty(ref field, value); }
 
-
-    
-    
-    
     public List<StatCardItem>? StatCards { get; set => SetProperty(ref field, value); }
 
 
@@ -149,11 +103,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
         this.Hide();
     }
 
-
-
-    
-    
-    
     private void LoadPlayTimeStats()
     {
         var biz = CurrentGameBiz;
@@ -162,13 +111,12 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
             var sessions = _playTimeStatsService.GetPlayTimeInRange(biz, DateTimeOffset.MinValue, DateTimeOffset.Now);
             long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-            
             long totalMs = 0;
-            
+
             long longestSpan = 0, longestStart = 0;
-            
+
             long lastStart = 0, lastSpan = 0;
-            
+
             Dictionary<DateOnly, long> timePerDay = new Dictionary<DateOnly, long>();
 
             foreach (var session in sessions)
@@ -181,7 +129,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
                     longestStart = session.StartTime;
                 }
 
-                
                 if (session.StartTime > lastStart && now - session.EndTime > 60_000)
                 {
                     lastStart = session.StartTime;
@@ -191,7 +138,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
                 DateTimeOffset startTime = DateTimeOffset.FromUnixTimeMilliseconds(session.StartTime).ToLocalTime();
                 DateTimeOffset endTime = DateTimeOffset.FromUnixTimeMilliseconds(session.EndTime).ToLocalTime();
 
-                
                 for (DateTime day = startTime.Date; day <= endTime.Date; day = day.AddDays(1))
                 {
                     DateTimeOffset dayStart = day == startTime.Date ? startTime : day;
@@ -218,7 +164,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
             AverageDayTimeText = timePerDay.Count > 0 ? TimeSpanToString(TimeSpan.FromMilliseconds(totalMs / timePerDay.Count)) : "-";
             PlayDaysText = timePerDay.Count > 0 ? string.Format(Lang.Instance.PlayTimeStatsDialog_PlayedFor0Days, timePerDay.Count) : "";
 
-            
             int longestContinuousDays = 0;
             DateOnly? longestContinuousStart = null;
             DateOnly? longestContinuousEnd = null;
@@ -232,12 +177,12 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
             {
                 if (previousDay.HasValue && orderedDay == previousDay.Value.AddDays(1))
                 {
-                    
+
                     currentStreak++;
                 }
                 else
                 {
-                    
+
                     currentStart = orderedDay;
                     currentStreak = 1;
                 }
@@ -263,7 +208,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
                 LongestContinuousDaysText = "";
             }
 
-            
             long maxDayMs = 0;
             DateOnly maxDayDate = default;
             foreach (var (day, ms) in timePerDay)
@@ -342,9 +286,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
 
     }
 
-
-
-    
     private void SetBars(List<BarChartItem> items, long total)
     {
         PlayTimeBarChart.Items = items;
@@ -358,8 +299,8 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
         var today = DateTime.Today;
         if (range == 1)
         {
-            
-            int sinceMonday = ((int)today.DayOfWeek + 6) % 7; 
+
+            int sinceMonday = ((int)today.DayOfWeek + 6) % 7;
             var firstMonday = today.AddDays(-sinceMonday - 11 * 7);
             var items = new List<BarChartItem>(12);
             long total = 0;
@@ -381,7 +322,7 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
         }
         else if (range == 2)
         {
-            
+
             var firstMonth = new DateTime(today.Year, today.Month, 1).AddMonths(-11);
             var items = new List<BarChartItem>(12);
             long total = 0;
@@ -442,10 +383,9 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
 
     private void BuildHeatmap()
     {
-        
+
         var today = DateTime.Today;
-        
-        
+
         int sinceMonday = ((int)today.DayOfWeek + 6) % 7;
         var firstDay = today.AddDays(-sinceMonday - 51 * 7);
         int totalDays = (today - firstDay).Days + 1;
@@ -466,11 +406,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
         PlayTimeHeatmap.Days = items;
     }
 
-
-
-    
-    
-    
     private long SumDayRange(DateOnly start, DateOnly end)
     {
         long sum = 0;

@@ -15,13 +15,12 @@
         <SolidColorBrush x:Key="GachaColumnDivider" Color="#26FFFFFF" />
         <SolidColorBrush x:Key="GachaTextPrimary" Color="#F2F2F2" />
         <SolidColorBrush x:Key="GachaTextSecondary" Color="#A6A6A6" />
-        
+
         <SolidColorBrush x:Key="GachaStar5" Color="#FFA500" />
         <SolidColorBrush x:Key="GachaStar4" Color="#C864E0" />
         <SolidColorBrush x:Key="GachaStar3" Color="#5EAAED" />
         <SolidColorBrush x:Key="GachaStar5Avg" Color="#3BA272" />
 
-        
     </mf:PageBase.Resources>
 
 
@@ -49,7 +48,6 @@
                       PlaceholderText="{x:Bind lang:Lang.Instance.GachaLogPage_SelectPlayer, Mode=OneWay}"
                       SelectedItem="{x:Bind ViewModel.SelectedPlayer, Mode=TwoWay}" />
 
-            
             <SplitButton Height="32"
                          Command="{x:Bind ViewModel.RefreshCommand}"
                          CommandParameter="all"
@@ -64,37 +62,35 @@
                 </StackPanel>
                 <SplitButton.Flyout>
                     <MenuFlyout>
-                        
+
                         <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshCommand}"
                                         CommandParameter="cache"
                                         Text="{x:Bind lang:Lang.Instance.GachaLogPage_UpdateSavedUrl, Mode=OneWay}" />
-                        
+
                         <MenuFlyoutItem Command="{x:Bind ViewModel.RefreshCommand}"
                                         CommandParameter="all"
                                         Text="{x:Bind lang:Lang.Instance.GachaLogPage_UpdateAll, Mode=OneWay}" />
-                        
+
                         <MenuFlyoutItem Click="ImportUrl_Click" Text="{x:Bind lang:Lang.Instance.GachaLogPage_InputUrl, Mode=OneWay}" />
-                        
+
                         <MenuFlyoutItem Click="CloudGame_Click" Text="{x:Bind lang:Lang.Instance.GachaLogPage_ViaCloudGame, Mode=OneWay}" />
                     </MenuFlyout>
                 </SplitButton.Flyout>
             </SplitButton>
 
-            
             <Button Height="32" Margin="0,0,8,0">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon Margin="0,2,0,0" FontSize="14" Glyph="&#xE713;" />
                     <TextBlock Text="{x:Bind lang:Lang.Instance.SettingPage_AppSettings, Mode=OneWay}" />
                 </StackPanel>
                 <Button.Flyout>
-                    
+
                     <Flyout>
                         <StackPanel MinWidth="200"
                                     Spacing="8">
                             <TextBlock FontSize="16"
                                        Text="{x:Bind lang:Lang.Instance.GachaLogPage_OtherSettings, Mode=OneWay}" />
 
-                            
                             <Button Margin="0,8,0,0" Command="{x:Bind ViewModel.CopyUrlCommand}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon FontSize="16" Glyph="&#xE8C8;" />
@@ -102,7 +98,6 @@
                                 </StackPanel>
                             </Button>
 
-                            
                             <TextBlock Margin="0,8,0,0"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        Text="{x:Bind lang:Lang.Instance.GachaLogPage_LinkHelp, Mode=OneWay}" />
@@ -119,14 +114,13 @@
                                 </StackPanel>
                             </Button>
 
-                            
                             <Button HorizontalAlignment="Stretch"
                                     Margin="0,4,0,0"
                                     Content="{x:Bind lang:Lang.Instance.GachaLogPage_Language, Mode=OneWay}">
                                 <Button.Flyout>
                                     <Flyout Placement="Left">
                                         <StackPanel MinWidth="200">
-                                            
+
                                             <ComboBox x:Name="ComboBox_GachaLanguage"
                                                       HorizontalAlignment="Stretch"
                                                       SelectionChanged="ComboBox_GachaLanguage_SelectionChanged">
@@ -148,7 +142,6 @@
 
                             <MenuFlyoutSeparator />
 
-                            
                             <Button HorizontalAlignment="Stretch" Content="{x:Bind lang:Lang.Instance.GachaLogPage_ImportExport, Mode=OneWay}">
                                 <Button.Flyout>
                                     <Flyout>
@@ -178,7 +171,6 @@
                                 </Button.Flyout>
                             </Button>
 
-                            
                             <Button HorizontalAlignment="Stretch" Content="{x:Bind lang:Lang.Instance.GachaLogPage_HidePools, Mode=OneWay}">
                                 <Button.Flyout>
                                     <Flyout>
@@ -196,7 +188,6 @@
                                 </Button.Flyout>
                             </Button>
 
-                            
                             <Button HorizontalAlignment="Stretch" Click="DeletePlayer_Click">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <FontIcon FontSize="14"
@@ -210,7 +201,6 @@
                 </Button.Flyout>
             </Button>
 
-            
             <Button Height="32"
                     BorderThickness="0"
                     Click="ToggleItemStatsPane_Click"
@@ -225,7 +215,6 @@
             </Button>
         </StackPanel>
 
-        
         <SplitView Name="SplitView_Content"
                    Grid.Row="1"
                    BorderThickness="0"
@@ -238,7 +227,7 @@
 
             <SplitView.Content>
                 <Grid>
-                    
+
                     <ScrollViewer x:Name="ScrollViewer_Columns"
                                   HorizontalScrollBarVisibility="Auto"
                                   HorizontalScrollMode="Auto"
@@ -253,7 +242,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="local:PoolViewModel">
-                                    
+
                                     <Border Width="268"
                                             Padding="12,10"
                                             Shadow="{ThemeResource ThemeShadow}"
@@ -264,7 +253,7 @@
                                             CornerRadius="8"
                                             RequestedTheme="Dark">
                                         <StackPanel>
-                                            
+
                                             <Grid ColumnSpacing="8">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
@@ -292,7 +281,6 @@
                                                     Margin="0,6,0,4"
                                                     Background="{StaticResource GachaColumnDivider}" />
 
-                                            
                                             <Grid Margin="0,3">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
@@ -326,7 +314,7 @@
                                                                Visibility="{x:Bind HasUp, Converter={StaticResource BoolToVisibilityConverter}}" />
                                                 </StackPanel>
                                             </Grid>
-                                            
+
                                             <Grid Margin="0,3">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
@@ -347,7 +335,7 @@
                                                            Foreground="{StaticResource GachaStar5}"
                                                            Text="{x:Bind Count5Text}" />
                                             </Grid>
-                                            
+
                                             <Grid Margin="0,3">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
@@ -368,7 +356,7 @@
                                                            Foreground="{StaticResource GachaStar4}"
                                                            Text="{x:Bind Count4Text}" />
                                             </Grid>
-                                            
+
                                             <Grid Margin="0,3">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*" />
@@ -390,7 +378,6 @@
                                                            Text="{x:Bind Count3Text}" />
                                             </Grid>
 
-                                            
                                             <cwc:Segmented Margin="0,10,0,6"
                                                            HorizontalAlignment="Stretch"
                                                            SelectedIndex="{x:Bind SelectedRarityIndex, Mode=TwoWay}">
@@ -410,7 +397,6 @@
                                                 </cwc:SegmentedItem>
                                             </cwc:Segmented>
 
-                                            
                                             <ItemsControl Margin="0,2,0,0"
                                                           ItemsSource="{x:Bind Items5}"
                                                           Visibility="{x:Bind Is5Selected, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -423,7 +409,7 @@
                                                                 <ColumnDefinition Width="Auto" />
                                                                 <ColumnDefinition Width="Auto" MinWidth="28" />
                                                             </Grid.ColumnDefinitions>
-                                                            
+
                                                             <Border Width="28"
                                                                     Height="28"
                                                                     Margin="0,0,4,0"
@@ -479,7 +465,7 @@
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="Auto" MinWidth="28" />
                                                             </Grid.ColumnDefinitions>
-                                                            
+
                                                             <Border Width="28"
                                                                     Height="28"
                                                                     Margin="0,0,4,0"
@@ -523,7 +509,6 @@
                         </ItemsControl>
                     </ScrollViewer>
 
-                    
                     <StackPanel HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Visibility="{x:Bind EmptyVisibility(ViewModel.HasData, ViewModel.IsLoading), Mode=OneWay}">
@@ -548,7 +533,6 @@
                 </Grid>
             </SplitView.Content>
 
-            
             <SplitView.Pane>
                 <GridView Padding="24,12,24,12"
                           ItemsSource="{x:Bind ViewModel.ItemStats}"
@@ -563,7 +547,7 @@
                     </GridView.ItemContainerStyle>
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="local:GachaItemStat">
-                            
+
                             <StackPanel Width="80"
                                         Margin="4,2,4,2"
                                         Spacing="3">
@@ -578,7 +562,7 @@
                                                         Stretch="UniformToFill" />
                                         </Border.Background>
                                     </Border>
-                                    
+
                                     <TextBlock Margin="4"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
@@ -588,7 +572,7 @@
                                                TextAlignment="Center"
                                                TextWrapping="Wrap"
                                                Visibility="{x:Bind NameVisibility, Mode=OneWay}" />
-                                    
+
                                     <Border Height="3"
                                             VerticalAlignment="Bottom"
                                             CornerRadius="0,0,8,8"

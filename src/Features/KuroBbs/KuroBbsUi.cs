@@ -10,17 +10,15 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
 internal static class KuroBbsUi
 {
-    
+
     public static void ShowInfoBar(InfoBar bar, bool open)
     {
         bar.IsOpen = open;
         bar.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    
     public static void AnimateWidth(Border element, double targetWidth, int delayMs)
     {
         try
@@ -43,10 +41,6 @@ internal static class KuroBbsUi
         catch { }
     }
 
-    
-    
-    
-    
     public static Border KuroCard(
         FrameworkElement? child = null,
         double cornerRadius = 8,
@@ -84,9 +78,6 @@ internal static class KuroBbsUi
         return border;
     }
 
-    
-    
-    
     public static Border MakeCornerBadge(
         string text,
         double fontSize = 11,
@@ -117,11 +108,9 @@ internal static class KuroBbsUi
         };
     }
 
-    
     public static Border MakeDivider(string brushKey, double height, Thickness? margin = null, double width = 0, bool verticalCenter = false) =>
         MakeDivider((Brush)Application.Current.Resources[brushKey], height, margin, width, verticalCenter);
 
-    
     public static Border MakeDivider(Brush background, double height, Thickness? margin = null, double width = 0, bool verticalCenter = false)
     {
         var border = new Border { Height = height, Background = background };
@@ -140,7 +129,6 @@ internal static class KuroBbsUi
         return border;
     }
 
-    
     public static Image MakeThemeIcon(FrameworkElement themeHost, string iconKey, double size, bool centered = false)
     {
         string suffix = themeHost.ActualTheme == ElementTheme.Light ? "Light" : "Dark";
@@ -157,10 +145,6 @@ internal static class KuroBbsUi
         return img;
     }
 
-    
-    
-    
-    
     public static void HandleKuroError(int code, string? msg, string? toastTitle, string fallbackText, InfoBar? errorBar = null, bool foldVisibility = true)
     {
         if (code == 220)
@@ -186,12 +170,6 @@ internal static class KuroBbsUi
         }
     }
 
-    
-    
-    
-    
-    
-    
     public static async Task RunPgrLoadAsync(
         InfoBar noAccountBar,
         InfoBar? errorBar,
@@ -203,7 +181,7 @@ internal static class KuroBbsUi
         Func<KuroBbsAccount, Task> body,
         string toastTitle)
     {
-        
+
         var account = KuroBbsAccountStore.Load(pgr: true);
         if (account is null || string.IsNullOrEmpty(account.Token))
         {

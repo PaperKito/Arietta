@@ -18,11 +18,9 @@
                        FontWeight="Bold"
                        Text="Arietta" />
 
-            
             <TextBlock Margin="0,4,0,0"
                        Text="{x:Bind lang:Lang.Instance.SettingPage_About_Copyright}" />
 
-            
             <StackPanel Margin="0,12,0,0"
                         Orientation="Horizontal"
                         Spacing="4">
@@ -32,7 +30,6 @@
                            Text="{x:Bind AppVersionText}" />
             </StackPanel>
 
-            
             <TextBlock Margin="0,20,0,0"
                        FontSize="20"
                        Text="{x:Bind lang:Lang.Instance.SettingPage_About_Links}" />

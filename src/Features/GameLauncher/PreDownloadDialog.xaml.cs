@@ -10,12 +10,6 @@ using System.IO;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
 [ObservableObject]
 public sealed partial class PreDownloadDialog : ContentDialog
 {
@@ -26,7 +20,7 @@ public sealed partial class PreDownloadDialog : ContentDialog
         _requiredBytes = state.RequiredDiskSpace;
         _stagedBytes = state.PredownloadedBytes;
         TitleText = string.Format(Lang.Instance.GameUpdate_PredownloadTitle, state.TargetVersion);
-        
+
         SizeLabel = _requiredBytes > 0 ? Lang.Instance.GameUpdate_SpaceRequired : Lang.Instance.GameUpdate_PackageSize;
         PackageSizeText = GameUpdateSession.FormatSize(_requiredBytes > 0 ? _requiredBytes : _totalBytes);
         PredownloadedSizeText = GameUpdateSession.FormatSize(_stagedBytes);
@@ -42,7 +36,6 @@ public sealed partial class PreDownloadDialog : ContentDialog
     private readonly long _requiredBytes;
     private readonly long _stagedBytes;
 
-    
     public bool Confirmed { get; private set; }
 
     public string TitleText { get; }
@@ -65,11 +58,6 @@ public sealed partial class PreDownloadDialog : ContentDialog
     [RelayCommand]
     private void Close() => Hide();
 
-    
-    
-    
-    
-    
     private void RefreshSpace()
     {
         string? error = null;
@@ -92,7 +80,7 @@ public sealed partial class PreDownloadDialog : ContentDialog
             }
             catch (Exception)
             {
-                
+
             }
         }
         AvailableSpaceText = available;

@@ -20,25 +20,18 @@ public sealed partial class GachaLogPage : PageBase
     public GachaLogPage()
     {
         this.InitializeComponent();
-        
+
         _restoringGachaLanguage = true;
         ComboBox_GachaLanguage.SelectedIndex = Math.Max(0, Array.FindIndex(
             AnnouncementLanguageSettings.Options, o => o.Code == GachaLanguageSettings.Selected));
         _restoringGachaLanguage = false;
         InitializeGachaPools();
-        
+
         ViewModel.CloudGameFetchRequested = OpenCloudGameWindow;
     }
 
-
-    
     private bool _restoringGachaPools;
 
-
-    
-    
-    
-    
     private void InitializeGachaPools()
     {
         var items = GachaPools.DisplayOrder.Select(id => new GachaPoolItem(id, GachaPools.GetName(id))).ToList();
@@ -75,35 +68,22 @@ public sealed partial class GachaLogPage : PageBase
         {
             return;
         }
-        
+
         GachaPools.SetVisiblePools(ListView_GachaPools.SelectedItems.Cast<GachaPoolItem>().Select(x => x.PoolId));
         ViewModel.ApplyVisiblePools();
     }
 
-
-    
     public Visibility EmptyVisibility(bool hasData, bool isLoading) => hasData || isLoading ? Visibility.Collapsed : Visibility.Visible;
 
     public Visibility ContentVisibility(bool hasData) => hasData ? Visibility.Visible : Visibility.Collapsed;
 
-
-    
-    
-    
-    
-    
     private void ToggleItemStatsPane_Click(object sender, RoutedEventArgs e)
     {
         ViewModel.IsPaneOpen = !ViewModel.IsPaneOpen;
     }
 
-
-    
-    
     private bool _restoringGachaLanguage;
 
-
-    
     private void ComboBox_GachaLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_restoringGachaLanguage)
@@ -166,15 +146,11 @@ public sealed partial class GachaLogPage : PageBase
         _ = ImportUrlAsync();
     }
 
-
-    
     private void ImportRecords_Click(object sender, RoutedEventArgs e)
     {
         _ = ImportRecordsAsync();
     }
 
-
-    
     private void ExportUgf_Click(object sender, RoutedEventArgs e)
     {
         _ = ExportRecordsAsync("json");
@@ -190,8 +166,6 @@ public sealed partial class GachaLogPage : PageBase
         _ = ExportRecordsAsync("csv");
     }
 
-
-    
     private async Task ImportRecordsAsync()
     {
         try
@@ -199,7 +173,7 @@ public sealed partial class GachaLogPage : PageBase
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
             WinRT.Interop.InitializeWithWindow.Initialize(picker,
                 WinRT.Interop.WindowNative.GetWindowHandle(ViewHost.MainWindow.Current));
-            
+
             picker.FileTypeFilter.Add(".json");
             picker.FileTypeFilter.Add(".xlsx");
             picker.FileTypeFilter.Add(".csv");
@@ -227,8 +201,6 @@ public sealed partial class GachaLogPage : PageBase
         }
     }
 
-
-    
     private async Task ExportRecordsAsync(string format)
     {
         try
@@ -238,7 +210,7 @@ public sealed partial class GachaLogPage : PageBase
                 WinRT.Interop.WindowNative.GetWindowHandle(ViewHost.MainWindow.Current));
             picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
             picker.SuggestedFileName = $"GachaLog_{ViewModel.SelectedPlayer}_{DateTime.Now:yyyyMMdd_HHmm}";
-            
+
             picker.FileTypeChoices.Add(format switch
             {
                 "xlsx" => "Excel",
@@ -286,26 +258,17 @@ public sealed partial class GachaLogPage : PageBase
         }
     }
 
-
-    
-    
-    
-    
     private void CloudGame_Click(object sender, RoutedEventArgs e)
     {
         OpenCloudGameWindow();
     }
 
-
-    
     private void OpenCloudGameWindow()
     {
         var window = new CloudGameWindow(async parameters => await ViewModel.ImportFromParamsAsync(parameters));
         window.Activate();
     }
 
-
-    
     private void ClearSavedUrl_Click(object sender, RoutedEventArgs e)
     {
         _ = ClearSavedUrlAsync();
@@ -333,8 +296,6 @@ public sealed partial class GachaLogPage : PageBase
         }
     }
 
-
-    
     private async Task ImportUrlAsync()
     {
         var input = new TextBox
@@ -374,7 +335,5 @@ public sealed partial class GachaLogPage : PageBase
     }
 
 }
-
-
 
 public sealed record GachaPoolItem(string PoolId, string Name);

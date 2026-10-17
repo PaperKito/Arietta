@@ -22,7 +22,7 @@
                     <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Instance.RolePage_Refresh, Mode=OneWay}" />
                 </StackPanel>
             </Button>
-            
+
             <TextBlock x:Name="TextBlock_Title"
                        VerticalAlignment="Center"
                        Margin="8,0,0,0"
@@ -41,7 +41,6 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            
             <ScrollViewer x:Name="Scroll_Periods"
                           Grid.Column="0"
                           Margin="0,0,16,16"
@@ -64,13 +63,13 @@
                                            Text="{x:Bind DateLabel}"
                                            TextTrimming="CharacterEllipsis" />
                                 <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Spacing="5">
-                                    
+
                                     <Image Width="16"
                                            Height="16"
                                            VerticalAlignment="Center"
                                            Source="ms-appx:///Assets/Image/Combat/TowerStar.png"
                                            Visibility="{x:Bind StarIconVisibility}" />
-                                    
+
                                     <Image Width="{x:Bind RankIconSize}"
                                            VerticalAlignment="Center"
                                            Source="{x:Bind RankSource}"
@@ -84,7 +83,7 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                     <ListView.ItemContainerStyle>
-                        
+
                         <Style TargetType="ListViewItem">
                             <Setter Property="HorizontalContentAlignment" Value="Left" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -160,7 +159,6 @@
                      Title="{x:Bind lang:Lang.Instance.RolePage_NoAccount, Mode=OneWay}"
                      Message="{x:Bind lang:Lang.Instance.RolePage_NoAccountDesc, Mode=OneWay}" />
 
-            
             <ScrollViewer Grid.Column="1" Padding="0,0,16,16">
                 <StackPanel x:Name="StackPanel_Content" Spacing="16" />
             </ScrollViewer>

@@ -77,13 +77,11 @@
           Shadow="{ThemeResource ThemeShadow}"
           Translation="0,0,16">
 
-        
         <Rectangle x:Name="Rect_AccentBackground"
                    Fill="{ThemeResource AccentFillColorDefaultBrush}"
                    IsHitTestVisible="False"
                    Visibility="{x:Bind IsAccentColorBackgroundVisible}" />
 
-        
         <Button x:Name="Button_GameAction"
                 Padding="0"
                 HorizontalAlignment="Stretch"
@@ -100,23 +98,22 @@
                 PointerExited="Control_PointerExited"
                 Style="{ThemeResource GameButtonStyle}">
             <Grid>
-                
+
                 <Grid Visibility="{x:Bind NonInstallingVisibility}">
-                    
+
                     <ProgressRing Width="20"
                                   Height="20"
                                   Margin="14,0,0,0"
                                   HorizontalAlignment="Left"
                                   IsHitTestVisible="False"
                                   Visibility="{x:Bind IsGameActionCommandRunning}" />
-                    
+
                     <TextBlock Margin="41,5,53,6"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                Text="{x:Bind StartGameButtonText}" />
                 </Grid>
 
-                
                 <Grid Margin="0,0,48,0"
                       ColumnSpacing="10"
                       IsHitTestVisible="False"
@@ -126,7 +123,6 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    
                     <Grid Margin="10,0,0,0"
                           HorizontalAlignment="Left">
                         <ProgressRing Width="28"
@@ -143,7 +139,6 @@
                                    Visibility="{x:Bind RingValueTextVisibility}" />
                     </Grid>
 
-                    
                     <Grid Grid.Column="1"
                           VerticalAlignment="Center"
                           ColumnSpacing="4"
@@ -156,7 +151,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        
+
                         <FontIcon Grid.Row="0"
                                   Grid.Column="0"
                                   FontFamily="Segoe Fluent Icons"
@@ -170,7 +165,7 @@
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    IsTextScaleFactorEnabled="False"
                                    Text="{x:Bind InstallStateText}" />
-                        
+
                         <FontIcon Grid.Row="1"
                                   Grid.Column="0"
                                   FontFamily="Segoe Fluent Icons"
@@ -186,7 +181,6 @@
                                    Text="{x:Bind RemainTimeText}" />
                     </Grid>
 
-                    
                     <TextBlock Grid.Column="1"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
@@ -196,7 +190,6 @@
                                Opacity="{x:Bind InstallStateCenterOpacity}"
                                Text="{x:Bind InstallStateText}" />
 
-                    
                     <TextBlock Grid.Column="1"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
@@ -209,7 +202,6 @@
             </Grid>
         </Button>
 
-        
         <Button x:Name="Button_Setting"
                 Width="44"
                 Height="44"
@@ -234,7 +226,6 @@
             </AnimatedIcon>
         </Button>
 
-        
         <Popup x:Name="Popup_GameInfo"
                DesiredPlacement="Top"
                PlacementTarget="{x:Bind Grid_Root}"
@@ -244,16 +235,15 @@
                   Padding="20,12,20,12"
                   Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
                   CornerRadius="8">
-                
+
                 <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            IsTextScaleFactorEnabled="False"
                            Text="{x:Bind RunningGameInfo}"
                            TextWrapping="Wrap"
                            Visibility="{x:Bind NonInstallingVisibility}" />
 
-                
                 <StackPanel Visibility="{x:Bind InstallingVisibility}">
-                    
+
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="14"
                                    FontWeight="Bold"
@@ -285,7 +275,6 @@
 
                     <MenuFlyoutSeparator Margin="0,8,0,0" />
 
-                    
                     <StackPanel Margin="0,8,0,0"
                                 Orientation="Horizontal"
                                 Spacing="4"

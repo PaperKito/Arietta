@@ -8,7 +8,6 @@
              xmlns:mf="using:Arietta.Frameworks"
              mc:Ignorable="d">
 
-    
     <GridView Padding="0,0,24,24"
               HorizontalAlignment="Stretch"
               SelectionMode="None">

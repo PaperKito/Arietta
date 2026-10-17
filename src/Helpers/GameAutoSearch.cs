@@ -8,9 +8,6 @@ using Arietta.Core;
 
 namespace Arietta.Helpers;
 
-
-
-
 internal static class GameAutoSearch
 {
 
@@ -19,13 +16,11 @@ internal static class GameAutoSearch
         "Windows", "$Recycle.Bin", "$WinREAgent", "ProgramData\\Package", "System Volume Information", "PerfLogs",
     };
 
-    
     public static string? FindGame(GameBiz gameBiz)
     {
         var entry = Core.GameRegistry.GetEntry(gameBiz);
         var key = Core.GameRegistry.GetExePathConfigKey(gameBiz);
 
-        
         foreach (var keyName in entry.RegistryKeys)
         {
             try
@@ -39,7 +34,7 @@ internal static class GameAutoSearch
                 {
                     continue;
                 }
-                
+
                 foreach (var valueName in new[] { "SingleLauncherInstallPath", "GameInstallPath", "InstallPath", "Install Dir", null })
                 {
                     if (Registry.GetValue(keyName, valueName ?? "", null) is string path && Directory.Exists(path))
@@ -55,7 +50,6 @@ internal static class GameAutoSearch
             catch { }
         }
 
-        
         foreach (var drive in Directory.GetLogicalDrives())
         {
             try
@@ -80,20 +74,11 @@ internal static class GameAutoSearch
         return null;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     public static void WriteOfficialLedger(GameBiz gameBiz, string? gameDir, bool elevateForHklm = false)
     {
         foreach (var keyName in Core.GameRegistry.GetEntry(gameBiz).RegistryKeys)
         {
-            
-            
+
             bool hklm = keyName.StartsWith("HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase);
             if (hklm)
             {
@@ -124,7 +109,6 @@ internal static class GameAutoSearch
         }
     }
 
-    
     private static void WriteElevatedRegAdd(string subKey, string valueName, string value)
     {
         try
@@ -141,13 +125,11 @@ internal static class GameAutoSearch
         }
         catch (Exception ex)
         {
-            
+
             AppConfig.GetLogger("GameAutoSearch").LogInformation(ex, "elevated 写 HKLM 账本被取消或失败 {SubKey}", subKey);
         }
     }
 
-
-    
     private static readonly string[] _otherServerHints = { "bilibili", "overseas", "global" };
 
     private static string? ScanDrive(string drive, Core.GameRegistry.GameEntry entry)
@@ -160,13 +142,13 @@ internal static class GameAutoSearch
             string name = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar));
             if (depth > 0 && entry.MarkerDirs.Any(m => name.Contains(m, StringComparison.OrdinalIgnoreCase)))
             {
-                
+
                 bool hintOk = entry.DirHint == null
                     ? !_otherServerHints.Any(h => dir.Contains(h, StringComparison.OrdinalIgnoreCase))
                     : dir.Contains(entry.DirHint, StringComparison.OrdinalIgnoreCase);
                 if (hintOk)
                 {
-                    
+
                     string? exe = FindExeUnder(dir, entry);
                     if (exe != null)
                     {

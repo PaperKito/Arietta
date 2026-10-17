@@ -27,7 +27,7 @@
                   CornerRadius="8,18,18,8"
                   HorizontalAlignment="Left"
                   SelectionChanged="ComboBox_Language_SelectionChanged">
-            
+
             <ComboBoxItem Content="{x:Bind lang:Lang.Instance.Language_Chinese, Mode=OneWay}" />
             <ComboBoxItem Content="{x:Bind lang:Lang.Instance.Language_HantChinese, Mode=OneWay}" />
             <ComboBoxItem Content="{x:Bind lang:Lang.Instance.Language_English, Mode=OneWay}" />
@@ -63,7 +63,6 @@
                          GroupName="CloseWindowOption" />
         </StackPanel>
 
-        
         <TextBlock Margin="0,16,0,4"
                    FontSize="20"
                    FontWeight="Bold"
@@ -82,7 +81,6 @@
                          GroupName="AfterLaunchOption" />
         </StackPanel>
 
-        
         <TextBlock Margin="0,16,0,4"
                    FontSize="20"
                    FontWeight="Bold"
@@ -105,7 +103,6 @@
                          GroupName="AfterGameExitOption" />
         </StackPanel>
 
-        
         <MenuFlyoutSeparator Margin="0,20,0,0" />
 
         <TextBlock Margin="0,20,0,0"

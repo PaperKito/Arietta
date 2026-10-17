@@ -6,9 +6,6 @@ using System.Linq;
 
 namespace Arietta;
 
-
-
-
 public static partial class AppConfig
 {
 
@@ -20,13 +17,6 @@ public static partial class AppConfig
 
     public static string LocalFolder { get; } = ResolveLocalFolder();
 
-    
-    
-    
-    
-    
-    
-    
     private static string ResolveLocalFolder()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -50,29 +40,18 @@ public static partial class AppConfig
 
     public static string BackgroundFolder => Path.Combine(LocalFolder, "bg");
 
-
-    
     public static string DynamicBackgroundFolder => BackgroundFolder;
 
 
     public static string ConfigFile => Path.Combine(LocalFolder, "config.ini");
 
-
-    
     public static string[] CommandLineArgs { get; } =
         Environment.GetCommandLineArgs().Skip(1).ToArray();
 
-
-    
-    
-    
-    
     public static bool IsPlayTimeHelperProcess =>
         CommandLineArgs.Length > 0
         && string.Equals(CommandLineArgs[0], "playtime", StringComparison.OrdinalIgnoreCase);
 
-
-    
     private static readonly ConcurrentDictionary<string, string> _configCache = new();
 
 

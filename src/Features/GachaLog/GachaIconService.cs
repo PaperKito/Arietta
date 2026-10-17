@@ -12,58 +12,31 @@ using Arietta.Helpers;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class GachaIconService
 {
 
     private static readonly HttpClient Http = SharedHttp.Default;
 
-    
     private static readonly string CacheFolder = Path.Combine(AppConfig.LocalFolder, "GachaIcons");
 
     private static readonly string IndexFile = Path.Combine(CacheFolder, "index.json");
 
-    
     private static readonly TimeSpan IndexLifetime = TimeSpan.FromHours(24);
 
     private const string WikiBaseUrl = "https://api.kurobbs.com/wiki/core/catalogue/item/getPage";
 
-    
     private const string WikiType = "9";
     private static readonly int[] CatalogueIds = [1105, 1106];
 
-    
     private static volatile Dictionary<string, string>? _index;
 
     private static readonly SemaphoreSlim _indexLoadLock = new(1, 1);
 
-
-    
-    
-    
-    
-    
-    
-    
     public static Task<string?> EnsureCachedAsync(int resourceId, string name)
     {
         return GachaIconSource.EnsureCachedAsync(resourceId, name, overwrite: false);
     }
 
-
-    
     internal static async Task<string?> LookupWikiUrlAsync(string name, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -74,8 +47,6 @@ public static class GachaIconService
         return index is not null && index.TryGetValue(name.Trim(), out string? url) ? url : null;
     }
 
-
-    
     private static async Task<Dictionary<string, string>?> EnsureIndexAsync()
     {
         var cached = _index;
@@ -106,7 +77,6 @@ public static class GachaIconService
                 return fresh;
             }
 
-            
             if (disk is not null)
             {
                 return _index = disk.Items;
@@ -192,7 +162,7 @@ public static class GachaIconService
         }
         catch
         {
-            
+
         }
     }
 
@@ -250,7 +220,6 @@ public static class GachaIconService
         public string? ContentUrl { get; set; }
     }
 }
-
 
 [JsonSerializable(typeof(GachaIconService.IndexFileModel))]
 [JsonSerializable(typeof(GachaIconService.WikiPageModel))]

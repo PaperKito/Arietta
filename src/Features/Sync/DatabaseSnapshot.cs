@@ -5,10 +5,6 @@ using System.Security.Cryptography;
 
 namespace Arietta.Features.Sync;
 
-
-
-
-
 internal static class DatabaseSnapshot
 {
     private static readonly byte[] Magic = [0x4D, 0x57, 0x4C, 0x31];
@@ -18,11 +14,6 @@ internal static class DatabaseSnapshot
 
     private const int HeaderSize = 6;
 
-
-    
-    
-    
-    
     public static byte[] Create(out string plainHash)
     {
         string tempFolder = Path.Combine(Path.GetTempPath(), "Arietta", "snapshot");
@@ -30,7 +21,7 @@ internal static class DatabaseSnapshot
         string tempDatabase = Path.Combine(tempFolder, $"snapshot_{Guid.NewGuid():N}.db");
         try
         {
-            
+
             DatabaseService.VacuumInto(tempDatabase, stripHostSpecificData: true);
             byte[] plain = File.ReadAllBytes(tempDatabase);
             plainHash = Convert.ToHexString(SHA256.HashData(plain));
@@ -44,8 +35,6 @@ internal static class DatabaseSnapshot
         }
     }
 
-
-    
     public static byte[] Extract(byte[] payload)
     {
         if (payload.Length <= HeaderSize || payload[0] != Magic[0] || payload[1] != Magic[1]

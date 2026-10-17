@@ -9,15 +9,6 @@ using System.Xml.Linq;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
-
-
 public static class GachaTableImporter
 {
     public static (string PlayerId, Dictionary<string, List<GachaRecord>> Pool) Import(string fileName, byte[] data)
@@ -40,7 +31,7 @@ public static class GachaTableImporter
     private static (string PlayerId, Dictionary<string, List<GachaRecord>> Pool) BuildPool(List<Dictionary<string, string>> rows)
     {
         var header = rows[0];
-        
+
         var map = new Dictionary<string, string>();
         foreach (var col in header)
         {
@@ -100,8 +91,6 @@ public static class GachaTableImporter
         return ("", pool);
     }
 
-
-    
     private static string ResolvePoolId(string value)
     {
         if (value.Length == 0)
@@ -116,8 +105,6 @@ public static class GachaTableImporter
         return mapped.Length > 0 ? mapped : GachaPools.CharacterEvent;
     }
 
-
-    
     private static string NormalizeTime(string value)
     {
         if (DateTime.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.None, out var dt)
@@ -133,14 +120,8 @@ public static class GachaTableImporter
         return value;
     }
 
-
-    
-
-    
     private static readonly string[] ExportHeader = ["卡池", "时间", "名称", "物品ID", "类型", "星级", "数量"];
 
-
-    
     public static string ExportCsv(string playerId, Dictionary<string, List<GachaRecord>> pool)
     {
         var sb = new StringBuilder();
@@ -153,8 +134,6 @@ public static class GachaTableImporter
         return sb.ToString();
     }
 
-
-    
     public static byte[] ExportXlsx(string playerId, Dictionary<string, List<GachaRecord>> pool)
     {
         List<string[]> cells = [[$"玩家ID: {playerId}"], ExportHeader];
@@ -198,8 +177,6 @@ public static class GachaTableImporter
         return ms.ToArray();
     }
 
-
-    
     private static IEnumerable<string[]> ExportRows(Dictionary<string, List<GachaRecord>> pool)
     {
         foreach (var (poolId, records) in pool)
@@ -237,8 +214,6 @@ public static class GachaTableImporter
         writer.Write(content);
     }
 
-
-    
     private static string BuildSheetXml(List<string[]> cells)
     {
         var sb = new StringBuilder();
@@ -259,14 +234,10 @@ public static class GachaTableImporter
         return sb.ToString();
     }
 
-
-    
-
     private static List<Dictionary<string, string>> ReadXlsx(byte[] data)
     {
         using var zip = new ZipArchive(new MemoryStream(data), ZipArchiveMode.Read);
 
-        
         var shared = new List<string>();
         var ssEntry = zip.GetEntry("xl/sharedStrings.xml");
         if (ssEntry is not null)
@@ -278,7 +249,6 @@ public static class GachaTableImporter
             shared.AddRange(ss);
         }
 
-        
         string sheetPath = "xl/worksheets/sheet1.xml";
         var wbEntry = zip.GetEntry("xl/workbook.xml");
         if (wbEntry is not null)
@@ -343,18 +313,14 @@ public static class GachaTableImporter
     private static XName Ns(string name) => XName.Get(name, "http://schemas.openxmlformats.org/spreadsheetml/2006/main");
     private static XName NsR(string name) => XName.Get(name, "http://schemas.openxmlformats.org/officeDocument/2006/relationships");
 
-    
     private static string ColumnLetters(string cellRef)
     {
         return new string(cellRef.TakeWhile(char.IsLetter).ToArray());
     }
 
-
-    
-
     private static List<Dictionary<string, string>> ReadCsv(byte[] data)
     {
-        
+
         string text = DecodeText(data);
         var rows = new List<Dictionary<string, string>>();
         foreach (var line in SplitLines(text))
@@ -370,8 +336,6 @@ public static class GachaTableImporter
         return rows;
     }
 
-
-    
     private static string DecodeText(byte[] data)
     {
         if (data.Length >= 3 && data[0] == 0xEF && data[1] == 0xBB && data[2] == 0xBF)
@@ -392,7 +356,7 @@ public static class GachaTableImporter
             {
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             }
-            catch {  }
+            catch { }
             return Encoding.GetEncoding("gbk").GetString(data);
         }
     }
@@ -414,7 +378,7 @@ public static class GachaTableImporter
 
     private static IEnumerable<string> SplitLines(string text)
     {
-        
+
         return text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n').Where(l => l.Trim().Length > 0);
     }
 

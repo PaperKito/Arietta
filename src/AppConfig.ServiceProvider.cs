@@ -7,11 +7,6 @@ using System;
 
 namespace Arietta;
 
-
-
-
-
-
 public static partial class AppConfig
 {
 
@@ -21,15 +16,11 @@ public static partial class AppConfig
     private static PlayTimeStatsService? _playTimeStatsService;
     private static CloudSyncService? _cloudSyncService;
 
-
-    
     public static T GetService<T>() where T : notnull
         => typeof(T) == typeof(PlayTimeStatsService) ? (T)(object)PlayTimeStatsServiceInstance
          : typeof(T) == typeof(CloudSyncService) ? (T)(object)CloudSyncServiceInstance
          : throw new InvalidOperationException($"No service for type '{typeof(T)}' has been registered.");
 
-
-    
     public static ILogger<T> GetLogger<T>()
     {
         try
@@ -42,8 +33,6 @@ public static partial class AppConfig
         }
     }
 
-
-    
     public static Microsoft.Extensions.Logging.ILogger GetLogger(string category)
     {
         try
@@ -56,8 +45,6 @@ public static partial class AppConfig
         }
     }
 
-
-    
     private static ILoggerFactory LogFactory
     {
         get
@@ -77,8 +64,6 @@ public static partial class AppConfig
         }
     }
 
-
-    
     internal static PlayTimeStatsService PlayTimeStatsServiceInstance
     {
         get
@@ -94,8 +79,6 @@ public static partial class AppConfig
         }
     }
 
-
-    
     internal static CloudSyncService CloudSyncServiceInstance
     {
         get

@@ -5,36 +5,13 @@ using System.Text;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class GachaNameTable
 {
 
-    
     private const int ColZhHans = 0;
     private const int ColZhHant = 1;
     private const int ColEn = 2;
 
-    
     private static readonly Dictionary<string, int> ColumnByLanguage = new(StringComparer.OrdinalIgnoreCase)
     {
         ["zh-Hans"] = ColZhHans,
@@ -49,7 +26,6 @@ public static class GachaNameTable
         ["de"] = ColEn,
     };
 
-    
     private static readonly int[] LookupColumnOrder =
     [
         ColZhHans, ColZhHant, ColEn, 3, 4, 5, 6, 7, 8,
@@ -75,7 +51,7 @@ public static class GachaNameTable
     private static Dictionary<string, GachaNameRow> BuildRowByName()
     {
         var byName = new Dictionary<string, GachaNameRow>(StringComparer.Ordinal);
-        
+
         foreach (int column in LookupColumnOrder)
         {
             foreach (GachaNameRow row in GachaNameTableData.Rows)
@@ -90,8 +66,6 @@ public static class GachaNameTable
         return byName;
     }
 
-
-    
     private static GachaNameRow? FindRow(int resourceId, string? storedName)
     {
         GachaNameRow? row = null;
@@ -106,11 +80,6 @@ public static class GachaNameTable
         return row;
     }
 
-
-    
-    
-    
-    
     public static string? Translate(int resourceId, string? storedName, string targetCode)
     {
         GachaNameRow? row = FindRow(resourceId, storedName);
@@ -119,19 +88,16 @@ public static class GachaNameTable
             return null;
         }
 
-        
         bool targetHasOwnColumn = !string.Equals(targetCode, "de", StringComparison.OrdinalIgnoreCase);
         int column = ColumnByLanguage.TryGetValue(targetCode, out int c) ? c : ColEn;
         string value = row.Get(column);
 
-        
         bool needsEnFallback = string.IsNullOrWhiteSpace(value) || !targetHasOwnColumn;
         if (!needsEnFallback)
         {
             return value;
         }
-        
-        
+
         string en = row.En;
         if (string.IsNullOrWhiteSpace(en))
         {
@@ -140,8 +106,6 @@ public static class GachaNameTable
         return !string.IsNullOrWhiteSpace(storedName) && RowContainsName(row, storedName) ? en : null;
     }
 
-
-    
     private static bool RowContainsName(GachaNameRow row, string storedName)
     {
         string normalized = Normalize(storedName);
@@ -155,11 +119,6 @@ public static class GachaNameTable
         return false;
     }
 
-
-    
-    
-    
-    
     public static string GetIconLookupName(int resourceId, string storedName)
     {
         GachaNameRow? row = FindRow(resourceId, storedName);
@@ -171,11 +130,6 @@ public static class GachaNameTable
         return string.IsNullOrWhiteSpace(zh) ? storedName : zh;
     }
 
-
-    
-    
-    
-    
     private static string Normalize(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))

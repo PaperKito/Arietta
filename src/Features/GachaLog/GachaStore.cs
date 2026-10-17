@@ -9,39 +9,19 @@ using Arietta.Features.Database;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class GachaStore
 {
-    
+
     private const string GameExePathConfigKey = "GameExePath";
 
-    
     private const string ParamsKeyPrefix = "gacha_params_";
 
-    
     private static string LegacyFolder => Path.Combine(AppConfig.LocalFolder, "gacha");
 
-    
     private const string LegacyImportedKeyPrefix = "gacha_legacy_imported_";
 
-    
     public static string DataFolder => DatabaseService.DatabaseFolder;
 
-
-    
     public static void ImportAllLegacy()
     {
         try
@@ -74,11 +54,6 @@ public static class GachaStore
         }
     }
 
-
-    
-    
-    
-    
     public static List<(int ResourceId, string Name, int QualityLevel)> LoadDistinctItems()
     {
         try
@@ -105,9 +80,7 @@ public static class GachaStore
         try
         {
             using var connection = DatabaseService.CreateConnection();
-            
-            
-            
+
             var rows = connection.Query<GachaRow>(
                 $"SELECT CardPoolType, ResourceId, QualityLevel, ResourceType, Name, Count, Time " +
                 $"FROM {DatabaseSchema.Tables.GachaLogItem} WHERE PlayerId = @p ORDER BY Time DESC, rowid ASC;",
@@ -162,21 +135,10 @@ public static class GachaStore
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     public static int Save(string playerId, Dictionary<string, List<GachaRecord>> pool, GachaParams parameters)
     {
         SaveParams(playerId, parameters);
 
-        
-        
-        
         const string sql =
             $"INSERT OR IGNORE INTO {DatabaseSchema.Tables.GachaLogItem} " +
             "(PlayerId, CardPoolType, ResourceId, QualityLevel, ResourceType, Name, Count, Time, SubSeq) " +
@@ -193,7 +155,7 @@ public static class GachaStore
             {
                 continue;
             }
-            
+
             var subSeq = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var record in records)
             {
@@ -265,15 +227,6 @@ public static class GachaStore
         DatabaseService.RemoveValue(ParamsKeyPrefix + playerId);
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     private static void ImportLegacyIfNeeded(string playerId)
     {
         if (string.IsNullOrEmpty(playerId))
@@ -287,7 +240,7 @@ public static class GachaStore
                 return;
             }
             string folder = Path.Combine(LegacyFolder, playerId);
-            
+
             string poolFile = Path.Combine(folder, "pool.json");
             if (!File.Exists(poolFile))
             {
@@ -307,8 +260,7 @@ public static class GachaStore
             Save(playerId, pool, parameters);
             DatabaseService.SetValue(LegacyImportedKeyPrefix + playerId, "1");
             string plainFile = Path.Combine(folder, "pool.json");
-            
-            
+
             if (poolFile == plainFile)
             {
                 try { File.Move(plainFile, plainFile + ".imported", true); } catch { }
@@ -344,13 +296,6 @@ public static class GachaStore
         return new GachaParams { PlayerId = playerId };
     }
 
-
-    
-    
-    
-    
-    
-    
     public static string? FindGameLogFile()
     {
         string? exe = GameRegistry.GetConfiguredExePath(Core.GameBiz.WutheringWaves);
@@ -371,8 +316,6 @@ public static class GachaStore
         return null;
     }
 
-
-    
     private sealed class GachaRow
     {
         public string CardPoolType { get; set; } = "";

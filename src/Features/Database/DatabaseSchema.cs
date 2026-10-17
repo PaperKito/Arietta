@@ -2,19 +2,9 @@
 
 namespace Arietta.Features.Database;
 
-
-
-
-
-
-
-
 internal static class DatabaseSchema
 {
-    
-    
-    
-    
+
     public static readonly string[] HostSpecificKeyPrefixes =
     [
         "host_",
@@ -25,7 +15,6 @@ internal static class DatabaseSchema
         "LogLevel",
     ];
 
-    
     public static class Tables
     {
         public const string Setting = "Setting";
@@ -95,16 +84,6 @@ internal static class DatabaseSchema
         COMMIT TRANSACTION;
         """;
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private const string Sql_v2 = """
         BEGIN TRANSACTION;
 
@@ -130,15 +109,6 @@ internal static class DatabaseSchema
         COMMIT TRANSACTION;
         """;
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private const string Sql_v3 = """
         BEGIN TRANSACTION;
 
@@ -167,15 +137,6 @@ internal static class DatabaseSchema
         COMMIT TRANSACTION;
         """;
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private const string Sql_v4 = """
         BEGIN TRANSACTION;
 
@@ -198,15 +159,6 @@ internal static class DatabaseSchema
         COMMIT TRANSACTION;
         """;
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private const string Sql_v5 = """
         BEGIN TRANSACTION;
 
@@ -226,17 +178,6 @@ internal static class DatabaseSchema
         COMMIT TRANSACTION;
         """;
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private const string Sql_v6 = """
         BEGIN TRANSACTION;
 

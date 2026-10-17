@@ -8,19 +8,6 @@ using Arietta.Features.Database;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 internal static class ResourceRecordStore
 {
     private const string WuwaBiz = nameof(GameBiz.WutheringWaves);
@@ -32,13 +19,10 @@ internal static class ResourceRecordStore
 
     #region 鸣潮 · 资源简报（/aki/resource/period：月 / 周 / 版本）
 
-    
     public static void SaveBriefing(string roleId, string periodType, int periodIndex, string? title, KuroBriefingRecord record)
         => UpsertResourceRecord(WuwaBiz, roleId, periodType, periodIndex, title,
             JsonSerializer.Serialize(record, JsonOptions));
 
-
-    
     public static KuroBriefingRecord? GetBriefing(string roleId, string periodType, int periodIndex)
     {
         try
@@ -56,8 +40,6 @@ internal static class ResourceRecordStore
         }
     }
 
-
-    
     public static List<BriefingRow> ListBriefing(string roleId, string periodType)
     {
         try
@@ -98,7 +80,6 @@ internal static class ResourceRecordStore
 
     #region 战双 · 资源月报（/haru/resource/halfOfYear：近半年逐月）
 
-    
     public static void SavePgrReport(string roleId, KuroPgrResourceReport report)
     {
         foreach (var m in report.PerMonthList ?? [])
@@ -108,15 +89,11 @@ internal static class ResourceRecordStore
         }
     }
 
-
-    
     public static void SavePgrMonth(string roleId, int year, int month, string? title,
         int blackCard, int developResource, int tradeCredit)
         => UpsertResourceRecord(PgrBiz, roleId, PgrPeriodType, year * 100 + month, title,
             JsonSerializer.Serialize(new PgrMonthPayload(blackCard, developResource, tradeCredit), JsonOptions));
 
-
-    
     private static void UpsertResourceRecord(string biz, string roleId, string periodType, int periodIndex,
         string? title, string json)
     {
@@ -144,8 +121,6 @@ internal static class ResourceRecordStore
         catch { }
     }
 
-
-    
     public static List<PgrMonthRow> ListPgrMonths(string roleId)
     {
         try

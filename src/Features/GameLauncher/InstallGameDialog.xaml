@@ -23,13 +23,11 @@
 
         <StackPanel>
 
-            
             <TextBlock FontSize="18"
                        FontWeight="Bold"
                        IsTextScaleFactorEnabled="False"
                        Text="{x:Bind lang:Lang.Instance.InstallGameDialog_SelectInstallationPath, Mode=OneWay}" />
 
-            
             <Grid Height="36"
                   Margin="0,16,0,0"
                   Background="{ThemeResource DateTimePickerFlyoutButtonBackgroundPointerOver}"
@@ -50,7 +48,7 @@
                            Text="{x:Bind InstallationPath}"
                            TextTrimming="CharacterEllipsis"
                            TextWrapping="Wrap" />
-                
+
                 <Button Grid.Column="1"
                         Padding="12,0,12,0"
                         HorizontalAlignment="Right"
@@ -66,13 +64,11 @@
                 </Button>
             </Grid>
 
-            
             <cwc:Segmented x:Name="Segmented_Tier"
                            Margin="0,8,0,0"
                            HorizontalAlignment="Stretch"
                            Visibility="{x:Bind TierVisibility}" />
 
-            
             <StackPanel Margin="1,8,0,0"
                         Orientation="Horizontal"
                         Spacing="8">
@@ -82,7 +78,7 @@
                     <Run Text="{x:Bind lang:Lang.Instance.InstallGameDialog_SpaceRequiredToDownload, Mode=OneWay}" />
                     <Run Text="{x:Bind RequiredBytesText}" />
                 </TextBlock>
-                
+
                 <Button Padding="4"
                         Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
                     <FontIcon FontSize="12"
@@ -109,7 +105,6 @@
                 </TextBlock>
             </StackPanel>
 
-            
             <TextBlock Margin="1,8,1,0"
                        FontSize="12"
                        Foreground="{ThemeResource SystemFillColorCautionBrush}"
@@ -118,7 +113,6 @@
                        TextWrapping="Wrap"
                        Visibility="{x:Bind ErrorMessage, Converter={StaticResource ObjectToVisibilityConverter}}" />
 
-            
             <Button x:Name="Button_StartInstallation"
                     Margin="0,16,0,0"
                     HorizontalAlignment="Right"
@@ -131,7 +125,6 @@
 
         </StackPanel>
 
-        
         <StackPanel HorizontalAlignment="Left"
                     VerticalAlignment="Bottom"
                     Orientation="Horizontal"
@@ -162,7 +155,6 @@
             </Button>
         </StackPanel>
 
-        
         <Button Width="32"
                 Height="32"
                 Margin="-20"

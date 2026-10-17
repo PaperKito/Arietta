@@ -7,11 +7,6 @@ using Windows.Graphics;
 
 namespace Arietta.Helpers;
 
-
-
-
-
-
 internal static class XamlRootExtension
 {
 

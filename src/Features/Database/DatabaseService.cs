@@ -7,23 +7,11 @@ using System.IO;
 
 namespace Arietta.Features.Database;
 
-
-
-
-
-
-
-
-
-
-
-
 internal static class DatabaseService
 {
-    
+
     public const string DatabaseFileName = "Arietta.db";
 
-    
     public const string ConfigKey_UserDataFolder = "UserDataFolder";
 
     private static readonly object _lock = new();
@@ -37,7 +25,6 @@ internal static class DatabaseService
         SqlMapper.AddTypeHandler(new DapperSqlMapper.DateTimeOffsetHandler());
     }
 
-    
     public static string DatabasePath
     {
         get
@@ -49,7 +36,6 @@ internal static class DatabaseService
         }
     }
 
-    
     public static string DatabaseFolder => Path.GetDirectoryName(DatabasePath)!;
 
     private static string ResolveDatabasePath()
@@ -60,7 +46,6 @@ internal static class DatabaseService
         return path;
     }
 
-    
     public static SqliteConnection CreateConnection()
     {
         EnsureDatabaseCreated();
@@ -69,7 +54,6 @@ internal static class DatabaseService
         return connection;
     }
 
-    
     public static void EnsureDatabaseCreated()
     {
         if (_initialized)
@@ -95,7 +79,6 @@ internal static class DatabaseService
         }
     }
 
-    
     public static void Reload()
     {
         lock (_lock)
@@ -115,7 +98,7 @@ internal static class DatabaseService
         }
         catch
         {
-            
+
             try
             {
                 connection.Execute("PRAGMA journal_mode = DELETE;");
@@ -126,12 +109,6 @@ internal static class DatabaseService
 
     #region 快照与替换
 
-    
-    
-    
-    
-    
-    
     public static void VacuumInto(string targetFile, bool stripHostSpecificData = false)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(targetFile)!);
@@ -142,7 +119,6 @@ internal static class DatabaseService
             connection.Execute($"VACUUM INTO '{Escape(targetFile)}';");
         }
 
-        
         using (var snapshot = new SqliteConnection($"Data Source={targetFile};Pooling=False;"))
         {
             snapshot.Open();
@@ -162,10 +138,6 @@ internal static class DatabaseService
         NormalizeFileHeader(targetFile);
     }
 
-    
-    
-    
-    
     private static void NormalizeFileHeader(string databaseFile)
     {
         try
@@ -188,7 +160,6 @@ internal static class DatabaseService
         catch { }
     }
 
-    
     public static void ReplaceDatabase(string snapshotFile)
     {
         lock (_lock)
@@ -198,7 +169,6 @@ internal static class DatabaseService
             string wal = target + "-wal";
             string shm = target + "-shm";
 
-            
             DeleteIfExists(wal);
             DeleteIfExists(shm);
             File.Copy(snapshotFile, target, overwrite: true);
@@ -209,7 +179,6 @@ internal static class DatabaseService
         EnsureDatabaseCreated();
     }
 
-    
     public static bool IntegrityCheck(string databaseFile, out string message)
     {
         try
@@ -244,14 +213,6 @@ internal static class DatabaseService
 
     #region 数据指纹
 
-    
-    
-    
-    
-    
-    
-    
-    
     public static string GetContentVersion()
     {
         try
@@ -278,8 +239,7 @@ internal static class DatabaseService
         }
         catch
         {
-            
-            
+
             return Guid.NewGuid().ToString("N");
         }
     }
@@ -288,7 +248,6 @@ internal static class DatabaseService
 
     #region Setting 读写
 
-    
     public static T? GetValue<T>(string key, out bool found)
     {
         found = false;
@@ -310,14 +269,12 @@ internal static class DatabaseService
         }
     }
 
-    
     public static T? GetValue<T>(string key, T? defaultValue = default)
     {
         T? value = GetValue<T>(key, out bool found);
         return found ? value : defaultValue;
     }
 
-    
     public static void SetValue<T>(string key, T value, DateTimeOffset? time = null)
     {
         try
@@ -336,7 +293,6 @@ internal static class DatabaseService
         catch { }
     }
 
-    
     public static void RemoveValue(string key)
     {
         try
@@ -347,7 +303,6 @@ internal static class DatabaseService
         catch { }
     }
 
-    
     public static DateTimeOffset? GetUpdateTime(string key)
     {
         try

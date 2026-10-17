@@ -13,20 +13,19 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.DynamicBackground;
 
-
 public enum DynamicBackgroundUpdateKind
 {
-    
+
     NotSupported,
-    
+
     Disabled,
-    
+
     Skipped,
-    
+
     UpToDate,
-    
+
     Updated,
-    
+
     Failed,
 }
 
@@ -37,56 +36,36 @@ public sealed class DynamicBackgroundUpdateResult
     public long Size { get; init; }
 }
 
-
 public sealed class DynamicBackgroundLocal
 {
     public string VideoPath { get; init; } = "";
     public string? PosterPath { get; init; }
-    
+
     public string? Source { get; init; }
     public string? BackgroundId { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
     public long Size { get; init; }
 }
 
-
-
-
-
-
-
-
-
-
 public static class DynamicBackgroundStore
 {
-    
+
     public const string VideoFileName = "bg.mp4";
     public const string PosterFileName = "poster.webp";
     public const string MetaFileName = "meta.json";
 
-    
     public const int AutoUpdateCooldownHours = 6;
 
-    
     public const string AutoUpdateConfigKey = "DynBgAutoUpdate";
 
-    
     public const string VolumeConfigKey = "DynBgVolume";
 
-    
-    
     public const string FpsCapConfigKey = "DynBgFpsCap";
 
-    
-    
     public const string QualityConfigKey = "DynBgQuality";
 
-    
-    
     public const string PauseOnGameConfigKey = "DynBgPauseOnGame";
 
-    
     public static event EventHandler<GameBiz>? Updated;
 
     private static Microsoft.Extensions.Logging.ILogger Log => AppConfig.GetLogger("DynamicBackgroundStore");
@@ -94,18 +73,11 @@ public static class DynamicBackgroundStore
 
     public static bool IsAutoUpdateEnabled => AppConfig.GetConfig(AutoUpdateConfigKey) != "0";
 
-    
     public static string GetLastCheckConfigKey(GameBiz biz) => $"DynBgLastCheck_{biz.GetBaseBiz()}";
 
-    
     public static string GetFolder(GameBiz biz) =>
         Path.Combine(AppConfig.DynamicBackgroundFolder, biz.GetBaseBiz().ToString());
 
-
-    
-    
-    
-    
     public static bool IsOwnedFile(string? fileName)
     {
         string name = Path.GetFileName(fileName ?? "");
@@ -113,12 +85,10 @@ public static class DynamicBackgroundStore
             || name.Equals(PosterFileName, StringComparison.OrdinalIgnoreCase)
             || name.Equals(MetaFileName, StringComparison.OrdinalIgnoreCase)
             || name.Equals("slogan.png", StringComparison.OrdinalIgnoreCase)
-            
+
             || Regex.IsMatch(name, @"^bg-.+-\d{10}\.mp4$", RegexOptions.IgnoreCase);
     }
 
-
-    
     public static DynamicBackgroundLocal? GetLocal(GameBiz biz)
     {
         try
@@ -152,8 +122,6 @@ public static class DynamicBackgroundStore
         }
     }
 
-
-    
     private static Meta? ReadMeta(string folder)
     {
         try
@@ -169,12 +137,6 @@ public static class DynamicBackgroundStore
         }
     }
 
-
-    
-    
-    
-    
-    
     private static string ResolveVideoFile(string folder, string? file)
     {
         if (!string.IsNullOrEmpty(file) && File.Exists(Path.Combine(folder, file)))
@@ -184,11 +146,6 @@ public static class DynamicBackgroundStore
         return File.Exists(Path.Combine(folder, VideoFileName)) ? VideoFileName : (file ?? VideoFileName);
     }
 
-
-    
-    
-    
-    
     private static DateTimeOffset ParseTime(string? raw, DateTimeOffset fallback)
     {
         return DateTimeOffset.TryParse(
@@ -198,11 +155,6 @@ public static class DynamicBackgroundStore
             : fallback;
     }
 
-
-    
-    
-    
-    
     public static async Task<DynamicBackgroundUpdateResult> CheckAndUpdateAsync(
         GameBiz biz,
         bool force,
@@ -235,7 +187,7 @@ public static class DynamicBackgroundStore
             }
             if (!info.IsVideo)
             {
-                
+
                 return new DynamicBackgroundUpdateResult
                 {
                     Kind = DynamicBackgroundUpdateKind.Failed,
@@ -247,7 +199,7 @@ public static class DynamicBackgroundStore
             if (!force && local is not null &&
                 string.Equals(local.Source, info.BackgroundFile, StringComparison.OrdinalIgnoreCase))
             {
-                
+
                 MarkChecked(biz);
                 Log.LogInformation("Kuro background {Biz} up to date ({Size} bytes)", biz, local.Size);
                 return new DynamicBackgroundUpdateResult
@@ -261,13 +213,10 @@ public static class DynamicBackgroundStore
             string folder = GetFolder(biz);
             Directory.CreateDirectory(folder);
 
-            
-            
             string destFile = $"bg-{info.BackgroundId}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.mp4";
             long size = await KuroLauncherBackgroundClient.DownloadAsync(
                 info.BackgroundFile!, Path.Combine(folder, destFile), progress, ct);
 
-            
             await KuroLauncherBackgroundClient.TryDownloadAsync(
                 info.FirstFrameImage, Path.Combine(folder, PosterFileName), ct);
 
@@ -275,7 +224,7 @@ public static class DynamicBackgroundStore
             MarkChecked(biz);
             Log.LogInformation("Kuro background {Biz} updated: {Size} bytes, id={Id}", biz, size, info.BackgroundId);
             Updated?.Invoke(null, biz);
-            
+
             CleanupOldVideos(folder, destFile);
 
             return new DynamicBackgroundUpdateResult
@@ -300,11 +249,6 @@ public static class DynamicBackgroundStore
         }
     }
 
-
-    
-    
-    
-    
     public static async Task SyncAllAsync(GameBiz activeBiz, bool force = false, CancellationToken ct = default)
     {
         if (!force && !IsAutoUpdateEnabled)
@@ -319,7 +263,7 @@ public static class DynamicBackgroundStore
         {
             if (!force && !GameRegistry.IsDynamicBgEnabled(biz))
             {
-                continue; 
+                continue;
             }
             try
             {
@@ -331,17 +275,12 @@ public static class DynamicBackgroundStore
             }
             catch (Exception ex)
             {
-                
+
                 Log.LogWarning(ex, "Kuro background sync failed for {Biz}", biz);
             }
         }
     }
 
-
-    
-    
-    
-    
     private static void MigrateLegacyFolders()
     {
         try
@@ -370,8 +309,6 @@ public static class DynamicBackgroundStore
         }
     }
 
-
-    
     public static void Clear(GameBiz biz)
     {
         try
@@ -407,8 +344,6 @@ public static class DynamicBackgroundStore
 
     private static string? Existing(string path) => File.Exists(path) ? path : null;
 
-
-    
     private static void CleanupOldVideos(string folder, string keepFile)
     {
         try

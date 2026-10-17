@@ -14,7 +14,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        
         <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="8" Margin="0,4,0,12">
             <Button x:Name="Button_Refresh"
                     Click="Button_Refresh_Click"
@@ -43,7 +42,6 @@
         <ScrollViewer Grid.Row="1" Padding="0,0,16,16">
             <StackPanel Spacing="16" MaxWidth="1000" HorizontalAlignment="Left">
 
-                
                 <Border Padding="16" CornerRadius="8"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -85,7 +83,6 @@
                             </StackPanel>
                         </Grid>
 
-                        
                         <GridView x:Name="GridView_Goods" SelectionMode="None" IsItemClickEnabled="False">
                             <GridView.ItemTemplate>
                                 <DataTemplate>
@@ -108,7 +105,7 @@
                                                        TextTrimming="CharacterEllipsis"
                                                        Text="{Binding GoodsText}" />
                                         </StackPanel>
-                                        
+
                                         <Border HorizontalAlignment="Right"
                                                 VerticalAlignment="Top"
                                                 Background="{ThemeResource AccentFillColorDefaultBrush}"
@@ -117,7 +114,7 @@
                                                 Visibility="{Binding SignedVisibility}">
                                             <TextBlock FontSize="10" Foreground="White" Text="✓" />
                                         </Border>
-                                        
+
                                         <Border CornerRadius="8"
                                                 BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
                                                 BorderThickness="2"

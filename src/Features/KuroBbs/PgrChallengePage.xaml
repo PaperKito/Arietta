@@ -14,7 +14,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        
         <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="6" Margin="0,4,0,6">
             <Button x:Name="Button_Refresh"
                     Click="Button_Refresh_Click"
@@ -46,7 +45,6 @@
                          Severity="Warning"
                          Message="{x:Bind lang:Lang.Instance.PgrData_NoRole, Mode=OneWay}" />
 
-                
                 <StackPanel x:Name="StackPanel_Body" Spacing="12" />
             </StackPanel>
         </ScrollViewer>

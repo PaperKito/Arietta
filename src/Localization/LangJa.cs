@@ -2,27 +2,18 @@
 
 namespace Arietta.Localization;
 
-
-
-
-
-
-
-
-
 internal static class LangJa
 {
 
     public static readonly Dictionary<string, string> Map = new()
     {
-        
+
         ["MainPage_Launcer"] = "ランチャー",
         ["LauncherPage_GameSetting"] = "ゲーム設定",
         ["MainPage_GameScreenshot"] = "スクリーンショット",
         ["GachaLogPage_ConveneRecords"] = "喚取履歴",
         ["Toolbox"] = "ツールボックス",
 
-        
         ["ScreenshotPage_MultiSelect"] = "複数選択",
         ["ScreenshotPage_OpenFolder"] = "フォルダを開く",
         ["ScreenshotPage_Total0Files"] = "全 {0} 枚",
@@ -37,25 +28,21 @@ internal static class LangJa
         ["ScreenshotPage_OpenImage"] = "画像を開く",
         ["ScreenshotPage_DeletedPartial"] = "{0} / {1} 枚を削除しました。残りは使用中の可能性があります",
 
-        
         ["KuroBbs"] = "クロBBS",
         ["KuroBbs_SignIn"] = "チェックイン",
         ["KuroBbs_Role"] = "キャラクター",
         ["KuroBbs_ResourceBrief"] = "資源概要",
 
-        
         ["PgrData_NoRole"] = "このクロBBSアカウントにはまだパニシングのキャラクターが設定されていません。クロBBSアプリの「マイページ」で設定してからご覧ください。",
         ["PgrData_Locked"] = "未解放",
         ["PgrData_FullIn"] = "{0}後に全回復",
 
-        
         ["KuroBbs_DataTerminal"] = "データ端末",
         ["KuroBbs_CombatData"] = "戦闘データ",
         ["DataTerminal_NoAccount"] = "まだクロBBSにログインしていません。上のアカウント矢印をタップしてログインしてからご覧ください。",
         ["DataTerminal_NoRole"] = "このクロBBSアカウントはまだ{0}のキャラクターを紐付けていません。先にクロBBSアプリで紐付けてください。",
         ["DataTerminal_LoadFailed"] = "ページの読み込みに失敗しました：{0}",
 
-        
         ["KuroBbs_PgrRole"] = "キャラクター",
         ["KuroBbs_PgrResource"] = "資源月報",
         ["KuroBbs_PgrCage"] = "幻痛ケージ",
@@ -79,7 +66,6 @@ internal static class LangJa
         ["PgrWarArea_Waves"] = "ウェーブ {0}",
         ["PgrCommon_LoadFailed"] = "データの取得に失敗しました",
 
-        
         ["DailyBriefing"] = "ブリーフィング",
         ["DailyBriefing_Desc"] = "ゲーム内デイリーデータ",
         ["DailyBriefing_Refresh"] = "更新",
@@ -98,7 +84,6 @@ internal static class LangJa
         ["KuroBbs_TokenExpired"] = "クロBBSのログインの有効期限が切れました",
         ["KuroBbs_TokenExpiredDesc"] = "設定 → クロBBSアカウント で token を再取得または入力してください",
 
-        
         ["KuroAccount_UsbTitle"] = "ADB ツール",
         ["KuroAccount_UsbShortDesc"] = "Android スマホを接続してクロBBSの Token と Did を取得します",
         ["KuroAccount_UsbDesc"] = "USB ケーブルでスマホを接続し USB デバッグを有効にしてください。スマホでクロBBSアプリを開き「データ端末」または「育成計算ツール」ページに入ってから「取得開始」をタップすると、ツールが自動的に token と did を取得します。adb.exe が必要です（",
@@ -145,7 +130,6 @@ internal static class LangJa
         ["KuroAccount_Saved"] = "アカウントを保存しました",
         ["KuroAccount_Cleared"] = "アカウントをクリアしました",
 
-        
         ["RolePage_Refresh"] = "更新",
         ["RolePage_NoAccount"] = "クロBBSアカウントがまだ設定されていません",
         ["RolePage_NoAccountDesc"] = "設定 → クロBBSアカウント で設定を完了してから更新してください",
@@ -153,7 +137,6 @@ internal static class LangJa
         ["RolePage_Back"] = "一覧に戻る",
         ["RolePage_Phantoms"] = "音骸",
 
-        
         ["GachaLogPage_Refresh"] = "記録を更新",
         ["GachaLogPage_ImportUrl"] = "リンクを貼り付けてインポート",
         ["GachaLogPage_ImportUrlDesc"] = "喚取記録ページへのリンクを貼り付けてください（ゲーム内で「喚取記録」を開いた後、ログから取得するか、他のツールからコピー）。クラウドスマホのユーザーも利用できます",
@@ -211,7 +194,6 @@ internal static class LangJa
         ["GachaLogPage_EmptyTitle"] = "喚取履歴はまだありません",
         ["GachaLogPage_EmptyDesc"] = "先に設定でゲームフォルダを指定し、ゲーム内で「喚取記録」ページを一度開いてから、ここに戻って「記録を更新」をクリックすると同期できます。",
 
-        
         ["LauncherPage_StartGame"] = "ゲームを起動",
         ["LauncherPage_InstallGame"] = "ゲームをインストール",
         ["LauncherPage_ResumeInstall"] = "インストールを続行",
@@ -229,10 +211,8 @@ internal static class LangJa
         ["Notice_LoadFailed"] = "お知らせの読み込みに失敗しました",
         ["LauncherPage_UpdateGame"] = "ゲームをアップデート",
 
-        
         ["SettingPage_Language"] = "言語",
 
-        
         ["GameUpdate_PredownloadAvailable"] = "新バージョン {0} の事前ダウンロードが開始されました",
         ["GameUpdate_Predownloaded"] = "{0} は事前ダウンロード済みです。アップデート開始後にそのままインストールできます",
         ["GameUpdate_PredownloadButton"] = "事前ダウンロード",
@@ -258,7 +238,6 @@ internal static class LangJa
         ["GameUpdate_RepairDone"] = "{0} 件のファイルを修復しました",
         ["GameUpdate_RepairNoBaseUrl"] = "現在のバージョンはオンライン修復に対応していません。先にゲームを最新バージョンに更新してから再試行してください",
 
-        
         ["GameLauncherPage_Gallery"] = "ギャラリー",
         ["Common_Copy"] = "コピー",
         ["ImageViewWindow2_SaveAs"] = "名前を付けて保存",
@@ -271,15 +250,12 @@ internal static class LangJa
         ["InstallGameDialog_LocateGame"] = "ゲームを指定",
         ["GameLauncherPage_GameIsRunning"] = "ゲームが実行中です",
 
-        
         ["SettingPage_Download"] = "ダウンロード",
 
-        
         ["DownloadGamePage_Downloading"] = "ダウンロード中",
         ["DownloadGamePage_Verifying"] = "検証中",
         ["DownloadGamePage_Pause"] = "一時停止",
 
-        
         ["Common_Confirm"] = "確認",
         ["Common_Cancel"] = "キャンセル",
         ["Common_Close"] = "閉じる",
@@ -287,13 +263,11 @@ internal static class LangJa
         ["Common_Error"] = "エラー",
         ["Common_Ok"] = "OK",
 
-        
         ["SettingPage_AppSettings"] = "設定",
         ["SettingPage_About"] = "このアプリについて",
         ["SettingPage_General"] = "一般",
         ["SettingPage_FileManagement"] = "ファイル管理",
 
-        
         ["FilePage_DataFolder"] = "データフォルダ",
         ["FilePage_DataFolderDesc"] = "個人データは以下のフォルダに保存されています。大切なデータのため、むやみに削除しないでください。",
         ["FilePage_ReselectDataFolder"] = "データフォルダを再選択",
@@ -310,7 +284,6 @@ internal static class LangJa
         ["FilePage_CleanCache"] = "キャッシュをクリア",
         ["FilePage_CleanBackgroundCache"] = "ランチャー背景ファイルを削除",
 
-        
         ["FilePage_HardLink"] = "ハードリンク",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "同一ディスク上の他リージョンクライアントの同一ファイルはハードリンクで再利用されます。ダウンロードは約 {0} の見込みです。これは推定値であり、実際はインストール時のファイルごとの検証によります。",
         ["InstallGameDialog_HardLinkAfterSize"] = "ハードリンク後のサイズ：",
@@ -324,12 +297,10 @@ internal static class LangJa
         ["FilePage_DownloadThreads"] = "マルチスレッド",
         ["FilePage_DownloadThreadsDesc"] = "同時に張るダウンロード接続数。HDD では並列が多すぎるとシークでかえって遅くなります。変更は次回から有効。",
 
-        
         ["KuroBbs_RefreshInfo"] = "情報を更新",
         ["KuroBbs_Login"] = "ログイン",
         ["KuroBbs_Settings"] = "クロBBS設定",
 
-        
         ["Login_Title"] = "クロBBSにログイン",
         ["Login_ByToken"] = "Token でログイン",
         ["Login_BySms"] = "認証コードでログイン",
@@ -354,7 +325,6 @@ internal static class LangJa
         ["Login_SeekRoleFailed"] = "紐付けキャラクターの検索に失敗しました：{0}",
         ["Login_Success"] = "クロBBSアカウント「{0}」でログインしました",
 
-        
         ["ResourceBrief_Month"] = "月間",
         ["ResourceBrief_Week"] = "週間",
         ["ResourceBrief_Version"] = "バージョン",
@@ -365,7 +335,6 @@ internal static class LangJa
         ["ResourceBrief_Detail"] = "獲得明細",
         ["ResourceBrief_Empty"] = "この期間のデータはありません",
 
-        
         ["SignPage_DoSignIn"] = "チェックイン",
         ["SignPage_MonthlySign"] = "今月のチェックイン",
         ["SignPage_SignedToday"] = "本日チェックイン済み",
@@ -397,9 +366,6 @@ internal static class LangJa
         ["CombatPage_ClearRecordsConfirm"] = "この端末に保存された「{0}」の全期間の記録を削除します。元に戻せません。削除しますか？",
         ["CombatPage_Clear"] = "削除",
 
-        
-
-        
         ["PlayTimeStatsDialog_TotalPlaytime"] = "合計プレイ時間",
         ["PlayTimeStatsDialog_Started0Times"] = "起動 {0} 回",
         ["PlayTimeStatsDialog_AverageDailyPlaytime"] = "1 日平均プレイ時間",
@@ -414,7 +380,6 @@ internal static class LangJa
         ["PlayTimeStatsDialog_Last12Months"] = "直近 12 か月",
         ["PlayTimeStatsDialog_Total"] = "合計",
 
-        
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "システムトレイに最小化",
         ["GameLauncherSettingDialog_BasicInformation"] = "基本情報",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "アンインストールの確認",
@@ -437,11 +402,9 @@ internal static class LangJa
         ["PlayTimeStatsDialog_PlaytimeStatistics"] = "プレイ時間統計",
         ["PlayTimeStatsDialog_StatsTip"] = "統計には、本ランチャーから起動したゲームのプレイ時間のみが含まれます。",
 
-        
         ["SettingPage_BgSizeTip"] = "背景画像サイズのヒント",
         ["SettingPage_CustomBackgroundSupportVideo"] = "カスタム背景は動画に対応しています",
 
-        
         ["Common_Apply"] = "適用",
         ["GameSettingPage_Resolution"] = "解像度",
         ["GameSettingPage_FullScreen"] = "フルスクリーン",
@@ -464,9 +427,6 @@ internal static class LangJa
         ["GameSettingPage_ApplyFailed"] = "ゲーム設定の適用に失敗しました",
         ["GameSettingPage_Applied"] = "適用しました。次回のゲーム起動時に有効になります",
 
-        
-
-        
         ["SettingPage_WindowBehavior"] = "ウィンドウの動作",
         ["SettingPage_CloseWindowOption"] = "ウィンドウを閉じた時の動作",
         ["SettingPage_ExitApp"] = "完全に終了",
@@ -481,24 +441,18 @@ internal static class LangJa
         ["SettingPage_TransparencyEffects"] = "透明効果",
         ["SettingPage_AnimationEffects"] = "アニメーション効果",
 
-        
-
-        
         ["Common_Exit"] = "終了",
 
-        
         ["GameSelector_Subtitle"] = "左上のアイコンをクリックすると、ゲームを選択または切り替えられます",
         ["GameSelector_AutoFind"] = "端末内のゲームを自動検索",
         ["GameSelector_SelectServer"] = "サーバーを選択",
         ["GameSelector_InstalledSize"] = "インストール済みゲームの実際の使用容量 ",
         ["GameSelector_Calculating"] = "集計中",
 
-        
         ["KuroBbs_AccountLevelLabel"] = "ユニオンレベル ",
         ["KuroBbs_SwitchRole"] = "キャラクターを切り替え",
         ["KuroBbs_ClearAccount"] = "アカウントをクリア",
 
-        
         ["GameBiz_Wuwa"] = "鳴潮",
         ["GameBiz_WuwaCn"] = "鳴潮 · 中国サーバー",
         ["GameBiz_WuwaGlobal"] = "鳴潮 · グローバル",
@@ -517,7 +471,6 @@ internal static class LangJa
         ["GameBiz_PgrTaiwan"] = "パニシング：グレイレイヴン · 台湾サーバー",
         ["GameBiz_ShortTaiwan"] = "台湾サーバー",
 
-        
         ["GachaPool_CharacterEvent"] = "キャラクターイベント喚取",
         ["GachaPool_WeaponEvent"] = "武器イベント喚取",
         ["GachaPool_CharacterStandard"] = "キャラクター常設喚取",
@@ -533,11 +486,9 @@ internal static class LangJa
         ["GachaPool_WeaponRevisit"] = "武器復刻喚取",
         ["GachaPool_Unknown"] = "ガチャ {0}",
 
-        
         ["Adb_DeviceOnline"] = "オンライン",
         ["Adb_DeviceUnauthorized"] = "未認可",
 
-        
         ["Sync_Title"] = "WebDAV",
         ["Sync_Description"] = "クラウド同期でデータを保存します",
         ["Sync_ServerUrl"] = "サーバーアドレス",
@@ -561,7 +512,6 @@ internal static class LangJa
         ["Sync_LastSync"] = "前回の同期",
         ["Sync_Working"] = "処理中…",
 
-        
         ["CloudGame_ErrNoLogin"] = "利用可能なログイン情報がありません",
         ["CloudGame_ErrHttp"] = "クラウドゲームサービスが HTTP {0} を返しました",
         ["CloudGame_ErrRequest"] = "クラウドゲームサービスへのリクエストに失敗しました：{0}",
@@ -569,16 +519,13 @@ internal static class LangJa
         ["CloudGame_ErrEmpty"] = "クラウドゲームサービスが空の内容を返しました：{0}",
         ["CloudGame_ErrCode"] = "クラウドゲーム API がエラーを返しました code={0}：{1}",
 
-        
         ["GachaLogPage_ExportEmpty"] = "現在のアカウントにはエクスポートできる喚取履歴がありません",
         ["GachaLog_PityBuilt"] = "天井",
 
-        
         ["GameLauncherSettingDialog_PathRemoved"] = "ゲームパスの設定を削除しました",
         ["GameLauncherSettingDialog_WrongServerExe"] = "選択されたゲーム exe は現在のサーバーに属していないため、選び直してください",
         ["GameLauncherSettingDialog_ExpectExe"] = "ゲームの実行ファイルを選択してください：{0}",
 
-        
         ["KrSdk_ErrNoUserCache"] = "KRSDKUserCache.json が見つかりません。先にゲーム内で一度ログインしてください。",
         ["KrSdk_ErrEmptyContent"] = "内容が空です",
         ["KrSdk_ErrParseFailed"] = "KRSDKUserCache.json の解析に失敗したため、ログイン状態を壊さないよう書き込みを中止しました。",
@@ -586,7 +533,6 @@ internal static class LangJa
         ["KrSdk_ErrAccountNotInCache"] = "このアカウントはローカルキャッシュにありません。",
         ["KrSdk_ErrVerifyFailed"] = "書き込み後の検証に失敗したため、変更前のキャッシュに戻しました。",
 
-        
         ["GameUpdate_ErrNoPlan"] = "ダウンロードプランがありません",
         ["GameUpdate_ErrNoTarget"] = "ターゲットバージョンがありません",
         ["GameUpdate_ErrNoGamePath"] = "ゲームパスが未設定のため、アップデートできません",
@@ -594,11 +540,9 @@ internal static class LangJa
         ["GameUpdate_ErrFileMissing"] = "アップデートファイルが見つかりません：{0}",
         ["GameUpdate_ErrFileChecksum"] = "アップデートファイルの検証に失敗しました：{0}",
 
-        
         ["GameSetting_ErrNoLocalStorage"] = "ゲームの LocalStorage.db が見つかりません",
         ["GameSetting_ErrNoGameUserSettings"] = "ゲームの GameUserSettings.ini が見つかりません",
 
-        
         ["KuroBbs_ErrConnection"] = "接続に失敗しました。ステータスコード：{0}",
         ["KuroBbs_ErrAccessTokenEmpty"] = "requestToken が空の accessToken を返しました",
         ["KuroBbs_ErrAccessToken"] = "B-At accessToken の取得に失敗しました（code={0}）：{1}",
@@ -608,18 +552,11 @@ internal static class LangJa
         ["KuroBbs_SignAlready"] = "本日はチェックイン済みです",
         ["KuroBbs_SignFail"] = "チェックインに失敗しました",
 
-        
-
-        
         ["Ugf_ErrNoUid"] = "UGF ファイルにアカウントの uid がありません",
         ["Ugf_ErrUnknownFormat"] = "認識できないファイル形式です：UGFまたはガチャ記録 JSON が必要です",
 
-        
-
-        
         ["CombatPage_AreaFallback"] = "エリア {0}",
 
-        
         ["KuroBbs_UnionLevel"] = "ユニオンレベル",
         ["KuroBbs_CommanderLevel"] = "コマンダーレベル",
         ["KuroBbs_NoLevel"] = "レベルなし",
@@ -631,10 +568,8 @@ internal static class LangJa
         ["KuroBbs_AutoSignDoneToast"] = "デイリーチェックイン完了",
         ["KuroBbs_AutoSignFailedToast"] = "デイリーチェックインに失敗しました",
 
-        
         ["RolePage_WeaponLevel"] = "LV.{0} · 突破{1}",
 
-        
         ["Common_UnknownError"] = "不明なエラー",
     };
 

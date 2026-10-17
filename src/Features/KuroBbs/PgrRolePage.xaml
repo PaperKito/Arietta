@@ -14,7 +14,6 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        
         <StackPanel Grid.Row="0" x:Name="StackPanel_TopBar" Orientation="Vertical" Spacing="8" Margin="0,4,0,6">
             <Button x:Name="Button_Refresh"
                     Click="Button_Refresh_Click"
@@ -62,14 +61,14 @@
                                     BorderThickness="1"
                                     CornerRadius="8">
                                 <StackPanel>
-                                    
+
                                     <Grid>
                                         <Border Height="150"
                                                 CornerRadius="7,7,0,0"
                                                 Background="{ThemeResource ControlFillColorTertiaryBrush}">
                                             <Image Source="{Binding IconUrl}" Stretch="UniformToFill" />
                                         </Border>
-                                        
+
                                         <Border Height="4"
                                                 VerticalAlignment="Bottom"
                                                 CornerRadius="0,0,0,0"
@@ -98,7 +97,6 @@
             </StackPanel>
         </ScrollViewer>
 
-        
         <Grid Grid.Row="1" x:Name="Grid_Detail" Visibility="Collapsed" Background="{ThemeResource CustomOverlayAcrylicBrush}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -118,7 +116,6 @@
             <ScrollViewer Grid.Row="1" Padding="16,0,24,24">
                 <StackPanel Spacing="16" MaxWidth="1200" HorizontalAlignment="Left">
 
-                    
                     <Border Padding="16"
                             CornerRadius="12"
                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -130,7 +127,6 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            
                             <StackPanel x:Name="StackPanel_DetailInfo"
                                         Grid.Column="0"
                                         HorizontalAlignment="Stretch"
@@ -151,7 +147,6 @@
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
 
-                                
                                 <StackPanel Orientation="Horizontal" Spacing="8">
                                     <StackPanel x:Name="StackPanel_DetailBadges"
                                                 VerticalAlignment="Center"
@@ -170,7 +165,6 @@
                                     </HyperlinkButton>
                                 </StackPanel>
 
-                                
                                 <Grid ColumnSpacing="24">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -182,7 +176,7 @@
                                             <TextBlock FontSize="12"
                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                        Text="{x:Bind lang:Lang.Instance.PgrRoleDetail_Grade, Mode=OneWay}" />
-                                            
+
                                             <TextBlock x:Name="TextBlock_DetailGrade"
                                                        FontSize="30"
                                                        FontWeight="Bold" />
@@ -198,7 +192,6 @@
                                         </StackPanel>
                                     </StackPanel>
 
-                                    
                                     <StackPanel x:Name="StackPanel_GearIcons"
                                                 Grid.Column="1"
                                                 HorizontalAlignment="Left"
@@ -207,14 +200,12 @@
                                                 Spacing="12" />
                                 </Grid>
 
-                                
                                 <Grid x:Name="Grid_EquipIcons"
                                       HorizontalAlignment="Left"
                                       ColumnSpacing="8"
                                       RowSpacing="8" />
                             </StackPanel>
 
-                            
                             <StackPanel x:Name="StackPanel_PortraitWrap"
                                         Grid.Column="1"
                                         Width="320"
@@ -233,7 +224,6 @@
                         </Grid>
                     </Border>
 
-                    
                     <ProgressRing x:Name="ProgressRing_Detail"
                                   HorizontalAlignment="Left"
                                   IsActive="False" />

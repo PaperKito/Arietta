@@ -76,7 +76,7 @@ internal sealed class PlayTimeStatsService
             switch (item.State)
             {
                 case PlayTimeState.Start:
-                    
+
                     CloseSession(key, true);
                     StartSession(key, item.TimeStamp);
                     break;
@@ -86,7 +86,7 @@ internal sealed class PlayTimeStatsService
                     {
                         if (item.TimeStamp - s.EndTime > MAX_INTERVAL)
                         {
-                            
+
                             CloseSession(key, true);
                             StartSession(key, item.TimeStamp);
                         }
@@ -97,16 +97,14 @@ internal sealed class PlayTimeStatsService
                     }
                     else
                     {
-                        
+
                         StartSession(key, item.TimeStamp);
                     }
                     break;
 
                 case PlayTimeState.Stop:
                 case PlayTimeState.Error:
-                    
-                    
-                    
+
                     if (sessionByKey.TryGetValue(key, out var st))
                     {
                         st.Interruption = item.State is PlayTimeState.Error;
@@ -118,7 +116,6 @@ internal sealed class PlayTimeStatsService
             }
         }
 
-        
         foreach (var kv in sessionByKey)
         {
             kv.Value.Interruption = true;

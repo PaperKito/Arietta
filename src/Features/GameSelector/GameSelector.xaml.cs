@@ -19,18 +19,10 @@ using Windows.Foundation;
 
 namespace Arietta.Features.GameSelector;
 
-
-
-
-
-
-
-
 [INotifyPropertyChanged]
 public sealed partial class GameSelector : UserControl
 {
 
-    
     public event EventHandler<GameBiz>? CurrentGameChanged;
 
 
@@ -38,9 +30,9 @@ public sealed partial class GameSelector : UserControl
     {
         this.InitializeComponent();
         InitializeGameSelector();
-        
+
         GameBizIcons.CollectionChanged += GameBizIcons_CollectionChanged;
-        
+
         Localization.UiLanguage.Changed += OnUiLanguageChanged;
         TeachTip_SelectGame.Closed += (_, _) => AppConfig.SetConfig("GameSelectorTipDismissed", "1");
         this.Loaded += GameSelector_Loaded;
@@ -65,8 +57,6 @@ public sealed partial class GameSelector : UserControl
 
     public ObservableCollection<GameBizIcon> InstalledGames { get; } = [];
 
-
-    
     public string? InstalledGamesActualSize { get; set => SetProperty(ref field, value); }
 
 
@@ -80,18 +70,17 @@ public sealed partial class GameSelector : UserControl
     {
         try
         {
-            
+
             if (Enum.TryParse(AppConfig.GetConfig("CurrentGameBiz"), out GameBiz saved) && Enum.IsDefined(saved))
             {
                 CurrentGameBiz = saved;
             }
             else
             {
-                
+
                 CurrentGameBiz = GameBiz.WutheringWavesGlobal;
             }
 
-            
             GameBizIcons.Clear();
             var pinnedBizs = GetPinnedBizs();
             foreach (string str in pinnedBizs)
@@ -109,7 +98,6 @@ public sealed partial class GameSelector : UserControl
                 GameIconsAreaVisible = true;
             }
 
-            
             var displays = new List<GameBizDisplay>();
             foreach (var group in GameRegistry.Groups)
             {
@@ -118,7 +106,7 @@ public sealed partial class GameSelector : UserControl
                 {
                     GameName = group.Game,
                     Logo = GameBizIcon.LoadIcon(group.IconPath),
-                    
+
                     Icon = GameBizIcon.LoadIcon(group.Servers[0].GameIconPath),
                     Servers = servers,
                 });
@@ -128,15 +116,13 @@ public sealed partial class GameSelector : UserControl
         catch { }
     }
 
-
-    
     private void OnUiLanguageChanged()
     {
-        
+
         GameBizIcons.CollectionChanged -= GameBizIcons_CollectionChanged;
         InitializeGameSelector();
         GameBizIcons.CollectionChanged += GameBizIcons_CollectionChanged;
-        
+
         _installedSignature = null;
     }
 
@@ -156,9 +142,7 @@ public sealed partial class GameSelector : UserControl
             var biz = Enum.Parse<GameBiz>(bizName, true);
             var entry = GameRegistry.GetEntry(biz);
             var group = GameRegistry.Groups.FirstOrDefault(g => g.Servers.Contains(entry));
-            
-            
-            
+
             return new GameBizIcon
             {
                 Biz = biz,
@@ -178,8 +162,6 @@ public sealed partial class GameSelector : UserControl
         }
     }
 
-
-    
     private void SyncSelection()
     {
         foreach (var icon in GameBizIcons)
@@ -188,7 +170,7 @@ public sealed partial class GameSelector : UserControl
             icon.IsSelected = selected;
             icon.MaskOpacity = selected ? 0 : 1;
         }
-        
+
         CurrentGameBizIcon = GameBizIcons.FirstOrDefault(x => x.Biz == CurrentGameBiz)
                              ?? CreateIcon(CurrentGameBiz.ToString(), false);
     }
@@ -200,8 +182,7 @@ public sealed partial class GameSelector : UserControl
         {
             this.XamlRoot.Changed -= XamlRoot_Changed;
             this.XamlRoot.Changed += XamlRoot_Changed;
-            
-            
+
             UpdateDragRectangles();
             await Task.Delay(600);
             if (GameBizIcons.Count == 0 && AppConfig.GetConfig("GameSelectorTipDismissed") is not "1")
@@ -226,8 +207,6 @@ public sealed partial class GameSelector : UserControl
 
     #region 拖动窗口区域
 
-
-    
     public void UpdateDragRectangles()
     {
         try
@@ -251,8 +230,6 @@ public sealed partial class GameSelector : UserControl
 
     #region 待选图标栏
 
-
-    
     public bool GameIconsAreaVisible
     {
         get => Grid_GameIconsArea.Translation == Vector3.Zero;
@@ -263,15 +240,11 @@ public sealed partial class GameSelector : UserControl
         }
     }
 
-
-    
     private void Border_CurrentGameIcon_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         GameIconsAreaVisible = true;
     }
 
-
-    
     private void Border_CurrentGameIcon_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         if (FullBackgroundVisible || IsPinned)
@@ -283,15 +256,13 @@ public sealed partial class GameSelector : UserControl
             var position = e.GetCurrentPoint(ele).Position;
             if (position.X > ele.ActualSize.X - 1 && position.Y > 0 && position.Y < ele.ActualSize.Y)
             {
-                
+
                 return;
             }
         }
         GameIconsAreaVisible = false;
     }
 
-
-    
     private void Grid_GameIconsArea_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         if (FullBackgroundVisible || IsPinned)
@@ -307,8 +278,6 @@ public sealed partial class GameSelector : UserControl
         UpdateDragRectangles();
     }
 
-
-    
     private void Grid_GameIcon_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         if (sender is FrameworkElement fe && fe.DataContext is GameBizIcon icon)
@@ -318,8 +287,6 @@ public sealed partial class GameSelector : UserControl
         }
     }
 
-
-    
     private void Grid_GameIcon_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
     {
         if (sender is FrameworkElement fe && fe.DataContext is GameBizIcon icon)
@@ -348,8 +315,6 @@ public sealed partial class GameSelector : UserControl
         }
     }
 
-
-    
     [RelayCommand]
     private void Pin()
     {
@@ -360,7 +325,7 @@ public sealed partial class GameSelector : UserControl
         }
         else
         {
-            
+
             var temp = CurrentGameBizIcon;
             CurrentGameBizIcon = null;
             CurrentGameBizIcon = temp;
@@ -372,8 +337,6 @@ public sealed partial class GameSelector : UserControl
         AppConfig.SetConfig("GameBizSelectorPinned", IsPinned ? "1" : null);
     }
 
-
-    
     private void GameBizIcons_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         try
@@ -390,8 +353,6 @@ public sealed partial class GameSelector : UserControl
         SelectCore(icon.Biz);
     }
 
-
-    
     private bool SelectCore(GameBiz biz)
     {
         if (biz == CurrentGameBiz)
@@ -441,7 +402,7 @@ public sealed partial class GameSelector : UserControl
         Border_FullBackground.IsHitTestVisible = false;
         Border_Pin.Opacity = 0;
         Border_Pin.IsHitTestVisible = false;
-        
+
         _hideFullBackgroundTimer?.Stop();
         DispatcherQueueTimer timer = DispatcherQueue.CreateTimer();
         _hideFullBackgroundTimer = timer;
@@ -469,8 +430,6 @@ public sealed partial class GameSelector : UserControl
         HideFullBackground();
     }
 
-
-    
     private void Expander_InstalledGamesActualSize_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         e.Handled = true;
@@ -487,8 +446,6 @@ public sealed partial class GameSelector : UserControl
 
     private bool _isGameBizDisplayPressed;
 
-
-    
     private void Grid_GameBizDisplay_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         if (sender is FrameworkElement ele)
@@ -510,8 +467,6 @@ public sealed partial class GameSelector : UserControl
         }
     }
 
-
-    
     private void Grid_GameBizDisplay_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         if (sender is FrameworkElement ele && _isGameBizDisplayPressed)
@@ -524,8 +479,6 @@ public sealed partial class GameSelector : UserControl
         }
     }
 
-
-    
     private void Button_GameServer_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -543,7 +496,7 @@ public sealed partial class GameSelector : UserControl
                 }
                 if (selected)
                 {
-                    
+
                     if (VisualTreeHelper.GetOpenPopupsForXamlRoot(this.XamlRoot).FirstOrDefault() is Popup popup)
                     {
                         popup.IsOpen = false;
@@ -556,8 +509,6 @@ public sealed partial class GameSelector : UserControl
         catch { }
     }
 
-
-    
     private void Button_PinGameBiz_Click(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement fe && fe.DataContext is GameBizIcon server)
@@ -580,7 +531,7 @@ public sealed partial class GameSelector : UserControl
             GameBizIcons.Add(server);
             server.IsPinned = true;
         }
-        
+
     }
 
 
@@ -594,14 +545,8 @@ public sealed partial class GameSelector : UserControl
 
     private CancellationTokenSource? _initializeInstalledGamesCancellationTokenSource;
 
-    
-    
-    
-    
     private string? _installedSignature;
 
-
-    
     [RelayCommand]
     private async Task InitializeInstalledGamesAsync()
     {
@@ -619,7 +564,7 @@ public sealed partial class GameSelector : UserControl
             string signature = string.Join("|", exes);
             if (signature == _installedSignature && InstalledGamesActualSize is not null)
             {
-                return; 
+                return;
             }
             _installedSignature = signature;
 
@@ -633,7 +578,7 @@ public sealed partial class GameSelector : UserControl
                 string? exe = GameRegistry.GetConfiguredExePath(server.Biz);
                 if (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe))
                 {
-                    continue; 
+                    continue;
                 }
                 string dir = Path.GetFullPath(Path.GetDirectoryName(exe)!).TrimEnd('\\', '/').ToLowerInvariant();
                 server.InstallPath = exe;
@@ -643,7 +588,7 @@ public sealed partial class GameSelector : UserControl
                     {
                         try
                         {
-                            
+
                             var options = new EnumerationOptions
                             {
                                 IgnoreInaccessible = true,
@@ -668,7 +613,7 @@ public sealed partial class GameSelector : UserControl
                 {
                     return;
                 }
-                
+
                 if (shownDirs.Add(dir))
                 {
                     InstalledGames.Add(server);
@@ -680,8 +625,6 @@ public sealed partial class GameSelector : UserControl
         catch { }
     }
 
-
-    
     [RelayCommand]
     private async Task AutoSearchInstalledGamesAsync()
     {

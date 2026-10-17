@@ -8,35 +8,16 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class GameProcessMonitor
 {
     private static readonly object Gate = new();
 
     private static readonly HashSet<GameBiz> Running = new();
 
-    
     private static readonly Dictionary<GameBiz, int> Sessions = new();
 
     private static int _scanned;
 
-    
     public static event Action? Changed;
 
 
@@ -48,8 +29,6 @@ public static class GameProcessMonitor
         }
     }
 
-
-    
     public static bool IsAnyRunning()
     {
         lock (Gate)
@@ -58,8 +37,6 @@ public static class GameProcessMonitor
         }
     }
 
-
-    
     public static void SetRunning(GameBiz biz, bool running)
     {
         bool changed;
@@ -83,11 +60,6 @@ public static class GameProcessMonitor
         }
     }
 
-
-    
-    
-    
-    
     public static void NotifyProcessExited(GameBiz biz)
     {
         if (!IsProcessAlive(biz))
@@ -96,8 +68,6 @@ public static class GameProcessMonitor
         }
     }
 
-
-    
     public static void EnsureScanned()
     {
         if (Interlocked.Exchange(ref _scanned, 1) == 1)
@@ -113,8 +83,6 @@ public static class GameProcessMonitor
         }
     }
 
-
-    
     private static bool IsSessionCurrent(GameBiz biz, int session)
     {
         lock (Gate)
@@ -123,11 +91,6 @@ public static class GameProcessMonitor
         }
     }
 
-
-    
-    
-    
-    
     private static async Task PollUntilExitedAsync(GameBiz biz, int session)
     {
         try
@@ -139,7 +102,7 @@ public static class GameProcessMonitor
         }
         catch
         {
-            
+
         }
         finally
         {
@@ -155,20 +118,12 @@ public static class GameProcessMonitor
         }
     }
 
-
-    
     private static bool IsProcessAlive(GameBiz biz)
     {
         using Process? process = FindRunningProcess(biz);
         return process is not null;
     }
 
-
-    
-    
-    
-    
-    
     public static Process? FindRunningProcess(GameBiz biz)
     {
         string? configured = GameRegistry.GetConfiguredExePath(biz);
@@ -189,18 +144,16 @@ public static class GameProcessMonitor
                 try
                 {
                     string? image = Core.ProcessImage.GetPath(process);
-                    
-                    
-                    
+
                     matched = IsUnderDirectory(Path.GetDirectoryName(image), dir);
                 }
                 catch
                 {
-                    
+
                 }
                 finally
                 {
-                    
+
                     if (!matched)
                     {
                         process.Dispose();
@@ -215,8 +168,6 @@ public static class GameProcessMonitor
         return null;
     }
 
-
-    
     private static bool IsUnderDirectory(string? dir, string root)
     {
         if (string.IsNullOrEmpty(dir))

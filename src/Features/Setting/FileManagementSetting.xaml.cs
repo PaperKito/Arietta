@@ -11,10 +11,6 @@ using WinRT.Interop;
 
 namespace Arietta.Features.Setting;
 
-
-
-
-
 public sealed partial class FileManagementSetting : PageBase
 {
 
@@ -118,7 +114,6 @@ public sealed partial class FileManagementSetting : PageBase
 
     #region 缓存
 
-    
     private static string GachaIconFolder => Path.Combine(AppConfig.LocalFolder, "GachaIcons");
 
     private void RefreshCacheSize()
@@ -132,7 +127,7 @@ public sealed partial class FileManagementSetting : PageBase
 
     private async void Button_CleanCache_Click(object sender, RoutedEventArgs e)
     {
-        
+
         bool cleanBg = CheckBox_CleanBackground.IsChecked == true;
         var dialog = new ContentDialog
         {

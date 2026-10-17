@@ -9,19 +9,13 @@ using System.Threading.Tasks;
 
 namespace Arietta.Helpers;
 
-
-
-
-
-
-
 public sealed class CdpTokenSniffer : IAsyncDisposable
 {
     private const string TargetHost = "api.kurobbs.com";
 
     private ClientWebSocket? _ws;
     private readonly CancellationTokenSource _cts = new();
-    private readonly Dictionary<string, string> _trackedRequests = [];   
+    private readonly Dictionary<string, string> _trackedRequests = [];
     private readonly object _gate = new();
     private int _nextCommandId = 1;
 
@@ -31,8 +25,6 @@ public sealed class CdpTokenSniffer : IAsyncDisposable
     public event Action<string>? UserIdCaptured;
     public event Action? Disconnected;
 
-
-    
     public async Task ConnectAsync(string webSocketDebuggerUrl)
     {
         _ws = new ClientWebSocket();
@@ -42,7 +34,6 @@ public sealed class CdpTokenSniffer : IAsyncDisposable
             { "maxTotalBufferSize": 104857600, "maxResourceBufferSize": 10485760, "maxPostDataSize": 1048576 }
             """).RootElement.Clone());
 
-        
         try
         {
             await SendCommandAsync("Page.reload", JsonDocument.Parse("""{ "ignoreCache": true }""").RootElement.Clone());
@@ -202,7 +193,6 @@ public sealed class CdpTokenSniffer : IAsyncDisposable
             Log?.Invoke("已同时捕获 did 和 token");
         }
 
-        
         if (paramsEl.TryGetProperty("requestId", out var idEl))
         {
             lock (_gate)

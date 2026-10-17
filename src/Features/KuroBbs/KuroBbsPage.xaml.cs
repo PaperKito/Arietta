@@ -17,9 +17,7 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
 public sealed record KuroBbsFeature(string Title, string Glyph);
-
 
 public static class KuroBbsEvents
 {
@@ -34,24 +32,18 @@ public sealed partial class KuroBbsPage : PageBase
 
     private static readonly KuroBbsFeature SignInFeature = new(Lang.Instance.KuroBbs_SignIn, "\uE787");
 
-    
     private static readonly KuroBbsFeature DataTerminalFeature = new(Lang.Instance.KuroBbs_DataTerminal, "\uE8B7");
 
-    
     private static readonly KuroBbsFeature PgrRoleFeature = new(Lang.Instance.KuroBbs_PgrRole, "\uE716");
     private static readonly KuroBbsFeature PgrResourceFeature = new(Lang.Instance.KuroBbs_PgrResource, "\uE8A5");
     private static readonly KuroBbsFeature PgrCageFeature = new(Lang.Instance.KuroBbs_PgrCage, "\uE734");
     private static readonly KuroBbsFeature PgrWarAreaFeature = new(Lang.Instance.KuroBbs_PgrWarArea, "\uE945");
     private static readonly KuroBbsFeature PgrTransfiniteFeature = new(Lang.Instance.KuroBbs_PgrTransfinite, "\uE774");
 
-    
-    
     private static bool IsPgr => MainView.CurrentGameBiz.IsPunishingGrayRaven();
 
-    
     private readonly NavigationViewItem[] _wuwaOnlyItems;
 
-    
     private readonly NavigationViewItem[] _pgrOnlyItems;
 
 
@@ -76,9 +68,9 @@ public sealed partial class KuroBbsPage : PageBase
         ];
         UpdateGameHeader();
         UpdateAccountBar();
-        
+
         NavigateTo(SignInFeature, new SuppressNavigationTransitionInfo());
-        
+
         NavigationView_KuroBbs.SelectedItem = NavigationViewItem_SignIn;
     }
 
@@ -87,7 +79,7 @@ public sealed partial class KuroBbsPage : PageBase
     {
         MainView.GameChanged += MainView_GameChanged;
         KuroBbsEvents.AccountChanged += KuroBbsEvents_AccountChanged;
-        
+
         _ = RefreshAccountInfoAsync();
     }
 
@@ -108,8 +100,7 @@ public sealed partial class KuroBbsPage : PageBase
     private void MainView_GameChanged(object? sender, GameBiz biz)
     {
         UpdateGameHeader();
-        
-        
+
         bool stillValid = IsPgr
             ? Frame_KuroBbs.Content is SignInPage or PgrRolePage or PgrResourcePage or PgrChallengePage
             : Frame_KuroBbs.Content is not (PgrRolePage or PgrResourcePage or PgrChallengePage);
@@ -121,8 +112,6 @@ public sealed partial class KuroBbsPage : PageBase
         _ = RefreshAccountInfoAsync();
     }
 
-
-    
     private void UpdateGameHeader()
     {
         var wuwaVisibility = IsPgr ? Visibility.Collapsed : Visibility.Visible;
@@ -134,13 +123,13 @@ public sealed partial class KuroBbsPage : PageBase
         {
             item.Visibility = IsPgr ? Visibility.Visible : Visibility.Collapsed;
         }
-        
+
         TextBlock_DataTerminal.Text = IsPgr ? Lang.Instance.KuroBbs_CombatData : Lang.Instance.KuroBbs_DataTerminal;
-        
+
         Image_DataTerminal.Source = new BitmapImage(new Uri(
             IsPgr ? "ms-appx:///Assets/Image/Common/CombatData.png"
                   : "ms-appx:///Assets/Image/Common/DataTerminal.png"));
-        
+
         TextBlock_SignIn.Text = IsPgr ? Lang.Instance.PgrData_DailySupply : Lang.Instance.KuroBbs_SignIn;
         Image_SignIn.Source = new BitmapImage(new Uri(
             IsPgr ? "ms-appx:///Assets/Image/Common/DailySupply.png"
@@ -150,15 +139,12 @@ public sealed partial class KuroBbsPage : PageBase
 
     #region 顶部账号栏（照抄 Starward GameRecordPage 交互）
 
-    
     private void UpdateAccountBar()
     {
         var accounts = KuroBbsAccountStore.Accounts;
-        
-        
+
         var account = KuroBbsAccountStore.Load(IsPgr);
 
-        
         bool pgr = IsPgr;
         Run_AccountLevelLabel.Text = pgr ? Lang.Instance.KuroBbs_CommanderLevel + " " : Lang.Instance.KuroBbs_UnionLevel + " ";
         string name = pgr ? (account?.PgrRoleName ?? "") : (account?.RoleName ?? "");
@@ -177,25 +163,18 @@ public sealed partial class KuroBbsPage : PageBase
             Run_AccountLevel.Text = level > 0 ? level.ToString() : "-";
         }
 
-        
-        
-        
-        
-        
         var all = accounts.Select((a, i) => new AccountItem(a, i, pgr)).ToList();
         var items = pgr ? all.Where(x => x.Account.HasPgrRole != false).ToList() : all;
         if (items.Count == 0)
         {
-            
+
             items = all;
         }
         ListView_Accounts.ItemsSource = items;
-        
+
         ListView_Accounts.SelectedItem = items.FirstOrDefault(x => x.Index == KuroBbsAccountStore.GetIndex(pgr));
     }
 
-
-    
     private void SetAvatar(TextBlock fallbackText, Microsoft.UI.Xaml.Controls.Image image, string? url, string fallbackChar)
     {
         fallbackText.Text = fallbackChar;
@@ -231,16 +210,6 @@ public sealed partial class KuroBbsPage : PageBase
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     internal static string GetDisplayAvatar(KuroBbsAccount account, bool pgr)
     {
         if (pgr)
@@ -254,16 +223,6 @@ public sealed partial class KuroBbsPage : PageBase
         return account.AvatarUrl;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static async Task BackfillPgrRoleInfoAsync(KuroBbsAccount account)
     {
         if (string.IsNullOrEmpty(account.PgrRoleId))
@@ -305,15 +264,11 @@ public sealed partial class KuroBbsPage : PageBase
         }
     }
 
-
-    
     private void Grid_Avatar_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         Flyout_Accounts.ShowAt(Button_AccountSwitcher);
     }
 
-
-    
     private void NavigationViewItem_ModuleSettings_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
     {
         Toggle_KuroCommunitySign.IsOn = AppConfig.GetConfig("KuroBbs_AutoSign_Community") != "0";
@@ -353,9 +308,6 @@ public sealed partial class KuroBbsPage : PageBase
         await RefreshAccountInfoAsync();
     }
 
-
-    
-    
     private async void ListView_Accounts_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ListView_Accounts.SelectedItem is AccountItem item
@@ -368,8 +320,6 @@ public sealed partial class KuroBbsPage : PageBase
         }
     }
 
-
-    
     private async void MenuFlyoutItem_SwitchRole_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not MenuFlyoutItem { Tag: AccountItem item })
@@ -446,7 +396,7 @@ public sealed partial class KuroBbsPage : PageBase
             account.PgrServerId = selected.ServerId;
             account.PgrRoleName = selected.RoleName;
             account.PgrLevel = selected.Level;
-            account.PgrAvatarUrl = "";   
+            account.PgrAvatarUrl = "";
         }
         else
         {
@@ -466,8 +416,6 @@ public sealed partial class KuroBbsPage : PageBase
         InAppToast.MainWindow?.Success(pgr ? Lang.Instance.KuroBbs_SwitchedPgr : Lang.Instance.KuroBbs_SwitchedWuwa);
     }
 
-
-    
     private void MenuFlyoutItem_DeleteAccount_Click(object sender, RoutedEventArgs e)
     {
         if (sender is MenuFlyoutItem { Tag: AccountItem item })
@@ -479,26 +427,22 @@ public sealed partial class KuroBbsPage : PageBase
         }
     }
 
-
-    
     private async Task RefreshAccountInfoAsync()
     {
-        
+
         var account = KuroBbsAccountStore.Load(IsPgr);
         if (account is null)
         {
             return;
         }
-        
+
         if (IsPgr)
         {
-            
-            
+
             int pgrIndexBefore = KuroBbsAccountStore.GetIndex(pgr: true);
             try
             {
-                
-                
+
                 await KuroBbsAccountStore.EnsurePgrRolesAsync();
                 await KuroBbsAccountStore.EnsurePgrRoleAsync(account);
                 await BackfillPgrRoleInfoAsync(account);
@@ -522,7 +466,7 @@ public sealed partial class KuroBbsPage : PageBase
             var roles = await KuroBbsClient.Instance.SeekGameRoleAsync(account.Token);
             if (roles is { IsSuccess: true, Data: { Count: > 0 } } )
             {
-                
+
                 var role = roles.Data.FirstOrDefault(r => string.Equals(r.RoleId, account.RoleId, StringComparison.OrdinalIgnoreCase))
                     ?? roles.Data[0];
                 account.UserId = role.UserId;
@@ -595,14 +539,9 @@ public sealed partial class KuroBbsPage : PageBase
         };
     }
 
-
-    
-    
-    
-    
     private void NavigateToTag(string? tag)
     {
-        
+
         if (tag == "DataTerminal")
         {
             DataTerminalWindow.ShowTerminal();
@@ -624,13 +563,11 @@ public sealed partial class KuroBbsPage : PageBase
 
     private void NavigateTo(KuroBbsFeature feature, NavigationTransitionInfo? infoOverride = null)
     {
-        
+
         Frame_KuroBbs.Navigate(typeof(SignInPage), feature, infoOverride);
     }
 
 }
-
-
 
 public sealed class AccountItem
 {
@@ -641,7 +578,6 @@ public sealed class AccountItem
     public string SubText => LevelText == "-" ? Lang.Instance.KuroBbs_NoLevel : $"{LevelLabel} {LevelText}";
     public int Index { get; init; }
 
-    
     public KuroBbsAccount Account { get; init; } = new();
 
     public AccountItem(KuroBbsAccount account, int index, bool pgr = false)

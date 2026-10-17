@@ -2,19 +2,10 @@
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
 public static class GameNoticeSettings
 {
     public const string EnableBannerAndPostKey = "EnableBannerAndPost";
 
-
-    
     public static bool ShowBannerAndPost => AppConfig.GetConfig(EnableBannerAndPostKey) != "0";
 
 

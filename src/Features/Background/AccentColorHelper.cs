@@ -6,50 +6,28 @@ using Windows.UI;
 
 namespace Arietta.Features.Background;
 
-
-
-
-
-
-
-
-
-
 internal static class AccentColorHelper
 {
 
-    
     private const double AccentSaturation = 0.6;
 
-    
-    
-    
-    
     private const double MinChroma = 10;
 
-    
     private const double AccentValue = 0.7;
 
-    
     private const double MinColoredSaturation = 0.25;
 
-    
     private const double MinColoredValue = 0.15;
     private const double MaxColoredValue = 0.92;
 
-    
     private static readonly Color FallbackDefaultAccent = Color.FromArgb(255, 0x00, 0xC2, 0xAC);
 
     private static Color _defaultAccent = FallbackDefaultAccent;
 
     private static bool _defaultAccentCaptured;
 
-
-    
     public static event EventHandler? Changed;
 
-
-    
     public static Color DefaultAccent
     {
         get
@@ -59,12 +37,6 @@ internal static class AccentColorHelper
         }
     }
 
-
-    
-    
-    
-    
-    
     public static void CaptureDefaultAccent()
     {
         if (_defaultAccentCaptured)
@@ -81,20 +53,12 @@ internal static class AccentColorHelper
         }
         catch
         {
-            
+
         }
     }
 
-
-    
     private const int HueBins = 24;
 
-    
-    
-    
-    
-    
-    
     public static Color? GetAccentColor(byte[]? bgra, int width, int height)
     {
         if (bgra is null || width <= 0 || height <= 0 || bgra.Length < (long)width * height * 4)
@@ -104,11 +68,11 @@ internal static class AccentColorHelper
         try
         {
             var votes = new double[HueBins];
-            
+
             var sinSum = new double[HueBins];
             var cosSum = new double[HueBins];
             int stride = width * 4;
-            
+
             for (int y = 0; y < height; y += 2)
             {
                 int row = y * stride;
@@ -140,7 +104,7 @@ internal static class AccentColorHelper
             {
                 return null;
             }
-            
+
             double sin = 0, cos = 0;
             for (int offset = -1; offset <= 1; offset++)
             {
@@ -157,11 +121,6 @@ internal static class AccentColorHelper
         }
     }
 
-
-    
-    
-    
-    
     public static void ApplyAccentColor(Color? color)
     {
         if (color is not { } value || Application.Current is not { } app)
@@ -181,17 +140,10 @@ internal static class AccentColorHelper
         }
         catch
         {
-            
+
         }
     }
 
-
-    
-    
-    
-    
-    
-    
     public static string DescribeResolvedAccent()
     {
         try
@@ -221,8 +173,6 @@ internal static class AccentColorHelper
                               (byte)((input.B * percent) + (blend.B * (1 - percent))));
     }
 
-
-    
     private static (double Hue, double Saturation, double Value) ToHsv(byte r, byte g, byte b)
     {
         double rd = r / 255d, gd = g / 255d, bd = b / 255d;
@@ -253,8 +203,6 @@ internal static class AccentColorHelper
         return (hue, saturation, max);
     }
 
-
-    
     private static Color FromHsv(double hue, double saturation, double value)
     {
         hue = ((hue % 360) + 360) % 360;

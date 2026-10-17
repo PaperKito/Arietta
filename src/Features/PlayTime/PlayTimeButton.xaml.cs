@@ -9,13 +9,6 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.PlayTime;
 
-
-
-
-
-
-
-
 [ObservableObject]
 public sealed partial class PlayTimeButton : UserControl
 {

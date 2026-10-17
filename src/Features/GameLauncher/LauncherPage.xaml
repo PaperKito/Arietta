@@ -14,7 +14,7 @@
              mc:Ignorable="d">
 
     <mf:PageBase.Resources>
-        
+
         <Style x:Key="TransparentIconButtonStyle"
                TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
@@ -72,7 +72,6 @@
           DragOver="RootGrid_DragOver"
           Drop="RootGrid_Drop">
 
-        
         <Border x:Name="Border_BackgroundDragIn"
                 Margin="0,40,0,0"
                 Padding="24"
@@ -98,7 +97,6 @@
             </StackPanel>
         </Border>
 
-        
         <Border x:Name="Border_SwitchBackgroundImage"
                 Height="60"
                 HorizontalAlignment="Stretch"
@@ -115,7 +113,7 @@
                         Background="Transparent"
                         Orientation="Horizontal"
                         Spacing="4">
-                
+
                 <PipsPager x:Name="PipsPager_SwitchBackgroundImage"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Bottom"
@@ -124,7 +122,7 @@
                            PreviousButtonVisibility="VisibleOnPointerOver"
                            SelectedPageIndex="{x:Bind CurrentBackgroundImageIndex, Mode=TwoWay}" />
                 <AppBarSeparator Padding="0,4,0,4" />
-                
+
                 <Button Padding="4"
                         VerticalAlignment="Center"
                         Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
@@ -169,7 +167,7 @@
                               Glyph="&#xE91B;"
                               IsTextScaleFactorEnabled="False" />
                 </Button>
-                
+
                 <Button Padding="4"
                         VerticalAlignment="Center"
                         Click="Button_CopyBackground_Click"
@@ -180,7 +178,7 @@
                               Glyph="&#xE8C8;"
                               IsTextScaleFactorEnabled="False" />
                 </Button>
-                
+
                 <Button Padding="4"
                         VerticalAlignment="Center"
                         Click="Button_SaveBackgroundAs_Click"
@@ -191,7 +189,7 @@
                               Glyph="&#xE74E;"
                               IsTextScaleFactorEnabled="False" />
                 </Button>
-                
+
                 <Button Padding="4"
                         VerticalAlignment="Center"
                         Click="Button_PlayPauseBackground_Click"
@@ -215,14 +213,12 @@
             </Border.OpacityTransition>
         </Border>
 
-        
         <local:GameAccountSwitcher x:Name="GameAccountSwitcher"
                                    Margin="0,0,40,100"
                                    HorizontalAlignment="Right"
                                    VerticalAlignment="Bottom"
                                    CurrentGameBiz="{x:Bind CurrentGameBiz}" />
 
-        
         <Button x:Name="Button_DailyBriefing"
                 Width="40"
                 Height="40"
@@ -239,15 +235,12 @@
                    Source="ms-appx:///Assets/Image/Common/1789406285416.png" />
         </Button>
 
-        
-        
         <local:GameBannerAndPost x:Name="BannerAndPost"
                                  Margin="40,0,0,40"
                                  HorizontalAlignment="Left"
                                  VerticalAlignment="Bottom"
                                  CurrentGameBiz="{x:Bind CurrentGameBiz, Mode=OneWay}" />
 
-        
         <StackPanel Margin="0,0,40,40"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom">
@@ -256,7 +249,6 @@
                         Orientation="Horizontal"
                         Spacing="8">
 
-                
                 <Button x:Name="Button_PreDownload"
                         Height="44"
                         Padding="10,0,14,0"
@@ -271,14 +263,14 @@
                         Visibility="Collapsed">
                     <Grid>
                         <Grid.Resources>
-                            
+
                             <cu:AttachedDropShadow x:Key="PreDownloadTextShadow"
                                                    BlurRadius="6"
                                                    CastTo="{x:Bind Border_PreDownloadShadowTarget}"
                                                    Offset="0,2"
                                                    Color="#80000000" />
                         </Grid.Resources>
-                        
+
                         <Border x:Name="Border_PreDownloadShadowTarget" />
                         <StackPanel Orientation="Horizontal"
                                     Spacing="8">
@@ -301,7 +293,6 @@
                     </Grid>
                 </Button>
 
-                
                 <Popup x:Name="Popup_PreDownloadProgress"
                        DesiredPlacement="Top"
                        IsOpen="False"
@@ -364,7 +355,6 @@
             </StackPanel>
         </StackPanel>
 
-        
         <TextBlock Margin="0,0,78,14"
                    HorizontalAlignment="Right"
                    VerticalAlignment="Bottom"

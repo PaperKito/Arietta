@@ -14,7 +14,6 @@
                 Orientation="Horizontal"
                 Spacing="16">
 
-        
         <Grid Background="{ThemeResource CustomAcrylicBrush}"
               CornerRadius="20"
               Shadow="{StaticResource ThemeShadow}"
@@ -27,7 +26,7 @@
                       SelectedItem="{x:Bind SelectAccount, Mode=TwoWay}"
                       SelectionChanged="ComboBox_GameAccount_SelectionChanged">
                 <ComboBox.ItemTemplate>
-                    
+
                     <DataTemplate x:DataType="local:KrSdkAccount">
                         <TextBlock Padding="8,0,0,0"
                                    VerticalAlignment="Center"
@@ -43,7 +42,6 @@
             </ComboBox>
         </Grid>
 
-        
         <Grid Background="{ThemeResource CustomAcrylicBrush}"
               CornerRadius="20"
               Shadow="{StaticResource ThemeShadow}"
@@ -72,21 +70,21 @@
                                 <TextBlock FontSize="16"
                                            FontWeight="SemiBold"
                                            Text="{x:Bind lang:Lang.Instance.AccountSwitcher_AccountInfo, Mode=OneWay}" />
-                                
+
                                 <TextBlock Text="{x:Bind lang:Lang.Instance.AccountSwitcher_Nickname, Mode=OneWay}" />
                                 <TextBox x:Name="TextBox_Nickname"
                                          IsSpellCheckEnabled="False"
                                          Text="{x:Bind SelectAccount.Nickname, Mode=TwoWay}" />
-                                
+
                                 <TextBlock Text="{x:Bind lang:Lang.Instance.AccountSwitcher_RoleId, Mode=OneWay}" />
                                 <TextBox IsEnabled="False"
                                          IsReadOnly="True"
                                          Text="{x:Bind SelectAccount.DisplayUid}" />
-                                
+
                                 <TextBlock Foreground="{ThemeResource SystemFillColorCautionBrush}"
                                            Text="{x:Bind lang:Lang.Instance.AccountSwitcher_Unsaved, Mode=OneWay}"
                                            Visibility="{x:Bind ShowUnsavedHint, Converter={StaticResource BoolToVisibilityConverter}}" />
-                                
+
                                 <Grid Margin="0,8,0,0"
                                       HorizontalAlignment="Stretch"
                                       Background="{ThemeResource CustomAcrylicBrush}"

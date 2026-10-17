@@ -4,9 +4,6 @@ using System.Text;
 
 namespace Arietta;
 
-
-
-
 public static class Program
 {
 

@@ -15,22 +15,14 @@ using Windows.UI;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
-
 public sealed partial class PgrResourcePage : PageBase
 {
-    
+
     private static readonly Color[] Palette =
     [
-        Color.FromArgb(0xFF, 0xC5, 0x6B, 0xE8), 
-        Color.FromArgb(0xFF, 0x5B, 0x8D, 0xEF), 
-        Color.FromArgb(0xFF, 0x4C, 0xB0, 0x8A), 
+        Color.FromArgb(0xFF, 0xC5, 0x6B, 0xE8),
+        Color.FromArgb(0xFF, 0x5B, 0x8D, 0xEF),
+        Color.FromArgb(0xFF, 0x4C, 0xB0, 0x8A),
     ];
 
     private KuroPgrResourceReport? _report;
@@ -39,10 +31,8 @@ public sealed partial class PgrResourcePage : PageBase
     private long _peakTrade = 1;
     private bool _loading;
 
-    
     private List<KuroPgrResourceMonth> _allMonths = [];
 
-    
     private HashSet<int> _serverMonthKeys = [];
 
 
@@ -92,12 +82,11 @@ public sealed partial class PgrResourcePage : PageBase
             {
                 _report = data;
 
-                
                 ResourceRecordStore.SavePgrReport(account.PgrRoleId, data);
                 MergeLocalMonths(account.PgrRoleId);
                 ComputePeaks();
                 FillPeriodList();
-                
+
                 if (ListView_Periods.Items.Count > 0)
                 {
                     ListView_Periods.SelectedIndex = 0;
@@ -110,8 +99,6 @@ public sealed partial class PgrResourcePage : PageBase
         },
         Lang.Instance.KuroBbs_PgrResource);
 
-
-    
     private void MergeLocalMonths(string roleId)
     {
         var serverMonths = _report?.PerMonthList ?? new List<KuroPgrResourceMonth>();
@@ -132,8 +119,6 @@ public sealed partial class PgrResourcePage : PageBase
             .ToList();
     }
 
-
-    
     private void ComputePeaks()
     {
         _peakBlack = Math.Max(1, _allMonths.Max(m => (long)m.MonthBlackCard));
@@ -141,8 +126,6 @@ public sealed partial class PgrResourcePage : PageBase
         _peakTrade = Math.Max(1, _allMonths.Max(m => (long)m.MonthTradeCredit));
     }
 
-
-    
     private void FillPeriodList()
     {
         if (_report is null)
@@ -183,8 +166,6 @@ public sealed partial class PgrResourcePage : PageBase
         RenderPeriod(item);
     }
 
-
-    
     private void RenderPeriod(PgrResourcePeriodItem item)
     {
         if (_report is null)
@@ -194,7 +175,7 @@ public sealed partial class PgrResourcePage : PageBase
         long black, develop, trade;
         if (item.IsCumulative)
         {
-            
+
             var months = _report?.PerMonthList ?? new List<KuroPgrResourceMonth>();
             black = months.Sum(m => (long)m.MonthBlackCard);
             develop = months.Sum(m => (long)m.MonthDevelopResource);
@@ -217,11 +198,6 @@ public sealed partial class PgrResourcePage : PageBase
         FillMonthlyTable(item);
     }
 
-
-    
-    
-    
-    
     private void FillComposition(PgrResourcePeriodItem item)
     {
         StackPanel_Composition.Children.Clear();
@@ -274,8 +250,6 @@ public sealed partial class PgrResourcePage : PageBase
         }
     }
 
-
-    
     private static void AddCompositionBar(StackPanel host, IReadOnlyList<(string Label, long Value)> segments, Color[] palette)
     {
         long total = segments.Sum(s => Math.Max(s.Value, 0));
@@ -326,7 +300,6 @@ public sealed partial class PgrResourcePage : PageBase
         host.Children.Add(bar);
         host.Children.Add(legend);
 
-        
         void AnimateSegments(double totalWidth)
         {
             for (int k = 0; k < plan.Count; k++)
@@ -353,12 +326,6 @@ public sealed partial class PgrResourcePage : PageBase
         }
     }
 
-
-    
-    
-    
-    
-    
     private void FillMonthlyTable(PgrResourcePeriodItem item)
     {
         StackPanel_Items.Children.Clear();
@@ -452,8 +419,6 @@ public sealed partial class PgrResourcePage : PageBase
         }
     }
 
-
-    
     private static void FadeIn(UIElement element, int delayMs)
     {
         try
@@ -481,8 +446,6 @@ public sealed partial class PgrResourcePage : PageBase
         KuroBbsUi.HandleKuroError(code, msg, null, Lang.Instance.PgrCommon_LoadFailed, InfoBar_Error, foldVisibility: false);
     }
 }
-
-
 
 public sealed class PgrResourcePeriodItem
 {

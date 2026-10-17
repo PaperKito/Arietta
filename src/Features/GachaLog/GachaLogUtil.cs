@@ -7,10 +7,6 @@ using System.Threading;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
 public static partial class GachaLogUtil
 {
     [GeneratedRegex(@"https.*/aki/gacha/index.html#/record[^""'\s]+")]
@@ -19,10 +15,6 @@ public static partial class GachaLogUtil
     [GeneratedRegex(@"\\u([0-9A-Fa-f]{4})")]
     private static partial Regex UnicodeEscapePattern();
 
-    
-    
-    
-    
     public static string? GetLogFileUrl(string logFile)
     {
         string? decrypted = DecryptLog(logFile);
@@ -39,12 +31,6 @@ public static partial class GachaLogUtil
         return last is not null && UnicodeEscapePattern().IsMatch(last) ? DecodeUnicodeEscapes(last) : last;
     }
 
-
-    
-    
-    
-    
-    
     public static string? DecryptLog(string logFile)
     {
         for (int attempt = 0; ; attempt++)
@@ -73,10 +59,6 @@ public static partial class GachaLogUtil
         }
     }
 
-
-    
-    
-    
     public static GachaParams GetParamFromUrl(string url)
     {
         var parameters = new GachaParams();

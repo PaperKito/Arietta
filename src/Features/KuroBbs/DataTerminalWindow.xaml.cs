@@ -13,30 +13,17 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
-
-
 public sealed partial class DataTerminalWindow : Window
 {
 
-    
     private const string WuwaTerminalUrl = "https://web-static.kurobbs.com/mcbox/index.html#/mc-role-box";
 
-    
     private const string PgrTerminalUrl = "https://web-static.kurobbs.com/pns-box/index.html#/pns-role-box";
 
-    
     private const string AppUserAgent = "Mozilla/5.0 (Linux; Android 13; 23049RAD8C Build/TQ3A.230805.001; wv) "
         + "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile Safari/537.36 "
         + "Kuro/3.1.2 KuroGameBox/3.1.2";
 
-    
     private static readonly string[] BridgeHandlers =
     [
         "KJQKeyboardChange", "activityChangeTitle", "appLogout", "appShare", "appShareFailed",
@@ -72,10 +59,9 @@ public sealed partial class DataTerminalWindow : Window
         };
         MainView.GameChanged += MainView_GameChanged;
         KuroBbsEvents.AccountChanged += KuroBbsEvents_AccountChanged;
-        
+
         this.AppWindow.Resize(new Windows.Graphics.SizeInt32(620, 1140));
-        
-        
+
         try
         {
             this.AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
@@ -86,8 +72,6 @@ public sealed partial class DataTerminalWindow : Window
         }
     }
 
-
-    
     public static void ShowTerminal()
     {
         if (_current is not null)
@@ -115,15 +99,12 @@ public sealed partial class DataTerminalWindow : Window
         DispatcherQueue.TryEnqueue(async () => await ReloadAsync());
     }
 
-
-    
     private async Task ReloadAsync()
     {
         bool pgr = IsPgr;
         _isPgr = pgr;
         Title = pgr ? Lang.Instance.KuroBbs_CombatData : Lang.Instance.KuroBbs_DataTerminal;
 
-        
         var account = KuroBbsAccountStore.Load(pgr);
         if (account is null || string.IsNullOrEmpty(account.Token))
         {
@@ -148,7 +129,7 @@ public sealed partial class DataTerminalWindow : Window
         string serverId = pgr ? account.PgrServerId : KuroBbsClient.ParamServerId;
         string gameId = pgr ? "2" : "3";
         string baseUrl = pgr ? PgrTerminalUrl : WuwaTerminalUrl;
-        
+
         _url = $"{baseUrl}?accessType=1&roleId={Uri.EscapeDataString(roleId)}&serverId={Uri.EscapeDataString(serverId)}";
 
         HidePlaceholder();
@@ -159,10 +140,7 @@ public sealed partial class DataTerminalWindow : Window
             {
                 return;
             }
-            
-            
-            
-            
+
             await InstallBootstrapAsync(account, roleId, serverId, gameId, pgr);
             Web.CoreWebView2.Navigate(_url);
         }
@@ -204,8 +182,7 @@ public sealed partial class DataTerminalWindow : Window
                     "数据终端页面加载失败：{Status}", args.WebErrorStatus);
             }
         };
-        
-        
+
         Web.CoreWebView2.WebMessageReceived += (_, args) =>
         {
             try
@@ -221,10 +198,6 @@ public sealed partial class DataTerminalWindow : Window
         _coreReady = true;
     }
 
-
-    
-    
-    
     private async Task InstallBootstrapAsync(KuroBbsAccount account, string roleId, string serverId, string gameId, bool pgr)
     {
         if (Web.CoreWebView2 is null)
@@ -242,12 +215,10 @@ public sealed partial class DataTerminalWindow : Window
         }
         _scriptId = await Web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(
             BuildBootstrapScript(account, roleId, serverId, gameId, pgr));
-        
+
         ApplyAuthCookies(account);
     }
 
-
-    
     private void ApplyAuthCookies(KuroBbsAccount account)
     {
         if (Web.CoreWebView2 is null)
@@ -281,14 +252,6 @@ public sealed partial class DataTerminalWindow : Window
 
     #region 登录态注入
 
-    
-    
-    
-    
-    
-    
-    
-    
     private static string BuildBootstrapScript(KuroBbsAccount account, string roleId, string serverId, string gameId, bool pgr)
     {
         var auth = new Dictionary<string, object?>
@@ -333,11 +296,7 @@ public sealed partial class DataTerminalWindow : Window
             });
             const createResponse = (name, data) => {
                 switch (name) {
-                    
-                    
-                    
-                    
-                    
+
                     case 'getUserInfo':
                         return auth.storage && auth.storage.initUserInfo ? auth.storage.initUserInfo : userInfo();
                     case 'getAuthToken':
@@ -386,7 +345,6 @@ public sealed partial class DataTerminalWindow : Window
             window.jsBridge.registerHandler = bridge.registerHandler;
             window.WVJBCallbacks = window.WVJBCallbacks || [];
 
-            
             const report = (m) => { try { window.chrome.webview.postMessage('__mwl: ' + m); } catch {} };
             window.addEventListener('error', (e) => report('error: ' + e.message + ' @' + e.filename + ':' + e.lineno));
             window.addEventListener('unhandledrejection', (e) => report('rejection: ' + (e.reason && e.reason.message ? e.reason.message : e.reason)));
@@ -400,8 +358,6 @@ public sealed partial class DataTerminalWindow : Window
         """;
     }
 
-
-    
     private static Dictionary<string, string?> BuildStorage(
         KuroBbsAccount account, string roleId, string serverId, string gameId, bool pgr)
     {
@@ -416,7 +372,7 @@ public sealed partial class DataTerminalWindow : Window
         };
         if (pgr)
         {
-            
+
             storage["zs_box_master_roleId"] = roleId;
             storage["zs_box_master_serverId"] = serverId;
             storage["zs_userInfo"] = JsonSerializer.Serialize(new Dictionary<string, string?>
@@ -429,8 +385,7 @@ public sealed partial class DataTerminalWindow : Window
         }
         else
         {
-            
-            
+
             var userInfo = JsonSerializer.Serialize(new Dictionary<string, object?>
             {
                 ["appVersion"] = "3.1.2",

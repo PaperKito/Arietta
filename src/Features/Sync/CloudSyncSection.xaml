@@ -8,10 +8,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d">
 
-    
     <StackPanel Spacing="12">
 
-        
         <Grid ColumnSpacing="16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -38,7 +36,6 @@
                           OnContent="" />
         </Grid>
 
-        
         <Border HorizontalAlignment="Stretch"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -59,7 +56,6 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    
                     <Viewbox Width="28" Height="28" VerticalAlignment="Center">
                         <Canvas Width="24" Height="24">
                             <Rectangle Canvas.Left="3" Canvas.Top="4"
@@ -105,7 +101,6 @@
             </Button>
         </Border>
 
-        
         <Button x:Name="Button_SyncNow"
                 Click="Button_SyncNow_Click"
                 HorizontalAlignment="Stretch"
@@ -120,7 +115,6 @@
             </StackPanel>
         </Button>
 
-        
         <StackPanel Orientation="Horizontal" Spacing="8">
             <ProgressRing x:Name="ProgressRing_Busy"
                           Width="14"

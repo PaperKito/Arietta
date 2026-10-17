@@ -12,7 +12,6 @@ public sealed partial class CachedImage : UserControl
 {
     private readonly Image _image = new() { Stretch = Stretch.Uniform };
 
-    
     private Uri? _pendingUri;
 
     public CachedImage()
@@ -21,7 +20,6 @@ public sealed partial class CachedImage : UserControl
         SizeChanged += OnSizeChanged;
     }
 
-    
     public Stretch ImageStretch
     {
         get => (Stretch)GetValue(ImageStretchProperty);
@@ -94,12 +92,6 @@ public sealed partial class CachedImage : UserControl
         }
     }
 
-    
-    
-    
-    
-    
-    
     private static async Task<BitmapImage> DecodeAsync(Uri uri, double displayWidth)
     {
         var bitmap = new BitmapImage

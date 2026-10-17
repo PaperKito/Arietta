@@ -93,7 +93,6 @@ dist/NoComments/
 
 # Proprietary Xbox font (used by gamepad glyphs): not committed, shipped with the release package.
 # Source: Assets/Font/XboxFluent2.ttf from a local Starward install, or download from the Xbox Design System.
-# See the gamepad mapping handoff note (internal docs, not published).
 src/Assets/Font/XboxFluent2.ttf
 
 # ---- Extra: packaging output and stray build folders ----

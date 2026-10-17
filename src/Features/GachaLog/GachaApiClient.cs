@@ -8,10 +8,6 @@ using Arietta.Helpers;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
 public class GachaApiClient
 {
     private const string CnRequestUrl = "https://gmserver-api.aki-game2.com/gacha/record/query";
@@ -19,12 +15,6 @@ public class GachaApiClient
 
     private static readonly HttpClient Client = SharedHttp.Default;
 
-
-    
-    
-    
-    
-    
     public async Task<GachaFetchResult> FetchAllPoolsAsync(GachaParams parameters)
     {
         string requestUrl = parameters.PlayerId.StartsWith('1') ? CnRequestUrl : GlobalRequestUrl;
@@ -52,7 +42,7 @@ public class GachaApiClient
                 errorMessage = response.Message;
             }
         }
-        
+
         return result.Count > 0
             ? new GachaFetchResult(result, 0, null)
             : new GachaFetchResult(result, errorCode, errorMessage);

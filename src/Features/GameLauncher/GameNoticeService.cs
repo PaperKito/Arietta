@@ -11,46 +11,14 @@ using Arietta.Helpers;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class GameNoticeService
 {
-    
+
     private enum NoticePathKind
     {
-        
+
         Legacy,
-        
+
         AppWithServer,
     }
 
@@ -64,14 +32,10 @@ public static class GameNoticeService
         string[]? Languages = null,
         BizConfig? Fallback = null)
     {
-        
-        
-        
-        
+
         public string[] SupportedLanguages => Languages is { Length: > 0 } ? Languages : OnlyZhHans;
     }
 
-    
     private static readonly string[] CnBases =
     [
         "https://prod-cn-alicdn-gamestarter.kurogame.com",
@@ -81,32 +45,19 @@ public static class GameNoticeService
         "https://prod-alicdn-gamestarter.kurogame.com",
     ];
 
-    
     private static readonly string[] GlobalBases =
     [
         "https://prod-alicdn-gamestarter.kurogame.com",
     ];
 
-    
-    
-    
-    
     private static readonly string[] OverseasPgrBases =
     [
         "https://prod-alicdn-gamestarter.kurogame.com",
         "https://prod-volcdn-gamestarter.kurogame.net",
     ];
 
-    
-    
-    
-    
-    
-    
-    
     private static readonly string[] OnlyZhHans = ["zh-Hans"];
 
-    
     private static readonly string[] GlobalLanguages =
     ["zh-Hans", "zh-Hant", "en", "ja", "ko", "fr", "de", "es", "th", "pt-BR"];
 
@@ -115,15 +66,11 @@ public static class GameNoticeService
         [GameBiz.WutheringWaves] = new(CnBases,
             "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5", "G152", null, NoticePathKind.Legacy, true,
             OnlyZhHans),
-        
-        
+
         [GameBiz.WutheringWavesBilibili] = new(CnBases,
             "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y", "G152", null, NoticePathKind.Legacy, false,
             OnlyZhHans),
-        
-        
-        
-        
+
         [GameBiz.WutheringWavesGlobal] = new(GlobalBases,
             "50004_P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e", "G153", "official", NoticePathKind.AppWithServer, true,
             GlobalLanguages,
@@ -132,10 +79,7 @@ public static class GameNoticeService
         [GameBiz.PunishingGrayRaven] = new(CnBases,
             "10012_RnIUKs3r59Csliu3N0rl5uRWWBOFDaJL", "G148", null, NoticePathKind.Legacy, true,
             OnlyZhHans),
-        
-        
-        
-        
+
         [GameBiz.PunishingGrayRavenGlobal] = new(OverseasPgrBases,
             "50015_LWdk9D2Ep9mpJmqBZZkcPBU2YNraEWBQ", "G143", null, NoticePathKind.Legacy, true,
             ["en"]),
@@ -154,37 +98,27 @@ public static class GameNoticeService
 
     private static readonly Microsoft.Extensions.Logging.ILogger _logger = AppConfig.GetLogger<LogTag>();
 
-    
     private sealed class LogTag;
 
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-    
     private static readonly TimeSpan CacheLifetime = TimeSpan.FromMinutes(10);
 
-    
     private static readonly Dictionary<GameBiz, (List<GameBannerItem> Banners, List<GamePostGroup> Groups, string Lang, DateTimeOffset Time)> _cache = new();
 
-
-    
     public static void InvalidateCache()
     {
         _cache.Clear();
     }
 
-
-    
     public static string? LastError { get; private set; }
 
-    
     public static NoticeFailureKind LastFailure { get; private set; }
 
-
-    
     public static async Task<(List<GameBannerItem> Banners, List<GamePostGroup> Groups)?> GetAsync(GameBiz biz)
     {
         LastFailure = NoticeFailureKind.None;
-        
+
         if (!Configs.TryGetValue(biz, out var cfg) && !Configs.TryGetValue(biz.GetBaseBiz(), out cfg))
         {
             LastError = $"{biz} 未配置通知接口";
@@ -193,7 +127,6 @@ public static class GameNoticeService
             return null;
         }
 
-        
         if (!cfg.HasAnnouncement)
         {
             LastError = null;
@@ -202,10 +135,6 @@ public static class GameNoticeService
             return null;
         }
 
-        
-        
-        
-        
         string lang = ResolveLanguage(cfg);
 
         if (_cache.TryGetValue(biz, out var cached)
@@ -215,7 +144,6 @@ public static class GameNoticeService
             return (cached.Banners, cached.Groups);
         }
 
-        
         if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
         {
             LastError = null;
@@ -226,7 +154,7 @@ public static class GameNoticeService
 
         var failures = new List<string>();
         var result = await TryFetchAsync(cfg, lang, failures);
-        
+
         if (result is null && cfg.Fallback is { } fb)
         {
             result = await TryFetchAsync(fb, lang, failures);
@@ -239,16 +167,12 @@ public static class GameNoticeService
             return result;
         }
 
-        
-        
         LastError = string.Join(" | ", failures);
         LastFailure = NoticeFailureKind.Error;
         _logger.LogWarning("公告全部 CDN 加载失败：{Biz} lang={Lang} {Detail}", biz, lang, LastError);
         return _cache.TryGetValue(biz, out var old) ? (old.Banners, old.Groups) : null;
     }
 
-
-    
     private static string ResolveLanguage(BizConfig cfg)
     {
         string want = AnnouncementLanguageSettings.EffectiveLanguage;
@@ -262,8 +186,6 @@ public static class GameNoticeService
         return cfg.SupportedLanguages[0];
     }
 
-
-    
     private static async Task<(List<GameBannerItem> Banners, List<GamePostGroup> Groups)?> TryFetchAsync(
         BizConfig cfg, string lang, List<string> failures)
     {
@@ -318,16 +240,14 @@ public static class GameNoticeService
         return null;
     }
 
-
-    
     public enum NoticeFailureKind
     {
         None,
-        
+
         Offline,
-        
+
         Error,
-        
+
         NotSupported,
     }
 

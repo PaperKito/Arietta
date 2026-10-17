@@ -8,13 +8,10 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
-            
             <ThemeShadow x:Key="ThemeShadow" />
 
-            
             <FontFamily x:Key="XboxFluent2">ms-appx:///Assets/Font/XboxFluent2.ttf#Xbox Fluent v2</FontFamily>
 
-            
             <scv:ObjectToBoolConverter x:Key="ObjectToBoolConverter" />
             <scv:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
             <scv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
@@ -22,7 +19,6 @@
             <scv:ObjectToVisibilityReversedConverter x:Key="ObjectToVisibilityReversedConverter" />
             <scv:BoolReversedConverter x:Key="BoolReversedConverter" />
 
-            
             <AcrylicBrush x:Key="CustomAcrylicBrush"
                           FallbackColor="#F52C2C2C"
                           TintColor="{ThemeResource ControlOnImageFillColorDefault}"
@@ -32,7 +28,6 @@
                           TintColor="{ThemeResource ControlOnImageFillColorDefault}"
                           TintOpacity="0.4" />
 
-            
             <AcrylicBrush x:Key="CustomDialogAcrylicBrush"
                           FallbackColor="#CC1C1C1C"
                           TintColor="#1C1C1C"
@@ -43,7 +38,6 @@
             <StaticResource x:Key="NavigationViewDefaultPaneBackground" ResourceKey="CustomAcrylicBrush" />
             <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="ControlFillColorTransparentBrush" />
 
-            
             <Style x:Key="KuroBbsEdgeButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
                 <Setter Property="Height" Value="36" />
                 <Setter Property="MinWidth" Value="0" />
@@ -63,7 +57,6 @@
                 <Setter Property="Background" Value="{ThemeResource CustomAcrylicBrush}" />
             </Style>
 
-            
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <Color x:Key="SystemAccentColor">#00A693</Color>

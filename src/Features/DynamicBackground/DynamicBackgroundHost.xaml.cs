@@ -10,46 +10,31 @@ using Windows.Media.Playback;
 
 namespace Arietta.Features.DynamicBackground;
 
-
-
-
-
-
-
-
 public sealed partial class DynamicBackgroundHost : UserControl
 {
-    
+
     public static DynamicBackgroundHost? Current { get; private set; }
 
     private MediaPlayer? _player;
     private string? _currentPath;
 
-    
     private CanvasRenderTarget? _videoSurface;
     private CanvasImageSource? _videoImageSource;
     private int _surfaceWidth;
     private int _surfaceHeight;
 
-    
     private readonly SemaphoreSlim _frameSemaphore = new(1, 1);
 
-    
     private bool _pausedByUser;
 
-    
     private double _fpsIntervalMs;
 
-    
     private long _lastDrawTicks;
 
-    
     private string _qualityMode = "auto";
 
-    
     private bool _windowVisible = true;
 
-    
     private bool _gameRunning;
 
     public DynamicBackgroundHost()
@@ -66,27 +51,21 @@ public sealed partial class DynamicBackgroundHost : UserControl
         _fpsIntervalMs = FpsToInterval(AppConfig.GetConfig(DynamicBackgroundStore.FpsCapConfigKey));
         var configuredQuality = AppConfig.GetConfig(DynamicBackgroundStore.QualityConfigKey);
         _qualityMode = configuredQuality is "high" or "medium" or "low" ? configuredQuality : "auto";
-        
+
         Arietta.Features.GameLauncher.GameProcessMonitor.Changed += () => DispatcherQueue?.TryEnqueue(RefreshGameRunningPause);
         RefreshGameRunningPause();
     }
 
-
-    
     public void SetFpsCap(int fps)
     {
         _fpsIntervalMs = fps > 0 ? 1000d / fps : 0;
     }
 
-
-    
     public void SetQuality(string quality)
     {
         _qualityMode = quality is "high" or "medium" or "low" ? quality : "auto";
     }
 
-
-    
     public void RefreshGameRunningPause()
     {
         bool enabled = AppConfig.GetConfig(DynamicBackgroundStore.PauseOnGameConfigKey) != "0";
@@ -102,22 +81,16 @@ public sealed partial class DynamicBackgroundHost : UserControl
 
     private static double FpsToInterval(string? config)
     {
-        
+
         int fps = int.TryParse(config, out int v) ? v : 30;
         return fps > 0 ? 1000d / fps : 0;
     }
 
-
-    
     public bool IsPlaying => _player is not null
                              && Image_Video.Visibility == Visibility.Visible;
 
-
-    
     public bool IsPaused => _pausedByUser;
 
-
-    
     public void Play(string videoPath)
     {
         try
@@ -142,7 +115,7 @@ public sealed partial class DynamicBackgroundHost : UserControl
                 AutoPlay = true,
                 IsLoopingEnabled = true,
                 AudioCategory = MediaPlayerAudioCategory.GameMedia,
-                
+
                 IsVideoFrameServerEnabled = true,
             };
             player.CommandManager.IsEnabled = false;
@@ -164,8 +137,6 @@ public sealed partial class DynamicBackgroundHost : UserControl
         }
     }
 
-
-    
     public void Stop()
     {
         try
@@ -191,30 +162,19 @@ public sealed partial class DynamicBackgroundHost : UserControl
         _surfaceHeight = 0;
     }
 
-
-    
-    
-    
-    
-    
     public void SetWindowVisible(bool visible)
     {
         _windowVisible = visible;
         UpdatePlayback();
     }
 
-
-    
-    
-    
-    
     private void UpdatePlayback()
     {
         if (_player is null)
         {
             if (ShouldPlay() && _currentPath is { Length: > 0 })
             {
-                
+
                 Play(_currentPath);
             }
             return;
@@ -232,12 +192,6 @@ public sealed partial class DynamicBackgroundHost : UserControl
 
     private bool ShouldPlay() => _windowVisible && !_gameRunning && !_pausedByUser;
 
-
-    
-    
-    
-    
-    
     private void SuspendPlayback()
     {
         if (_player is null)
@@ -255,8 +209,6 @@ public sealed partial class DynamicBackgroundHost : UserControl
         _player = null;
     }
 
-
-    
     public void TogglePause()
     {
         if (_player is null)
@@ -267,15 +219,11 @@ public sealed partial class DynamicBackgroundHost : UserControl
         UpdatePlayback();
     }
 
-
-    
     public void SetVolume(double volume)
     {
         ApplyVolume(volume);
     }
 
-
-    
     public static double GetConfiguredVolume()
     {
         return double.TryParse(AppConfig.GetConfig(DynamicBackgroundStore.VolumeConfigKey), out double v)
@@ -299,11 +247,6 @@ public sealed partial class DynamicBackgroundHost : UserControl
         catch { }
     }
 
-
-    
-    
-    
-    
     private void Player_VideoFrameAvailable(MediaPlayer sender, object args)
     {
         long now = Environment.TickCount64;
@@ -327,8 +270,7 @@ public sealed partial class DynamicBackgroundHost : UserControl
                 {
                     return;
                 }
-                
-                
+
                 double hostW = ActualWidth;
                 double hostH = ActualHeight;
                 double raster = XamlRoot?.RasterizationScale ?? 1;

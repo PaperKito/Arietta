@@ -32,11 +32,6 @@ public sealed partial class StartGameButton : UserControl
 
     public ICommand SettingCommand { get; set => SetProperty(ref field, value); }
 
-
-    
-    
-    
-    
     public string? RunningGameTime { get; set { field = value; OnPropertyChanged(nameof(StartGameButtonText)); } }
 
 
@@ -45,8 +40,6 @@ public sealed partial class StartGameButton : UserControl
 
     public GameState GameState { get; set { if (SetProperty(ref field, value)) UpdateActionButtonState(); } }
 
-
-    
     public bool IsResumeInstall { get; set { if (SetProperty(ref field, value)) OnPropertyChanged(nameof(StartGameButtonText)); } }
 
 
@@ -66,7 +59,7 @@ public sealed partial class StartGameButton : UserControl
     public string StartGameButtonText => GameState switch
     {
         GameState.StartGame => Lang.Instance.LauncherPage_StartGame,
-        
+
         GameState.GameIsRunning => RunningGameTime ?? "",
         GameState.InstallGame => IsResumeInstall ? Lang.Instance.LauncherPage_ResumeInstall : Lang.Instance.LauncherPage_InstallGame,
         GameState.UpdateGame => Lang.Instance.LauncherPage_UpdateGame,
@@ -107,7 +100,7 @@ public sealed partial class StartGameButton : UserControl
     {
         OnPropertyChanged(nameof(ActionButtonForeground));
         OnPropertyChanged(nameof(SettingButtonForeground));
-        
+
         RefreshInstallStateBindings();
     }
 
@@ -160,7 +153,6 @@ public sealed partial class StartGameButton : UserControl
 
     #region 更新下载状态（对齐 Starward 的 GameInstallState 展示）
 
-    
     public DownloadPhase InstallPhase { get; private set => SetProperty(ref field, value); }
 
     public int ProgressRingValue { get; private set => SetProperty(ref field, value); }
@@ -180,13 +172,10 @@ public sealed partial class StartGameButton : UserControl
 
     public Visibility InstallingVisibility => GameStateIsInstalling ? Visibility.Visible : Visibility.Collapsed;
 
-    
     public bool InstallStateIsApplying => InstallPhase is DownloadPhase.Applying;
 
-    
     public bool InstallRingIndeterminate => InstallPhase is DownloadPhase.Applying && !ApplyingHasCounts;
 
-    
     public bool ApplyingHasCounts { get; private set => SetProperty(ref field, value); }
 
     public string InstallStateText => InstallPhase switch
@@ -197,7 +186,6 @@ public sealed partial class StartGameButton : UserControl
         _ => "",
     };
 
-    
     public string PauseHintText => InstallPhase is DownloadPhase.Downloading
         ? Lang.Instance.DownloadGamePage_Pause
         : Lang.Instance.Common_Cancel;
@@ -218,8 +206,6 @@ public sealed partial class StartGameButton : UserControl
 
     public Visibility RingValueTextVisibility => InstallStateIsApplying && !ApplyingHasCounts ? Visibility.Collapsed : Visibility.Visible;
 
-
-    
     public void UpdateGameInstallProgress(GameDownloadProgress p)
     {
         InstallPhase = p.Phase;
@@ -236,7 +222,7 @@ public sealed partial class StartGameButton : UserControl
         }
         else if (p.Phase is DownloadPhase.Verifying && p.TotalFiles > 0)
         {
-            
+
             double verifyProgress = (double)p.CompletedFiles / p.TotalFiles;
             ProgressRingValue = (int)(verifyProgress * 100);
             ProgressPercentText = $"{verifyProgress:P1}";
@@ -246,8 +232,7 @@ public sealed partial class StartGameButton : UserControl
         }
         else if (p.Phase is DownloadPhase.Applying && p.TotalFiles > 0)
         {
-            
-            
+
             ApplyingHasCounts = true;
             double applyProgress = (double)p.CompletedFiles / p.TotalFiles;
             ProgressRingValue = (int)(applyProgress * 100);
@@ -258,7 +243,7 @@ public sealed partial class StartGameButton : UserControl
         }
         else
         {
-            
+
             ApplyingHasCounts = false;
             ProgressRingValue = 100;
             ProgressPercentText = "100%";
@@ -269,8 +254,6 @@ public sealed partial class StartGameButton : UserControl
         RefreshInstallStateBindings();
     }
 
-
-    
     public void ResetInstallState()
     {
         InstallPhase = DownloadPhase.Downloading;
@@ -283,19 +266,12 @@ public sealed partial class StartGameButton : UserControl
         RefreshInstallStateBindings();
     }
 
-
-    
-    
-    
-    
     public void ShowPausing()
     {
         DownloadSpeedText = Lang.Instance.GameUpdate_Pausing;
         RemainTimeText = "--:--:--";
     }
 
-
-    
     private void RefreshInstallStateBindings()
     {
         OnPropertyChanged(nameof(GameStateIsInstalling));

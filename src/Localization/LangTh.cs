@@ -2,26 +2,18 @@
 
 namespace Arietta.Localization;
 
-
-
-
-
-
-
-
 internal static class LangTh
 {
 
     public static readonly Dictionary<string, string> Map = new()
     {
-        
+
         ["MainPage_Launcer"] = "ตัวเรียกเกม",
         ["LauncherPage_GameSetting"] = "ตั้งค่าเกม",
         ["MainPage_GameScreenshot"] = "ภาพหน้าจอ",
         ["GachaLogPage_ConveneRecords"] = "บันทึกการอัญเชิญ",
         ["Toolbox"] = "เครื่องมือ",
 
-        
         ["ScreenshotPage_MultiSelect"] = "เลือกหลายรายการ",
         ["ScreenshotPage_OpenFolder"] = "เปิดโฟลเดอร์",
         ["ScreenshotPage_Total0Files"] = "ทั้งหมด {0} รูป",
@@ -36,25 +28,21 @@ internal static class LangTh
         ["ScreenshotPage_OpenImage"] = "เปิดรูปภาพ",
         ["ScreenshotPage_DeletedPartial"] = "ลบแล้ว {0} / {1} รูป ที่เหลืออาจถูกใช้งานอยู่",
 
-        
         ["KuroBbs"] = "Kuro BBS",
         ["KuroBbs_SignIn"] = "เช็คอิน",
         ["KuroBbs_Role"] = "ตัวละคร",
         ["KuroBbs_ResourceBrief"] = "สรุปทรัพยากร",
 
-        
         ["PgrData_NoRole"] = "บัญชี Kuro BBS นี้ยังไม่ได้ตั้งค่าตัวละคร PGR โปรดตั้งค่าใน \"ของฉัน\" ของแอป Kuro BBS แล้วจึงตรวจสอบอีกครั้งที่นี่",
         ["PgrData_Locked"] = "ยังล็อกอยู่",
         ["PgrData_FullIn"] = "จะเต็มในอีก {0}",
 
-        
         ["KuroBbs_DataTerminal"] = "เทอร์มินัลข้อมูล",
         ["KuroBbs_CombatData"] = "ข้อมูลการต่อสู้",
         ["DataTerminal_NoAccount"] = "ยังไม่ได้เข้าสู่ระบบ Kuro BBS แตะลูกศรบัญชีด้านบนเพื่อเข้าสู่ระบบก่อน",
         ["DataTerminal_NoRole"] = "บัญชี Kuro BBS นี้ยังไม่ได้ผูกตัวละคร{0} โปรดผูกในแอป Kuro BBS ก่อน",
         ["DataTerminal_LoadFailed"] = "โหลดหน้าเพจไม่สำเร็จ: {0}",
 
-        
         ["KuroBbs_PgrRole"] = "ตัวละคร",
         ["KuroBbs_PgrResource"] = "รายงานทรัพยากร",
         ["KuroBbs_PgrCage"] = "กรงแห่งปวดทรมาน",
@@ -76,7 +64,6 @@ internal static class LangTh
         ["PgrWarArea_Waves"] = "รอบ {0}",
         ["PgrCommon_LoadFailed"] = "ดึงข้อมูลไม่สำเร็จ",
 
-        
         ["DailyBriefing"] = "สรุปประจำวัน",
         ["DailyBriefing_Desc"] = "ข้อมูลรายวันในเกม",
         ["DailyBriefing_Refresh"] = "รีเฟรช",
@@ -95,7 +82,6 @@ internal static class LangTh
         ["KuroBbs_TokenExpired"] = "การเข้าสู่ระบบ Kuro BBS หมดอายุแล้ว",
         ["KuroBbs_TokenExpiredDesc"] = "ไปที่ การตั้งค่า → บัญชี Kuro BBS เพื่อดักจับหรือกรอก token ใหม่",
 
-        
         ["KuroAccount_UsbTitle"] = "เครื่องมือ ADB",
         ["KuroAccount_UsbShortDesc"] = "เชื่อมต่อมือถือ Android เพื่อดักจับ Token และ Did ของ Kuro BBS",
         ["KuroAccount_UsbDesc"] = "เชื่อมต่อโทรศัพท์ด้วยสาย USB และเปิด USB Debugging: เปิดแอป Kuro BBS ในโทรศัพท์และเข้าไปที่หน้า \"เทอร์มินัลข้อมูล\" หรือ \"เครื่องคำนวณการเลี้ยงดู\" แล้วกด \"เริ่มดักจับ\" เครื่องมือจะดักจับ token และ did ให้อัตโนมัติ ต้องมี adb.exe (ดาวน์โหลดได้จาก ",
@@ -142,7 +128,6 @@ internal static class LangTh
         ["KuroAccount_Saved"] = "บันทึกบัญชีแล้ว",
         ["KuroAccount_Cleared"] = "ล้างบัญชีแล้ว",
 
-        
         ["RolePage_Refresh"] = "รีเฟรช",
         ["RolePage_NoAccount"] = "ยังไม่ได้ตั้งค่าบัญชี Kuro BBS",
         ["RolePage_NoAccountDesc"] = "ไปตั้งค่าที่ การตั้งค่า → บัญชี Kuro BBS ให้เสร็จแล้วรีเฟรช",
@@ -150,7 +135,6 @@ internal static class LangTh
         ["RolePage_Back"] = "กลับไปที่รายการ",
         ["RolePage_Phantoms"] = "เอคโค่",
 
-        
         ["GachaLogPage_Refresh"] = "อัปเดตบันทึก",
         ["GachaLogPage_ImportUrl"] = "นำเข้าด้วยลิงก์",
         ["GachaLogPage_ImportUrlDesc"] = "วางลิงก์ของหน้ารายละเอียดการอัญเชิญ (เปิด \"รายละเอียดการอัญเชิญ\" ในเกมแล้วดึงจาก log หรือคัดลอกจากเครื่องมืออื่น) ผู้เล่นผ่านคลาวด์โฟนก็ใช้ได้",
@@ -208,7 +192,6 @@ internal static class LangTh
         ["GachaLogPage_EmptyTitle"] = "ยังไม่มีบันทึกการอัญเชิญ",
         ["GachaLogPage_EmptyDesc"] = "ระบุโฟลเดอร์เกมในการตั้งค่าก่อน จากนั้นเข้าเกมเปิดหน้า \"รายละเอียดการอัญเชิญ\" สักครั้ง แล้วกลับมาที่นี่กด \"อัปเดตบันทึก\" เพื่อซิงก์ข้อมูล",
 
-        
         ["LauncherPage_StartGame"] = "เริ่มเกม",
         ["LauncherPage_InstallGame"] = "ติดตั้งเกม",
         ["LauncherPage_ResumeInstall"] = "ติดตั้งต่อ",
@@ -226,10 +209,8 @@ internal static class LangTh
         ["Notice_LoadFailed"] = "โหลดประกาศไม่สำเร็จ",
         ["LauncherPage_UpdateGame"] = "อัปเดตเกม",
 
-        
         ["SettingPage_Language"] = "ภาษา",
 
-        
         ["GameUpdate_PredownloadAvailable"] = "เวอร์ชันใหม่ {0} เปิดพรีโหลดแล้ว",
         ["GameUpdate_Predownloaded"] = "พรีโหลด {0} แล้ว เมื่อเปิดอัปเดตจะติดตั้งได้ทันที",
         ["GameUpdate_PredownloadButton"] = "พรีโหลด",
@@ -255,7 +236,6 @@ internal static class LangTh
         ["GameUpdate_RepairDone"] = "ซ่อมแล้ว {0} ไฟล์",
         ["GameUpdate_RepairNoBaseUrl"] = "เวอร์ชันปัจจุบันไม่รองรับการซ่อมแซมออนไลน์ โปรดอัปเดตเกมเป็นเวอร์ชันล่าสุดก่อนแล้วลองใหม่",
 
-        
         ["GameLauncherPage_Gallery"] = "แกลเลอรี",
         ["Common_Copy"] = "คัดลอก",
         ["ImageViewWindow2_SaveAs"] = "บันทึกเป็น",
@@ -268,15 +248,12 @@ internal static class LangTh
         ["InstallGameDialog_LocateGame"] = "ระบุตำแหน่งเกม",
         ["GameLauncherPage_GameIsRunning"] = "เกมกำลังทำงานอยู่",
 
-        
         ["SettingPage_Download"] = "ดาวน์โหลด",
 
-        
         ["DownloadGamePage_Downloading"] = "กำลังดาวน์โหลด",
         ["DownloadGamePage_Verifying"] = "กำลังตรวจสอบ",
         ["DownloadGamePage_Pause"] = "หยุดชั่วคราว",
 
-        
         ["Common_Confirm"] = "ยืนยัน",
         ["Common_Cancel"] = "ยกเลิก",
         ["Common_Error"] = "ข้อผิดพลาด",
@@ -285,13 +262,11 @@ internal static class LangTh
         ["Common_Apply"] = "ใช้งาน",
         ["Common_Exit"] = "ออก",
 
-        
         ["SettingPage_AppSettings"] = "การตั้งค่า",
         ["SettingPage_About"] = "เกี่ยวกับ",
         ["SettingPage_General"] = "ทั่วไป",
         ["SettingPage_FileManagement"] = "จัดการไฟล์",
 
-        
         ["FilePage_DataFolder"] = "โฟลเดอร์ข้อมูล",
         ["FilePage_DataFolderDesc"] = "ข้อมูลส่วนบุคคลของคุณถูกเก็บไว้ในโฟลเดอร์ด้านล่าง ซึ่งสำคัญมาก โปรดอย่าลบโดยพลการ",
         ["FilePage_ReselectDataFolder"] = "เลือกโฟลเดอร์ข้อมูลใหม่",
@@ -308,7 +283,6 @@ internal static class LangTh
         ["FilePage_CleanCache"] = "ล้างแคช",
         ["FilePage_CleanBackgroundCache"] = "ล้างไฟล์พื้นหลังของตัวเรียกเกม",
 
-        
         ["FilePage_HardLink"] = "Hard Link",
         ["InstallGameDialog_HardLinkEstimateDesc"] = "ไฟล์ที่เหมือนกันของไคลเอ็นต์ภูมิภาคอื่นในดิสก์เดียวกันจะใช้ฮาร์ดลิงก์ซ้ำ คาดดาวน์โหลดประมาณ {0} เป็นเพียงค่าประมาณ ค่าจริงขึ้นกับการตรวจสอบแต่ละไฟล์ตอนติดตั้ง",
         ["InstallGameDialog_HardLinkAfterSize"] = "ขนาดหลังฮาร์ดลิงก์: ",
@@ -322,12 +296,10 @@ internal static class LangTh
         ["FilePage_DownloadThreads"] = "มัลติเธรด",
         ["FilePage_DownloadThreadsDesc"] = "จำนวนการเชื่อมต่อดาวน์โหลดพร้อมกัน ขนานมากเกินไปจะทำให้ HDD ช้าลงเพราะการ seek การเปลี่ยนแปลงมีผลตั้งแต่ครั้งถัดไป",
 
-        
         ["KuroBbs_RefreshInfo"] = "รีเฟรชข้อมูล",
         ["KuroBbs_Login"] = "เข้าสู่ระบบ",
         ["KuroBbs_Settings"] = "การตั้งค่า Kuro BBS",
 
-        
         ["Login_Title"] = "เข้าสู่ระบบ Kuro BBS",
         ["Login_ByToken"] = "เข้าสู่ระบบด้วย Token",
         ["Login_BySms"] = "เข้าสู่ระบบด้วยรหัส SMS",
@@ -352,7 +324,6 @@ internal static class LangTh
         ["Login_SeekRoleFailed"] = "ค้นหาตัวละครที่ผูกไว้ไม่สำเร็จ: {0}",
         ["Login_Success"] = "เข้าสู่ระบบบัญชี Kuro BBS \"{0}\" สำเร็จ",
 
-        
         ["ResourceBrief_Month"] = "รายเดือน",
         ["ResourceBrief_Week"] = "รายสัปดาห์",
         ["ResourceBrief_Version"] = "เวอร์ชัน",
@@ -363,7 +334,6 @@ internal static class LangTh
         ["ResourceBrief_Detail"] = "รายละเอียดการได้รับ",
         ["ResourceBrief_Empty"] = "ไม่มีข้อมูลในช่วงนี้",
 
-        
         ["SignPage_DoSignIn"] = "เช็คอิน",
         ["SignPage_MonthlySign"] = "เช็คอินเดือนนี้",
         ["SignPage_SignedToday"] = "เช็คอินวันนี้แล้ว",
@@ -381,9 +351,6 @@ internal static class LangTh
         ["CombatPage_Locked"] = "{0} ยังไม่ปลดล็อกในรอบนี้หรือไม่มีข้อมูล",
         ["CombatPage_NoData"] = "ไม่มีข้อมูล: เซิร์ฟเวอร์ยังไม่สร้างบันทึกของรอบนี้ โปรดเปิดหน้า \"{0}\" ในแอป Kuro BBS เพื่อรีเฟรชข้อมูลแล้วลองใหม่",
 
-        
-
-        
         ["PlayTimeStatsDialog_TotalPlaytime"] = "เวลาเล่นทั้งหมด",
         ["PlayTimeStatsDialog_Started0Times"] = "เปิดเกม {0} ครั้ง",
         ["PlayTimeStatsDialog_AverageDailyPlaytime"] = "เวลาเล่นเฉลี่ยต่อวัน",
@@ -400,7 +367,6 @@ internal static class LangTh
         ["PlayTimeStatsDialog_PlaytimeStatistics"] = "สถิติเวลาเล่น",
         ["PlayTimeStatsDialog_StatsTip"] = "สถิตินับเฉพาะเวลาเล่นที่เริ่มเกมผ่านตัวเรียกเกมนี้เท่านั้น",
 
-        
         ["ExperienceSettingPage_MinimizeToSystemTray"] = "ย่อไปที่ถาดระบบ",
         ["GameLauncherSettingDialog_BasicInformation"] = "ข้อมูลพื้นฐาน",
         ["GameLauncherSettingDialog_ConfirmUninstall"] = "ยืนยันการถอนการติดตั้ง",
@@ -417,11 +383,9 @@ internal static class LangTh
         ["LauncherPage_UninstallGame"] = "ถอนการติดตั้งเกม",
         ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "ไม่รองรับไดรฟ์เครือข่ายแบบแมป โปรดใช้เส้นทางแชร์เครือข่ายที่ขึ้นต้นด้วยแบ็กสแลชสองตัว",
 
-        
         ["SettingPage_BgSizeTip"] = "คำแนะนำขนาดภาพพื้นหลัง",
         ["SettingPage_CustomBackgroundSupportVideo"] = "พื้นหลังแบบกำหนดเองรองรับวิดีโอ",
 
-        
         ["GameSettingPage_Resolution"] = "ความละเอียด",
         ["GameSettingPage_FullScreen"] = "เต็มหน้าจอ",
         ["GameSettingPage_PgrFullscreenBlockedTip"] = "ความละเอียดของจอเกินขีดจำกัดที่เกมรองรับ โหมดเต็มหน้าจอจึงใช้งานไม่ได้ตามปกติ",
@@ -443,9 +407,6 @@ internal static class LangTh
         ["GameSettingPage_ApplyFailed"] = "ใช้การตั้งค่าเกมไม่สำเร็จ",
         ["GameSettingPage_Applied"] = "ใช้แล้ว จะมีผลเมื่อเปิดเกมครั้งถัดไป",
 
-        
-
-        
         ["SettingPage_WindowBehavior"] = "พฤติกรรมหน้าต่าง",
         ["SettingPage_CloseWindowOption"] = "ตัวเลือกการปิดหน้าต่าง",
         ["SettingPage_ExitApp"] = "ออกจากแอปโดยสมบูรณ์",
@@ -460,19 +421,16 @@ internal static class LangTh
         ["SettingPage_TransparencyEffects"] = "เอฟเฟกต์ความโปร่งใส",
         ["SettingPage_AnimationEffects"] = "เอฟเฟกต์แอนิเมชัน",
 
-        
         ["GameSelector_Subtitle"] = "แตะไอคอนมุมซ้ายบนเพื่อเลือกหรือสลับเกม",
         ["GameSelector_AutoFind"] = "ค้นหาเกมในเครื่องอัตโนมัติ",
         ["GameSelector_SelectServer"] = "เลือกเซิร์ฟเวอร์",
         ["GameSelector_InstalledSize"] = "พื้นที่จริงที่เกมที่ติดตั้งใช้งาน ",
         ["GameSelector_Calculating"] = "กำลังคำนวณ",
 
-        
         ["KuroBbs_AccountLevelLabel"] = "เลเวลยูเนียน ",
         ["KuroBbs_SwitchRole"] = "สลับตัวละคร",
         ["KuroBbs_ClearAccount"] = "ล้างบัญชี",
 
-        
         ["GameBiz_Wuwa"] = "Wuthering Waves",
         ["GameBiz_WuwaCn"] = "Wuthering Waves · CN",
         ["GameBiz_WuwaGlobal"] = "Wuthering Waves · Global",
@@ -491,7 +449,6 @@ internal static class LangTh
         ["GameBiz_PgrTaiwan"] = "Punishing: Gray Raven · Taiwan",
         ["GameBiz_ShortTaiwan"] = "เซิร์ฟเวอร์ไต้หวัน",
 
-        
         ["GachaPool_CharacterEvent"] = "อัญเชิญเรโซเนเตอร์ลิมิเต็ด",
         ["GachaPool_WeaponEvent"] = "อัญเชิญอาวุธลิมิเต็ด",
         ["GachaPool_CharacterStandard"] = "อัญเชิญตัวละครประจำ",
@@ -507,11 +464,9 @@ internal static class LangTh
         ["GachaPool_WeaponRevisit"] = "อัญเชิญอาวุธหวนคืน",
         ["GachaPool_Unknown"] = "แบนเนอร์ {0}",
 
-        
         ["Adb_DeviceOnline"] = "ออนไลน์",
         ["Adb_DeviceUnauthorized"] = "ยังไม่ได้รับอนุญาต",
 
-        
         ["Sync_Title"] = "WebDAV",
         ["Sync_Description"] = "บันทึกข้อมูลด้วยการซิงก์ผ่านคลาวด์",
         ["Sync_ServerUrl"] = "ที่อยู่เซิร์ฟเวอร์",
@@ -535,7 +490,6 @@ internal static class LangTh
         ["Sync_LastSync"] = "ซิงก์ล่าสุด",
         ["Sync_Working"] = "กำลังดำเนินการ…",
 
-        
         ["CloudGame_ErrNoLogin"] = "ไม่มีข้อมูลการเข้าสู่ระบบที่ใช้ได้",
         ["CloudGame_ErrHttp"] = "บริการเกมคลาวด์ตอบกลับ HTTP {0}",
         ["CloudGame_ErrRequest"] = "ขอบริการเกมคลาวด์ไม่สำเร็จ: {0}",
@@ -543,16 +497,13 @@ internal static class LangTh
         ["CloudGame_ErrEmpty"] = "บริการเกมคลาวด์ตอบกลับว่างเปล่า: {0}",
         ["CloudGame_ErrCode"] = "อินเทอร์เฟซเกมคลาวด์คืนค่าข้อผิดพลาด code={0}: {1}",
 
-        
         ["GachaLogPage_ExportEmpty"] = "บัญชีปัจจุบันไม่มีบันทึกการอัญเชิญให้ส่งออก",
         ["GachaLog_PityBuilt"] = "Pity",
 
-        
         ["GameLauncherSettingDialog_PathRemoved"] = "ลบการตั้งค่าเส้นทางเกมออกแล้ว",
         ["GameLauncherSettingDialog_WrongServerExe"] = "ไฟล์ exe ของเกมที่เลือกไม่ได้เป็นของเซิร์ฟเวอร์ปัจจุบัน โปรดเลือกใหม่",
         ["GameLauncherSettingDialog_ExpectExe"] = "โปรดเลือกไฟล์ exe หลักของเกม: {0}",
 
-        
         ["KrSdk_ErrNoUserCache"] = "ไม่พบ KRSDKUserCache.json โปรดเข้าสู่ระบบในเกมสักครั้งก่อน",
         ["KrSdk_ErrEmptyContent"] = "เนื้อหาว่างเปล่า",
         ["KrSdk_ErrParseFailed"] = "แยกวิเคราะห์ KRSDKUserCache.json ไม่สำเร็จ จึงยกเลิกการเขียนเพื่อไม่ทำลายสถานะการเข้าสู่ระบบ",
@@ -560,7 +511,6 @@ internal static class LangTh
         ["KrSdk_ErrAccountNotInCache"] = "ไม่มีบัญชีนี้ในแคชในเครื่อง",
         ["KrSdk_ErrVerifyFailed"] = "ตรวจสอบหลังเขียนไม่ผ่าน จึงคืนค่าแคชกลับสู่สถานะก่อนแก้ไขแล้ว",
 
-        
         ["GameUpdate_ErrNoPlan"] = "ขาดแผนการดาวน์โหลด",
         ["GameUpdate_ErrNoTarget"] = "ขาดเวอร์ชันเป้าหมาย",
         ["GameUpdate_ErrNoGamePath"] = "ยังไม่ได้ตั้งค่าเส้นทางเกม จึงอัปเดตไม่ได้",
@@ -568,11 +518,9 @@ internal static class LangTh
         ["GameUpdate_ErrFileMissing"] = "ไฟล์อัปเดตสูญหาย: {0}",
         ["GameUpdate_ErrFileChecksum"] = "ตรวจสอบไฟล์อัปเดตไม่ผ่าน: {0}",
 
-        
         ["GameSetting_ErrNoLocalStorage"] = "ไม่พบ LocalStorage.db ของเกม",
         ["GameSetting_ErrNoGameUserSettings"] = "ไม่พบ GameUserSettings.ini ของเกม",
 
-        
         ["KuroBbs_ErrConnection"] = "เชื่อมต่อไม่สำเร็จ รหัสสถานะ HTTP: {0}",
         ["KuroBbs_ErrAccessTokenEmpty"] = "requestToken คืน accessToken ว่างเปล่า",
         ["KuroBbs_ErrAccessToken"] = "ดึง B-At accessToken ไม่สำเร็จ (code={0}): {1}",
@@ -582,18 +530,11 @@ internal static class LangTh
         ["KuroBbs_SignAlready"] = "วันนี้เช็คอินแล้ว",
         ["KuroBbs_SignFail"] = "เช็คอินไม่สำเร็จ",
 
-        
-
-        
         ["Ugf_ErrNoUid"] = "ไฟล์ UGF ขาด uid ของบัญชี",
         ["Ugf_ErrUnknownFormat"] = "ไม่รู้จักรูปแบบไฟล์: ต้องเป็น UGF หรือ JSON บันทึกแบนเนอร์",
 
-        
-
-        
         ["CombatPage_AreaFallback"] = "พื้นที่ {0}",
 
-        
         ["KuroBbs_UnionLevel"] = "เลเวลยูเนียน",
         ["KuroBbs_CommanderLevel"] = "เลเวลผู้บัญชาการ",
         ["KuroBbs_NoLevel"] = "ยังไม่มีเลเวล",
@@ -605,10 +546,8 @@ internal static class LangTh
         ["KuroBbs_AutoSignDoneToast"] = "เช็คอินรายวันเสร็จสิ้น",
         ["KuroBbs_AutoSignFailedToast"] = "เช็คอินรายวันไม่สำเร็จ",
 
-        
         ["RolePage_WeaponLevel"] = "LV.{0} · อัปขีดจำกัด {1}",
 
-        
         ["Common_UnknownError"] = "ข้อผิดพลาดที่ไม่รู้จัก",
     };
 

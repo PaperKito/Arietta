@@ -1,5 +1,3 @@
-English | [简体中文](./README.zh.md)
-
 This folder is empty in the repository (font files are excluded by `.gitignore`). The build needs this file placed here:
 
     XboxFluent2.ttf

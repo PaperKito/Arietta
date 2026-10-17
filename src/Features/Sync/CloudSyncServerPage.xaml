@@ -9,9 +9,8 @@
              xmlns:mf="using:Arietta.Frameworks"
              mc:Ignorable="d">
 
-    
     <Page.Resources>
-        
+
         <Style x:Key="SyncStatusOkStyle" TargetType="Border">
             <Setter Property="Background" Value="{ThemeResource SystemFillColorSuccessBackgroundBrush}" />
         </Style>
@@ -19,7 +18,6 @@
             <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBackgroundBrush}" />
         </Style>
 
-        
         <Style TargetType="TextBox">
             <Setter Property="Foreground" Value="{ThemeResource TextControlForeground}" />
             <Setter Property="Background" Value="{ThemeResource TextControlBackground}" />
@@ -145,13 +143,12 @@
     </Page.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
-        
+
         <StackPanel Spacing="20"
                     Width="640"
                     HorizontalAlignment="Left"
                     Padding="0,0,0,24">
 
-            
             <StackPanel Orientation="Horizontal" Spacing="4">
                 <Button Click="Button_Back_Click"
                         Padding="6,2"
@@ -169,7 +166,6 @@
                            Text="{x:Bind lang:Lang.Instance.Sync_ServerEntry}" />
             </StackPanel>
 
-            
             <Grid ColumnSpacing="16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -182,7 +178,7 @@
                         VerticalAlignment="Top"
                         Background="{ThemeResource AccentFillColorDefaultBrush}"
                         CornerRadius="16">
-                    
+
                     <Viewbox Width="26" Height="26">
                         <Canvas Width="24" Height="24">
                             <Rectangle Canvas.Left="3" Canvas.Top="4"
@@ -223,7 +219,6 @@
                 </StackPanel>
             </Grid>
 
-            
             <Border HorizontalAlignment="Stretch"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -238,7 +233,7 @@
                     <TextBox x:Name="TextBox_UserName"
                              Header="{x:Bind lang:Lang.Instance.Sync_UserName}"
                              CornerRadius="8" />
-                    
+
                     <Grid>
                         <PasswordBox x:Name="PasswordBox_Password"
                                      Header="{x:Bind lang:Lang.Instance.Sync_Password}"
@@ -275,7 +270,6 @@
                 </StackPanel>
             </Border>
 
-            
             <Button x:Name="Button_SaveAndTest"
                     Click="Button_SaveAndTest_Click"
                     HorizontalAlignment="Stretch"
@@ -289,7 +283,6 @@
                 </StackPanel>
             </Button>
 
-            
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <ProgressRing x:Name="ProgressRing_Busy"
                               Width="18"

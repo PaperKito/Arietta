@@ -10,7 +10,7 @@
              mc:Ignorable="d">
 
     <Page.Resources>
-        
+
         <Style x:Key="PillButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
             <Setter Property="Height" Value="40" />
             <Setter Property="Padding" Value="16,0,16,0" />
@@ -34,7 +34,6 @@
                            TextWrapping="Wrap"
                            Text="{x:Bind lang:Lang.Instance.FilePage_DataFolderDesc, Mode=OneWay}" />
 
-                
                 <StackPanel Margin="0,4,0,0" Orientation="Horizontal" Spacing="8">
                     <Button Click="Button_ReselectDataFolder_Click" Style="{StaticResource PillButtonStyle}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
@@ -42,7 +41,7 @@
                             <TextBlock Text="{x:Bind lang:Lang.Instance.FilePage_ReselectDataFolder, Mode=OneWay}" />
                         </StackPanel>
                     </Button>
-                    
+
                     <Button Height="40"
                             VerticalAlignment="Center"
                             Click="Button_OpenDataFolder_Click"

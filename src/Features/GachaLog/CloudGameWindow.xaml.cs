@@ -10,23 +10,13 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
 public sealed partial class CloudGameWindow : Window
 {
 
-    
     private const string CloudApiPrefix = "https://cloud-game-sh.aki-game.com/";
 
-    
     private readonly Func<GachaParams, Task> _onGrabbed;
 
-    
     private string? _capturedCookie;
     private string? _capturedXToken;
     private string? _capturedTraceId;
@@ -41,7 +31,7 @@ public sealed partial class CloudGameWindow : Window
         Title = Lang.Instance.CloudGame_Title;
         this.AppWindow.Resize(new Windows.Graphics.SizeInt32(1180, 780));
         Web.Loaded += async (_, _) => await EnsureWebviewAsync();
-        
+
         this.Closed += (_, _) => Web.Close();
     }
 
@@ -51,8 +41,7 @@ public sealed partial class CloudGameWindow : Window
         try
         {
             await Web.EnsureCoreWebView2Async();
-            
-            
+
             Web.CoreWebView2.WebResourceResponseReceived -= CaptureCloudApiHeaders;
             Web.CoreWebView2.WebResourceResponseReceived += CaptureCloudApiHeaders;
             Web.CoreWebView2.Navigate(CloudGameClient.CloudHomePage);
@@ -124,7 +113,6 @@ public sealed partial class CloudGameWindow : Window
                 await EnsureWebviewAsync();
             }
 
-            
             (GachaParams? Params, string? Error) result;
             if (_capturedCookie is not null || _capturedXToken is not null)
             {
@@ -133,7 +121,7 @@ public sealed partial class CloudGameWindow : Window
             }
             else
             {
-                
+
                 var cookies = await Web.CoreWebView2.CookieManager.GetCookiesAsync("https://mc.kurogames.com/");
                 var dict = cookies.ToDictionary(c => c.Name, c => c.Value);
                 result = await CloudGameClient.TryBuildParamsAsync(dict);

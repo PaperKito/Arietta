@@ -3,40 +3,17 @@ using System.Globalization;
 
 namespace Arietta.Localization;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class UiLanguage
 {
 
-    
     public const string AnnouncementLanguageConfigKey = "AnnouncementLanguage";
 
-
-    
     public static event Action? Changed;
 
 
     private static bool _loaded;
     private static UiLanguageKind _kind;
 
-
-    
     public static UiLanguageKind Current
     {
         get
@@ -46,18 +23,11 @@ public static class UiLanguage
         }
     }
 
-
-    
     public static UiLanguageKind KindFor(string? announcementLanguage)
     {
         return Resolve(announcementLanguage);
     }
 
-
-    
-    
-    
-    
     public static void SetLanguage(UiLanguageKind kind)
     {
         EnsureLoaded();
@@ -69,8 +39,6 @@ public static class UiLanguage
         Changed?.Invoke();
     }
 
-
-    
     public static void SetLanguageFromCode(string? announcementLanguage)
     {
         SetLanguage(KindFor(announcementLanguage));
@@ -91,12 +59,12 @@ public static class UiLanguage
     {
         try
         {
-            
+
             if (!string.IsNullOrWhiteSpace(announcementLanguage))
             {
                 return FromLanguageCode(announcementLanguage.Trim());
             }
-            
+
             return FromLanguageCode(CultureInfo.CurrentUICulture.Name);
         }
         catch
@@ -105,8 +73,6 @@ public static class UiLanguage
         }
     }
 
-
-    
     private static UiLanguageKind FromLanguageCode(string language)
     {
         if (string.IsNullOrWhiteSpace(language))
@@ -151,8 +117,6 @@ public static class UiLanguage
     }
 
 }
-
-
 
 public enum UiLanguageKind
 {

@@ -4,10 +4,6 @@ using Arietta.Frameworks;
 
 namespace Arietta.Features.ViewHost;
 
-
-
-
-
 public sealed partial class ToolboxPage : PageBase
 {
 
@@ -25,7 +21,7 @@ public sealed partial class ToolboxPage : PageBase
         }
         catch
         {
-            
+
         }
     }
 

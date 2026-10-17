@@ -4,9 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace Arietta.Helpers;
 
-
-
-
 public static class RecycleBin
 {
 
@@ -35,8 +32,6 @@ public static class RecycleBin
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern int SHFileOperation(ref SHFILEOPSTRUCT op);
 
-
-    
     public static bool DeleteToRecycleBin(IReadOnlyList<string> files)
     {
         if (files.Count == 0)
@@ -44,7 +39,6 @@ public static class RecycleBin
             return true;
         }
 
-        
         string from = string.Join('\0', files) + "\0";
         var op = new SHFILEOPSTRUCT
         {

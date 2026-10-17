@@ -9,35 +9,17 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher.GameUpdate;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public sealed class GameUpdateSession
 {
 
     public static GameUpdateSession Current { get; } = new();
 
-
-    
     public event EventHandler? Changed;
 
 
     private readonly object _gate = new();
     private CancellationTokenSource? _cts;
 
-    
     private long _cancelRequestedTimestamp;
 
 
@@ -49,43 +31,26 @@ public sealed class GameUpdateSession
 
     public string? TargetVersion { get; private set; }
 
-    
     public string? InstallDir { get; private set; }
 
-    
     public string? InstallTier { get; private set; }
 
-    
     public bool IsApplying { get; private set; }
 
-    
-    
-    
-    
-    
     public bool IsPausing { get; private set; }
 
-    
     public double ProgressValue { get; private set; }
 
     public long ReceivedBytes { get; private set; }
 
     public long TotalBytes { get; private set; }
 
-    
     public string? ProgressText { get; private set; }
 
-    
     public GameDownloadProgress? LastProgress { get; private set; }
 
-
-    
     public bool IsActiveFor(GameBiz biz) => IsBusy && Biz == biz;
 
-
-    
-    
-    
     public bool Start(GameBiz biz, GameUpdateService.GameUpdateState state)
     {
         if (state.Target is null || state.TargetVersion is null)
@@ -95,11 +60,6 @@ public sealed class GameUpdateSession
         return Begin(biz, state, installDir: null);
     }
 
-
-    
-    
-    
-    
     public bool StartInstall(GameBiz biz, GameUpdateService.GameUpdateState state, string installDir, string? tierName = null)
     {
         if (state.Target is null || state.TargetVersion is null || string.IsNullOrWhiteSpace(installDir))
@@ -109,8 +69,6 @@ public sealed class GameUpdateSession
         return Begin(biz, state, installDir, tierName);
     }
 
-
-    
     private bool Begin(GameBiz biz, GameUpdateService.GameUpdateState state, string? installDir, string? tierName = null)
     {
         lock (_gate)
@@ -139,8 +97,6 @@ public sealed class GameUpdateSession
         return true;
     }
 
-
-    
     public void Cancel()
     {
         CancellationTokenSource? cts;
@@ -148,7 +104,7 @@ public sealed class GameUpdateSession
         {
             cts = _cts;
         }
-        
+
         Interlocked.CompareExchange(ref _cancelRequestedTimestamp, Stopwatch.GetTimestamp(), 0);
         AppConfig.GetLogger<GameUpdateSession>().LogInformation("暂停请求已发出");
         bool notify = false;
@@ -160,7 +116,7 @@ public sealed class GameUpdateSession
                 notify = true;
             }
         }
-        
+
         if (notify)
         {
             Changed?.Invoke(this, EventArgs.Empty);
@@ -171,21 +127,21 @@ public sealed class GameUpdateSession
         }
         catch
         {
-            
+
         }
     }
 
 
     private async Task RunAsync(GameBiz biz, GameUpdateService.GameUpdateState state)
     {
-        
+
         var progress = new Progress<GameDownloadProgress>(OnProgress);
         var ct = _cts?.Token ?? CancellationToken.None;
         try
         {
             if (InstallDir is { } installDir)
             {
-                
+
                 await Task.Run(() => GameUpdateService.InstallAsync(biz, installDir, state.Target!, progress, ct, InstallTier), ct);
                 InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_InstallDone, state.TargetVersion));
             }
@@ -196,19 +152,18 @@ public sealed class GameUpdateSession
             }
             else
             {
-                
+
                 await Task.Run(() => GameUpdateService.ApplyUpdateAsync(biz, state.Target!, progress, ct), ct);
                 InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_Done, state.TargetVersion));
             }
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
-            
+
         }
         catch (OperationCanceledException ex)
         {
-            
-            
+
             AppConfig.GetLogger<GameUpdateSession>().LogWarning(ex, "游戏更新非用户取消而中止 {Biz}", biz);
             InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_UpdateGame);
         }
@@ -241,13 +196,13 @@ public sealed class GameUpdateSession
     private void OnProgress(GameDownloadProgress p)
     {
         LastProgress = p;
-        
+
         static string WithPercent(string text, long done, long total)
             => total > 0 ? $"{text} · {done * 100 / total}%" : text;
         if (p.Phase == DownloadPhase.Applying)
         {
             IsApplying = true;
-            
+
             ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
             ProgressText = p.TotalFiles > 0
                 ? WithPercent(string.Format(Lang.Instance.GameUpdate_ApplyingProgress, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)
@@ -256,9 +211,7 @@ public sealed class GameUpdateSession
         else if (p.Phase == DownloadPhase.Patching)
         {
             IsApplying = true;
-            
-            
-            
+
             ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
             ProgressText = p.TotalFiles > 0
                 ? WithPercent(string.Format(Lang.Instance.GameUpdate_Patching, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)

@@ -7,15 +7,6 @@ using Arietta.Localization;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
-
-
-
-
 #region 账号概览（haru/roleBox/accountData）
 
 public sealed class KuroPgrAccountData
@@ -38,13 +29,6 @@ public sealed class KuroPgrRoleIndex
     [JsonPropertyName("showRoleIdList")] public List<long>? ShowRoleIdList { get; set; }
 }
 
-
-
-
-
-
-
-
 [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
 public sealed class KuroPgrCharacter
 {
@@ -53,14 +37,7 @@ public sealed class KuroPgrCharacter
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
     [JsonPropertyName("element")] public string? Element { get; set; }
     [JsonPropertyName("effect")] public string? Effect { get; set; }
-    
-    
-    
-    
-    
-    
-    
-    
+
     [JsonPropertyName("quality")] public JsonElement? Quality { get; set; }
 
     [JsonIgnore] public int QualityValue => Quality?.ValueKind == JsonValueKind.Number && Quality.Value.TryGetInt32(out var q) ? q : 0;
@@ -75,27 +52,9 @@ public sealed class KuroPgrCharacter
     [JsonIgnore] public string GradeText => string.IsNullOrEmpty(Grade) ? (RoleRank ?? "") : Grade!;
     [JsonIgnore] public string FightText => string.Format(Lang.Instance.PgrRole_Fight, FightAbility);
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     [JsonIgnore]
     public Brush RankBrush => new SolidColorBrush(PgrRankColor(RoleRank));
 
-
-    
-    
-    
-    
     private static Color PgrRankColor(string? rank) => rank?.Trim().ToUpperInvariant() switch
     {
         "A" or "B" => Color.FromArgb(0xFF, 0xFD, 0x9C, 0x34),
@@ -120,12 +79,12 @@ public sealed class KuroPgrResourceMonth
 {
     [JsonPropertyName("currentYear")] public int CurrentYear { get; set; }
     [JsonPropertyName("currentMonth")] public int CurrentMonth { get; set; }
-    
+
     [JsonPropertyName("month")] public string? Month { get; set; }
     [JsonPropertyName("monthBlackCard")] public int MonthBlackCard { get; set; }
     [JsonPropertyName("monthDevelopResource")] public int MonthDevelopResource { get; set; }
     [JsonPropertyName("monthTradeCredit")] public int MonthTradeCredit { get; set; }
-    
+
     [JsonPropertyName("isHighest")] public bool IsHighest { get; set; }
 }
 
@@ -139,16 +98,15 @@ public sealed class KuroPgrCageData
     [JsonPropertyName("isOpen")] public bool IsOpen { get; set; }
     [JsonPropertyName("isConfirm")] public bool IsConfirm { get; set; }
     [JsonPropertyName("isUnlock")] public bool IsUnlock { get; set; }
-    
+
     [JsonPropertyName("chooseArea")] public bool ChooseArea { get; set; }
     [JsonPropertyName("challengeArea")] public string? ChallengeArea { get; set; }
     [JsonPropertyName("challengeLevel")] public string? ChallengeLevel { get; set; }
-    
+
     [JsonPropertyName("prisonerCage")] public KuroPgrCageInfo? PrisonerCage { get; set; }
-    
+
     [JsonPropertyName("fightHardZone")] public JsonElement? FightHardZone { get; set; }
 }
-
 
 public sealed class KuroPgrCageInfo
 {
@@ -162,7 +120,7 @@ public sealed class KuroPgrCageBossFight
     [JsonPropertyName("totalPoint")] public int TotalPoint { get; set; }
     [JsonPropertyName("totalNum")] public int TotalNum { get; set; }
     [JsonPropertyName("boss")] public KuroPgrCageBoss? Boss { get; set; }
-    
+
     [JsonPropertyName("stageInfoList")] public List<KuroPgrCageStage>? StageInfoList { get; set; }
 }
 
@@ -185,9 +143,9 @@ public sealed class KuroPgrCageStage
 {
     [JsonPropertyName("stageName")] public string? StageName { get; set; }
     [JsonPropertyName("point")] public int Point { get; set; }
-    
+
     [JsonPropertyName("fightTime")] public int FightTime { get; set; }
-    
+
     [JsonPropertyName("bodyList")] public List<KuroPgrWarAreaBodyEntry>? BodyList { get; set; }
 }
 
@@ -228,7 +186,7 @@ public sealed class KuroPgrStageFightInfo
 public sealed class KuroPgrBuffFightInfo
 {
     [JsonPropertyName("buffId")] public int BuffId { get; set; }
-    
+
     [JsonPropertyName("buffName")] public string? BuffName { get; set; }
     [JsonPropertyName("buffIconUrl")] public string? BuffIconUrl { get; set; }
     [JsonPropertyName("supportBuffList")] public List<KuroPgrSupportBuff>? SupportBuffList { get; set; }
@@ -239,7 +197,6 @@ public sealed class KuroPgrBuffFightInfo
     [JsonPropertyName("fightTime")] public long? FightTime { get; set; }
     [JsonPropertyName("totalNum")] public int? TotalNum { get; set; }
 }
-
 
 public sealed class KuroPgrWarAreaBodyEntry
 {
@@ -277,9 +234,9 @@ public sealed class KuroPgrTransfiniteData
     [JsonPropertyName("challengeArea")] public string? ChallengeArea { get; set; }
     [JsonPropertyName("challengeLevel")] public string? ChallengeLevel { get; set; }
     [JsonPropertyName("bossIconUrl")] public string? BossIconUrl { get; set; }
-    
+
     [JsonPropertyName("operatorCount")] public int OperatorCount { get; set; }
-    
+
     [JsonPropertyName("process")] public int Process { get; set; }
     [JsonPropertyName("fightTime")] public long FightTime { get; set; }
     [JsonPropertyName("characterList")] public List<KuroPgrCharacter>? CharacterList { get; set; }
@@ -290,14 +247,6 @@ public sealed class KuroPgrTransfiniteData
 
 #region 角色深层详情（haru/roleBox/roleDetail）
 
-
-
-
-
-
-
-
-
 public sealed class KuroPgrRoleDetailData
 {
     [JsonPropertyName("character")] public KuroPgrCharacterDetail? Character { get; set; }
@@ -307,49 +256,49 @@ public sealed class KuroPgrRoleDetailData
 public sealed class KuroPgrCharacterDetail
 {
     [JsonPropertyName("body")] public KuroPgrDetailBody? Body { get; set; }
-    
+
     [JsonPropertyName("quality")] public int Quality { get; set; }
-    
+
     [JsonPropertyName("grade")] public string? Grade { get; set; }
     [JsonPropertyName("fightAbility")] public int FightAbility { get; set; }
     [JsonPropertyName("weaponInfo")] public KuroPgrWeaponInfo? WeaponInfo { get; set; }
-    
+
     [JsonPropertyName("partner")] public KuroPgrPartnerInfo? Partner { get; set; }
-    
+
     [JsonPropertyName("chipSuitList")] public List<KuroPgrChipSuit>? ChipSuitList { get; set; }
-    
+
     [JsonPropertyName("chipResonanceList")] public List<KuroPgrChipResonance>? ChipResonanceList { get; set; }
-    
+
     [JsonPropertyName("chipExDamage")] public string? ChipExDamage { get; set; }
 }
 
 public sealed class KuroPgrDetailBody
 {
     [JsonPropertyName("bodyId")] public long BodyId { get; set; }
-    
+
     [JsonPropertyName("roleName")] public string? RoleName { get; set; }
-    
+
     [JsonPropertyName("bodyName")] public string? BodyName { get; set; }
     [JsonPropertyName("careerId")] public int? CareerId { get; set; }
-    
+
     [JsonPropertyName("career")] public string? Career { get; set; }
     [JsonPropertyName("isNewRole")] public int? IsNewRole { get; set; }
-    
+
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
-    
+
     [JsonPropertyName("imgUrl")] public string? ImgUrl { get; set; }
-    
+
     [JsonPropertyName("element")] public string? Element { get; set; }
-    
+
     [JsonPropertyName("elementDetail")] public string? ElementDetail { get; set; }
-    
+
     [JsonPropertyName("effect")] public string? Effect { get; set; }
-    
+
     [JsonPropertyName("wikiLink")] public string? WikiLink { get; set; }
     [JsonPropertyName("roleRank")] public string? RoleRank { get; set; }
     [JsonPropertyName("priority")] public int Priority { get; set; }
     [JsonPropertyName("weaponType")] public int WeaponType { get; set; }
-    
+
     [JsonPropertyName("overrunState")] public int? OverrunState { get; set; }
 }
 
@@ -359,9 +308,9 @@ public sealed class KuroPgrWeaponInfo
     [JsonPropertyName("overRunLevel")] public int? OverRunLevel { get; set; }
     [JsonPropertyName("maxOverRunLevel")] public int? MaxOverRunLevel { get; set; }
     [JsonPropertyName("quality")] public int? Quality { get; set; }
-    
+
     [JsonPropertyName("suit")] public KuroPgrWeaponSuit? Suit { get; set; }
-    
+
     [JsonPropertyName("weaponOverrun2")] public KuroPgrWeaponOverrun2? WeaponOverrun2 { get; set; }
     [JsonPropertyName("resonanceList")] public List<KuroPgrResonance>? ResonanceList { get; set; }
 }
@@ -406,7 +355,7 @@ public sealed class KuroPgrPartnerInfo
     [JsonPropertyName("partner")] public KuroPgrPartner? Partner { get; set; }
     [JsonPropertyName("level")] public int? Level { get; set; }
     [JsonPropertyName("breakThrough")] public int? BreakThrough { get; set; }
-    
+
     [JsonPropertyName("grade")] public string? Grade { get; set; }
     [JsonPropertyName("quality")] public int? Quality { get; set; }
     [JsonPropertyName("skillList")] public List<KuroPgrPartnerSkill>? SkillList { get; set; }
@@ -434,7 +383,7 @@ public sealed class KuroPgrChipSuit
     [JsonPropertyName("name")] public string? Name { get; set; }
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
     [JsonPropertyName("suitId")] public long SuitId { get; set; }
-    
+
     [JsonPropertyName("num")] public int? Num { get; set; }
     [JsonPropertyName("descriptionTwo")] public string? DescriptionTwo { get; set; }
     [JsonPropertyName("descriptionFour")] public string? DescriptionFour { get; set; }
@@ -444,19 +393,19 @@ public sealed class KuroPgrChipSuit
 public sealed class KuroPgrChipResonance
 {
     [JsonPropertyName("chipIconUrl")] public string? ChipIconUrl { get; set; }
-    
+
     [JsonPropertyName("site")] public int? Site { get; set; }
     [JsonPropertyName("chipName")] public string? ChipName { get; set; }
     [JsonPropertyName("defend")] public bool? Defend { get; set; }
     [JsonPropertyName("superSlotIconUrl")] public string? SuperSlotIconUrl { get; set; }
-    
+
     [JsonPropertyName("superAwake")] public bool? SuperAwake { get; set; }
-    
+
     [JsonPropertyName("superDescription")] public string? SuperDescription { get; set; }
     [JsonPropertyName("subSlotIconUrl")] public string? SubSlotIconUrl { get; set; }
-    
+
     [JsonPropertyName("subAwake")] public bool? SubAwake { get; set; }
-    
+
     [JsonPropertyName("subDescription")] public string? SubDescription { get; set; }
 }
 

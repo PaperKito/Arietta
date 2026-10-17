@@ -12,11 +12,6 @@ using Arietta.Helpers;
 
 namespace Arietta.Features.KuroBbs;
 
-
-
-
-
-
 public sealed class KuroBbsClient
 {
     private static readonly Lazy<KuroBbsClient> _instance = new(() => new KuroBbsClient());
@@ -25,7 +20,6 @@ public sealed class KuroBbsClient
     private static readonly HttpClient Http = SharedHttp.Default;
     private static readonly ILogger _logger = AppConfig.GetLogger<KuroBbsClient>();
 
-    
     public static async Task<byte[]?> DownloadBytesAsync(string url)
     {
         try
@@ -43,7 +37,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     private const string BaseDataUrl = "https://api.kurobbs.com/aki/roleBox/akiBox/baseData";
     private const string RoleDataUrl = "https://api.kurobbs.com/aki/roleBox/akiBox/roleData";
     private const string RoleDetailUrl = "https://api.kurobbs.com/aki/roleBox/akiBox/getRoleDetail";
@@ -56,49 +49,35 @@ public sealed class KuroBbsClient
     private const string BriefingVersionUrl = "https://api.kurobbs.com/aki/resource/version";
     private const string SignInUrl = "https://api.kurobbs.com/encourage/signIn/v2";
     private const string SignInInitUrl = "https://api.kurobbs.com/encourage/signIn/initSignInV2";
-    
+
     private const string CommunitySignInUrl = "https://api.kurobbs.com/user/signIn";
-    
-    
-    
-    
-    
-    
+
     private const string TowerDataUrl = "https://api.kurobbs.com/aki/roleBox/akiBox/towerDataDetail";
     private const string NewTowerDataUrl = "https://api.kurobbs.com/aki/roleBox/akiBox/newTowerDetail";
     private const string SlashDataUrl = "https://api.kurobbs.com/aki/roleBox/akiBox/slashDetail";
-    
+
     private const string RefreshBoxDataUrl = "https://api.kurobbs.com/aki/roleBox/akiBox/refreshData";
 
-    
     private const string CalculatorRefreshUrl = "https://api.kurobbs.com/aki/calculator/refreshData";
     private const string CalculatorListRoleUrl = "https://api.kurobbs.com/aki/calculator/listRole";
     private const string CalculatorListWeaponUrl = "https://api.kurobbs.com/aki/calculator/listWeapon";
     private const string CalculatorBatchRoleCostUrl = "https://api.kurobbs.com/aki/calculator/batchRoleCost";
 
-    
     private const string WuwaWidgetDataUrl = "https://api.kurobbs.com/gamer/widget/game3/getData";
 
-    
     public const string ParamServerId = "76402e5b20be2c39f095a152090afddc";
     public const string ParamGameId = "3";
 
-    
     private const string UserAgent = "Mozilla/5.0 (Linux; Android 9; 23116PN5BC Build/PQ3A.190605.02201427; wv) " +
         "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.6367.82 Mobile Safari/537.36 Kuro/2.5.0 KuroGameBox/2.5.0";
 
-    
     private const int TokenCacheSeconds = 3600;
     private const int TokenRefreshAdvance = 300;
 
     private readonly object _accessTokenLock = new();
-    
-    
-    
-    
+
     private readonly Dictionary<string, (string Token, long Timestamp)> _accessTokenCache = new();
 
-    
     private string? _cachedIp;
     private long _ipTimestamp;
     private string? _devcode;
@@ -108,7 +87,6 @@ public sealed class KuroBbsClient
 
     #region 角色列表 / 详情 / 玩家总览
 
-    
     public async Task<KuroBbsResponse<List<KuroRole>>> GetRoleListAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         using var body = new MultipartFormDataContent();
@@ -126,7 +104,6 @@ public sealed class KuroBbsClient
         return result;
     }
 
-    
     public async Task<KuroBbsResponse<KuroRoleDetail>> GetRoleDetailAsync(KuroBbsAccount account, int cardRoleId, CancellationToken ct = default)
     {
         using var body = new MultipartFormDataContent();
@@ -141,7 +118,6 @@ public sealed class KuroBbsClient
         return await ParseDataStringAsync<KuroRoleDetail>(request, ct);
     }
 
-    
     public async Task<KuroBbsResponse<JsonElement>> GetBaseDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         using var body = new MultipartFormDataContent();
@@ -158,8 +134,6 @@ public sealed class KuroBbsClient
 
     #region token 换取与角色查找
 
-    
-    
     public async Task<KuroBbsResponse<List<KuroBbsAccount>>> SeekGameRoleAsync(string token, int gameId = 3, CancellationToken ct = default)
     {
         try
@@ -207,9 +181,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
-    
-    
     private async Task<string> GetAccessTokenAsync(KuroBbsAccount account, CancellationToken ct)
     {
         try
@@ -236,7 +207,7 @@ public sealed class KuroBbsClient
                 {
                     account.Level = role.Level;
                 }
-                
+
                 KuroBbsAccountStore.AddOrUpdate(account, setCurrent: false);
                 InvalidateAccessToken();
                 return await RequestAccessTokenAsync(account, ct);
@@ -270,7 +241,7 @@ public sealed class KuroBbsClient
         int code = doc.RootElement.GetProperty("code").GetInt32();
         if (response.StatusCode == System.Net.HttpStatusCode.OK && code is 200 or 10902)
         {
-            
+
             var dataNode = JsonDocument.Parse(doc.RootElement.GetProperty("data").GetString() ?? "{}").RootElement;
             string accessToken = dataNode.GetProperty("accessToken").GetString() ?? "";
             if (accessToken.Length == 0)
@@ -286,8 +257,6 @@ public sealed class KuroBbsClient
         throw new InvalidOperationException(string.Format(Localization.Lang.Instance.KuroBbs_ErrAccessToken, code, doc.RootElement.GetProperty("msg").GetString()));
     }
 
-
-    
     public void InvalidateAccessToken()
     {
         lock (_accessTokenLock)
@@ -301,7 +270,6 @@ public sealed class KuroBbsClient
 
     #region 登录 / 短信验证码（移植自 wwt-kuro-api KujiequAuthApi）
 
-    
     public async Task<string?> SendSmsCodeAsync(string phone, CancellationToken ct = default)
     {
         try
@@ -336,7 +304,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     public async Task<KuroBbsResponse<KuroLoginResult>> LoginWithSmsAsync(string phone, string code, CancellationToken ct = default)
     {
         try
@@ -385,7 +352,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     private static string RandomDevCode()
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -403,7 +369,6 @@ public sealed class KuroBbsClient
 
     #region 资源简报（移植自 wwt-kuro-api KujiequSignApi 的 Briefing 任务）
 
-    
     public async Task<KuroBbsResponse<KuroBriefing>> GetBriefingListAsync(string token, CancellationToken ct = default)
     {
         try
@@ -427,7 +392,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     public async Task<KuroBbsResponse<KuroBriefingRecord>> GetBriefingDetailAsync(
         KuroBbsAccount account, int period, string type, CancellationToken ct = default)
     {
@@ -459,10 +423,6 @@ public sealed class KuroBbsClient
 
     #region 签到 / 深塔 / 终焉矩阵 / 冥歌海墟（移植自 wwt-kuro-api KujiequSignApi、KujiequTowerApi 与 wwt-app SignService）
 
-    
-    
-    
-    
     private async Task<HttpRequestMessage> BuildSourceRequestAsync(string url, KuroBbsAccount account, CancellationToken ct)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, url);
@@ -475,7 +435,6 @@ public sealed class KuroBbsClient
         return request;
     }
 
-    
     public async Task<KuroBbsResponse<KuroSignInitData>> GetSignInInitAsync(KuroBbsAccount account, string gameId = ParamGameId, string? serverId = null, string? roleId = null, CancellationToken ct = default)
     {
         try
@@ -485,7 +444,7 @@ public sealed class KuroBbsClient
             var result = await ParseDirectAsync<KuroSignInitData>(request, ct);
             if (result is { IsSuccess: true, Data: { } data })
             {
-                
+
                 if (data.SignInGoodsConfigs is { } goods)
                 {
                     for (int i = 0; i < goods.Count; i++)
@@ -502,7 +461,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     public async Task<KuroBbsResponse<bool>> SignInAsync(KuroBbsAccount account, string gameId = ParamGameId, string? serverId = null, string? roleId = null, CancellationToken ct = default)
     {
         try
@@ -550,16 +508,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public async Task<KuroBbsResponse<bool>> CommunitySignInAsync(string token, CancellationToken ct = default)
     {
         try
@@ -579,7 +527,7 @@ public sealed class KuroBbsClient
             var root = doc.RootElement;
             int code = root.TryGetProperty("code", out var c) ? c.GetInt32() : 0;
             string msg = root.TryGetProperty("msg", out var m) ? m.GetString() ?? "" : "";
-            
+
             bool ok = code == 200 || code == 1511;
             if (msg.Length == 0)
             {
@@ -601,10 +549,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
-    
-    
-    
     public async Task<bool> RefreshBoxDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -623,7 +567,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     public async Task<KuroBbsResponse<KuroTowerData>> GetTowerDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         await RefreshBoxDataAsync(account, ct);
@@ -635,7 +578,6 @@ public sealed class KuroBbsClient
         return await ParseDataStringAsync<KuroTowerData>(request, ct);
     }
 
-    
     public async Task<KuroBbsResponse<KuroNewTowerData>> GetNewTowerDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         await RefreshBoxDataAsync(account, ct);
@@ -646,13 +588,6 @@ public sealed class KuroBbsClient
         return await ParseDataStringAsync<KuroNewTowerData>(request, ct);
     }
 
-    
-    
-    
-    
-    
-    
-    
     public async Task<KuroBbsResponse<KuroSlashData>> GetSlashDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         await RefreshBoxDataAsync(account, ct);
@@ -669,7 +604,6 @@ public sealed class KuroBbsClient
 
     #region 养成计算器（移植自 wwt-kuro-api KujiequCalculatorApi）
 
-    
     public async Task<KuroBbsResponse<bool>> RefreshCalculatorDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -690,7 +624,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     public async Task<KuroBbsResponse<List<KuroCalculatorRole>>> GetCalculatorRoleListAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -709,7 +642,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     public async Task<KuroBbsResponse<List<KuroCalculatorWeapon>>> GetCalculatorWeaponListAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -728,14 +660,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
     public async Task<KuroBbsResponse<KuroCalculatorResult>> BatchRoleCostAsync(
         KuroBbsAccount account, IEnumerable<KuroCalculatorRoleAim> aims, CancellationToken ct = default)
     {
@@ -763,11 +687,6 @@ public sealed class KuroBbsClient
 
     #region 战双 · 作战数据（web-static.kurobbs.com/pns-box，接口前缀 /haru）
 
-    
-    
-    
-    
-
     private const string PgrRefreshUrl = "https://api.kurobbs.com/haru/roleBox/refreshData";
     private const string PgrAccountDataUrl = "https://api.kurobbs.com/haru/roleBox/accountData";
     private const string PgrRoleIndexUrl = "https://api.kurobbs.com/haru/roleBox/roleIndex";
@@ -777,7 +696,6 @@ public sealed class KuroBbsClient
     private const string PgrWarAreaUrl = "https://api.kurobbs.com/haru/roleBox/area";
     private const string PgrTransfiniteUrl = "https://api.kurobbs.com/haru/roleBox/transfinite";
 
-    
     private async Task<HttpRequestMessage> BuildPgrRequestAsync(string url, Dictionary<string, string> form, KuroBbsAccount account, CancellationToken ct)
     {
         var request = await BuildSourceRequestAsync(url, account, ct);
@@ -795,7 +713,6 @@ public sealed class KuroBbsClient
         return form;
     }
 
-    
     public async Task<bool> RefreshPgrDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -810,7 +727,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     private async Task<KuroBbsResponse<T>> PostPgrAsync<T>(string url, Dictionary<string, string> form, KuroBbsAccount account, CancellationToken ct)
     {
         try
@@ -824,22 +740,12 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     public Task<KuroBbsResponse<KuroPgrAccountData>> GetPgrAccountDataAsync(KuroBbsAccount account, CancellationToken ct = default)
         => PostPgrAsync<KuroPgrAccountData>(PgrAccountDataUrl, PgrForm(account), account, ct);
 
-    
     public Task<KuroBbsResponse<KuroPgrRoleIndex>> GetPgrRoleListAsync(KuroBbsAccount account, CancellationToken ct = default)
         => PostPgrAsync<KuroPgrRoleIndex>(PgrRoleIndexUrl, PgrForm(account), account, ct);
 
-    
-    
-    
-    
-    
-    
-    
-    
     public async Task<KuroBbsResponse<KuroPgrRoleDetailData>> GetPgrRoleDetailAsync(KuroBbsAccount account, long bodyId, CancellationToken ct = default)
     {
         var form = PgrForm(account);
@@ -847,19 +753,15 @@ public sealed class KuroBbsClient
         return await PostPgrAsync<KuroPgrRoleDetailData>(PgrRoleDetailUrl, form, account, ct);
     }
 
-    
     public Task<KuroBbsResponse<KuroPgrResourceReport>> GetPgrResourceReportAsync(KuroBbsAccount account, CancellationToken ct = default)
         => PostPgrAsync<KuroPgrResourceReport>(PgrResourceUrl, PgrForm(account, withServer: false), account, ct);
 
-    
     public Task<KuroBbsResponse<KuroPgrCageData>> GetPgrCageDataAsync(KuroBbsAccount account, CancellationToken ct = default)
         => PostPgrAsync<KuroPgrCageData>(PgrCageUrl, PgrForm(account), account, ct);
 
-    
     public Task<KuroBbsResponse<KuroPgrWarAreaData>> GetPgrWarAreaDataAsync(KuroBbsAccount account, CancellationToken ct = default)
         => PostPgrAsync<KuroPgrWarAreaData>(PgrWarAreaUrl, PgrForm(account), account, ct);
 
-    
     public Task<KuroBbsResponse<KuroPgrTransfiniteData>> GetPgrTransfiniteDataAsync(KuroBbsAccount account, CancellationToken ct = default)
         => PostPgrAsync<KuroPgrTransfiniteData>(PgrTransfiniteUrl, PgrForm(account), account, ct);
 
@@ -868,15 +770,6 @@ public sealed class KuroBbsClient
 
     #region 鸣潮（gamer/widget/game3）
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public async Task<KuroBbsResponse<KuroWuwaWidgetData>> GetWuwaWidgetDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -905,7 +798,6 @@ public sealed class KuroBbsClient
         return request;
     }
 
-    
     private async Task<HttpRequestMessage> BuildFormRequestAsync(string url, Dictionary<string, string> form, KuroBbsAccount account, CancellationToken ct)
     {
         string bAt = await GetAccessTokenAsync(account, ct);
@@ -923,14 +815,13 @@ public sealed class KuroBbsClient
         request.Headers.TryAddWithoutValidation("Devcode", devcode);
         request.Headers.TryAddWithoutValidation("B-At", bAt);
         request.Headers.TryAddWithoutValidation("Did", account.Did);
-        
+
         if (withToken)
         {
             request.Headers.TryAddWithoutValidation("token", account.Token);
         }
     }
 
-    
     private async Task<string> GetDevcodeAsync(CancellationToken ct)
     {
         if (_devcode is not null)
@@ -971,12 +862,11 @@ public sealed class KuroBbsClient
         return _devcode;
     }
 
-    
     private static string? ExtractIp(string text)
     {
         if (Uri.IsHexDigit(text[0]) || char.IsDigit(text[0]))
         {
-            return text.Contains(':') ? null : text;   
+            return text.Contains(':') ? null : text;
         }
         try
         {
@@ -995,7 +885,6 @@ public sealed class KuroBbsClient
 
     #region 响应解析
 
-    
     private async Task<KuroBbsResponse<T>> ParseDirectAsync<T>(HttpRequestMessage request, CancellationToken ct)
     {
         try
@@ -1015,10 +904,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
-    
-    
-    
     private static T? DeserializeWithFallback<T>(string json, string? url)
     {
         try
@@ -1032,10 +917,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
-    
-    
-    
     private async Task<KuroBbsResponse<T>> ParseDataStringAsync<T>(HttpRequestMessage request, CancellationToken ct)
     {
         try
@@ -1071,7 +952,6 @@ public sealed class KuroBbsClient
         }
     }
 
-    
     private async Task<KuroBbsResponse<JsonElement>> ParseRawDataAsync(HttpRequestMessage request, CancellationToken ct)
     {
         try
@@ -1105,8 +985,6 @@ public sealed class KuroBbsClient
 
     #endregion
 
-
-    
     private static string GetStringSafe(JsonElement obj, string name)
     {
         return obj.TryGetProperty(name, out var v) && v.ValueKind is JsonValueKind.String or JsonValueKind.Number
@@ -1114,7 +992,6 @@ public sealed class KuroBbsClient
             : "";
     }
 
-    
     private sealed class KuroRoleDataInner
     {
         [System.Text.Json.Serialization.JsonPropertyName("roleList")]

@@ -24,12 +24,6 @@ internal class PlayTimeRecordService
         _playTimeStatsService = playTimeStatsService;
     }
 
-
-    
-    
-    
-    
-    
     public static PlayTimeRecordService Create()
     {
         return new PlayTimeRecordService(
@@ -86,8 +80,7 @@ internal class PlayTimeRecordService
         var startTime = new DateTimeOffset(process.StartTime);
         Log(biz, process.Id, PlayTimeState.Start, startTime.ToUnixTimeMilliseconds(), $"{process.ProcessName} [{startTime}]");
         using var dapper = DatabaseService.CreateConnection();
-        
-        
+
         var last = dapper.QueryFirstOrDefault<PlayTimeItemStruct>("SELECT * FROM PlayTimeItem WHERE GameBiz = @biz AND Pid = @Id ORDER BY TimeStamp DESC LIMIT 1;", new { biz, process.Id });
         DateTimeOffset time = startTime;
         if (last.TimeStamp > startTime.ToUnixTimeMilliseconds())
@@ -168,12 +161,6 @@ internal class PlayTimeRecordService
         }
     }
 
-    
-    
-    
-    
-    
-    
     public Task<Process?> StartProcessToLogAsync(GameId gameId, int? anchorPid = null)
     {
         try
@@ -188,18 +175,6 @@ internal class PlayTimeRecordService
         return Task.FromResult<Process?>(null);
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public Task StartProcessToLogAsync(GameId gameId, int launchedPid, string launchedProcessName)
     {
         string[] names = GetGameExeNames(gameId);
@@ -213,23 +188,11 @@ internal class PlayTimeRecordService
         return Task.CompletedTask;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public async Task WaitGameProcessAndLogAsync(GameBiz biz, int anchorPid = 0)
     {
         try
         {
-            
+
             var waiter = AppInstance.FindOrRegisterForKey($"playtime_wait_{biz}");
             if (!waiter.IsCurrent)
             {
@@ -244,8 +207,7 @@ internal class PlayTimeRecordService
             {
                 await Task.Delay(2000);
                 var parents = anchorPid > 0 ? ProcessTree.BuildParentMap() : null;
-                
-                
+
                 var process = parents is { Count: > 0 }
                     ? FindLoggableProcess(biz, names, anchorPid, anchorPid, parents)
                     : FindLoggableProcess(biz, names, anchorPid, 0, null);
@@ -254,13 +216,13 @@ internal class PlayTimeRecordService
                     await LogPlayTimeAsync(biz, process.Id);
                     return;
                 }
-                
+
                 if (anchorPid > 0)
                 {
                     lastResort?.Dispose();
                     lastResort = FindLoggableProcess(biz, names, anchorPid, 0, null);
                 }
-                
+
                 if (anchorPid > 0 && IsProcessAlive(anchorPid) && DateTime.Now < hardCap)
                 {
                     continue;
@@ -271,7 +233,7 @@ internal class PlayTimeRecordService
                 }
                 if (lastResort is not null)
                 {
-                    
+
                     _logger.LogWarning("Anchored wait found no descendant ({biz}, anchor {anchor}); falling back to pid {pid}",
                         biz, anchorPid, lastResort.Id);
                     await LogPlayTimeAsync(biz, lastResort.Id);
@@ -301,11 +263,6 @@ internal class PlayTimeRecordService
         }
     }
 
-
-    
-    
-    
-    
     private static IEnumerable<Process> EnumerateSessionProcesses(string[] names)
     {
         int session = Process.GetCurrentProcess().SessionId;
@@ -334,20 +291,12 @@ internal class PlayTimeRecordService
         }
     }
 
-
-    
-    
-    
-    
-    
-    
     public static bool HasOwnStartRecord(GameBiz biz, int pid)
     {
         try
         {
             using var dapper = DatabaseService.CreateConnection();
-            
-            
+
             return dapper.ExecuteScalar<long>(
                 "SELECT COUNT(*) FROM PlayTimeItem WHERE GameBiz = @biz AND Pid = @pid AND State = @state;",
                 new { biz, pid, state = (int)PlayTimeState.Start }) > 0;
@@ -358,19 +307,12 @@ internal class PlayTimeRecordService
         }
     }
 
-
-    
-    
-    
-    
-    
-    
     public static bool HasStatsRecord(GameBiz biz, long minEndTimeMs)
     {
         try
         {
             using var dapper = DatabaseService.CreateConnection();
-            
+
             return dapper.ExecuteScalar<long>(
                 "SELECT COUNT(*) FROM PlayTimeStats WHERE GameBiz = @biz AND EndTime >= @minEndTimeMs;",
                 new { biz, minEndTimeMs }) > 0;
@@ -381,13 +323,6 @@ internal class PlayTimeRecordService
         }
     }
 
-
-    
-    
-    
-    
-    
-    
     private Process? FindLoggableProcess(GameBiz biz, string[] names, int excludePid = 0, int anchorPid = 0, Dictionary<int, int>? parents = null)
     {
         bool requireDescendant = anchorPid > 0 && parents is { Count: > 0 };
@@ -398,32 +333,32 @@ internal class PlayTimeRecordService
                 int id = process.Id;
                 if (excludePid > 0 && id == excludePid)
                 {
-                    
+
                     process.Dispose();
                     continue;
                 }
                 if (requireDescendant && !ProcessTree.IsSelfOrDescendant(id, anchorPid, parents!))
                 {
-                    
+
                     process.Dispose();
                     continue;
                 }
                 if (HasStartRecordForOtherBiz(biz, id))
                 {
-                    
+
                     process.Dispose();
                     continue;
                 }
                 if (AppInstance.GetInstances().Any(x => x.Key == $"playtime_{id}"))
                 {
-                    
+
                     process.Dispose();
                     continue;
                 }
                 string? image = ProcessImage.GetPath(process);
                 if (image is not null && IsUnderOtherGameDir(biz, image))
                 {
-                    
+
                     process.Dispose();
                     continue;
                 }
@@ -431,19 +366,12 @@ internal class PlayTimeRecordService
             }
             catch
             {
-                
+
             }
         }
         return null;
     }
 
-
-    
-    
-    
-    
-    
-    
     private void StartPlayTimeLoggerProcess(GameBiz biz, int? pid, int? anchorPid = null)
     {
         try
@@ -501,7 +429,7 @@ internal class PlayTimeRecordService
 
     public string[] GetGameExeNames(GameId gameId)
     {
-        
+
         var names = GameRegistry.GetEntry(gameId.GameBiz).ExeNames
             .Select(x => Path.GetFileNameWithoutExtension(x))
             .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -519,9 +447,6 @@ internal class PlayTimeRecordService
         return names.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
     }
 
-
-    
-    
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _candidateDiagLogged = new();
 
     private static void LogCandidateOnce(int pid, string kind, Action log)
@@ -532,29 +457,13 @@ internal class PlayTimeRecordService
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public Process? FindRunningClient(GameBiz biz)
     {
         try
         {
             string[] names = GetGameExeNames(new GameId(biz, biz.ToString()));
             string? root = Path.GetDirectoryName(GameRegistry.GetConfiguredExePath(biz));
-            
-            
+
             int anchor = GameLaunchAnchor.Get(biz);
             var parents = anchor > 0 ? ProcessTree.BuildParentMap() : null;
             if (parents is { Count: 0 })
@@ -567,27 +476,21 @@ internal class PlayTimeRecordService
             {
                 if (HasStartRecordForOtherBiz(biz, process.Id))
                 {
-                    
-                    
+
                     process.Dispose();
                     continue;
                 }
                 string? image = ProcessImage.GetPath(process);
                 if (root is not null && IsUnderGameDir(image, root))
                 {
-                    
+
                     LogCandidateOnce(process.Id, "match", () => AppConfig.GetLogger<PlayTimeRecordService>().LogInformation(
                         "FindRunningClient ({biz}) matched own dir: pid {pid}, image {image}", biz, process.Id, image));
                     anchored?.Dispose();
                     fallback?.Dispose();
                     return process;
                 }
-                
-                
-                
-                
-                
-                
+
                 if (image is not null && IsUnderOtherGameDir(biz, image))
                 {
                     LogCandidateOnce(process.Id, "other", () => AppConfig.GetLogger<PlayTimeRecordService>().LogInformation(
@@ -595,8 +498,7 @@ internal class PlayTimeRecordService
                     process.Dispose();
                     continue;
                 }
-                
-                
+
                 if (parents is not null && ProcessTree.IsSelfOrDescendant(process.Id, anchor, parents))
                 {
                     if (anchored is null)
@@ -609,8 +511,7 @@ internal class PlayTimeRecordService
                     }
                     continue;
                 }
-                
-                
+
                 if (fallback is null)
                 {
                     if (image is null)
@@ -626,7 +527,7 @@ internal class PlayTimeRecordService
                     process.Dispose();
                 }
             }
-            
+
             if (anchored is not null)
             {
                 fallback?.Dispose();
@@ -636,19 +537,11 @@ internal class PlayTimeRecordService
         }
         catch
         {
-            
+
         }
         return null;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     public static bool HasStartRecordForOtherBiz(GameBiz biz, int pid)
     {
         try
@@ -664,11 +557,6 @@ internal class PlayTimeRecordService
         }
     }
 
-
-    
-    
-    
-    
     private static bool IsUnderOtherGameDir(GameBiz biz, string imagePath)
     {
         foreach (GameRegistry.GameEntry entry in GameRegistry.Games)
@@ -686,8 +574,6 @@ internal class PlayTimeRecordService
         return false;
     }
 
-
-    
     private static bool IsUnderGameDir(string? imagePath, string gameRoot)
     {
         string? imageDir = string.IsNullOrEmpty(imagePath) ? null : Path.GetDirectoryName(imagePath);

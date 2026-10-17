@@ -8,55 +8,31 @@ using System.Text.Json.Serialization;
 
 namespace Arietta.Features.GachaLog;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class UgfService
 {
     private const string ExportApp = "Arietta";
-    
-    
+
     private const string GameId = "wuthering-waves";
     private const string LegacyGameId = "wuwa";
 
-    
     private const string CnOffset = "+08:00";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        
+
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    
     public static string ResolvePoolId(string nameOrId)
     {
         return GachaPools.ResolvePoolId(nameOrId);
     }
 
-
-    
-    
-    
-    
-    
     public static string Export(string playerId, Dictionary<string, List<GachaRecord>> pool, GachaParams? parameters = null)
     {
-        
+
         bool cn = playerId.StartsWith('1');
         string? lang = string.IsNullOrWhiteSpace(parameters?.LanguageCode)
             ? GachaLanguageSettings.Effective
@@ -73,14 +49,14 @@ public static class UgfService
                 records.Add(new UgfItem
                 {
                     Pool = poolId,
-                    
+
                     Time = cn ? time + CnOffset : time,
                     ItemId = itemId,
                     Name = r.Name,
                     ItemType = r.ResourceType,
                     Rarity = r.QualityLevel,
                     Count = Math.Max(r.Count, 1),
-                    
+
                     Id = $"{ToUnixSeconds(r.Time, cn)}-{itemId}-{seq++}",
                 });
             }
@@ -111,11 +87,6 @@ public static class UgfService
         return JsonSerializer.Serialize(model, JsonOptions);
     }
 
-
-    
-    
-    
-    
     private static long ToUnixSeconds(string time, bool cn)
     {
         string iso = cn ? time.Replace(' ', 'T') + CnOffset : time.Replace(' ', 'T');
@@ -125,20 +96,14 @@ public static class UgfService
             : DateTimeOffset.Now.ToUnixTimeSeconds();
     }
 
-
-    
-    
-    
     public static (string PlayerId, Dictionary<string, List<GachaRecord>> Pool) Import(string json)
     {
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
 
-        
         if (root.TryGetProperty("accounts", out var accounts) && accounts.ValueKind == JsonValueKind.Array)
         {
-            
-            
+
             JsonElement account = default;
             foreach (var candidate in accounts.EnumerateArray())
             {
@@ -175,8 +140,6 @@ public static class UgfService
             return (uid, pool);
         }
 
-        
-        
         foreach (var key in new[] { "wuwa", "x_uigf_compat_wuwa" })
         {
             if (!root.TryGetProperty(key, out var legacy) || legacy.ValueKind != JsonValueKind.Array)
@@ -214,7 +177,6 @@ public static class UgfService
             return (uid, pool);
         }
 
-        
         var byName = new Dictionary<string, List<GachaRecord>>();
         bool anyRecord = false;
         foreach (var prop in root.EnumerateObject())
@@ -223,7 +185,7 @@ public static class UgfService
             {
                 continue;
             }
-            
+
             string poolId = GachaPools.ResolvePoolId(prop.Name);
             if (poolId.Length == 0)
             {
@@ -244,12 +206,10 @@ public static class UgfService
         {
             throw new InvalidOperationException(Localization.Lang.Instance.Ugf_ErrUnknownFormat);
         }
-        
+
         return ("", byName);
     }
 
-
-    
     private static string GetRaw(JsonElement element)
     {
         return element.ValueKind switch
@@ -267,7 +227,7 @@ public static class UgfService
         {
             return item.TryGetProperty(name, out var v) ? GetRaw(v) : "";
         }
-        
+
         string poolId = Get("pool");
         string mapped = GachaPools.ResolvePoolId(poolId);
         if (mapped.Length > 0)
@@ -286,15 +246,13 @@ public static class UgfService
         };
     }
 
-
-    
     private static GachaRecord RecordFromLegacyItem(JsonElement item)
     {
         string Get(string name)
         {
             return item.TryGetProperty(name, out var v) ? GetRaw(v) : "";
         }
-        
+
         string poolId = Get("gacha_type");
         if (poolId.Length == 0)
         {
@@ -317,10 +275,6 @@ public static class UgfService
         };
     }
 
-
-    
-    
-    
     private static string NormalizeTime(string raw)
     {
         raw = raw.Trim();
@@ -359,7 +313,6 @@ public class UgfExporter
     [JsonPropertyName("version")]
     public string Version { get; set; } = "";
 
-    
     [JsonPropertyName("exported_at")]
     public string ExportedAt { get; set; } = "";
 }
@@ -373,15 +326,12 @@ public class UgfAccount
     [JsonPropertyName("uid")]
     public string Uid { get; set; } = "";
 
-    
     [JsonPropertyName("server")]
     public string? Server { get; set; }
 
-    
     [JsonPropertyName("timezone")]
     public string? Timezone { get; set; }
 
-    
     [JsonPropertyName("lang")]
     public string? Lang { get; set; }
 
@@ -407,15 +357,12 @@ public class UgfItem
     [JsonPropertyName("item_type")]
     public string? ItemType { get; set; }
 
-    
     [JsonPropertyName("rarity")]
     public int? Rarity { get; set; }
 
-    
     [JsonPropertyName("count")]
     public int? Count { get; set; }
 
-    
     [JsonPropertyName("id")]
     public string? Id { get; set; }
 }

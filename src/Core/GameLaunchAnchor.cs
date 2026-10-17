@@ -2,20 +2,6 @@
 
 namespace Arietta.Core;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 internal static class GameLaunchAnchor
 {
     private static readonly ConcurrentDictionary<GameBiz, int> _anchors = new();

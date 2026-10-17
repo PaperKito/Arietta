@@ -11,77 +11,49 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.DynamicBackground;
 
-
-
-
-
-
 public sealed record KuroLauncherApp(string GameId, string AppId, string AppKey)
 {
-    
+
     public string DirName => $"{AppId}_{AppKey}";
 
-    
     public string LauncherConfigPath(string host) => $"{host}/launcher/launcher/{DirName}/{GameId}/index.json";
 
-    
     public string BackgroundConfigPath(string host, string backgroundId, string lang)
         => $"{host}/launcher/{DirName}/{GameId}/background/{backgroundId}/{lang}.json";
 }
-
-
-
-
 
 public sealed class KuroBackgroundInfo
 {
     [JsonPropertyName("functionSwitch")]
     public int FunctionSwitch { get; set; }
 
-    
     [JsonPropertyName("backgroundFile")]
     public string? BackgroundFile { get; set; }
 
-    
     [JsonPropertyName("backgroundFileType")]
     public int BackgroundFileType { get; set; }
 
-    
     [JsonPropertyName("firstFrameImage")]
     public string? FirstFrameImage { get; set; }
 
-    
     [JsonPropertyName("slogan")]
     public string? Slogan { get; set; }
 
-    
     [JsonIgnore]
     public string? BackgroundId { get; set; }
 
-    
     [JsonIgnore]
     public bool IsVideo => BackgroundFileType == 2;
 
-    
     [JsonIgnore]
     public string? Identity => BackgroundFile;
 }
 
-
-
-
-
-
-
-
-
-
 public static class KuroLauncherBackgroundClient
 {
-    
+
     public const string Language = "zh-Hans";
 
-    
     public static readonly string[] Hosts =
     {
         "https://prod-cn-alicdn-gamestarter.kurogame.com",
@@ -92,10 +64,6 @@ public static class KuroLauncherBackgroundClient
 
     private static readonly HttpClient Http = SharedHttp.LauncherBackground;
 
-    
-    
-    
-    
     public static KuroLauncherApp? GetApp(GameBiz biz)
     {
         return biz switch
@@ -106,16 +74,9 @@ public static class KuroLauncherBackgroundClient
         };
     }
 
-    
-    
-    
-    
-    
-    
     public static KuroLauncherApp? GetSourceApp(GameBiz biz)
         => GetApp(biz) ?? GetApp(GetSourceBiz(biz));
 
-    
     public static GameBiz GetSourceBiz(GameBiz biz)
     {
         if (GetApp(biz) is not null)
@@ -134,15 +95,8 @@ public static class KuroLauncherBackgroundClient
         };
     }
 
-    
-    
-    
-    
-    
     public static bool CanFetch(GameBiz biz) => GetSourceApp(biz) is not null;
 
-
-    
     public static async Task<KuroBackgroundInfo?> GetBackgroundAsync(GameBiz biz, CancellationToken ct = default)
     {
         var app = GetSourceApp(biz);
@@ -195,8 +149,6 @@ public static class KuroLauncherBackgroundClient
         return null;
     }
 
-
-    
     public static async Task<long> DownloadAsync(string url, string destPath, IProgress<double>? progress, CancellationToken ct)
     {
         string? dir = Path.GetDirectoryName(destPath);
@@ -233,8 +185,6 @@ public static class KuroLauncherBackgroundClient
         return new FileInfo(destPath).Length;
     }
 
-
-    
     public static async Task<bool> TryDownloadAsync(string? url, string destPath, CancellationToken ct)
     {
         if (url is not { Length: > 0 })

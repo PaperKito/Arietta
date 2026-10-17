@@ -16,91 +16,45 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher;
 
-
-
-
-
-
-
-
-
-
 public sealed class KrSdkAccount
 {
-    
+
     [JsonPropertyName("cuid")]
     public string Cuid { get; set; } = "";
 
-    
     [JsonPropertyName("token")]
     public string Token { get; set; } = "";
 
-    
-    
-    
-    
-    
     [JsonPropertyName("id")]
     public double Id { get; set; }
 
-    
     [JsonIgnore]
     public string? Nickname { get; set; }
 
-    
     [JsonIgnore]
     public string? RoleId { get; set; }
 
-    
     [JsonIgnore]
     public string? RoleName { get; set; }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     [JsonIgnore]
     public bool? HasRole { get; set; }
 
-    
     [JsonIgnore]
     public int Level { get; set; }
 
-    
     [JsonIgnore]
     public string? ServerName { get; set; }
 
-    
-    
-    
-    
     [JsonIgnore]
     public string DisplayName => string.IsNullOrWhiteSpace(Nickname) ? (RoleName ?? "") : Nickname!;
 
-    
-    
-    
-    
     [JsonIgnore]
     public string DisplayUid => RoleId ?? "";
 
-    
-    
-    
-    
     [JsonIgnore]
     public string UidSeparator => DisplayUid.Length == 0 ? "" : "  ";
 }
-
-
-
-
 
 internal sealed class KrSdkUserCacheData
 {
@@ -110,11 +64,6 @@ internal sealed class KrSdkUserCacheData
     [JsonPropertyName("last_login_cuid")]
     public string? LastLoginCuid { get; set; }
 }
-
-
-
-
-
 
 internal sealed class KrSdkLauncherUser
 {
@@ -127,46 +76,26 @@ internal sealed class KrSdkLauncherUser
     [JsonPropertyName("oauthCode")]
     public string OauthCode { get; set; } = "";
 
-    
     [JsonIgnore]
     public string DecodedOauthCode => new string(OauthCode.Select(c => (char)(c ^ 5)).ToArray());
 }
 
-
-
-
-
 public sealed record KrSdkRoleInfo(string ServerName, string RoleId, string RoleName, int Level);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 public sealed class KuroSdkBriefing
 {
-    
+
     public bool IsPgr { get; init; }
 
     public string RoleName { get; init; } = "";
 
     public int Level { get; init; }
 
-    
     public int Energy { get; init; }
     public int MaxEnergy { get; init; }
     public int StoreEnergy { get; init; }
     public int MaxStoreEnergy { get; init; }
 
-    
     public long EnergyRecoverMs { get; init; }
 
     public int Liveness { get; init; }
@@ -177,11 +106,9 @@ public sealed class KuroSdkBriefing
     public int BattlePassWeekMaxExp { get; init; }
     public bool BattlePassOpen { get; init; }
 
-    
     public int ActionPoint { get; init; }
     public int ActionPointTotal { get; init; }
 
-    
     public long ActionPointFullSeconds { get; init; }
 
     public int Activeness { get; init; }
@@ -193,15 +120,13 @@ public sealed class KuroSdkBriefing
     public int ArenaRewardTotal { get; init; }
     public bool ArenaUnlocked { get; init; }
 
-
-    
     public static KuroSdkBriefing? Parse(JsonElement root)
     {
         if (root.ValueKind != JsonValueKind.Object)
         {
             return null;
         }
-        
+
         if (root.TryGetProperty("Base", out var b) && b.ValueKind == JsonValueKind.Object)
         {
             root.TryGetProperty("BattlePass", out var bp);
@@ -264,21 +189,6 @@ public sealed class KuroSdkBriefing
            && v.ValueKind == JsonValueKind.True;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 public static class KrSdkAccountService
 {
     private const byte XorKey = 9;
@@ -288,13 +198,8 @@ public static class KrSdkAccountService
         PropertyNameCaseInsensitive = true,
     };
 
-    
     private static readonly Dictionary<GameBiz, string?> _cachePaths = [];
 
-    
-    
-    
-    
     private static readonly GameBiz[] LauncherBizOrder =
     {
         GameBiz.PunishingGrayRaven,
@@ -307,17 +212,6 @@ public static class KrSdkAccountService
         GameBiz.WutheringWavesBilibili,
     };
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static (string Folder, string PkgId, string ApiBase) GetSdkProfile(GameBiz biz) => biz switch
     {
         GameBiz.WutheringWaves => ("KR_G152", "A1381", "https://pc-launcher-sdk-api.kurogame.com"),
@@ -326,48 +220,18 @@ public static class KrSdkAccountService
         GameBiz.PunishingGrayRaven or GameBiz.PunishingGrayRavenGlobal or GameBiz.PunishingGrayRavenKorea
             or GameBiz.PunishingGrayRavenJapan or GameBiz.PunishingGrayRavenTaiwan
                 => ("KR_G148", "A1393", "https://pc-launcher-sdk-haru-api.kurogames.com"),
-        
+
         _ => throw new ArgumentOutOfRangeException(nameof(biz), biz, "未知的游戏服区，没有对应的 SDK 缓存配置"),
     };
 
-    
-    
-    
-    
-    
     private static bool HasSdkCache(GameBiz biz) => !biz.IsPunishingGrayRaven()
         || biz == GameBiz.PunishingGrayRaven;
 
-    
-    
-    
     public static string GetApiBase(GameBiz biz) => GetSdkProfile(biz).ApiBase;
 
-
-    
-    
-    
-    
-    
-    
-    
-    
     public static string? GetOauthCode(GameBiz biz, KrSdkAccount? account)
         => GetOauthCode(biz, account?.Cuid);
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static string? GetOauthCode(GameBiz biz, string? cuid)
     {
         if (string.IsNullOrEmpty(cuid))
@@ -401,8 +265,6 @@ public static class KrSdkAccountService
         return string.IsNullOrEmpty(code) ? null : code;
     }
 
-
-    
     public static KrSdkAccount? GetCurrentAccount(GameBiz biz)
     {
         var data = Load(biz);
@@ -410,28 +272,10 @@ public static class KrSdkAccountService
                ?? data?.AccountList?.FirstOrDefault();
     }
 
-
-    
     public static string? GetCurrentCuid(GameBiz biz) => Load(biz)?.LastLoginCuid;
 
-
-    
     public static List<KrSdkAccount> GetAccounts(GameBiz biz) => Load(biz)?.AccountList ?? [];
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static void SwitchTo(GameBiz biz, string cuid)
     {
         string path = GetCacheFilePath(biz)
@@ -446,7 +290,7 @@ public static class KrSdkAccountService
         }
         catch (Exception ex)
         {
-            
+
             throw new InvalidOperationException(Localization.Lang.Instance.KrSdk_ErrParseFailed, ex);
         }
 
@@ -463,10 +307,8 @@ public static class KrSdkAccountService
             return;
         }
 
-        
         BackupOnce(path, encrypted);
 
-        
         string? patched = TryPatchLastLoginCuid(original, cuid);
         if (patched is not null)
         {
@@ -474,12 +316,11 @@ public static class KrSdkAccountService
         }
         else
         {
-            
+
             root["last_login_cuid"] = cuid;
             File.WriteAllBytes(path, Xor(SerializeCache(root), XorKey));
         }
 
-        
         if (!Verify(path, cuid, list.Count))
         {
             Restore(path);
@@ -487,12 +328,6 @@ public static class KrSdkAccountService
         }
     }
 
-
-    
-    
-    
-    
-    
     private static string? TryPatchLastLoginCuid(string json, string cuid)
     {
         if (cuid.Length == 0 || cuid.IndexOfAny(['"', '\\']) >= 0)
@@ -524,16 +359,9 @@ public static class KrSdkAccountService
         return $"{json[..start]}\"{cuid}\"{json[(i + 1)..]}";
     }
 
-
-    
     private static JsonNode? ParseCache(byte[] encrypted)
         => JsonNode.Parse(Encoding.UTF8.GetString(Xor(encrypted, XorKey)));
 
-
-    
-    
-    
-    
     private static byte[] SerializeCache(JsonNode root)
         => JsonSerializer.SerializeToUtf8Bytes(root, CacheWriteOptions);
 
@@ -544,18 +372,6 @@ public static class KrSdkAccountService
         WriteIndented = false,
     };
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private static void BackupOnce(string path, byte[] original)
     {
         try
@@ -580,12 +396,10 @@ public static class KrSdkAccountService
         }
         catch
         {
-            
+
         }
     }
 
-
-    
     private static void Restore(string path)
     {
         try
@@ -598,12 +412,10 @@ public static class KrSdkAccountService
         }
         catch
         {
-            
+
         }
     }
 
-
-    
     private static bool Verify(string path, string cuid, int accountCount)
     {
         try
@@ -618,29 +430,6 @@ public static class KrSdkAccountService
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static async Task<bool> RefreshAccountInfosAsync(GameBiz biz, IReadOnlyList<KrSdkAccount> accounts, string? recentUid)
     {
         if (!HasSdkCache(biz))
@@ -654,7 +443,7 @@ public static class KrSdkAccountService
         foreach (var acc in accounts)
         {
             var stored = KrSdkAccountStore.Get(biz, acc.Cuid);
-            
+
             bool stale = stored is null || stored.HasRole is null
                 || DateTimeOffset.UtcNow - stored.QueryTime > TimeSpan.FromHours(24);
             bool forced = acc.Cuid == currentCuid
@@ -667,7 +456,7 @@ public static class KrSdkAccountService
             string? code = GetOauthCode(biz, acc.Cuid);
             if (string.IsNullOrEmpty(code))
             {
-                
+
                 noCode++;
                 continue;
             }
@@ -683,21 +472,19 @@ public static class KrSdkAccountService
                     changed = true;
                     break;
                 default:
-                    
+
                     break;
             }
         }
         if (accounts.Count > 0 && noCode == accounts.Count)
         {
-            
+
             AppConfig.GetLogger<RefreshTag>().LogInformation(
                 "判定角色信息跳过：{Biz} 下没有任何账号能取到 oauthCode（官方启动器缓存缺失）", biz);
         }
         return changed;
     }
 
-
-    
     private static List<KrSdkLauncherUser> GetLauncherUsers(GameBiz biz)
     {
         string? folder = FindCacheFolder(biz);
@@ -720,11 +507,6 @@ public static class KrSdkAccountService
         }
     }
 
-
-    
-    
-    
-    
     public static string? GetRecentlyLoginUid(GameBiz biz)
     {
         string? db = FindLocalStorageDb(biz);
@@ -742,8 +524,6 @@ public static class KrSdkAccountService
         }
     }
 
-
-    
     private static string? FindLocalStorageDb(GameBiz biz)
     {
         string? exe = GameRegistry.GetConfiguredExePath(biz);
@@ -760,11 +540,6 @@ public static class KrSdkAccountService
         return File.Exists(db) ? db : null;
     }
 
-
-    
-    
-    
-    
     private static string? ReadLocalStorageValue(string dbPath, string key)
     {
         try
@@ -798,8 +573,6 @@ public static class KrSdkAccountService
         }
     }
 
-
-    
     private static KrSdkUserCacheData? Load(GameBiz biz)
     {
         string? path = GetCacheFilePath(biz);
@@ -819,8 +592,6 @@ public static class KrSdkAccountService
         }
     }
 
-
-    
     private static string? GetCacheFilePath(GameBiz biz)
     {
         lock (_cachePaths)
@@ -829,7 +600,7 @@ public static class KrSdkAccountService
             {
                 return File.Exists(cached) ? cached : null;
             }
-            
+
             string? found = FindCacheFile(biz);
             if (found is not null)
             {
@@ -839,14 +610,6 @@ public static class KrSdkAccountService
         }
     }
 
-
-    
-    
-    
-    
-    
-    
-    
     private static string? FindCacheFile(GameBiz biz)
     {
         if (!HasSdkCache(biz))
@@ -859,8 +622,6 @@ public static class KrSdkAccountService
         return File.Exists(exact) ? exact : null;
     }
 
-
-    
     private static string? FindCacheFolder(GameBiz biz)
     {
         string? path = GetCacheFilePath(biz);
@@ -881,39 +642,17 @@ public static class KrSdkAccountService
     private sealed class RefreshTag;
 }
 
-
-
-
-
-
-
-
-
-
 public enum KuroSdkRoleState
 {
-    
+
     Unknown,
 
-    
     HasRole,
 
-    
     NoRole,
 }
 
-
-
 public sealed record KuroSdkRoleProbe(KuroSdkRoleState State, KrSdkRoleInfo? Role);
-
-
-
-
-
-
-
-
-
 
 public static class KuroSdkPlayerClient
 {
@@ -923,13 +662,8 @@ public static class KuroSdkPlayerClient
 
     private sealed class LogTag;
 
-    
     private const int MaxAttempts = 6;
 
-    
-    
-    
-    
     private static async Task<T?> RetryAsync<T>(Func<Task<T?>> attempt)
     {
         for (int i = 0; i < MaxAttempts; i++)
@@ -947,25 +681,12 @@ public static class KuroSdkPlayerClient
             }
             catch
             {
-                
+
             }
         }
         return default;
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static async Task<KuroSdkRoleProbe> ProbeRoleAsync(string apiBase, string oauthCode)
     {
         var probe = await RetryAsync(async () =>
@@ -981,8 +702,6 @@ public static class KuroSdkPlayerClient
         return probe;
     }
 
-
-    
     private static async Task<KuroSdkRoleProbe> ProbeOnceAsync(string apiBase, string oauthCode)
     {
         string url = $"{apiBase}/game/queryPlayerInfo?_t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
@@ -994,20 +713,16 @@ public static class KuroSdkPlayerClient
         var root = doc.RootElement;
         int code = root.TryGetProperty("code", out var codeEl) && codeEl.TryGetInt32(out int c) ? c : -1;
 
-        
         if (code == 1005)
         {
             return new KuroSdkRoleProbe(KuroSdkRoleState.Unknown, null);
         }
-        
-        
-        
+
         if (code == 1003)
         {
             return new KuroSdkRoleProbe(KuroSdkRoleState.NoRole, null);
         }
-        
-        
+
         if (code != 0 || !root.TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Object)
         {
             return new KuroSdkRoleProbe(KuroSdkRoleState.Unknown, null);
@@ -1017,7 +732,7 @@ public static class KuroSdkPlayerClient
         foreach (var server in data.EnumerateObject())
         {
             anyServer = true;
-            
+
             if (server.Value.ValueKind != JsonValueKind.String || server.Value.GetString() is not { Length: > 0 } inner)
             {
                 continue;
@@ -1025,7 +740,7 @@ public static class KuroSdkPlayerClient
             try
             {
                 using var item = JsonDocument.Parse(inner);
-                
+
                 string? roleId = TryGetString(item.RootElement, "roleId") ?? TryGetString(item.RootElement, "playerId");
                 string? roleName = TryGetString(item.RootElement, "roleName") ?? TryGetString(item.RootElement, "playerName") ?? "";
                 int level = TryGetInt(item.RootElement, "level") ?? TryGetInt(item.RootElement, "playerLevel") ?? 0;
@@ -1037,27 +752,13 @@ public static class KuroSdkPlayerClient
             }
             catch
             {
-                
+
             }
         }
-        
+
         return new KuroSdkRoleProbe(anyServer ? KuroSdkRoleState.Unknown : KuroSdkRoleState.NoRole, null);
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     public static async Task<KuroSdkBriefing?> QueryBriefingAsync(string apiBase, string oauthCode, string playerId, string region)
     {
         if (string.IsNullOrEmpty(oauthCode) || string.IsNullOrEmpty(playerId) || string.IsNullOrEmpty(region))
@@ -1099,7 +800,7 @@ public static class KuroSdkPlayerClient
         }
         if (string.IsNullOrEmpty(inner))
         {
-            
+
             foreach (var fallback in data.EnumerateObject())
             {
                 if (fallback.Value.ValueKind == JsonValueKind.String && fallback.Value.GetString() is { Length: > 0 } alt)
@@ -1123,8 +824,7 @@ public static class KuroSdkPlayerClient
             ? v.ValueKind switch
             {
                 JsonValueKind.String => v.GetString(),
-                
-                
+
                 JsonValueKind.Number => v.GetRawText(),
                 _ => null,
             }
@@ -1134,16 +834,6 @@ public static class KuroSdkPlayerClient
     private static int? TryGetInt(JsonElement element, string name)
         => element.TryGetProperty(name, out var v) && v.TryGetInt32(out int i) ? i : null;
 }
-
-
-
-
-
-
-
-
-
-
 
 public static class KrSdkAccountStore
 {
@@ -1156,10 +846,7 @@ public static class KrSdkAccountStore
 
     public sealed class KrSdkAccountInfo
     {
-        
-        
-        
-        
+
         public bool? HasRole { get; set; }
 
         public string? Nickname { get; set; }
@@ -1168,24 +855,17 @@ public static class KrSdkAccountStore
         public int Level { get; set; }
         public string? ServerName { get; set; }
 
-        
         public DateTimeOffset QueryTime { get; set; }
     }
 
-
-    
     private static string MakeKey(GameBiz biz, string cuid) => $"{(int)biz}|{cuid}";
 
-
-    
     public static KrSdkAccountInfo? Get(GameBiz biz, string cuid)
     {
         EnsureLoaded();
         return _infos.GetValueOrDefault(MakeKey(biz, cuid));
     }
 
-
-    
     public static void ApplyTo(GameBiz biz, KrSdkAccount account)
     {
         var info = Get(biz, account.Cuid);
@@ -1224,11 +904,6 @@ public static class KrSdkAccountStore
         Save();
     }
 
-
-    
-    
-    
-    
     public static void SetNoRole(GameBiz biz, string cuid)
     {
         EnsureLoaded();
@@ -1242,8 +917,6 @@ public static class KrSdkAccountStore
         Save();
     }
 
-
-    
     public static void Remove(GameBiz biz, string cuid)
     {
         EnsureLoaded();
@@ -1281,7 +954,7 @@ public static class KrSdkAccountStore
                 var migrated = new Dictionary<string, KrSdkAccountInfo>();
                 foreach (var (key, value) in raw)
                 {
-                    
+
                     string newKey = key.Contains('|') ? key : MakeKey(GameBiz.WutheringWaves, key);
                     migrated.TryAdd(newKey, value);
                 }

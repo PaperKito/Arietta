@@ -6,10 +6,6 @@ using System.Globalization;
 
 namespace Arietta.Features.Database;
 
-
-
-
-
 internal static class DapperSqlMapper
 {
     public sealed class GameBizHandler : SqlMapper.TypeHandler<GameBiz>

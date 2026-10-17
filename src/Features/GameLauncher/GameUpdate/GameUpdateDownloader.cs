@@ -14,17 +14,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Arietta.Features.GameLauncher.GameUpdate;
 
-
 public enum DownloadPhase
 {
     Downloading,
     Applying,
-    
+
     Patching,
-    
+
     Verifying,
 }
-
 
 public sealed class GameDownloadProgress
 {
@@ -34,7 +32,6 @@ public sealed class GameDownloadProgress
 
     public long TotalBytes { get; init; }
 
-    
     public long SpeedBytesPerSec { get; init; }
 
     public string? CurrentFile { get; init; }
@@ -44,64 +41,30 @@ public sealed class GameDownloadProgress
     public int TotalFiles { get; init; }
 }
 
-
-
-
-
 public sealed class GameUpdateDownloader
 {
-    
-    
-    
-    
-    
-    
+
     private readonly int _parallelism = GameUpdateService.DownloadThreads;
 
-    
     private const long SegmentThreshold = 64L << 20;
 
-    
-    
-    
-    
-    
     private readonly int _maxSegments = GameUpdateService.DownloadThreads <= 1 ? 1 : 4;
 
-    
     private const long MinSegmentSize = 16L << 20;
 
-    
     private const long SegmentFlushBytes = 4L << 20;
 
     private const string TempSuffix = ".part";
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private readonly SemaphoreSlim _diskWriteGate = new(1, 1);
 
-    
     private const int MaxAttempts = 3;
 
-    
-    
-    
-    
-    
-    
-    
     private static readonly TimeSpan ReadStallTimeout = TimeSpan.FromSeconds(60);
 
     private readonly string _cdn;
     private readonly string _baseUrl;
-    
+
     private readonly string? _fallbackBaseUrl;
     private readonly string _destDir;
     private readonly List<GameResourceEntry> _files;
@@ -110,26 +73,10 @@ public sealed class GameUpdateDownloader
     private static readonly ILogger _logger =
         AppConfig.GetLogger<GameUpdateDownloader>();
 
-    
-    
-    
-    
-    
-    
-    
     private long _received;
 
-    
     private long _newBytes;
 
-    
-    
-    
-    
-    
-    
-    
-    
     public GameUpdateDownloader(
         string cdn, string baseUrl, string destDir, List<GameResourceEntry> files,
         long receivedBase = 0, long totalOverride = 0, string? fallbackBaseUrl = null)
@@ -143,10 +90,6 @@ public sealed class GameUpdateDownloader
         _received = receivedBase + files.Sum(PartBytes);
     }
 
-    
-    
-    
-    
     private long PartBytes(GameResourceEntry file)
     {
         try
@@ -165,9 +108,6 @@ public sealed class GameUpdateDownloader
         }
     }
 
-    
-    
-    
     public async Task<long> DownloadAsync(IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
         Directory.CreateDirectory(_destDir);
@@ -200,8 +140,6 @@ public sealed class GameUpdateDownloader
             });
         }
 
-        
-        
         using var reporterCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         var reporter = Task.Run(async () =>
         {
@@ -213,18 +151,16 @@ public sealed class GameUpdateDownloader
                     await Task.Delay(200, reporterCts.Token);
                 }
             }
-            catch (OperationCanceledException) {  }
+            catch (OperationCanceledException) { }
         }, CancellationToken.None);
 
         using var limiter = new SemaphoreSlim(_parallelism);
-        
+
         var speedLimit = new SpeedLimiter();
-        
+
         var tasks = _files.OrderByDescending(f => f.Size).Select(file => Task.Run(async () =>
         {
-            
-            
-            
+
             bool segmented = file.Size >= SegmentThreshold;
             for (int attempt = 1; ; attempt++)
             {
@@ -246,7 +182,7 @@ public sealed class GameUpdateDownloader
                 }
                 catch (RangeUnsupportedException ex) when (segmented)
                 {
-                    
+
                     Interlocked.Add(ref _received, -DeleteSegmentState(file));
                     segmented = false;
                     _logger.LogWarning(ex, "{Dest} 服务器不支持 Range，改回单流下载", file.Dest);
@@ -267,10 +203,6 @@ public sealed class GameUpdateDownloader
         return Interlocked.Read(ref _newBytes);
     }
 
-    
-    
-    
-    
     private async Task WriteGatedAsync(Func<ValueTask> write, CancellationTokenSource stallCts, CancellationToken ct)
     {
         await _diskWriteGate.WaitAsync(ct);
@@ -285,19 +217,12 @@ public sealed class GameUpdateDownloader
         }
     }
 
-    
-    
-    
-    
     private async Task DownloadWholeAsync(GameResourceEntry file, SemaphoreSlim limiter, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
     {
         string dest = Path.Combine(_destDir, file.Dest);
         string temp = dest + TempSuffix;
         Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
 
-        
-        
-        
         if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5, ct))
         {
             return;
@@ -308,7 +233,6 @@ public sealed class GameUpdateDownloader
         {
             long existing = File.Exists(temp) ? new FileInfo(temp).Length : 0;
 
-            
             string baseUrl = file.FromFolder ?? _fallbackBaseUrl ?? _baseUrl;
             string url = GameUpdateService.BuildFileUrl(_cdn, baseUrl, file.Dest);
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -317,8 +241,6 @@ public sealed class GameUpdateDownloader
                 request.Headers.Range = new RangeHeaderValue(existing, null);
             }
 
-            
-            
             using var stallCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
             stallCts.CancelAfter(ReadStallTimeout);
             HttpResponseMessage resp;
@@ -336,7 +258,7 @@ public sealed class GameUpdateDownloader
                 bool resuming = existing > 0 && resp.StatusCode == HttpStatusCode.PartialContent;
                 if (!resuming && File.Exists(temp))
                 {
-                    
+
                     File.Delete(temp);
                     Interlocked.Add(ref _received, -existing);
                     existing = 0;
@@ -367,14 +289,13 @@ public sealed class GameUpdateDownloader
                     }
                 }
 
-            
             if (new FileInfo(temp).Length != file.Size)
             {
                 throw new InvalidDataException($"下载大小不符：{file.Dest}（期望 {file.Size}，实际 {new FileInfo(temp).Length}）");
             }
             if (file.Md5 is not null && !VerifyMd5(temp, file.Md5, ct))
             {
-                
+
                 long bad = new FileInfo(temp).Length;
                 File.Delete(temp);
                 Interlocked.Add(ref _received, -bad);
@@ -394,15 +315,6 @@ public sealed class GameUpdateDownloader
         }
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private async Task DownloadSegmentedAsync(GameResourceEntry file, SemaphoreSlim limiter, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
     {
         string dest = Path.Combine(_destDir, file.Dest);
@@ -412,7 +324,7 @@ public sealed class GameUpdateDownloader
 
         if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5, ct))
         {
-            try { File.Delete(sidecar); } catch {  }
+            try { File.Delete(sidecar); } catch { }
             return;
         }
 
@@ -421,11 +333,10 @@ public sealed class GameUpdateDownloader
         long[]? loaded = ReadSegmentProgress(sidecar, segCount, file.Size);
         if (loaded == null || !File.Exists(temp) || new FileInfo(temp).Length != file.Size)
         {
-            
-            
+
             Interlocked.Add(ref _received, -(loaded?.Sum() ?? 0));
-            try { File.Delete(temp); } catch {  }
-            try { File.Delete(sidecar); } catch {  }
+            try { File.Delete(temp); } catch { }
+            try { File.Delete(sidecar); } catch { }
             loaded = new long[segCount];
             using (var fs = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -446,7 +357,7 @@ public sealed class GameUpdateDownloader
                 long done = Math.Min(progress[index], to - from);
                 if (done >= to - from)
                 {
-                    return; 
+                    return;
                 }
                 await limiter.WaitAsync(ct);
                 try
@@ -461,7 +372,6 @@ public sealed class GameUpdateDownloader
         }
         await Task.WhenAll(segments);
 
-        
         for (int i = 0; i < segCount; i++)
         {
             long len = i == segCount - 1 ? file.Size - (segCount - 1) * segSize : segSize;
@@ -472,7 +382,7 @@ public sealed class GameUpdateDownloader
         }
         if (file.Md5 is not null && !VerifyMd5(temp, file.Md5, ct))
         {
-            
+
             File.Delete(temp);
             File.Delete(sidecar);
             Interlocked.Add(ref _received, -file.Size);
@@ -487,7 +397,6 @@ public sealed class GameUpdateDownloader
         File.Move(temp, dest);
     }
 
-    
     private async Task DownloadRangeAsync(GameResourceEntry file, string temp, string sidecar, int segIndex,
         long from, long to, long[] progress, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
     {
@@ -511,11 +420,11 @@ public sealed class GameUpdateDownloader
         {
             if (resp.StatusCode != HttpStatusCode.PartialContent)
             {
-                
+
                 throw new RangeUnsupportedException($"服务器不认 Range（HTTP {(int)resp.StatusCode}）：{file.Dest}");
             }
             await using var source = await resp.Content.ReadAsStreamAsync(ct);
-            
+
             await using var output = new FileStream(temp, FileMode.Open, FileAccess.Write, FileShare.ReadWrite, 1 << 16);
             output.Seek(from, SeekOrigin.Begin);
 
@@ -531,7 +440,7 @@ public sealed class GameUpdateDownloader
                     Interlocked.Add(ref _received, read);
                     Interlocked.Add(ref _newBytes, read);
                     speedMeter.Add(read);
-                    progress[segIndex] += read; 
+                    progress[segIndex] += read;
                     pending += read;
                     if (pending >= SegmentFlushBytes)
                     {
@@ -549,7 +458,6 @@ public sealed class GameUpdateDownloader
         }
     }
 
-    
     private int SegmentCount(long size)
     {
         return size >= SegmentThreshold && _maxSegments >= 2
@@ -557,10 +465,6 @@ public sealed class GameUpdateDownloader
             : 1;
     }
 
-    
-    
-    
-    
     private static long[]? ReadSegmentProgress(string sidecar, int segCount, long fileSize)
     {
         try
@@ -594,7 +498,6 @@ public sealed class GameUpdateDownloader
         }
     }
 
-    
     private static void WriteSegmentProgress(string sidecar, long[] progress)
     {
         try
@@ -615,27 +518,21 @@ public sealed class GameUpdateDownloader
         }
     }
 
-    
     private long DeleteSegmentState(GameResourceEntry file)
     {
         string temp = Path.Combine(_destDir, file.Dest) + TempSuffix;
         string sidecar = temp + ".s";
         long sum = ReadSegmentProgress(sidecar, SegmentCount(file.Size), file.Size)?.Sum() ?? 0;
-        try { File.Delete(temp); } catch {  }
-        try { File.Delete(sidecar); } catch {  }
+        try { File.Delete(temp); } catch { }
+        try { File.Delete(sidecar); } catch { }
         return sum;
     }
 
-    
     private sealed class RangeUnsupportedException : IOException
     {
         public RangeUnsupportedException(string message) : base(message) { }
     }
 
-    
-    
-    
-    
     public static bool VerifyMd5(string path, string? expectedMd5, CancellationToken ct = default)
     {
         if (expectedMd5 is null)
@@ -668,7 +565,6 @@ public sealed class GameUpdateDownloader
         }
     }
 
-    
     public static bool FileLengthMatches(string path, long expectedSize)
     {
         if (expectedSize <= 0)
@@ -685,13 +581,6 @@ public sealed class GameUpdateDownloader
         }
     }
 
-
-    
-    
-    
-    
-    
-    
     internal sealed class SpeedLimiter
     {
         private long _tokens;
@@ -728,8 +617,6 @@ public sealed class GameUpdateDownloader
         }
     }
 
-
-    
     private sealed class SpeedMeter
     {
         private readonly Stopwatch _clock = Stopwatch.StartNew();
@@ -743,7 +630,7 @@ public sealed class GameUpdateDownloader
             {
                 lock (_gate)
                 {
-                    
+
                     if (_clock.ElapsedMilliseconds > 3000)
                     {
                         _speed = 0;

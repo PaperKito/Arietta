@@ -35,8 +35,6 @@ public sealed partial class ScreenshotPage : PageBase
         await ReloadAsync();
     }
 
-
-    
     private async Task ReloadAsync()
     {
         try
@@ -75,15 +73,13 @@ public sealed partial class ScreenshotPage : PageBase
         }
     }
 
-
-    
     private void GridView_Images_ItemClick(object sender, ItemClickEventArgs e)
     {
         try
         {
             if (ToggleButton_MultiSelect.IsChecked == true)
             {
-                return;   
+                return;
             }
             if (e.ClickedItem is ScreenshotItem item)
             {
@@ -162,8 +158,6 @@ public sealed partial class ScreenshotPage : PageBase
         }
     }
 
-
-    
     private async void Button_DeleteSelected_Click(object sender, RoutedEventArgs e)
     {
         var files = new List<string>();

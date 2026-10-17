@@ -1,16 +1,18 @@
-第三方组件声明
-==============
+Third-Party Notices
+===================
 
 Assets\Hpatchz\hpatchz.exe
 --------------------------
-* 项目：HDiffPatch（https://github.com/sisong/HDiffPatch）
-* 版本：v4.8.0（HDiffPatch::hpatchz，MIT License，Copyright (c) 2020-2023 HouSisong）
-* 构建来源：海墟 WutheringWavesTool（https://github.com/BlameTwo/WutheringWavesTool，MIT License，Copyright (c) 2026 Blame）
-  附带的对官方 v4.8.0 的少量修改构建。★ 必须用该构建：库洛的 .krpdiff 在 DirHDiff 头里写了
-  privateReservedData（私有数据段），官方原版构建会因
-  "privateReservedDataSize 校验失败" 拒收（v4.8.0 / v5.1.3 官方二进制均实测 109 退出），
-  该构建放行此字段，实测可正确应用鸣潮 3.6.1→3.7.0 的全部 38 个组补丁（2026-09-29 实测）。
-* 许可：MIT License（HDiffPatch 与海墟构建均为 MIT），随本项目分发需保留本声明。
+* Project: HDiffPatch (https://github.com/sisong/HDiffPatch)
+* Version: v4.8.0 (HDiffPatch::hpatchz, MIT License, Copyright (c) 2020-2023 HouSisong)
+* Build source: WutheringWavesTool (https://github.com/BlameTwo/WutheringWavesTool, MIT License, Copyright (c) 2026 Blame)
+  This is a lightly modified build shipped with that project, and it is REQUIRED: Kuro's .krpdiff
+  writes privateReservedData (a private data section) into the DirHDiff header, which the official
+  builds reject with "privateReservedDataSize check failed" (official v4.8.0 and v5.1.3 binaries both
+  exit 109 in our tests). This build accepts the field — verified by applying all 38 group patches of
+  Wuthering Waves 3.6.1 -> 3.7.0 (tested 2026-09-29). Do not swap in an official build.
+* License: MIT License (both HDiffPatch and the WutheringWavesTool build), this notice must be
+  preserved when redistributing.
 
 MIT License
 

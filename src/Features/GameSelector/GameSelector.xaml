@@ -15,7 +15,6 @@
 
     <Grid>
 
-        
         <Border Name="Border_CurrentGameIcon"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
@@ -36,18 +35,18 @@
                     Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
                     ToolTipService.ToolTip="点击此处选择或切换游戏">
                 <Grid>
-                    
+
                     <FontIcon HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               FontSize="20"
                               Glyph="&#xE8A9;"
                               IsTextScaleFactorEnabled="False" />
-                    
+
                     <Grid Visibility="{x:Bind IsPinned, Converter={StaticResource BoolToVisibilityReversedConverter}}">
                         <Image Width="40"
                                Height="40"
                                Source="{x:Bind CurrentGameBizIcon.GameIcon, FallbackValue={x:Null}}" />
-                        
+
                         <Image Width="20"
                                Height="20"
                                HorizontalAlignment="Right"
@@ -59,7 +58,7 @@
                               HorizontalAlignment="Right"
                               VerticalAlignment="Bottom"
                               Visibility="{x:Bind CurrentGameBizIcon.HasServerCode, Converter={StaticResource BoolToVisibilityConverter}}">
-                            
+
                             <TextBlock Margin="0,1,0,0"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
@@ -81,8 +80,6 @@
             </Button>
         </Border>
 
-
-        
         <TeachingTip x:Name="TeachTip_SelectGame"
                      ActionButtonCommand="{x:Bind AutoSearchInstalledGamesCommand}"
                      Background="{ThemeResource CustomOverlayAcrylicBrush}"
@@ -99,9 +96,6 @@
             </TeachingTip.ActionButtonContent>
         </TeachingTip>
 
-
-
-        
         <Border x:Name="Border_FullBackground"
                 Padding="68,80,0,0"
                 Background="#80000000"
@@ -116,7 +110,6 @@
             <ScrollViewer>
                 <StackPanel Margin="0,0,12,12" Spacing="40">
 
-                    
                     <ItemsControl ItemsSource="{x:Bind GameBizDisplays}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -134,12 +127,12 @@
                                       CornerRadius="8"
                                       PointerEntered="Grid_GameBizDisplay_PointerEntered"
                                       Tapped="Grid_GameBizDisplay_Tapped">
-                                    
+
                                     <Border CornerRadius="8">
                                         <Image Name="Grid_GameBizDisplay_Logo"
                                                Source="{x:Bind Logo}" />
                                     </Border>
-                                    
+
                                     <Grid Name="Grid_GameBizDisplay_IconAndName"
                                           Background="#D0000000"
                                           BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
@@ -168,7 +161,7 @@
                                                    Text="{x:Bind lang:Lang.Instance.GameSelector_SelectServer, Mode=OneWay}"
                                                    TextWrapping="Wrap" />
                                     </Grid>
-                                    
+
                                     <Grid.Resources>
                                         <Storyboard x:Key="PointerInStoryboard">
                                             <DoubleAnimation Storyboard.TargetName="Grid_GameBizDisplay_Logo"
@@ -191,7 +184,7 @@
                                                              Duration="0:0:0.167" />
                                         </Storyboard>
                                     </Grid.Resources>
-                                    
+
                                     <mxi:Interaction.Behaviors>
                                         <mxic:EventTriggerBehavior EventName="PointerEntered">
                                             <mxim:ControlStoryboardAction Storyboard="{StaticResource PointerInStoryboard}" />
@@ -200,7 +193,7 @@
                                             <mxim:ControlStoryboardAction Storyboard="{StaticResource PointerOutStoryboard}" />
                                         </mxic:EventTriggerBehavior>
                                     </mxi:Interaction.Behaviors>
-                                    
+
                                     <FlyoutBase.AttachedFlyout>
                                         <Flyout>
                                             <ItemsControl ItemsSource="{x:Bind Servers}">
@@ -218,7 +211,7 @@
                                                                     <ColumnDefinition />
                                                                     <ColumnDefinition Width="Auto" />
                                                                 </Grid.ColumnDefinitions>
-                                                                
+
                                                                 <Border Width="24"
                                                                         Height="24"
                                                                         CornerRadius="4">
@@ -233,12 +226,12 @@
                                                                                    Visibility="{x:Bind HasServerCode, Converter={StaticResource BoolToVisibilityConverter}}" />
                                                                     </Grid>
                                                                 </Border>
-                                                                
+
                                                                 <TextBlock Grid.Column="1"
                                                                            HorizontalAlignment="Left"
                                                                            VerticalAlignment="Center"
                                                                            Text="{x:Bind ServerName}" />
-                                                                
+
                                                                 <Button Name="Button_PinGameBiz"
                                                                         Grid.Column="2"
                                                                         Width="28"
@@ -269,8 +262,6 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-
-                    
                     <Grid HorizontalAlignment="Left"
                           VerticalAlignment="Top"
                           Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
@@ -285,7 +276,7 @@
                                 <Thickness x:Key="ExpanderHeaderBorderThickness">0,0,0,1</Thickness>
                                 <Thickness x:Key="ExpanderContentDownBorderThickness">0</Thickness>
                             </Expander.Resources>
-                            
+
                             <Expander.Header>
                                 <Grid ColumnSpacing="12">
                                     <Grid.ColumnDefinitions>
@@ -311,7 +302,7 @@
                                                       HorizontalAlignment="Left"
                                                       IsIndeterminate="True" />
                                     </StackPanel>
-                                    
+
                                     <StackPanel Grid.Column="2"
                                                 Orientation="Horizontal"
                                                 Spacing="8">
@@ -326,7 +317,7 @@
                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                       Glyph="&#xE72C;" />
                                         </Button>
-                                        
+
                                         <Button x:Name="Button_AutoSearch"
                                                 Grid.Column="2"
                                                 Width="32"
@@ -351,17 +342,17 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="local:GameBizIcon">
                                         <StackPanel Orientation="Horizontal" Spacing="12">
-                                            
+
                                             <Border Width="36"
                                                     Height="36"
                                                     CornerRadius="8">
                                                 <Image Source="{x:Bind GameIcon, FallbackValue={x:Null}}" />
                                             </Border>
-                                            
+
                                             <TextBlock MinWidth="160"
                                                        VerticalAlignment="Center"
                                                        Text="{x:Bind GameName}" />
-                                            
+
                                             <Border Width="24"
                                                     Height="24"
                                                     HorizontalAlignment="Center"
@@ -378,7 +369,7 @@
                                                                Visibility="{x:Bind HasServerCode, Converter={StaticResource BoolToVisibilityConverter}}" />
                                                 </Grid>
                                             </Border>
-                                            
+
                                             <TextBlock MinWidth="100"
                                                        VerticalAlignment="Center"
                                                        Text="{x:Bind ServerName}" />
@@ -402,9 +393,6 @@
 
         </Border>
 
-
-
-        
         <Grid x:Name="Grid_GameIconsArea"
               Height="60"
               Margin="56,0,0,0"
@@ -428,7 +416,6 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            
             <ListView AllowDrop="True"
                       CanReorderItems="True"
                       ItemsSource="{x:Bind GameBizIcons}"
@@ -439,7 +426,7 @@
                         <ItemsStackPanel Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
-                
+
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
@@ -448,7 +435,7 @@
                         <Setter Property="Foreground" Value="{ThemeResource ListViewItemForeground}" />
                         <Setter Property="TabNavigation" Value="Local" />
                         <Setter Property="IsHoldingEnabled" Value="True" />
-                        
+
                         <Setter Property="Padding" Value="6,8,6,8" />
                         <Setter Property="HorizontalContentAlignment" Value="Center" />
                         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -519,7 +506,7 @@
                             <Image Width="40"
                                    Height="40"
                                    Source="{x:Bind GameIcon}" />
-                            
+
                             <Image Width="20"
                                    Height="20"
                                    HorizontalAlignment="Right"
@@ -531,7 +518,7 @@
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Bottom"
                                   Visibility="{x:Bind HasServerCode, Converter={StaticResource BoolToVisibilityConverter}}">
-                                
+
                                 <TextBlock Margin="0,1,0,0"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
@@ -558,7 +545,6 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            
             <Border Name="Border_Pin"
                     Grid.Column="1"
                     Width="40"
