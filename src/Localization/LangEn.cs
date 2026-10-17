@@ -515,6 +515,13 @@ internal static class LangEn
         ["SettingPage_CurrentVersion"] = "Current version:",
 
         
+        ["SettingPage_About_Links"] = "Links",
+        ["SettingPage_ProjectHomepage"] = "Project Homepage",
+        ["SettingPage_ReportIssue"] = "Report Issue",
+        ["SettingPage_ReleaseHistory"] = "Release History",
+        ["SettingPage_DataAndPrivacy"] = "Data & Privacy",
+
+        
         ["GameSelector_Subtitle"] = "Tap the icon at the top-left to select or switch games",
         ["GameSelector_AutoFind"] = "Auto-detect Installed Games",
         ["GameSelector_SelectServer"] = "Select Server",

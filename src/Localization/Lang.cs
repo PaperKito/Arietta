@@ -685,6 +685,13 @@ public sealed class Lang : INotifyPropertyChanged
     public string SettingPage_About_Copyright => T("Developed by Pizazz-stack. All rights reserved.");
 
     
+    public string SettingPage_About_Links => T("相关链接");
+    public string SettingPage_ProjectHomepage => T("项目主页");
+    public string SettingPage_ReportIssue => T("问题反馈");
+    public string SettingPage_ReleaseHistory => T("更新历史");
+    public string SettingPage_DataAndPrivacy => T("数据与隐私");
+
+    
 
     
     public string Common_Exit => T("退出");
