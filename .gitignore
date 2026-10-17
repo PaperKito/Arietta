@@ -1,4 +1,4 @@
-# ---------- 构建产物 ----------
+# ---------- Build output ----------
 bin/
 obj/
 publish/
@@ -9,7 +9,7 @@ publish/
 *.opendb
 *.VC.db
 
-# MSIX / 打包中间物（本项目不打包，但保留规则以防本地试验）
+# MSIX / packaging intermediates (this project is not packaged, rules kept for local experiments)
 AppPackages/
 BundleArtifacts/
 Package.StoreAssociation.xml
@@ -20,7 +20,7 @@ _pkginfo.txt
 *.msix
 *.msixbundle
 
-# ---------- Visual Studio / 编辑器 ----------
+# ---------- Visual Studio / editors ----------
 .vs/
 .vscode/
 .idea/
@@ -34,9 +34,9 @@ _pkginfo.txt
 *.vsp
 *.vspx
 
-# ---------- 运行时数据目录（便携数据，含数据库 / 日志 / 凭据 / 缓存） ----------
-# 发布版：<exe 同级>\Arietta\   调试版：src\Arietta\
-# 内含 Arietta.db、config.ini、log\、gacha\、DynamicBg\、CloudSync\（sync.json 为 DPAPI 加密的同步凭据）
+# ---------- Runtime data folder (portable data: database / logs / credentials / cache) ----------
+# Release: <next to exe>\Arietta\    Debug: src\Arietta\
+# Contains Arietta.db, config.ini, log\, gacha\, DynamicBg\, CloudSync\ (sync.json holds DPAPI-encrypted sync credentials)
 src/Arietta/
 dist/**/Arietta/
 data/
@@ -47,7 +47,7 @@ Arietta/
 *.sqlite
 *.sqlite3
 
-# ---------- 密钥与本地机密 ----------
+# ---------- Keys and local secrets ----------
 *.pfx
 *.publishsettings
 *.key
@@ -58,7 +58,7 @@ secrets.json
 .env.*
 CloudSync/sync.json
 
-# ---------- 日志与临时产物 ----------
+# ---------- Logs and temporary artifacts ----------
 *.log
 *.tlog
 .tmp/
@@ -66,7 +66,7 @@ tmp/
 vid_frames/
 *.xbf
 
-# ---------- 依赖与工具缓存 ----------
+# ---------- Dependencies and tool caches ----------
 node_modules/
 __pycache__/
 tools/**/__pycache__/
@@ -75,7 +75,7 @@ tools/**/__pycache__/
 .nuget/
 packages/
 
-# ---------- 杂项 / 本地参考与外部仓库 ----------
+# ---------- Misc / local references and external repos ----------
 Github/
 .zcode/
 .zcodeignore
@@ -88,15 +88,15 @@ Desktop.ini
 *.swp
 *~
 
-# 注释剥离工具生成目录
+# Output folder of the comment-stripping tool
 dist/NoComments/
 
-# Xbox 专有字体（手柄映射图标用）：不进仓库，随发布包分发。
-# 获取：本机 Starward 安装目录 Assets/Font/XboxFluent2.ttf，或 Xbox Design System 下载。
-# 详见 docs/Gamepad-手柄映射-交接.md 的「图标（XboxFluent2）」一节。
+# Proprietary Xbox font (used by gamepad glyphs): not committed, shipped with the release package.
+# Source: Assets/Font/XboxFluent2.ttf from a local Starward install, or download from the Xbox Design System.
+# See the gamepad mapping handoff note (internal docs, not published).
 src/Assets/Font/XboxFluent2.ttf
 
-# ---- 补充：打包产物与误留编译目录 ----
+# ---- Extra: packaging output and stray build folders ----
 dist/
 src/binx64*/
 tools/.tmp_*
