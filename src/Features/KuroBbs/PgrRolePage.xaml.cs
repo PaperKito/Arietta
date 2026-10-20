@@ -194,7 +194,7 @@ public sealed partial class PgrRolePage : PageBase
         {
             if (!ct.IsCancellationRequested)
             {
-                InAppToast.MainWindow?.Error(ex, Lang.Instance.KuroBbs_PgrRole);
+                KuroBbsUi.HandleException(ex, Lang.Instance.KuroBbs_PgrRole);
             }
         }
         finally

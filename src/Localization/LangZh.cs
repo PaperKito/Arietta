@@ -552,13 +552,14 @@ internal static class LangZh
 
         ["SettingPage_CurrentVersion"] = "当前版本",
 
-        ["SettingPage_About_Copyright"] = "Developed by Pizazz-stack. All rights reserved.",
+        ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
 
         ["SettingPage_About_Links"] = "相关链接",
         ["SettingPage_ProjectHomepage"] = "项目主页",
         ["SettingPage_ReportIssue"] = "问题反馈",
         ["SettingPage_ReleaseHistory"] = "更新历史",
-        ["SettingPage_DataAndPrivacy"] = "数据与隐私",
+
+        ["SettingPage_Donate"] = "赞助开发者",
 
         ["Common_Exit"] = "退出",
 

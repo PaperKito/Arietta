@@ -86,7 +86,7 @@ public sealed partial class SignInPage : PageBase
         }
         catch (Exception ex)
         {
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.KuroBbs_SignIn);
+            KuroBbsUi.HandleException(ex, Lang.Instance.KuroBbs_SignIn);
         }
         finally
         {
@@ -100,7 +100,7 @@ public sealed partial class SignInPage : PageBase
         {
             if (result.IsTokenExpired)
             {
-                InAppToast.MainWindow?.Warning(Lang.Instance.KuroBbs_TokenExpired, Lang.Instance.KuroBbs_TokenExpiredDesc);
+                KuroBbsUi.ShowTokenExpiredToast();
             }
             else
             {
@@ -135,7 +135,7 @@ public sealed partial class SignInPage : PageBase
         }
         catch (Exception ex)
         {
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.KuroBbs_SignIn);
+            KuroBbsUi.HandleException(ex, Lang.Instance.KuroBbs_SignIn);
         }
         await LoadAllAsync();
     }

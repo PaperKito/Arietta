@@ -482,7 +482,7 @@ public sealed partial class KuroBbsPage : PageBase
             }
             else if (roles.IsTokenExpired)
             {
-                InAppToast.MainWindow?.Warning(Lang.Instance.KuroBbs_TokenExpired, Lang.Instance.KuroBbs_TokenExpiredDesc);
+                KuroBbsUi.ShowTokenExpiredToast();
             }
 
             if (account.Level <= 0)
@@ -499,7 +499,7 @@ public sealed partial class KuroBbsPage : PageBase
         }
         catch (Exception ex)
         {
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.KuroBbs_RefreshInfo);
+            KuroBbsUi.HandleException(ex, Lang.Instance.KuroBbs_RefreshInfo);
         }
         UpdateAccountBar();
     }

@@ -22,11 +22,12 @@ And there is more to explore.
 The release is a portable zip: unzip it and double-click `Arietta.exe`. All data lives by default in an `Arietta\` folder next to the exe — move the whole folder and you have migrated.
 
 - **System requirements**: Windows 10 1809 (build 17763) or later, x64
+- [.NET 10 runtime](https://dotnet.microsoft.com/download/dotnet/10.0) installed — the portable build is not self-contained, so the **Desktop Runtime** is the safest pick (it includes the base runtime)
 - [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2) installed
 - [WebP Image Extensions](https://apps.microsoft.com/detail/9pg2dk419drg) installed
 - For the best experience, enable **Transparency effects** and **Animation effects** in Windows Settings
 
-Then download the archive for your platform from [GitHub Releases](https://github.com/Pizazz-stack/Arietta/releases), unzip it, run `Arietta.exe` and follow the prompts.
+Then download the archive for your platform from [GitHub Releases](https://github.com/PaperKito/Arietta/releases), unzip it, run `Arietta.exe` and follow the prompts.
 
 ## Development
 
@@ -48,7 +49,7 @@ To build the app locally, you need the latest Visual Studio with the following w
 
 ## Sponsor
 
-Development takes real effort. If you find Arietta useful, you can sponsor me via ------
+Development takes real effort. If you find Arietta useful, you can sponsor me via [the sponsor page](https://paperkitoblog-dpbyupmog00q.edgeone.dev/sponsor/).
 
 ## License
 

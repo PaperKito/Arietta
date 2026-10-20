@@ -628,7 +628,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string SettingPage_ProjectHomepage => T();
     public string SettingPage_ReportIssue => T();
     public string SettingPage_ReleaseHistory => T();
-    public string SettingPage_DataAndPrivacy => T();
+
+    public string SettingPage_Donate => T();
 
     public string Common_Exit => T();
 
