@@ -121,12 +121,18 @@ public sealed partial class ResourceBriefPage : PageBase
             if (result is { IsSuccess: true, Data: { } briefing })
             {
                 _briefing = briefing;
+
+                ResourceRecordStore.PruneBriefing(account.RoleId, "week", ResourceRecordStore.WeekWindowSize);
                 HighlightPeriodTypeButton();
                 FillPeriodList();
                 if (ListView_Periods.Items.Count > 0)
                 {
                     ListView_Periods.SelectedIndex = 0;
                 }
+            }
+            else if (result.IsTokenExpired)
+            {
+                KuroBbsUi.ShowTokenExpiredToast();
             }
             else
             {
@@ -160,7 +166,13 @@ public sealed partial class ResourceBriefPage : PageBase
             }
         }
 
-        ListView_Periods.ItemsSource = items.OrderByDescending(i => i.Index).ToList();
+        var ordered = items.OrderByDescending(i => i.Index).ToList();
+
+        if (_periodType == "week" && ordered.Count > ResourceRecordStore.WeekWindowSize)
+        {
+            ordered = ordered.Take(ResourceRecordStore.WeekWindowSize).ToList();
+        }
+        ListView_Periods.ItemsSource = ordered;
 
         if (items.Count > 0 && ListView_Periods.SelectedIndex < 0)
         {
@@ -201,7 +213,7 @@ public sealed partial class ResourceBriefPage : PageBase
             }
             else if (result.IsTokenExpired)
             {
-                InAppToast.MainWindow?.Warning(Lang.Instance.KuroBbs_TokenExpired, Lang.Instance.KuroBbs_TokenExpiredDesc);
+                KuroBbsUi.ShowTokenExpiredToast();
             }
             else
             {

@@ -184,7 +184,7 @@ public sealed partial class CombatPage : PageBase
         catch (Exception ex)
         {
             Log.LogError(ex, "战绩拉取/渲染失败 mode={Mode}", _mode);
-            InAppToast.MainWindow?.Error(ex, TextBlock_Title.Text);
+            KuroBbsUi.HandleException(ex, TextBlock_Title.Text);
         }
         finally
         {
@@ -559,7 +559,7 @@ public sealed partial class CombatPage : PageBase
         catch (Exception ex)
         {
             Log.LogError(ex, "期次快照渲染失败 mode={Mode} period={Period}", entry.Mode, entry.PeriodEnd);
-            InAppToast.MainWindow?.Error(ex, TextBlock_Title.Text);
+            KuroBbsUi.HandleException(ex, TextBlock_Title.Text);
         }
     }
 

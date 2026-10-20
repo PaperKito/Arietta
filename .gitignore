@@ -99,3 +99,7 @@ src/Assets/Font/XboxFluent2.ttf
 dist/
 src/binx64*/
 tools/.tmp_*
+
+# ---- Publish repo only: local commit helper scripts, never publish them ----
+commit.bat
+commit.ps1

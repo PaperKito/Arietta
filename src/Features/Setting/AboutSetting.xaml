@@ -35,31 +35,32 @@
                        Text="{x:Bind lang:Lang.Instance.SettingPage_About_Links}" />
 
             <TextBlock Margin="0,8,0,0" HorizontalAlignment="Left">
-                <Hyperlink NavigateUri="https://github.com/Pizazz-stack/Arietta" UnderlineStyle="None">
+                <Hyperlink NavigateUri="https://github.com/PaperKito/Arietta" UnderlineStyle="None">
                     <Run FontWeight="Bold"
                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                          Text="{x:Bind lang:Lang.Instance.SettingPage_ProjectHomepage}" />
                 </Hyperlink>
             </TextBlock>
             <TextBlock Margin="0,8,0,0" HorizontalAlignment="Left">
-                <Hyperlink NavigateUri="https://github.com/Pizazz-stack/Arietta/issues" UnderlineStyle="None">
+                <Hyperlink NavigateUri="https://github.com/PaperKito/Arietta/issues" UnderlineStyle="None">
                     <Run FontWeight="Bold"
                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                          Text="{x:Bind lang:Lang.Instance.SettingPage_ReportIssue}" />
                 </Hyperlink>
             </TextBlock>
             <TextBlock Margin="0,8,0,0" HorizontalAlignment="Left">
-                <Hyperlink NavigateUri="https://github.com/Pizazz-stack/Arietta/releases" UnderlineStyle="None">
+                <Hyperlink NavigateUri="https://github.com/PaperKito/Arietta/releases" UnderlineStyle="None">
                     <Run FontWeight="Bold"
                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                          Text="{x:Bind lang:Lang.Instance.SettingPage_ReleaseHistory}" />
                 </Hyperlink>
             </TextBlock>
+
             <TextBlock Margin="0,8,0,0" HorizontalAlignment="Left">
-                <Hyperlink NavigateUri="https://github.com/Pizazz-stack/Arietta/blob/main/README.md" UnderlineStyle="None">
+                <Hyperlink NavigateUri="https://paperkito.github.io/Arietta/sponsor/" UnderlineStyle="None">
                     <Run FontWeight="Bold"
                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                         Text="{x:Bind lang:Lang.Instance.SettingPage_DataAndPrivacy}" />
+                         Text="{x:Bind lang:Lang.Instance.SettingPage_Donate}" />
                 </Hyperlink>
             </TextBlock>
 

@@ -26,7 +26,7 @@ The release is a portable zip: unzip it and double-click `Arietta.exe`. All data
 - [WebP Image Extensions](https://apps.microsoft.com/detail/9pg2dk419drg) installed
 - For the best experience, enable **Transparency effects** and **Animation effects** in Windows Settings
 
-Then download the archive for your platform from [GitHub Releases](https://github.com/Pizazz-stack/Arietta/releases), unzip it, run `Arietta.exe` and follow the prompts.
+Then download the archive for your platform from [GitHub Releases](https://github.com/PaperKito/Arietta/releases), unzip it, run `Arietta.exe` and follow the prompts.
 
 ## Development
 
@@ -48,7 +48,7 @@ To build the app locally, you need the latest Visual Studio with the following w
 
 ## Sponsor
 
-Development takes real effort. If you find Arietta useful, you can sponsor me via ------
+Development takes real effort. If you find Arietta useful, you can sponsor me via [the sponsor page](https://paperkito.github.io/Arietta/sponsor/).
 
 ## License
 

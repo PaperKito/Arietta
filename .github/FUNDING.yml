@@ -1,0 +1,10 @@
+# Sponsor links — renders the "Sponsor" button on the repository page.
+# https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+#
+# github: / ko_fi: are deliberately omitted — GitHub Sponsors pays out through
+# Stripe Connect and Ko-fi through PayPal/Stripe, both of which need a bank
+# account that accepts international transfers. A mainland UnionPay debit card
+# cannot receive either, so those buttons would be dead ends.
+
+custom:
+  - https://afdian.com/a/PaperKito

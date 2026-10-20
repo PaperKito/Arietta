@@ -85,6 +85,53 @@ public class InAppToast : Behavior<StackPanel>
         catch { }
     }
 
+    private InfoBar? _singleBar;
+
+    private int _singleGen;
+
+    public void ShowSingle(InfoBarSeverity severity, string? title, string? message = null, int duration = 5000)
+    {
+        DispatcherQueue.TryEnqueue(async () =>
+        {
+            try
+            {
+                int gen = ++_singleGen;
+                InfoBar bar;
+                if (_singleBar is { } existing && AssociatedObject.Children.Contains(existing))
+                {
+
+                    bar = existing;
+                    bar.Severity = severity;
+                    bar.Title = title;
+                    bar.Message = message;
+                    bar.IsOpen = true;
+                    AnimateIn(bar);
+                }
+                else
+                {
+                    bar = new InfoBar
+                    {
+                        Severity = severity,
+                        Title = title,
+                        Message = message,
+                        IsOpen = true,
+                    };
+                    _singleBar = bar;
+                    Show(bar);
+                }
+                if (duration > 0)
+                {
+                    await Task.Delay(duration);
+
+                    if (_singleGen == gen)
+                    {
+                        await HideAsync(bar);
+                    }
+                }
+            }
+            catch { }
+        });
+    }
 
 
     public void Show(InfoBar infoBar, int duration = 0, int index = -1)

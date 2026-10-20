@@ -145,11 +145,33 @@ internal static class KuroBbsUi
         return img;
     }
 
+    public static void ShowTokenExpiredToast()
+    {
+        InAppToast.MainWindow?.ShowSingle(InfoBarSeverity.Warning,
+            Lang.Instance.KuroBbs_TokenExpired, Lang.Instance.KuroBbs_TokenExpiredDesc);
+    }
+
+    public static bool IsTokenExpiredException(Exception ex) =>
+        ex.Message.Contains("登录已过期", StringComparison.Ordinal)
+        || ex.Message.Contains("accessToken", StringComparison.OrdinalIgnoreCase);
+
+    public static void HandleException(Exception ex, string? toastTitle)
+    {
+        if (IsTokenExpiredException(ex))
+        {
+            ShowTokenExpiredToast();
+        }
+        else
+        {
+            InAppToast.MainWindow?.Error(ex, toastTitle);
+        }
+    }
+
     public static void HandleKuroError(int code, string? msg, string? toastTitle, string fallbackText, InfoBar? errorBar = null, bool foldVisibility = true)
     {
         if (code == 220)
         {
-            InAppToast.MainWindow?.Warning(Lang.Instance.KuroBbs_TokenExpired, Lang.Instance.KuroBbs_TokenExpiredDesc);
+            ShowTokenExpiredToast();
             return;
         }
         if (errorBar is null)
@@ -210,7 +232,7 @@ internal static class KuroBbsUi
         }
         catch (Exception ex)
         {
-            InAppToast.MainWindow?.Error(ex, toastTitle);
+            HandleException(ex, toastTitle);
         }
         finally
         {

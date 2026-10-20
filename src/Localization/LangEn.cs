@@ -476,7 +476,8 @@ internal static class LangEn
         ["SettingPage_ProjectHomepage"] = "Project Homepage",
         ["SettingPage_ReportIssue"] = "Report Issue",
         ["SettingPage_ReleaseHistory"] = "Release History",
-        ["SettingPage_DataAndPrivacy"] = "Data & Privacy",
+
+        ["SettingPage_Donate"] = "Sponsor the developer",
 
         ["GameSelector_Subtitle"] = "Tap the icon at the top-left to select or switch games",
         ["GameSelector_AutoFind"] = "Auto-detect Installed Games",

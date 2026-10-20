@@ -26,7 +26,7 @@ Arietta 旨在解决官方启动器的不足，它支持 Kuro Games 旗下所有
 - 已安装 [WebP 映像扩展](https://apps.microsoft.com/detail/9pg2dk419drg)
 - 为了更好的使用体验，请在系统设置中开启**透明效果**和**动画效果**
 
-然后在 [GitHub Release](https://github.com/Pizazz-stack/Arietta/releases) 下载对应 CPU 架构的压缩包，解压后运行 `Arietta.exe` 并按提示操作
+然后在 [GitHub Release](https://github.com/PaperKito/Arietta/releases) 下载对应 CPU 架构的压缩包，解压后运行 `Arietta.exe` 并按提示操作
 
 ## 开发
 
@@ -48,7 +48,7 @@ Arietta 旨在解决官方启动器的不足，它支持 Kuro Games 旗下所有
 
 ## 赞助
 
-开发不易，如果你觉得 Arietta 好用，可以在------赞助我
+开发不易，如果你觉得 Arietta 好用，可以在[赞助页面](https://paperkito.github.io/Arietta/sponsor/)赞助我。
 
 ## 许可
 

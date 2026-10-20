@@ -72,7 +72,7 @@ public sealed partial class RolePage : PageBase
             }
             else if (result.IsTokenExpired)
             {
-                InAppToast.MainWindow?.Warning(Lang.Instance.KuroBbs_TokenExpired, Lang.Instance.KuroBbs_TokenExpiredDesc);
+                KuroBbsUi.ShowTokenExpiredToast();
             }
             else
             {
@@ -82,7 +82,7 @@ public sealed partial class RolePage : PageBase
         }
         catch (Exception ex)
         {
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.RolePage_Refresh);
+            KuroBbsUi.HandleException(ex, Lang.Instance.RolePage_Refresh);
         }
         finally
         {
@@ -123,12 +123,12 @@ public sealed partial class RolePage : PageBase
             }
             else
             {
-                InAppToast.MainWindow?.Error(new InvalidOperationException(result.Msg ?? Lang.Instance.Common_UnknownError), Lang.Instance.RolePage_LoadFailed);
+                KuroBbsUi.HandleException(new InvalidOperationException(result.Msg ?? Lang.Instance.Common_UnknownError), Lang.Instance.RolePage_LoadFailed);
             }
         }
         catch (Exception ex)
         {
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.RolePage_LoadFailed);
+            KuroBbsUi.HandleException(ex, Lang.Instance.RolePage_LoadFailed);
         }
         finally
         {

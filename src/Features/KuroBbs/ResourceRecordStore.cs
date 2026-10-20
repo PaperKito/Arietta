@@ -13,6 +13,9 @@ internal static class ResourceRecordStore
     private const string WuwaBiz = nameof(GameBiz.WutheringWaves);
     private const string PgrBiz = nameof(GameBiz.PunishingGrayRaven);
     private const string PgrPeriodType = "month";
+    private const string WeekPeriodType = "week";
+
+    internal const int WeekWindowSize = 3;
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
@@ -20,8 +23,38 @@ internal static class ResourceRecordStore
     #region 鸣潮 · 资源简报（/aki/resource/period：月 / 周 / 版本）
 
     public static void SaveBriefing(string roleId, string periodType, int periodIndex, string? title, KuroBriefingRecord record)
-        => UpsertResourceRecord(WuwaBiz, roleId, periodType, periodIndex, title,
+    {
+        UpsertResourceRecord(WuwaBiz, roleId, periodType, periodIndex, title,
             JsonSerializer.Serialize(record, JsonOptions));
+        if (periodType == WeekPeriodType)
+        {
+            PruneBriefing(roleId, WeekPeriodType, WeekWindowSize);
+        }
+    }
+
+    public static void PruneBriefing(string roleId, string periodType, int keep)
+    {
+        if (keep <= 0)
+        {
+            return;
+        }
+        try
+        {
+            using var connection = DatabaseService.CreateConnection();
+            connection.Execute($"""
+                DELETE FROM {DatabaseSchema.Tables.ResourceRecord}
+                WHERE GameBiz = @biz AND RoleId = @roleId AND PeriodType = @periodType
+                  AND PeriodIndex NOT IN (
+                      SELECT PeriodIndex FROM {DatabaseSchema.Tables.ResourceRecord}
+                      WHERE GameBiz = @biz AND RoleId = @roleId AND PeriodType = @periodType
+                      ORDER BY PeriodIndex DESC LIMIT @keep);
+                """, new { biz = WuwaBiz, roleId, periodType, keep });
+        }
+        catch
+        {
+
+        }
+    }
 
     public static KuroBriefingRecord? GetBriefing(string roleId, string periodType, int periodIndex)
     {

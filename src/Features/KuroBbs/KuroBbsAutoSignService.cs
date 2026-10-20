@@ -157,7 +157,7 @@ public static class KuroBbsAutoSignService
         {
 
             Log.LogError(ex, "自动签到：本轮中途异常，未完成的项不记「今天已做」");
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.KuroBbs_AutoSignFailedToast);
+            KuroBbsUi.HandleException(ex, Lang.Instance.KuroBbs_AutoSignFailedToast);
         }
         finally
         {
