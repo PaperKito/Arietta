@@ -57,7 +57,7 @@
             </TextBlock>
 
             <TextBlock Margin="0,8,0,0" HorizontalAlignment="Left">
-                <Hyperlink NavigateUri="https://paperkito.github.io/Arietta/sponsor/" UnderlineStyle="None">
+                <Hyperlink NavigateUri="https://paperkito.github.io/sponsor/" UnderlineStyle="None">
                     <Run FontWeight="Bold"
                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                          Text="{x:Bind lang:Lang.Instance.SettingPage_Donate}" />

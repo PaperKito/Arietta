@@ -22,6 +22,7 @@ Arietta 旨在解决官方启动器的不足，它支持 Kuro Games 旗下所有
 发布版是免安装压缩包，解压后双击 `Arietta.exe` 即可。所有数据默认存放在 exe 同级的 `Arietta\` 目录下，整个目录拷走就能迁移。
 
 - **系统要求**：Windows 10 1809（build 17763）及以上，x64
+- 已安装 [.NET 10 运行时](https://dotnet.microsoft.com/download/dotnet/10.0)——绿色版非自包含，不确定就装「桌面运行时」（它包含基础运行时）
 - 已安装 [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2)
 - 已安装 [WebP 映像扩展](https://apps.microsoft.com/detail/9pg2dk419drg)
 - 为了更好的使用体验，请在系统设置中开启**透明效果**和**动画效果**
@@ -48,7 +49,7 @@ Arietta 旨在解决官方启动器的不足，它支持 Kuro Games 旗下所有
 
 ## 赞助
 
-开发不易，如果你觉得 Arietta 好用，可以在[赞助页面](https://paperkito.github.io/Arietta/sponsor/)赞助我。
+开发不易，如果你觉得 Arietta 好用，可以在[赞助页面](https://paperkito.github.io/sponsor/)赞助我。
 
 ## 许可
 
