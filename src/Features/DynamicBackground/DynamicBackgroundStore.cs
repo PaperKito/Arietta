@@ -367,8 +367,6 @@ public static class DynamicBackgroundStore
             var meta = new Meta
             {
                 Source = info.BackgroundFile,
-                PosterSource = info.FirstFrameImage,
-                SloganSource = info.Slogan,
                 BackgroundId = info.BackgroundId,
                 File = videoFile,
                 UpdatedAt = DateTimeOffset.Now.ToString("o"),
@@ -385,8 +383,6 @@ public static class DynamicBackgroundStore
     private sealed class Meta
     {
         [JsonPropertyName("source")] public string? Source { get; set; }
-        [JsonPropertyName("posterSource")] public string? PosterSource { get; set; }
-        [JsonPropertyName("sloganSource")] public string? SloganSource { get; set; }
         [JsonPropertyName("backgroundId")] public string? BackgroundId { get; set; }
         [JsonPropertyName("file")] public string? File { get; set; }
         [JsonPropertyName("updatedAt")] public string? UpdatedAt { get; set; }

@@ -90,13 +90,6 @@ public sealed partial class PgrChallengePage : PageBase
         _moduleTitle);
 
 
-    private void SetSubtitle(string text)
-    {
-        TextBlock_Subtitle.Text = text;
-        TextBlock_Subtitle.Visibility = string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
-    }
-
-
     #region 幻痛囚笼
 
     private async Task FillCageAsync(KuroBbsAccount account)
@@ -471,7 +464,6 @@ public sealed partial class PgrChallengePage : PageBase
             return;
         }
 
-        SetSubtitle("");
         StackPanel_Body.Children.Add(BuildWarAreaHeader(data));
 
         var stages = data.AreaInfo?.StageFightInfoList ?? [];
@@ -790,8 +782,6 @@ public sealed partial class PgrChallengePage : PageBase
             return;
         }
 
-        SetSubtitle("");
-
         StackPanel_Body.Children.Add(BuildTransfiniteHeader(data));
 
         var characters = data.CharacterList ?? [];
@@ -951,8 +941,15 @@ public sealed partial class PgrChallengePage : PageBase
         {
             return;
         }
-        var card = CreateCard(title, "", null);
-        var panel = (StackPanel)card.Tag;
+        var content = new StackPanel { Spacing = 4 };
+        var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
+        header.Children.Add(new TextBlock { Text = title, FontSize = 15, FontWeight = Microsoft.UI.Text.FontWeights.Bold });
+
+        var root = new StackPanel { Spacing = 8 };
+        root.Children.Add(header);
+        root.Children.Add(content);
+        var border = KuroBbsUi.KuroCard(root, padding: new Thickness(16));
+        StackPanel_Body.Children.Add(border);
         foreach (var prop in element.EnumerateObject())
         {
             if (prop.Value.ValueKind is JsonValueKind.Object or JsonValueKind.Array)
@@ -973,7 +970,7 @@ public sealed partial class PgrChallengePage : PageBase
             Grid.SetColumn(value, 1);
             row.Children.Add(name);
             row.Children.Add(value);
-            panel.Children.Add(row);
+            content.Children.Add(row);
         }
     }
 
@@ -988,37 +985,6 @@ public sealed partial class PgrChallengePage : PageBase
             JsonValueKind.False => "否",
             _ => "",
         };
-    }
-
-
-    private Border CreateCard(string title, string summary, string? iconUrl)
-    {
-        var content = new StackPanel { Spacing = 4 };
-        var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10 };
-        if (!string.IsNullOrEmpty(iconUrl))
-        {
-            header.Children.Add(CreateIcon(iconUrl, 28));
-        }
-        var textStack = new StackPanel { Spacing = 1 };
-        textStack.Children.Add(new TextBlock { Text = title, FontSize = 15, FontWeight = Microsoft.UI.Text.FontWeights.Bold });
-        if (!string.IsNullOrEmpty(summary))
-        {
-            textStack.Children.Add(new TextBlock
-            {
-                Text = summary,
-                FontSize = 12,
-                Foreground = (Brush)Application.Current.Resources["AccentTextFillColorPrimaryBrush"],
-            });
-        }
-        header.Children.Add(textStack);
-
-        var root = new StackPanel { Spacing = 8 };
-        root.Children.Add(header);
-        root.Children.Add(content);
-        var border = KuroBbsUi.KuroCard(root, padding: new Thickness(16));
-        border.Tag = content;
-        StackPanel_Body.Children.Add(border);
-        return border;
     }
 
 

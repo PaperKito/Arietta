@@ -26,8 +26,6 @@ internal static class AccentColorHelper
 
     private static bool _defaultAccentCaptured;
 
-    public static event EventHandler? Changed;
-
     public static Color DefaultAccent
     {
         get
@@ -136,7 +134,6 @@ internal static class AccentColorHelper
             app.Resources["SystemAccentColorDark1"] = ColorMix(value, Colors.Black, 0.8);
             app.Resources["SystemAccentColorDark2"] = ColorMix(value, Colors.Black, 0.6);
             app.Resources["SystemAccentColorDark3"] = ColorMix(value, Colors.Black, 0.4);
-            Changed?.Invoke(null, EventArgs.Empty);
         }
         catch
         {

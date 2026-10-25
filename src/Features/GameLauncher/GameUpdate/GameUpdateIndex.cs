@@ -20,9 +20,6 @@ public sealed class GameUpdateIndex
     [JsonPropertyName("bundles")]
     public Dictionary<string, GameBundle>? Bundles { get; set; }
 
-    [JsonPropertyName("keyFileCheckList")]
-    public List<string>? KeyFileCheckList { get; set; }
-
     [JsonExtensionData]
     public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
 
@@ -75,8 +72,6 @@ public sealed class GameVersionNode
 
 public sealed class GameVersionConfig
 {
-    [JsonPropertyName("version")]
-    public string? Version { get; set; }
 
     [JsonPropertyName("baseUrl")]
     public string? BaseUrl { get; set; }
@@ -124,20 +119,11 @@ public sealed class GameResourcePack
     [JsonPropertyName("indexFile")]
     public string? IndexFile { get; set; }
 
-    [JsonPropertyName("indexFileMd5")]
-    public string? IndexFileMd5 { get; set; }
-
     [JsonPropertyName("baseUrl")]
     public string? BaseUrl { get; set; }
 
     [JsonPropertyName("size")]
     public long Size { get; set; }
-
-    [JsonPropertyName("unCompressSize")]
-    public long UnCompressSize { get; set; }
-
-    [JsonPropertyName("patchConfig")]
-    public List<GamePatchConfig>? PatchConfig { get; set; }
 }
 
 public sealed class GameBundle

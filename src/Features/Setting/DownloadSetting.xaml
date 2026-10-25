@@ -85,17 +85,52 @@
                            IsTextScaleFactorEnabled="False"
                            Text="{x:Bind lang:Lang.Instance.FilePage_DownloadThreadsDesc, Mode=OneWay}"
                            TextWrapping="Wrap" />
-
                 <StackPanel Orientation="Horizontal"
+                            Spacing="16"
+                            Margin="0,4,0,0">
+                    <RadioButton x:Name="Radio_ThreadsAuto"
+                                 Checked="Radio_Threads_ModeChanged"
+                                 Content="{x:Bind lang:Lang.Instance.FilePage_DownloadThreadsAuto, Mode=OneWay}" />
+                    <RadioButton x:Name="Radio_ThreadsManual"
+                                 Checked="Radio_Threads_ModeChanged"
+                                 Content="{x:Bind lang:Lang.Instance.FilePage_DownloadThreadsManual, Mode=OneWay}" />
+                </StackPanel>
+
+                <StackPanel x:Name="Panel_ThreadsRow"
+                            Orientation="Horizontal"
                             Spacing="12"
                             Margin="0,4,0,-6">
-                    <Slider x:Name="Slider_Threads"
-                            Width="300"
-                            VerticalAlignment="Center"
-                            Maximum="16"
-                            Minimum="1"
-                            StepFrequency="1"
-                            ValueChanged="Slider_Threads_ValueChanged" />
+                    <Grid Width="300"
+                          VerticalAlignment="Center">
+                        <Border Height="6"
+                                Margin="14,0"
+                                VerticalAlignment="Center"
+                                CornerRadius="3"
+                                Background="{ThemeResource SliderTrackFill}" />
+                        <Slider x:Name="Slider_Threads"
+                                Width="300"
+                                VerticalAlignment="Center"
+                                Maximum="16"
+                                Minimum="1"
+                                StepFrequency="1"
+                                ValueChanged="Slider_Threads_ValueChanged">
+                            <Slider.Resources>
+                                <Thickness x:Key="SliderBorderThemeThickness">0</Thickness>
+                                <SolidColorBrush x:Key="SliderOuterThumbBackground" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderThumbBorderBrush" Color="Transparent" />
+                                <x:Double x:Key="SliderHorizontalThumbWidth">12</x:Double>
+                                <x:Double x:Key="SliderHorizontalThumbHeight">12</x:Double>
+                                <SolidColorBrush x:Key="SliderTrackFill" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderTrackFillPressed" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderTrackFillDisabled" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderTrackValueFill" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="Transparent" />
+                                <SolidColorBrush x:Key="SliderTrackValueFillDisabled" Color="Transparent" />
+                            </Slider.Resources>
+                        </Slider>
+                    </Grid>
                     <TextBlock x:Name="Text_ThreadsMax"
                                VerticalAlignment="Center"
                                FontWeight="SemiBold"

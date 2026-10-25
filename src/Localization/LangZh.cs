@@ -134,7 +134,6 @@ internal static class LangZh
         ["KuroBbs_TowerOfAdversity"] = "逆境深塔",
         ["KuroBbs_SongOfVoidSea"] = "冥歌海虚",
         ["KuroBbs_DoomsdayMatrix"] = "终焉矩阵",
-        ["KuroBbs_ComingSoon"] = "{0}功能开发中",
         ["KuroBbs_TokenExpired"] = "库街区登录已过期",
         ["KuroBbs_TokenExpiredDesc"] = "请到 设置 → 库街区账号 重新抓取或填写 token",
 
@@ -227,7 +226,6 @@ internal static class LangZh
         ["GachaLogPage_ExportFormatExcel"] = "Excel (.xlsx)",
         ["GachaLogPage_ExportFormatCsv"] = "CSV (.csv)",
         ["GachaLogPage_ImportRecords"] = "导入记录（选择文件）",
-        ["GachaLogPage_ImportOk"] = "导入成功：玩家 {0} 共 {1} 条记录（重复记录自动去重）",
         ["GachaLogPage_ImportFail"] = "导入失败：{0}",
         ["GachaLogPage_ImportFailNoPlayer"] = "文件不含账号信息且当前没有选中账号，无法确定归属",
 
@@ -236,7 +234,6 @@ internal static class LangZh
         ["GachaLogPage_LinkHelpDesc"] = "删除缓存文件夹后重启游戏",
         ["GachaLogPage_ClearSavedUrl"] = "删除缓存文件夹",
         ["GachaLogPage_ClearSavedUrlConfirm"] = "确定删除本地保存的唤取链接吗？（已拉取的抽卡记录不会删除）",
-        ["GachaLogPage_ClearSavedUrlDone"] = "已清除保存的唤取链接，请进入游戏重新打开「唤取记录」页面",
         ["GachaLogPage_Language"] = "语言",
         ["GachaLogPage_LanguageSaved"] = "语言已保存，物品名称已按内置翻译表即时切换（表内缺的新物品保持原名，下次更新记录生效）",
         ["GachaLogPage_LanguageApplied"] = "已把 {0} 条记录的物品名称更改为 {1}",
@@ -248,11 +245,8 @@ internal static class LangZh
         ["GachaLogPage_FetchEmptyDesc"] = "接口未报错但全部卡池均无记录，可能是链接已失效，请在游戏内重新打开「唤取记录」后重试",
         ["GachaLogPage_RefetchFromCloudGame"] = "重新从云游戏获取",
         ["GachaLogPage_UpdateFailed"] = "更新调频记录失败：{0}",
-        ["GachaLogPage_FetchFailed"] = "获取调频数据失败，请重试",
         ["GachaLogPage_LogNotFound"] = "未找到游戏日志或唤取链接：请先在设置中定位游戏（Wuthering Waves.exe）并在游戏内打开一次「唤取记录」页面，或在「更新记录」菜单中选择「粘贴链接导入」",
         ["GachaLogPage_UrlNotFound"] = "未找到唤取链接，请在游戏内打开一次「唤取记录」页面",
-        ["GachaLogPage_UrlCopied"] = "已复制唤取链接到剪贴板",
-        ["GachaLogPage_PlayerDeleted"] = "已删除 UID {0} 的本地唤取记录",
         ["GachaLogPage_DeleteConfirmText"] = "即将删除 UID {0} 的所有本地唤取记录，此操作不可恢复。",
         ["GachaLogPage_EmptyTitle"] = "暂无调频记录",
         ["GachaLogPage_EmptyDesc"] = "先在设置中定位游戏目录，然后进入游戏打开一次「唤取记录」页面，回到这里点击「更新记录」即可同步数据。",
@@ -278,11 +272,8 @@ internal static class LangZh
 
         ["SettingPage_Language"] = "语言",
 
-        ["GameUpdate_PredownloadAvailable"] = "新版本 {0} 开放预下载",
-        ["GameUpdate_Predownloaded"] = "{0} 已预下载，开放更新后可直接安装",
         ["GameUpdate_PredownloadButton"] = "预下载",
         ["GameUpdate_ContinuePredownload"] = "继续预下载",
-        ["GameUpdate_ConfirmPredownload"] = "预下载版本 {0}？共需下载 {1}，文件将暂存在游戏目录的 predownload 文件夹里，官方开放更新后应用时无需再下载。",
         ["GameUpdate_PredownloadTitle"] = "预下载新版本 {0}",
         ["GameUpdate_PackageSize"] = "安装包大小 ",
         ["GameUpdate_SpaceRequired"] = "所需空间 ",
@@ -383,7 +374,9 @@ internal static class LangZh
         ["FilePage_SpeedLimitDesc"] = "0表示不限速",
 
         ["FilePage_DownloadThreads"] = "多线程",
-        ["FilePage_DownloadThreadsDesc"] = "同时建立的下载连接数，机械硬盘上过高并行会因寻道而变慢。改动对下次生效",
+        ["FilePage_DownloadThreadsDesc"] = "机械硬盘上过高并行会因寻道而变慢。改动对下次下载生效",
+        ["FilePage_DownloadThreadsAuto"] = "自动",
+        ["FilePage_DownloadThreadsManual"] = "手动",
 
         ["KuroBbs_RefreshInfo"] = "刷新信息",
         ["KuroBbs_Login"] = "登录",
@@ -457,9 +450,6 @@ internal static class LangZh
         ["CombatPage_Locked"] = "{0} 本期未解锁或无数据",
         ["CombatPage_NoData"] = "暂无数据：服务端尚未生成本期记录，请先在库街区 App 中打开「{0}」页面刷新数据后重试",
         ["CombatPage_StatsPeriod"] = "统计周期 {0} - {1}",
-        ["CombatPage_ClearRecords"] = "清除战绩记录",
-        ["CombatPage_ClearRecordsConfirm"] = "将删除本机保存的「{0}」全部历史期次记录，无法恢复。确定清除？",
-        ["CombatPage_Clear"] = "清除",
 
         ["PlayTimeStatsDialog_TotalPlaytime"] = "总游戏时长",
         ["PlayTimeStatsDialog_Started0Times"] = "启动 {0} 次",
@@ -504,7 +494,6 @@ internal static class LangZh
         ["LauncherPage_UninstallGame"] = "卸载游戏",
         ["LauncherPage_CustomStartExecutable"] = "自定义启动程序",
 
-        ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "不支持映射的网络驱动器，请使用以双反斜杠开头的网络共享路径",
 
 
         ["Common_Select"] = "选择",
@@ -529,7 +518,6 @@ internal static class LangZh
         ["GameSettingPage_HDRNotEnabled"] = "Windows HDR 尚未开启，启用后可能无法生效",
         ["GameSettingPage_GameNotInstalled"] = "游戏未安装",
         ["GameSettingPage_GameNotInstalledDesc"] = "请先在启动器页设置游戏路径",
-        ["GameSettingPage_CloudGameNotSupport"] = "云游戏无需本地游戏设置",
         ["GameSettingPage_SettingNotEffect"] = "游戏运行时应用的设置无法生效",
         ["GameSettingPage_ResolutionMustBeGreaterThan0"] = "分辨率必须大于 0",
         ["GameSettingPage_LoadFailed"] = "读取游戏设置失败",
@@ -550,9 +538,28 @@ internal static class LangZh
         ["SettingPage_TransparencyEffects"] = "透明效果",
         ["SettingPage_AnimationEffects"] = "动画效果",
 
-        ["SettingPage_CurrentVersion"] = "当前版本",
+        ["SettingPage_CurrentVersion"] = "版本:",
 
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
+
+        ["SettingPage_CheckUpdate"] = "检查更新",
+        ["SettingPage_CheckingUpdate"] = "正在检查更新…",
+        ["SettingPage_UpToDate"] = "已是最新版本",
+        ["SettingPage_UpdateAvailable"] = "发现新版本",
+        ["SettingPage_UpdateDownload"] = "下载并安装",
+        ["SettingPage_UpdateReady"] = "新版本已就绪，请重启应用完成安装",
+        ["SettingPage_UpdateFailed"] = "更新失败",
+        ["SettingPage_UpdateDevLayout"] = "当前是开发目录，不支持安装更新（仅绿色版布局支持）",
+
+        ["UpdateDialog_IgnoreVersion"] = "忽略此版本",
+
+        ["UpdateWindow_UpdateNow"] = "立即更新",
+        ["UpdateWindow_PackageSize"] = "安装包大小",
+        ["UpdateWindow_Channel"] = "发布渠道",
+        ["UpdateWindow_ReleasePage"] = "发布页",
+        ["UpdateWindow_UpdateHistory"] = "更新历史",
+        ["UpdateWindow_LoadingHistory"] = "正在加载更新历史…",
+        ["UpdateWindow_RemindLater"] = "以后提醒",
 
         ["SettingPage_About_Links"] = "相关链接",
         ["SettingPage_ProjectHomepage"] = "项目主页",
@@ -691,6 +698,18 @@ internal static class LangZh
         ["RolePage_WeaponLevel"] = "LV.{0} · 突破{1}",
 
         ["Common_UnknownError"] = "未知错误",
+
+        ["Welcome_Title"] = "亲爱的玩家，欢迎来到 Arietta！",
+        ["Welcome_Desc"] = "这是一个专为库洛旗下游戏打造的启动器，帮助您轻松管理游戏，享受更好的体验。",
+        ["Welcome_DataFolderDesc"] = "您的所有个人数据将会被存放在以下文件夹中，它很重要。",
+        ["Welcome_EnvCheckIntro"] = "开始之前还需要检查一些必要环境。",
+        ["Welcome_WebView2"] = "WebView2 Runtime",
+        ["Welcome_NotInstalled"] = "未安装",
+        ["Welcome_SuggestIntro"] = "为了更好的体验，建议在系统设置中启用以下功能。",
+        ["Welcome_Transparency"] = "透明效果",
+        ["Welcome_Animation"] = "动画效果",
+        ["Welcome_Footer"] = "检查完毕后，点击右下角按钮即可开始使用。",
+        ["Welcome_Start"] = "Arietta，启动！",
     };
 
 }

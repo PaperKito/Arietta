@@ -8,6 +8,7 @@
              xmlns:mf="using:Arietta.Frameworks"
              xmlns:mh="using:Arietta.Helpers"
              xmlns:mxi="using:Microsoft.Xaml.Interactivity"
+             xmlns:welcome="using:Arietta.Features.Welcome"
              x:DefaultBindMode="OneWay"
              mc:Ignorable="d">
 
@@ -26,6 +27,8 @@
                 <mh:InAppToast Tag="MainWindow" />
             </mxi:Interaction.Behaviors>
         </StackPanel>
+
+        <welcome:WelcomeOverlay x:Name="WelcomeOverlayHost" Visibility="Collapsed" />
 
     </Grid>
 

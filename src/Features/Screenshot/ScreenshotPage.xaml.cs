@@ -40,7 +40,7 @@ public sealed partial class ScreenshotPage : PageBase
         try
         {
             var folders = ScreenshotService.GetFolders(MainView.CurrentGameBiz);
-            _logger.LogInformation("截图目录候选：{Folders}", string.Join(" | ", folders));
+            _logger.LogInformation("Screenshot directory candidates: {Folders}", string.Join(" | ", folders));
 
             var files = await Task.Run(() => ScreenshotService.EnumerateImages(folders));
             var groups = files
@@ -62,13 +62,13 @@ public sealed partial class ScreenshotPage : PageBase
             Panel_Empty.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
             if (empty)
             {
-                _logger.LogWarning("没有枚举到任何截图，候选目录：{Folders}", string.Join(" | ", folders));
+                _logger.LogWarning("No screenshots enumerated, candidate directories: {Folders}", string.Join(" | ", folders));
             }
             UpdateCountText();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "加载截图列表失败");
+            _logger.LogError(ex, "Failed to load screenshot list");
             InAppToast.MainWindow?.Error(ex, Lang.Instance.MainPage_GameScreenshot);
         }
     }
@@ -92,7 +92,7 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "用默认看图工具打开截图失败");
+            _logger.LogError(ex, "Failed to open screenshot with default image viewer");
             InAppToast.MainWindow?.Error(ex, Lang.Instance.ScreenshotPage_OpenImage);
         }
     }
@@ -117,7 +117,7 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "打开截图文件夹失败");
+            _logger.LogError(ex, "Failed to open screenshot folder");
             InAppToast.MainWindow?.Error(ex, Lang.Instance.ScreenshotPage_OpenFolder);
         }
     }
@@ -139,7 +139,7 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "切换多选模式失败");
+            _logger.LogError(ex, "Failed to toggle multi-select mode");
             InAppToast.MainWindow?.Error(ex, Lang.Instance.ScreenshotPage_MultiSelect);
         }
     }
@@ -154,7 +154,7 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "更新删除按钮状态失败");
+            _logger.LogError(ex, "Failed to update delete button state");
         }
     }
 
@@ -167,7 +167,7 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "读取选中截图失败");
+            _logger.LogError(ex, "Failed to read selected screenshot");
         }
         if (files.Count == 0)
         {
@@ -193,7 +193,7 @@ public sealed partial class ScreenshotPage : PageBase
 
             bool ok = await Task.Run(() => RecycleBin.DeleteToRecycleBin(files));
             int remaining = files.Count(File.Exists);
-            _logger.LogInformation("批量删除截图：ok={Ok}, remaining={Remaining}/{Total}", ok, remaining, files.Count);
+            _logger.LogInformation("Bulk delete screenshots: ok={Ok}, remaining={Remaining}/{Total}", ok, remaining, files.Count);
 
             if (ok && remaining == 0)
             {
@@ -211,7 +211,7 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "批量删除截图失败");
+            _logger.LogError(ex, "Failed to bulk delete screenshots");
             InAppToast.MainWindow?.Error(ex, Lang.Instance.ScreenshotPage_Delete);
         }
     }
@@ -227,7 +227,7 @@ public sealed partial class ScreenshotPage : PageBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "更新张数文本失败");
+            _logger.LogError(ex, "Failed to update count text");
         }
     }
 

@@ -147,7 +147,6 @@ public sealed partial class RolePage : PageBase
         FillAttributes(detail.RoleAttributeList);
 
         var weapon = detail.WeaponData?.Weapon;
-        Panel_Weapon.Visibility = weapon is null ? Visibility.Collapsed : Visibility.Visible;
         Border_Weapon.Visibility = weapon is null ? Visibility.Collapsed : Visibility.Visible;
         if (weapon is not null)
         {

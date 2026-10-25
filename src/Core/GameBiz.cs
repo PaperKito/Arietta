@@ -54,10 +54,7 @@ public static class GameRegistry
     public record GameEntry(
         GameBiz Biz,
         string Name,
-        string IconPath,
-        bool HasGachaPage,
-        string? CloudUrl = null,
-        string? DirHint = null)
+        bool HasGachaPage)
     {
 
         public string ShortName => Biz switch
@@ -176,14 +173,14 @@ public static class GameRegistry
     {
         return
         [
-            new(GameBiz.WutheringWaves, Localization.Lang.Instance.GameBiz_WuwaCn, "ms-appx:///Assets/Image/Game/gameicon_wuwa.png", true),
-            new(GameBiz.WutheringWavesGlobal, Localization.Lang.Instance.GameBiz_WuwaGlobal, "ms-appx:///Assets/Image/Game/gameicon_wuwa.png", true),
-            new(GameBiz.WutheringWavesBilibili, Localization.Lang.Instance.GameBiz_WuwaBilibili, "ms-appx:///Assets/Image/Game/gameicon_wuwa.png", true),
-            new(GameBiz.PunishingGrayRaven, Localization.Lang.Instance.GameBiz_Pgr, "ms-appx:///Assets/Image/Game/gameicon_pgr.png", false),
-            new(GameBiz.PunishingGrayRavenGlobal, Localization.Lang.Instance.GameBiz_PgrGlobal, "ms-appx:///Assets/Image/Game/gameicon_pgr.png", false),
-            new(GameBiz.PunishingGrayRavenKorea, Localization.Lang.Instance.GameBiz_PgrKorea, "ms-appx:///Assets/Image/Game/gameicon_pgr.png", false),
-            new(GameBiz.PunishingGrayRavenJapan, Localization.Lang.Instance.GameBiz_PgrJapan, "ms-appx:///Assets/Image/Game/gameicon_pgr.png", false),
-            new(GameBiz.PunishingGrayRavenTaiwan, Localization.Lang.Instance.GameBiz_PgrTaiwan, "ms-appx:///Assets/Image/Game/gameicon_pgr.png", false),
+            new(GameBiz.WutheringWaves, Localization.Lang.Instance.GameBiz_WuwaCn, true),
+            new(GameBiz.WutheringWavesGlobal, Localization.Lang.Instance.GameBiz_WuwaGlobal, true),
+            new(GameBiz.WutheringWavesBilibili, Localization.Lang.Instance.GameBiz_WuwaBilibili, true),
+            new(GameBiz.PunishingGrayRaven, Localization.Lang.Instance.GameBiz_Pgr, false),
+            new(GameBiz.PunishingGrayRavenGlobal, Localization.Lang.Instance.GameBiz_PgrGlobal, false),
+            new(GameBiz.PunishingGrayRavenKorea, Localization.Lang.Instance.GameBiz_PgrKorea, false),
+            new(GameBiz.PunishingGrayRavenJapan, Localization.Lang.Instance.GameBiz_PgrJapan, false),
+            new(GameBiz.PunishingGrayRavenTaiwan, Localization.Lang.Instance.GameBiz_PgrTaiwan, false),
         ];
     }
 

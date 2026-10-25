@@ -63,7 +63,7 @@ internal static class GamepadController
 
                 if (!SharpGameInput.GameInput.CreateV0(out _gameInput))
                 {
-                    _logger.LogWarning("创建 GameInput 实例失败，手柄映射不可用");
+                    _logger.LogWarning("Failed to create GameInput instance, gamepad mapping unavailable");
                     return;
                 }
                 _gameInput.RegisterSystemButtonCallback(null, GameInputSystemButtons.Guide | GameInputSystemButtons.Share,
@@ -82,11 +82,11 @@ internal static class GamepadController
                 TryParseKeys(AppConfig.GetConfig("GamepadShareKeys"), out _shareModifiers, out _shareKeys, out _);
                 Initialized = true;
                 UpdateGameBarRegistry();
-                _logger.LogInformation("手柄映射已初始化");
+                _logger.LogInformation("Gamepad mapping initialized");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "初始化手柄映射失败");
+                _logger.LogError(ex, "Failed to initialize gamepad mapping");
             }
         }
     }
@@ -169,7 +169,7 @@ internal static class GamepadController
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "处理手柄系统键回调失败");
+            _logger.LogError(ex, "Failed to handle gamepad system key callback");
         }
     }
 
@@ -198,7 +198,7 @@ internal static class GamepadController
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "更新 Game Bar 注册表失败");
+            _logger.LogWarning(ex, "Failed to update Game Bar registry");
         }
     }
 

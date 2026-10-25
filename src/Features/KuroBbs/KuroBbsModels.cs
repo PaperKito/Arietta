@@ -26,14 +26,11 @@ public sealed class KuroRole
 {
     [JsonPropertyName("roleId")] public int RoleId { get; set; }
     [JsonPropertyName("level")] public int Level { get; set; }
-    [JsonPropertyName("breach")] public int Breach { get; set; }
     [JsonPropertyName("chainUnlockNum")] public int ChainUnlockNum { get; set; }
     [JsonPropertyName("roleName")] public string? RoleName { get; set; }
     [JsonPropertyName("roleIconUrl")] public string? RoleIconUrl { get; set; }
     [JsonPropertyName("rolePicUrl")] public string? RolePicUrl { get; set; }
     [JsonPropertyName("starLevel")] public int StarLevel { get; set; }
-    [JsonPropertyName("attributeName")] public string? AttributeName { get; set; }
-    [JsonPropertyName("acronym")] public string? Acronym { get; set; }
 }
 
 #endregion
@@ -54,7 +51,6 @@ public sealed class KuroRoleDetail
 public sealed class KuroChain
 {
     [JsonPropertyName("name")] public string? Name { get; set; }
-    [JsonPropertyName("order")] public int Order { get; set; }
     [JsonPropertyName("description")] public string? Description { get; set; }
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
     [JsonPropertyName("unlocked")] public bool Unlocked { get; set; }
@@ -69,9 +65,7 @@ public sealed class KuroWeaponData
 
 public sealed class KuroWeapon
 {
-    [JsonPropertyName("weaponId")] public int WeaponId { get; set; }
     [JsonPropertyName("weaponName")] public string? WeaponName { get; set; }
-    [JsonPropertyName("weaponType")] public int WeaponType { get; set; }
     [JsonPropertyName("weaponStarLevel")] public int WeaponStarLevel { get; set; }
     [JsonPropertyName("weaponIcon")] public string? WeaponIcon { get; set; }
     [JsonPropertyName("weaponEffectName")] public string? WeaponEffectName { get; set; }
@@ -88,42 +82,28 @@ public sealed class KuroPhantom
 {
     [JsonPropertyName("phantomProp")] public KuroPhantomProp? PhantomProp { get; set; }
     [JsonPropertyName("cost")] public int Cost { get; set; }
-    [JsonPropertyName("quality")] public int Quality { get; set; }
     [JsonPropertyName("level")] public int Level { get; set; }
     [JsonPropertyName("fetterDetail")] public KuroFetterDetail? FetterDetail { get; set; }
     [JsonPropertyName("mainProps")] public List<KuroPhantomPropEntry>? MainProps { get; set; }
     [JsonPropertyName("subProps")] public List<KuroPhantomPropEntry>? SubProps { get; set; }
-    [JsonPropertyName("status")] public string? Status { get; set; }
-    [JsonPropertyName("propStatus")] public string? PropStatus { get; set; }
 }
 
 public sealed class KuroPhantomProp
 {
-    [JsonPropertyName("phantomPropId")] public int PhantomPropId { get; set; }
     [JsonPropertyName("name")] public string? Name { get; set; }
-    [JsonPropertyName("quality")] public int Quality { get; set; }
-    [JsonPropertyName("phantomId")] public int PhantomId { get; set; }
-    [JsonPropertyName("cost")] public int Cost { get; set; }
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
-    [JsonPropertyName("skillDescription")] public string? SkillDescription { get; set; }
 }
 
 public sealed class KuroPhantomPropEntry
 {
     [JsonPropertyName("attributeName")] public string? AttributeName { get; set; }
-    [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
     [JsonPropertyName("attributeValue")] public string? AttributeValue { get; set; }
-    [JsonPropertyName("level")] public int Level { get; set; }
     [JsonPropertyName("attributeMaxValue")] public double AttributeMaxValue { get; set; }
-    [JsonPropertyName("percent")] public double Percent { get; set; }
 }
 
 public sealed class KuroFetterDetail
 {
-    [JsonPropertyName("fetter")] public string? Fetter { get; set; }
     [JsonPropertyName("name")] public string? Name { get; set; }
-    [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
-    [JsonPropertyName("description")] public string? Description { get; set; }
 }
 
 public sealed class KuroSkillData
@@ -134,8 +114,6 @@ public sealed class KuroSkillData
 
 public sealed class KuroSkill
 {
-    [JsonPropertyName("id")] public int Id { get; set; }
-    [JsonPropertyName("type")] public string? Type { get; set; }
     [JsonPropertyName("name")] public string? Name { get; set; }
     [JsonPropertyName("description")] public string? Description { get; set; }
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
@@ -143,11 +121,8 @@ public sealed class KuroSkill
 
 public sealed class KuroRoleAttribute
 {
-    [JsonPropertyName("attributeId")] public int AttributeId { get; set; }
     [JsonPropertyName("attributeName")] public string? AttributeName { get; set; }
     [JsonPropertyName("attributeValue")] public string? AttributeValue { get; set; }
-    [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
-    [JsonPropertyName("sort")] public int Sort { get; set; }
 }
 
 #endregion
@@ -175,42 +150,17 @@ public sealed class KuroBriefingItem
 
 public sealed class KuroWuwaWidgetData
 {
-    [JsonPropertyName("gameId")] public int GameId { get; set; }
-    [JsonPropertyName("userId")] public long UserId { get; set; }
-    [JsonPropertyName("serverTime")] public long ServerTime { get; set; }
-    [JsonPropertyName("serverId")] public string? ServerId { get; set; }
-    [JsonPropertyName("serverName")] public string? ServerName { get; set; }
-    [JsonPropertyName("roleId")] public string? RoleId { get; set; }
-    [JsonPropertyName("roleName")] public string? RoleName { get; set; }
-
-    [JsonPropertyName("energyData")] public KuroWidgetItem? EnergyData { get; set; }
-
-    [JsonPropertyName("livenessData")] public KuroWidgetItem? LivenessData { get; set; }
-
-    [JsonPropertyName("storeEnergyData")] public KuroWidgetItem? StoreEnergyData { get; set; }
 
     [JsonPropertyName("towerData")] public KuroWidgetItem? TowerData { get; set; }
 
     [JsonPropertyName("newTowerData")] public KuroWidgetItem? NewTowerData { get; set; }
 
     [JsonPropertyName("slashTowerData")] public KuroWidgetItem? SlashTowerData { get; set; }
-
-    [JsonPropertyName("weeklyData")] public KuroWidgetItem? WeeklyData { get; set; }
-
-    [JsonPropertyName("weeklyFrameData")] public KuroWidgetItem? WeeklyFrameData { get; set; }
-
-    [JsonPropertyName("weeklyRougeData")] public KuroWidgetItem? WeeklyRougeData { get; set; }
-
-    [JsonPropertyName("battlePassData")] public List<KuroWidgetItem>? BattlePassData { get; set; }
 }
 
 public sealed class KuroWidgetItem
 {
-    [JsonPropertyName("name")] public string? Name { get; set; }
-    [JsonPropertyName("img")] public string? Img { get; set; }
     [JsonPropertyName("refreshTimeStamp")] public long? RefreshTimeStamp { get; set; }
-    [JsonPropertyName("value")] public string? Value { get; set; }
-    [JsonPropertyName("status")] public int Status { get; set; }
     [JsonPropertyName("cur")] public int Cur { get; set; }
     [JsonPropertyName("total")] public int Total { get; set; }
 }
@@ -219,7 +169,6 @@ public sealed class KuroBriefingRecord
 {
     [JsonPropertyName("totalCoin")] public long TotalCoin { get; set; }
     [JsonPropertyName("totalStar")] public long TotalStar { get; set; }
-    [JsonPropertyName("copyWriting")] public string? CopyWriting { get; set; }
     [JsonPropertyName("coinList")] public List<KuroBriefingItem>? CoinList { get; set; }
     [JsonPropertyName("starList")] public List<KuroBriefingItem>? StarList { get; set; }
 }
@@ -233,14 +182,8 @@ public sealed class KuroCalculatorRole
     [JsonPropertyName("roleId")] public int RoleId { get; set; }
     [JsonPropertyName("roleName")] public string? RoleName { get; set; }
     [JsonPropertyName("roleIconUrl")] public string? RoleIconUrl { get; set; }
-    [JsonPropertyName("starLevel")] public int StarLevel { get; set; }
-    [JsonPropertyName("attributeId")] public int AttributeId { get; set; }
-    [JsonPropertyName("attributeName")] public string? AttributeName { get; set; }
-    [JsonPropertyName("weaponTypeId")] public int WeaponTypeId { get; set; }
-    [JsonPropertyName("weaponTypeName")] public string? WeaponTypeName { get; set; }
     [JsonPropertyName("acronym")] public string? Acronym { get; set; }
     [JsonPropertyName("isPreview")] public bool IsPreview { get; set; }
-    [JsonPropertyName("isNew")] public bool IsNew { get; set; }
     [JsonPropertyName("priority")] public int Priority { get; set; }
 }
 
@@ -258,36 +201,24 @@ public sealed class KuroCalculatorRoleAim
 
 public sealed class KuroCalculatorResult
 {
-    [JsonPropertyName("roleNum")] public int RoleNum { get; set; }
-    [JsonPropertyName("weaponNum")] public int WeaponNum { get; set; }
     [JsonPropertyName("costList")] public List<KuroCalculatorCostList>? CostList { get; set; }
 }
 
 public sealed class KuroCalculatorCostList
 {
-    [JsonPropertyName("roleId")] public int? RoleId { get; set; }
-    [JsonPropertyName("weaponId")] public int? WeaponId { get; set; }
     [JsonPropertyName("allCost")] public List<KuroCalculatorCost>? AllCost { get; set; }
-    [JsonPropertyName("missingCost")] public List<KuroCalculatorCost>? MissingCost { get; set; }
 }
 
 public sealed class KuroCalculatorCost
 {
-    [JsonPropertyName("id")] public string? Id { get; set; }
     [JsonPropertyName("name")] public string? Name { get; set; }
     [JsonPropertyName("iconUrl")] public string? IconUrl { get; set; }
-    [JsonPropertyName("num")] public int Num { get; set; }
-    [JsonPropertyName("type")] public int Type { get; set; }
-    [JsonPropertyName("quality")] public int Quality { get; set; }
 }
 
 public sealed class KuroCalculatorWeapon
 {
-    [JsonPropertyName("weaponId")] public int WeaponId { get; set; }
     [JsonPropertyName("weaponName")] public string? WeaponName { get; set; }
     [JsonPropertyName("weaponIcon")] public string? WeaponIcon { get; set; }
-    [JsonPropertyName("weaponType")] public int WeaponType { get; set; }
-    [JsonPropertyName("weaponStarLevel")] public int WeaponStarLevel { get; set; }
     [JsonPropertyName("acronym")] public string? Acronym { get; set; }
     [JsonPropertyName("priority")] public int Priority { get; set; }
 }

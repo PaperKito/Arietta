@@ -114,12 +114,12 @@ internal static class CloudSyncHost
             Task<CloudSyncResult> task = service.SyncAsync();
             if (!task.Wait(ExitBudget))
             {
-                Logger.LogInformation("退出时同步未在 {Budget} 内完成，已放弃本次同步", ExitBudget);
+                Logger.LogInformation("Sync on exit did not finish within {Budget}; this sync abandoned", ExitBudget);
             }
         }
         catch (Exception ex)
         {
-            Logger.LogInformation(ex, "退出时同步失败（已忽略）");
+            Logger.LogInformation(ex, "Sync on exit failed (ignored)");
         }
     }
 
@@ -172,7 +172,7 @@ internal static class CloudSyncHost
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(ex, "云同步循环已退出");
+            Logger.LogWarning(ex, "Cloud sync loop exited");
         }
     }
 
@@ -188,7 +188,7 @@ internal static class CloudSyncHost
             CloudSyncResult result = await service.SyncAsync(ct);
             if (result.Action != CloudSyncAction.Skipped || !result.Success)
             {
-                Logger.LogInformation("后台同步：{Action} {Message}", result.Action, result.Message);
+                Logger.LogInformation("Background sync: {Action} {Message}", result.Action, result.Message);
             }
         }
         catch (OperationCanceledException)
@@ -197,7 +197,7 @@ internal static class CloudSyncHost
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(ex, "后台同步失败（已忽略，等待下一次）");
+            Logger.LogWarning(ex, "Background sync failed (ignored, waiting for next run)");
         }
     }
 
@@ -210,7 +210,7 @@ internal static class CloudSyncHost
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(ex, "获取云同步服务失败");
+            Logger.LogWarning(ex, "Failed to get cloud sync service");
             return null;
         }
     }

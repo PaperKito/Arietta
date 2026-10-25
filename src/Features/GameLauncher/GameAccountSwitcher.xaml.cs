@@ -83,8 +83,6 @@ public sealed partial class GameAccountSwitcher : UserControl
 
     public bool CanSwitchAccount { get; set => SetProperty(ref field, value); }
 
-    private string? RecentlyLoginUid { get; set; }
-
 
     public void UpdateAccounts()
     {
@@ -116,7 +114,6 @@ public sealed partial class GameAccountSwitcher : UserControl
             UpdateCanSwitch();
 
             string? recentUid = await Task.Run(() => KrSdkAccountService.GetRecentlyLoginUid(biz));
-            RecentlyLoginUid = recentUid;
 
             bool changed = await KrSdkAccountService.RefreshAccountInfosAsync(biz, accounts, recentUid);
             if (changed)

@@ -70,9 +70,6 @@ internal sealed class KrSdkLauncherUser
     [JsonPropertyName("cuid")]
     public string Cuid { get; set; } = "";
 
-    [JsonPropertyName("username")]
-    public string Username { get; set; } = "";
-
     [JsonPropertyName("oauthCode")]
     public string OauthCode { get; set; } = "";
 
@@ -84,9 +81,6 @@ public sealed record KrSdkRoleInfo(string ServerName, string RoleId, string Role
 
 public sealed class KuroSdkBriefing
 {
-
-    public bool IsPgr { get; init; }
-
     public string RoleName { get; init; } = "";
 
     public int Level { get; init; }
@@ -100,7 +94,6 @@ public sealed class KuroSdkBriefing
 
     public int Liveness { get; init; }
     public int LivenessMax { get; init; }
-    public int WeeklyInstCount { get; init; }
     public int BattlePassLevel { get; init; }
     public int BattlePassWeekExp { get; init; }
     public int BattlePassWeekMaxExp { get; init; }
@@ -132,7 +125,6 @@ public sealed class KuroSdkBriefing
             root.TryGetProperty("BattlePass", out var bp);
             return new KuroSdkBriefing
             {
-                IsPgr = false,
                 RoleName = Str(b, "Name"),
                 Level = Int(b, "Level"),
                 Energy = Int(b, "Energy"),
@@ -142,7 +134,6 @@ public sealed class KuroSdkBriefing
                 EnergyRecoverMs = Long(b, "EnergyRecoverTime"),
                 Liveness = Int(b, "Liveness"),
                 LivenessMax = Int(b, "LivenessMaxCount"),
-                WeeklyInstCount = Int(b, "WeeklyInstCount"),
                 BattlePassLevel = Int(bp, "Level"),
                 BattlePassWeekExp = Int(bp, "WeekExp"),
                 BattlePassWeekMaxExp = Int(bp, "WeekMaxExp"),
@@ -153,7 +144,6 @@ public sealed class KuroSdkBriefing
         {
             return new KuroSdkBriefing
             {
-                IsPgr = true,
                 RoleName = Str(root, "playerName"),
                 Level = Int(root, "playerLevel"),
                 ActionPoint = Int(root, "actionPoint"),
@@ -629,15 +619,7 @@ public static class KrSdkAccountService
     }
 
 
-    private static byte[] Xor(byte[] data, byte key)
-    {
-        var result = new byte[data.Length];
-        for (int i = 0; i < data.Length; i++)
-        {
-            result[i] = (byte)(data[i] ^ key);
-        }
-        return result;
-    }
+    private static byte[] Xor(byte[] data, byte key) => [.. data.Select(b => (byte)(b ^ key))];
 
     private sealed class RefreshTag;
 }
@@ -696,7 +678,7 @@ public static class KuroSdkPlayerClient
         });
         if (probe is null)
         {
-            _logger.LogWarning("queryPlayerInfo 重试 {Attempts} 次仍无结论，本轮按「未知」处理（{ApiBase}）", MaxAttempts, apiBase);
+            _logger.LogWarning("queryPlayerInfo inconclusive after {Attempts} retries, treating as \"Unknown\" this round ({ApiBase})", MaxAttempts, apiBase);
             return new KuroSdkRoleProbe(KuroSdkRoleState.Unknown, null);
         }
         return probe;
@@ -768,7 +750,7 @@ public static class KuroSdkPlayerClient
         var briefing = await RetryAsync(() => QueryBriefingOnceAsync(apiBase, oauthCode, playerId, region));
         if (briefing is null)
         {
-            _logger.LogWarning("queryRole 重试 {Attempts} 次仍失败，本轮放弃（{ApiBase} region={Region}）", MaxAttempts, apiBase, region);
+            _logger.LogWarning("queryRole still failing after {Attempts} retries, giving up this round ({ApiBase} region={Region})", MaxAttempts, apiBase, region);
         }
         return briefing;
     }

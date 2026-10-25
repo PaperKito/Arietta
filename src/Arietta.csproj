@@ -2,6 +2,8 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
+
+		<Version>1.0.0</Version>
 		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
 
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -46,7 +48,6 @@
 
 		<PackageReference Include="Starward.GameInput" Version="0.3.1" />
 		<PackageReference Include="Vanara.PInvoke.ComCtl32" Version="5.0.5" />
-		<PackageReference Include="Vanara.PInvoke.Kernel32" Version="5.0.5" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 

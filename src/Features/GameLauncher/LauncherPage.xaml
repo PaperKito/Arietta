@@ -13,58 +13,6 @@
              x:DefaultBindMode="OneWay"
              mc:Ignorable="d">
 
-    <mf:PageBase.Resources>
-
-        <Style x:Key="TransparentIconButtonStyle"
-               TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <ContentPresenter x:Name="ContentPresenter"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          AutomationProperties.AccessibilityView="Raw"
-                                          Background="Transparent"
-                                          Content="{TemplateBinding Content}"
-                                          Opacity="1">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal" />
-                                    <VisualState x:Name="PointerOver">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentPresenter"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="0.8"
-                                                             Duration="0" />
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Pressed">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentPresenter"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="0.6"
-                                                             Duration="0" />
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Disabled">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentPresenter"
-                                                             Storyboard.TargetProperty="Opacity"
-                                                             To="0.4"
-                                                             Duration="0" />
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                        </ContentPresenter>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </mf:PageBase.Resources>
-
     <Grid x:Name="RootGrid"
           AllowDrop="True"
           Background="Transparent"

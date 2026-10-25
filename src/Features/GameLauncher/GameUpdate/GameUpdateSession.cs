@@ -106,7 +106,7 @@ public sealed class GameUpdateSession
         }
 
         Interlocked.CompareExchange(ref _cancelRequestedTimestamp, Stopwatch.GetTimestamp(), 0);
-        AppConfig.GetLogger<GameUpdateSession>().LogInformation("暂停请求已发出");
+        AppConfig.GetLogger<GameUpdateSession>().LogInformation("Pause requested");
         bool notify = false;
         lock (_gate)
         {
@@ -164,12 +164,12 @@ public sealed class GameUpdateSession
         catch (OperationCanceledException ex)
         {
 
-            AppConfig.GetLogger<GameUpdateSession>().LogWarning(ex, "游戏更新非用户取消而中止 {Biz}", biz);
+            AppConfig.GetLogger<GameUpdateSession>().LogWarning(ex, "Game update aborted by non-user cancellation {Biz}", biz);
             InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_UpdateGame);
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<GameUpdateSession>().LogError(ex, "游戏更新失败 {Biz}", biz);
+            AppConfig.GetLogger<GameUpdateSession>().LogError(ex, "Game update failed {Biz}", biz);
             InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_UpdateGame);
         }
         finally
@@ -186,7 +186,7 @@ public sealed class GameUpdateSession
             if (cancelTs != 0)
             {
                 double ms = (Stopwatch.GetTimestamp() - cancelTs) * 1000.0 / Stopwatch.Frequency;
-                AppConfig.GetLogger<GameUpdateSession>().LogInformation("会话结束（暂停响应 {Ms:0}ms）", ms);
+                AppConfig.GetLogger<GameUpdateSession>().LogInformation("Session ended (pause response {Ms:0}ms)", ms);
             }
             Changed?.Invoke(this, EventArgs.Empty);
         }
@@ -199,11 +199,13 @@ public sealed class GameUpdateSession
 
         static string WithPercent(string text, long done, long total)
             => total > 0 ? $"{text} · {done * 100 / total}%" : text;
+
+        double fileProgress = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
         if (p.Phase == DownloadPhase.Applying)
         {
             IsApplying = true;
 
-            ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
+            ProgressValue = fileProgress;
             ProgressText = p.TotalFiles > 0
                 ? WithPercent(string.Format(Lang.Instance.GameUpdate_ApplyingProgress, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)
                 : Lang.Instance.GameUpdate_Applying;
@@ -212,7 +214,7 @@ public sealed class GameUpdateSession
         {
             IsApplying = true;
 
-            ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
+            ProgressValue = fileProgress;
             ProgressText = p.TotalFiles > 0
                 ? WithPercent(string.Format(Lang.Instance.GameUpdate_Patching, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)
                 : Lang.Instance.GameUpdate_Applying;
@@ -220,7 +222,7 @@ public sealed class GameUpdateSession
         else if (p.Phase == DownloadPhase.Verifying)
         {
             IsApplying = false;
-            ProgressValue = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
+            ProgressValue = fileProgress;
             ProgressText = WithPercent(string.Format(Lang.Instance.GameUpdate_Verifying, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles);
         }
         else

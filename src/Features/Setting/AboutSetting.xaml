@@ -30,6 +30,65 @@
                            Text="{x:Bind AppVersionText}" />
             </StackPanel>
 
+            <Grid Margin="0,4,0,0" ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Height="40"
+                        Padding="12,0,16,0"
+                        HorizontalAlignment="Left"
+                        BorderThickness="0"
+                        CornerRadius="4,20,20,4"
+                        Style="{ThemeResource AccentButtonStyle}"
+                        Click="OnCheckUpdateClick"
+                        IsEnabled="{x:Bind CanCheckNow}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE752;" />
+                        <TextBlock Text="{x:Bind lang:Lang.Instance.SettingPage_CheckUpdate}" />
+                    </StackPanel>
+                </Button>
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                    <ProgressRing Width="20"
+                                  Height="20"
+                                  Visibility="{x:Bind CheckingVisibility}" />
+                    <TextBlock MaxWidth="420"
+                               HorizontalAlignment="Left"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Text="{x:Bind StatusText}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Margin="0,8,0,0"
+                        Spacing="8"
+                        HorizontalAlignment="Left">
+                <TextBlock FontWeight="SemiBold"
+                           Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                           Text="{x:Bind NewVersionText}"
+                           Visibility="{x:Bind AvailableVisibility}" />
+                <ScrollViewer MaxHeight="160"
+                              HorizontalScrollMode="Disabled"
+                              HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto"
+                              Visibility="{x:Bind AvailableVisibility}">
+                    <TextBlock IsTextSelectionEnabled="True"
+                               Text="{x:Bind ReleaseNotesText}"
+                               TextWrapping="Wrap" />
+                </ScrollViewer>
+                <ProgressBar Width="260"
+                             Maximum="100"
+                             Value="{x:Bind DownloadProgress}"
+                             Visibility="{x:Bind DownloadingVisibility}" />
+                <Button Click="OnDownloadClick"
+                        Content="{x:Bind lang:Lang.Instance.SettingPage_UpdateDownload}"
+                        IsEnabled="{x:Bind CanDownloadNow}"
+                        Visibility="{x:Bind AvailableVisibility}" />
+            </StackPanel>
+
             <TextBlock Margin="0,20,0,0"
                        FontSize="20"
                        Text="{x:Bind lang:Lang.Instance.SettingPage_About_Links}" />
@@ -56,7 +115,7 @@
                 </Hyperlink>
             </TextBlock>
             <TextBlock Margin="0,8,0,0" HorizontalAlignment="Left">
-                <Hyperlink NavigateUri="https://paperkitoblog-dpbyupmog00q.edgeone.dev/sponsor/" UnderlineStyle="None">
+                <Hyperlink NavigateUri="https://paperkitoblog.edgeone.dev/sponsor/" UnderlineStyle="None">
                     <Run FontWeight="Bold"
                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                          Text="{x:Bind lang:Lang.Instance.SettingPage_Donate}" />

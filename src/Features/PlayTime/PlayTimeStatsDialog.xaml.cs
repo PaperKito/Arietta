@@ -67,30 +67,6 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
 
     private bool _playTimeLoaded;
 
-    public string TotalTimeText { get; set => SetProperty(ref field, value); }
-
-    public string StartUpCountText { get; set => SetProperty(ref field, value); }
-
-    public string AverageDayTimeText { get; set => SetProperty(ref field, value); }
-
-    public string PlayDaysText { get; set => SetProperty(ref field, value); }
-
-    public int LongestContinuousDays { get; set => SetProperty(ref field, value); }
-
-    public string LongestContinuousDaysText { get; set => SetProperty(ref field, value); }
-
-    public string LongestRunTimeText { get; set => SetProperty(ref field, value); }
-
-    public string LongestRunStartText { get; set => SetProperty(ref field, value); }
-
-    public string LastPlayDurationText { get; set => SetProperty(ref field, value); }
-
-    public string LastPlayTimeText { get; set => SetProperty(ref field, value); }
-
-    public string MaxDayPlayTimeText { get; set => SetProperty(ref field, value); }
-
-    public string MaxDayPlayDateText { get; set => SetProperty(ref field, value); }
-
     public string BarTotalText { get; set => SetProperty(ref field, value); }
 
     public List<StatCardItem>? StatCards { get; set => SetProperty(ref field, value); }
@@ -157,12 +133,12 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
 
             _playTimePerDay = timePerDay;
 
-            TotalTimeText = TimeSpanToString(TimeSpan.FromMilliseconds(totalMs));
-            StartUpCountText = totalMs > 0 ? string.Format(Lang.Instance.PlayTimeStatsDialog_Started0Times, sessions.Count) : "";
+            string totalTimeText = TimeSpanToString(TimeSpan.FromMilliseconds(totalMs));
+            string startUpCountText = totalMs > 0 ? string.Format(Lang.Instance.PlayTimeStatsDialog_Started0Times, sessions.Count) : "";
             DatabaseService.SetValue($"playtime_total_{biz}", TimeSpan.FromMilliseconds(totalMs));
 
-            AverageDayTimeText = timePerDay.Count > 0 ? TimeSpanToString(TimeSpan.FromMilliseconds(totalMs / timePerDay.Count)) : "-";
-            PlayDaysText = timePerDay.Count > 0 ? string.Format(Lang.Instance.PlayTimeStatsDialog_PlayedFor0Days, timePerDay.Count) : "";
+            string averageDayTimeText = timePerDay.Count > 0 ? TimeSpanToString(TimeSpan.FromMilliseconds(totalMs / timePerDay.Count)) : "-";
+            string playDaysText = timePerDay.Count > 0 ? string.Format(Lang.Instance.PlayTimeStatsDialog_PlayedFor0Days, timePerDay.Count) : "";
 
             int longestContinuousDays = 0;
             DateOnly? longestContinuousStart = null;
@@ -197,60 +173,39 @@ public sealed partial class PlayTimeStatsDialog : ContentDialog
                 previousDay = orderedDay;
             }
 
-            if (longestContinuousDays > 0)
-            {
-                LongestContinuousDays = longestContinuousDays;
-                LongestContinuousDaysText = $"{longestContinuousStart:yyyy/MM/dd} - {longestContinuousEnd:yyyy/MM/dd}";
-            }
-            else
-            {
-                LongestContinuousDays = 0;
-                LongestContinuousDaysText = "";
-            }
+            string longestContinuousDaysText = longestContinuousDays > 0
+                ? $"{longestContinuousStart:yyyy/MM/dd} - {longestContinuousEnd:yyyy/MM/dd}"
+                : "";
 
-            long maxDayMs = 0;
-            DateOnly maxDayDate = default;
-            foreach (var (day, ms) in timePerDay)
-            {
-                if (ms > maxDayMs)
-                {
-                    maxDayMs = ms;
-                    maxDayDate = day;
-                }
-            }
+            var maxDay = timePerDay.MaxBy(kv => kv.Value);
+            long maxDayMs = maxDay.Value;
 
-            if (maxDayMs > 0)
-            {
-                MaxDayPlayTimeText = TimeSpanToString(TimeSpan.FromMilliseconds(maxDayMs));
-                MaxDayPlayDateText = maxDayDate.ToString("yyyy-MM-dd");
-            }
-            else
-            {
-                MaxDayPlayTimeText = "-";
-                MaxDayPlayDateText = "";
-            }
+            string maxDayPlayTimeText = maxDayMs > 0 ? TimeSpanToString(TimeSpan.FromMilliseconds(maxDayMs)) : "-";
+            string maxDayPlayDateText = maxDayMs > 0 ? maxDay.Key.ToString("yyyy-MM-dd") : "";
 
-            LongestRunTimeText = TimeSpanToString(TimeSpan.FromMilliseconds(longestSpan));
-            LongestRunStartText = longestSpan > 0 ? DateTimeOffset.FromUnixTimeMilliseconds(longestStart).LocalDateTime.ToString("yyyy-MM-dd") : "";
+            string longestRunTimeText = TimeSpanToString(TimeSpan.FromMilliseconds(longestSpan));
+            string longestRunStartText = longestSpan > 0 ? DateTimeOffset.FromUnixTimeMilliseconds(longestStart).LocalDateTime.ToString("yyyy-MM-dd") : "";
+            string lastPlayDurationText;
+            string lastPlayTimeText;
             if (lastStart > 0)
             {
-                LastPlayDurationText = TimeSpanToString(TimeSpan.FromMilliseconds(Math.Max(lastSpan, 60_000)));
-                LastPlayTimeText = DateTimeOffset.FromUnixTimeMilliseconds(lastStart).LocalDateTime.ToString("yyyy-MM-dd HH:mm");
+                lastPlayDurationText = TimeSpanToString(TimeSpan.FromMilliseconds(Math.Max(lastSpan, 60_000)));
+                lastPlayTimeText = DateTimeOffset.FromUnixTimeMilliseconds(lastStart).LocalDateTime.ToString("yyyy-MM-dd HH:mm");
             }
             else
             {
-                LastPlayDurationText = "-";
-                LastPlayTimeText = "";
+                lastPlayDurationText = "-";
+                lastPlayTimeText = "";
             }
 
             StatCards =
             [
-                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_TotalPlaytime, Value = TotalTimeText, SubText = StartUpCountText },
-                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_AverageDailyPlaytime, Value = AverageDayTimeText, SubText = PlayDaysText },
-                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_LongestStreak, Value = string.Format(Lang.Instance.PlayTimeStatsDialog_0Days, LongestContinuousDays), SubText = LongestContinuousDaysText },
-                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_LongestSession, Value = LongestRunTimeText, SubText = LongestRunStartText },
-                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_LongestDailyPlaytime, Value = MaxDayPlayTimeText, SubText = MaxDayPlayDateText },
-                new StatCardItem { Title = Lang.Instance.PlayTimeButton_LastStartup, Value = LastPlayDurationText, SubText = LastPlayTimeText },
+                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_TotalPlaytime, Value = totalTimeText, SubText = startUpCountText },
+                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_AverageDailyPlaytime, Value = averageDayTimeText, SubText = playDaysText },
+                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_LongestStreak, Value = string.Format(Lang.Instance.PlayTimeStatsDialog_0Days, longestContinuousDays), SubText = longestContinuousDaysText },
+                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_LongestSession, Value = longestRunTimeText, SubText = longestRunStartText },
+                new StatCardItem { Title = Lang.Instance.PlayTimeStatsDialog_LongestDailyPlaytime, Value = maxDayPlayTimeText, SubText = maxDayPlayDateText },
+                new StatCardItem { Title = Lang.Instance.PlayTimeButton_LastStartup, Value = lastPlayDurationText, SubText = lastPlayTimeText },
             ];
         }
         catch (Exception ex)

@@ -296,12 +296,6 @@ internal sealed class WebDavClient : IDisposable
         return response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound;
     }
 
-    public async Task<bool> DeleteCollectionAsync(string relativePath, CancellationToken ct = default)
-    {
-        using var response = await SendAsync(() => new HttpRequestMessage(HttpMethod.Delete, BuildUri(relativePath, collection: true)), ct);
-        return response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound;
-    }
-
     public async Task<List<WebDavResource>> ListAsync(string relativePath, CancellationToken ct = default)
     {
         using var response = await SendAsync(() =>

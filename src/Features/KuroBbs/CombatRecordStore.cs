@@ -31,8 +31,6 @@ public sealed class CombatRecordEntry
 
 public sealed class TowerFloorRecordEntry
 {
-    public string Mode { get; init; } = "";
-    public string RoleId { get; init; } = "";
 
     public long PeriodEnd { get; init; }
 
@@ -101,26 +99,6 @@ public static class CombatRecordStore
         {
             return [];
         }
-    }
-
-    public static void Delete(string mode, string roleId)
-    {
-        try
-        {
-            using var connection = DatabaseService.CreateConnection();
-            connection.Execute(
-                $"DELETE FROM {DatabaseSchema.Tables.CombatRecord} WHERE Mode = @mode AND RoleId = @roleId;",
-                new { mode, roleId });
-        }
-        catch { }
-        try
-        {
-            using var connection = DatabaseService.CreateConnection();
-            connection.Execute(
-                $"DELETE FROM {DatabaseSchema.Tables.TowerFloorRecord} WHERE Mode = @mode AND RoleId = @roleId;",
-                new { mode, roleId });
-        }
-        catch { }
     }
 
     public static void SaveTowerFloors(string roleId, long periodEnd, KuroTowerData? data)
@@ -200,7 +178,7 @@ public static class CombatRecordStore
         {
             using var connection = DatabaseService.CreateConnection();
             rows = connection.Query<TowerFloorRecordEntry>($"""
-                SELECT Mode, RoleId, PeriodEnd, Difficulty, AreaId, AreaName, Floor, Star, Roles, UpdateTime
+                SELECT PeriodEnd, Difficulty, AreaId, AreaName, Floor, Star, Roles
                 FROM {DatabaseSchema.Tables.TowerFloorRecord}
                 WHERE Mode = @mode AND RoleId = @roleId AND PeriodEnd = @periodEnd;
                 """, new { mode = ModeTower, roleId, periodEnd }).AsList();

@@ -7,14 +7,10 @@ namespace Arietta.Features.KuroBbs;
 
 public sealed class KuroSignGood
 {
-    [JsonPropertyName("goodsId")] public long? GoodsId { get; set; }
     [JsonPropertyName("goodsName")] public string? GoodsName { get; set; }
     [JsonPropertyName("goodsNum")] public int? GoodsNum { get; set; }
     [JsonPropertyName("goodsUrl")] public string? GoodsUrl { get; set; }
-    [JsonPropertyName("id")] public int? Id { get; set; }
-    [JsonPropertyName("isGain")] public bool? IsGain { get; set; }
     [JsonPropertyName("serialNum")] public int? SerialNum { get; set; }
-    [JsonPropertyName("signId")] public int? SignId { get; set; }
 
     [JsonIgnore] public bool IsSign { get; set; }
 }
@@ -41,7 +37,6 @@ public sealed class KuroTowerSimpleRole
 public sealed class KuroTowerFloor
 {
     [JsonPropertyName("floor")] public int? Floor { get; set; }
-    [JsonPropertyName("picUrl")] public string? PicUrl { get; set; }
     [JsonPropertyName("roleList")] public List<KuroTowerSimpleRole>? RoleList { get; set; }
     [JsonPropertyName("star")] public int Star { get; set; }
 }
@@ -76,7 +71,6 @@ public sealed class KuroTowerData
 public sealed class KuroNewTowerBuff
 {
     [JsonPropertyName("buffIcon")] public string? BuffIcon { get; set; }
-    [JsonPropertyName("buffId")] public int BuffId { get; set; }
     [JsonPropertyName("buffName")] public string? BuffName { get; set; }
     [JsonPropertyName("desc")] public string? Desc { get; set; }
 }
@@ -117,8 +111,6 @@ public sealed class KuroNewTowerData
     [JsonPropertyName("endTime")] public long EndTime { get; set; }
     [JsonPropertyName("isUnlock")] public bool IsUnlock { get; set; }
     [JsonPropertyName("modeDetails")] public List<KuroNewTowerModeDetail>? ModeDetails { get; set; }
-    [JsonPropertyName("reward")] public int Reward { get; set; }
-    [JsonPropertyName("totalReward")] public int TotalReward { get; set; }
 }
 
 #endregion

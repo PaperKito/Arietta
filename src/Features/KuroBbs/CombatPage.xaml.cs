@@ -28,8 +28,6 @@ public sealed class CombatPeriodItem
 
     public Visibility StarIconVisibility { get; init; } = Visibility.Collapsed;
 
-    public Visibility ValueVisibility { get; init; } = Visibility.Visible;
-
     public ImageSource? RankSource { get; init; }
 
     public Visibility RankIconVisibility { get; init; } = Visibility.Collapsed;
@@ -183,7 +181,7 @@ public sealed partial class CombatPage : PageBase
         }
         catch (Exception ex)
         {
-            Log.LogError(ex, "战绩拉取/渲染失败 mode={Mode}", _mode);
+            Log.LogError(ex, "Combat record fetch/render failed, mode={Mode}", _mode);
             KuroBbsUi.HandleException(ex, TextBlock_Title.Text);
         }
         finally
@@ -400,14 +398,15 @@ public sealed partial class CombatPage : PageBase
 
                 valueScore = ResolveSlashPeriodScore(record);
             }
+
+            var noScore = _mode == CombatRecordStore.ModeTower ? record.Star <= 0 : valueScore <= 0;
             items.Add(new CombatPeriodItem
             {
                 Entry = record,
                 StartTs = starts[i],
                 DateLabel = FormatPeriodDate(record, starts[i]),
-                ValueLabel = _mode == CombatRecordStore.ModeTower ? record.Star.ToString() : valueScore.ToString("N0"),
+                ValueLabel = noScore ? "--" : _mode == CombatRecordStore.ModeTower ? record.Star.ToString() : valueScore.ToString("N0"),
                 StarIconVisibility = _mode == CombatRecordStore.ModeTower ? Visibility.Visible : Visibility.Collapsed,
-                ValueVisibility = _mode != CombatRecordStore.ModeTower && valueScore <= 0 ? Visibility.Collapsed : Visibility.Visible,
                 RankSource = rankSource,
                 RankIconVisibility = rankSource is null ? Visibility.Collapsed : Visibility.Visible,
                 RankIconSize = rankSize,
@@ -558,7 +557,7 @@ public sealed partial class CombatPage : PageBase
         }
         catch (Exception ex)
         {
-            Log.LogError(ex, "期次快照渲染失败 mode={Mode} period={Period}", entry.Mode, entry.PeriodEnd);
+            Log.LogError(ex, "Period snapshot render failed, mode={Mode} period={Period}", entry.Mode, entry.PeriodEnd);
             KuroBbsUi.HandleException(ex, TextBlock_Title.Text);
         }
     }
@@ -1026,7 +1025,7 @@ public sealed partial class CombatPage : PageBase
         }
         catch (Exception ex)
         {
-            Log.LogError(ex, "矩阵分享图生成失败");
+            Log.LogError(ex, "Failed to generate matrix share image");
             InAppToast.MainWindow?.Error(ex, TextBlock_Title.Text);
         }
     }
@@ -1466,10 +1465,11 @@ public sealed partial class CombatPage : PageBase
 
     private void AddSlashGroup(List<KuroSlashDifficulty> group)
     {
+        string groupTitle = SlashGroupTitle(group);
         var header = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, VerticalAlignment = VerticalAlignment.Center };
         header.Children.Add(new TextBlock
         {
-            Text = SlashGroupTitle(group),
+            Text = groupTitle,
             FontSize = 16,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             VerticalAlignment = VerticalAlignment.Center,
@@ -1477,10 +1477,9 @@ public sealed partial class CombatPage : PageBase
         foreach (var difficulty in group.OrderBy(SlashKind))
         {
             string name = SlashShortName(difficulty);
-            string title = SlashGroupTitle(group);
             header.Children.Add(new TextBlock
             {
-                Text = name.Length > 0 && name != title
+                Text = name.Length > 0 && name != groupTitle
                     ? string.Format(Lang.Instance.SlashPage_GroupScoreNamed, name, difficulty.AllScore, difficulty.MaxScore)
                     : string.Format(Lang.Instance.SlashPage_GroupScore, difficulty.AllScore, difficulty.MaxScore),
                 FontSize = 13,
@@ -1490,12 +1489,12 @@ public sealed partial class CombatPage : PageBase
         }
         StackPanel_Content.Children.Add(header);
 
-        var rows = new StackPanel { Spacing = 6 };
+        var rows = new StackPanel { Spacing = 28 };
         foreach (var difficulty in group)
         {
             foreach (var challenge in (difficulty.ChallengeList ?? []).OrderByDescending(c => c.ChallengeId))
             {
-                var block = new StackPanel { Spacing = 4 };
+                var block = new StackPanel { Spacing = 0 };
                 block.Children.Add(CreateSlashChallengeRow(challenge));
 
                 block.Children.Add(CreateSlashTeamList(challenge));
@@ -1611,7 +1610,7 @@ public sealed partial class CombatPage : PageBase
             teams.Children.Add(block);
         }
 
-        return KuroBbsUi.KuroCard(teams, padding: new Thickness(12, 10, 12, 10), secondaryBackground: true, margin: new Thickness(0, 2, 0, 0));
+        return KuroBbsUi.KuroCard(teams, padding: new Thickness(12, 10, 12, 10), secondaryBackground: true);
     }
 
     private FrameworkElement CreateSlashTeamBlock(KuroSlashHalf half, int index)

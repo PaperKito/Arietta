@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Buffers;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +10,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Arietta.Core;
 using Microsoft.Extensions.Logging;
@@ -48,11 +51,21 @@ public sealed class GameUpdateDownloader
 
     private const long SegmentThreshold = 64L << 20;
 
-    private readonly int _maxSegments = GameUpdateService.DownloadThreads <= 1 ? 1 : 4;
+    private readonly int _maxSegments = Math.Clamp(GameUpdateService.DownloadThreads, 1, 16);
 
     private const long MinSegmentSize = 16L << 20;
 
-    private const long SegmentFlushBytes = 4L << 20;
+    private const int ReadBlockSize = 1 << 20;
+
+    private const long MinStripeChunkSize = 8L << 20;
+
+    private const long MaxStripeChunkSize = 64L << 20;
+
+    private const int TargetBlocksPerSegment = 12;
+
+    private const int SegmentBufferBlocks = 2;
+
+    private const long WriteBurstBytes = 8L << 20;
 
     private const string TempSuffix = ".part";
 
@@ -62,13 +75,26 @@ public sealed class GameUpdateDownloader
 
     private static readonly TimeSpan ReadStallTimeout = TimeSpan.FromSeconds(60);
 
-    private readonly string _cdn;
     private readonly string _baseUrl;
 
     private readonly string? _fallbackBaseUrl;
     private readonly string _destDir;
     private readonly List<GameResourceEntry> _files;
     private readonly long _totalOverride;
+
+    private DownloadChannelSet _channelSet;
+
+    private readonly Func<CancellationToken, Task<DownloadChannelSet>>? _rebuildChannels;
+
+    private int _cursor;
+
+    private int _consecutiveStalls;
+
+    private readonly ConcurrentDictionary<string, int> _stallCounts = new();
+
+    private readonly SemaphoreSlim _rebuildGate = new(1, 1);
+
+    private const int StallRebuildThreshold = 3;
 
     private static readonly ILogger _logger =
         AppConfig.GetLogger<GameUpdateDownloader>();
@@ -78,10 +104,12 @@ public sealed class GameUpdateDownloader
     private long _newBytes;
 
     public GameUpdateDownloader(
-        string cdn, string baseUrl, string destDir, List<GameResourceEntry> files,
-        long receivedBase = 0, long totalOverride = 0, string? fallbackBaseUrl = null)
+        DownloadChannelSet channels, string baseUrl, string destDir, List<GameResourceEntry> files,
+        long receivedBase = 0, long totalOverride = 0, string? fallbackBaseUrl = null,
+        Func<CancellationToken, Task<DownloadChannelSet>>? rebuildChannels = null)
     {
-        _cdn = cdn;
+        _channelSet = channels;
+        _rebuildChannels = rebuildChannels;
         _baseUrl = baseUrl;
         _fallbackBaseUrl = fallbackBaseUrl;
         _destDir = destDir;
@@ -90,21 +118,143 @@ public sealed class GameUpdateDownloader
         _received = receivedBase + files.Sum(PartBytes);
     }
 
+    private DownloadChannel[] OrderedChannels()
+    {
+        return Volatile.Read(ref _channelSet).Channels
+            .Select((c, i) => (c, i, stalled: _stallCounts.ContainsKey(c.Host)))
+            .OrderBy(t => t.stalled ? 1 : 0)
+            .ThenBy(t => t.i)
+            .Select(t => t.c)
+            .ToArray();
+    }
+
+    private DownloadChannel PickChannel()
+    {
+        DownloadChannel[] channels = OrderedChannels();
+        return channels[(int)((uint)Interlocked.Increment(ref _cursor) % (uint)channels.Length)];
+    }
+
+    private string BuildUrl(DownloadChannel channel, GameResourceEntry file)
+    {
+        return GameUpdateService.BuildFileUrl(channel.Host, file.FromFolder ?? _fallbackBaseUrl ?? _baseUrl, file.Dest);
+    }
+
+    private void NoteStall(string host)
+    {
+        int count = _stallCounts.AddOrUpdate(host, 1, (_, n) => n + 1);
+        _logger.LogWarning("Host stalled {Count} time(s), sinking it in channel order: {Host}", count, host);
+    }
+
+    private async Task MaybeRebuildChannelsAsync(CancellationToken ct)
+    {
+        if (_rebuildChannels is null || Interlocked.Increment(ref _consecutiveStalls) < StallRebuildThreshold)
+        {
+            return;
+        }
+        await _rebuildGate.WaitAsync(ct);
+        try
+        {
+
+            if (Volatile.Read(ref _consecutiveStalls) < StallRebuildThreshold)
+            {
+                return;
+            }
+            _logger.LogWarning("Download stalled {Count} times in a row, re-probing download channels",
+                Volatile.Read(ref _consecutiveStalls));
+            try
+            {
+                Volatile.Write(ref _channelSet, await _rebuildChannels(ct));
+                _stallCounts.Clear();
+                Interlocked.Exchange(ref _consecutiveStalls, 0);
+                _logger.LogInformation("Download channels re-probed: {Channels}",
+                    string.Join(", ", Volatile.Read(ref _channelSet).Channels
+                        .Select(c => $"{c.Label}={c.ScoreBytesPerSec / 1048576.0:0.0}MB/s")));
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Re-probing download channels failed; keeping current channels");
+            }
+        }
+        finally
+        {
+            _rebuildGate.Release();
+        }
+    }
+
+    private DownloadChannel[] AssignSegments(GameResourceEntry file, int segCount)
+    {
+        DownloadChannel[] ranked = OrderedChannels();
+        int use = Math.Min(ranked.Length, segCount);
+        DownloadChannel[] top = ranked.Take(use).ToArray();
+        double[] credit = top.Select(c => Math.Max(c.ScoreBytesPerSec, 1)).ToArray();
+        int[] taken = new int[use];
+        var assignment = new DownloadChannel[segCount];
+        for (int j = 0; j < segCount; j++)
+        {
+            int pick = 0;
+            double best = double.NegativeInfinity;
+            for (int k = 0; k < use; k++)
+            {
+                double score = credit[k] / (taken[k] + 1);
+                if (score > best)
+                {
+                    best = score;
+                    pick = k;
+                }
+            }
+            taken[pick]++;
+            assignment[j] = top[pick];
+        }
+        if (use > 1)
+        {
+            _logger.LogInformation("Swarm: {Dest}, {Segs} segments on {Hosts} hosts: {Alloc}",
+                file.Dest, segCount, use, string.Join(", ", top.Select((c, i) => $"{c.Label}×{taken[i]}")));
+        }
+        return assignment;
+    }
+
     private long PartBytes(GameResourceEntry file)
     {
         try
         {
             string temp = Path.Combine(_destDir, file.Dest) + TempSuffix;
-            int segCount = SegmentCount(file.Size);
-            if (segCount > 1)
-            {
-                return ReadSegmentProgress(temp + ".s", segCount, file.Size)?.Sum() ?? 0;
-            }
             return File.Exists(temp) ? Math.Min(new FileInfo(temp).Length, file.Size) : 0;
         }
         catch
         {
             return 0;
+        }
+    }
+
+    private void DropLegacySegmentState(GameResourceEntry file)
+    {
+        string temp = Path.Combine(_destDir, file.Dest) + TempSuffix;
+        string sidecar = temp + ".s";
+        if (!File.Exists(sidecar))
+        {
+            return;
+        }
+        long len = 0;
+        try
+        {
+            len = File.Exists(temp) ? Math.Min(new FileInfo(temp).Length, file.Size) : 0;
+        }
+        catch
+        {
+
+        }
+        try { File.Delete(temp); } catch { }
+        try { File.Delete(sidecar); } catch { }
+        if (len > 0)
+        {
+
+            Interlocked.Add(ref _received, -len);
+            _logger.LogInformation(
+                "丢弃旧版切段残件（预分配空壳），本次重新下载：{Dest}（{Bytes} 字节）", file.Dest, len);
         }
     }
 
@@ -161,6 +311,8 @@ public sealed class GameUpdateDownloader
         var tasks = _files.OrderByDescending(f => f.Size).Select(file => Task.Run(async () =>
         {
 
+            DropLegacySegmentState(file);
+
             bool segmented = file.Size >= SegmentThreshold;
             for (int attempt = 1; ; attempt++)
             {
@@ -183,16 +335,25 @@ public sealed class GameUpdateDownloader
                 catch (RangeUnsupportedException ex) when (segmented)
                 {
 
-                    Interlocked.Add(ref _received, -DeleteSegmentState(file));
                     segmented = false;
-                    _logger.LogWarning(ex, "{Dest} 服务器不支持 Range，改回单流下载", file.Dest);
+                    _logger.LogWarning(ex, "{Dest}: server does not support Range, falling back to single stream", file.Dest);
+                }
+                catch (StallException ex) when (attempt < MaxAttempts)
+                {
+
+                    _logger.LogWarning(ex, "Download stalled, switching host and retry {Attempt}/{Max}: {Dest}",
+                        attempt, MaxAttempts - 1, file.Dest);
+                    await MaybeRebuildChannelsAsync(ct);
+                    await Task.Delay(TimeSpan.FromSeconds(attempt), ct);
                 }
                 catch (Exception ex) when (attempt < MaxAttempts)
                 {
-                    _logger.LogWarning(ex, "下载失败，重试 {Attempt}/{Max}：{Dest}", attempt, MaxAttempts - 1, file.Dest);
+                    _logger.LogWarning(ex, "Download failed, retry {Attempt}/{Max}: {Dest}", attempt, MaxAttempts - 1, file.Dest);
                     await Task.Delay(TimeSpan.FromSeconds(attempt), ct);
                 }
             }
+
+            Interlocked.Exchange(ref _consecutiveStalls, 0);
             Interlocked.Increment(ref completed);
             Report(Path.GetFileName(file.Dest), force: true);
         }, ct));
@@ -233,9 +394,8 @@ public sealed class GameUpdateDownloader
         {
             long existing = File.Exists(temp) ? new FileInfo(temp).Length : 0;
 
-            string baseUrl = file.FromFolder ?? _fallbackBaseUrl ?? _baseUrl;
-            string url = GameUpdateService.BuildFileUrl(_cdn, baseUrl, file.Dest);
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            DownloadChannel channel = PickChannel();
+            using var request = new HttpRequestMessage(HttpMethod.Get, BuildUrl(channel, file));
             if (existing > 0 && existing < file.Size)
             {
                 request.Headers.Range = new RangeHeaderValue(existing, null);
@@ -246,11 +406,12 @@ public sealed class GameUpdateDownloader
             HttpResponseMessage resp;
             try
             {
-                resp = await GameUpdateService.SharedClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, stallCts.Token);
+                resp = await channel.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, stallCts.Token);
             }
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
-                throw new IOException($"下载连接超时（{ReadStallTimeout.TotalSeconds:0}s 无响应）：{file.Dest}");
+                NoteStall(channel.Host);
+                throw new StallException($"下载连接超时（{ReadStallTimeout.TotalSeconds:0}s 无响应）：{file.Dest}");
             }
             using (resp)
             {
@@ -264,11 +425,16 @@ public sealed class GameUpdateDownloader
                     existing = 0;
                 }
 
+                IncrementalHash? inlineMd5 = !resuming && file.Md5 is not null
+                    ? IncrementalHash.CreateHash(HashAlgorithmName.MD5)
+                    : null;
                 long downloadedNow = 0;
                 await using (var source = await resp.Content.ReadAsStreamAsync(ct))
-                await using (var output = new FileStream(temp, resuming ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.None, 1 << 16))
+
+                await using (var output = new FileStream(temp, resuming ? FileMode.Append : FileMode.Create,
+                    FileAccess.Write, FileShare.None, ReadBlockSize, FileOptions.Asynchronous))
                 {
-                    var buffer = new byte[1 << 16];
+                    var buffer = new byte[ReadBlockSize];
                     int read;
                     try
                     {
@@ -276,6 +442,7 @@ public sealed class GameUpdateDownloader
                         {
                             await speedLimit.WaitAsync(read, ct);
                             await WriteGatedAsync(() => output.WriteAsync(buffer.AsMemory(0, read), ct), stallCts, ct);
+                            inlineMd5?.AppendData(buffer.AsSpan(0, read));
                             downloadedNow += read;
                             Interlocked.Add(ref _received, read);
                             Interlocked.Add(ref _newBytes, read);
@@ -285,7 +452,8 @@ public sealed class GameUpdateDownloader
                     }
                     catch (OperationCanceledException) when (!ct.IsCancellationRequested)
                     {
-                        throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:0}s 无数据）：{file.Dest}（已收 {downloadedNow} 字节）");
+                        NoteStall(channel.Host);
+                        throw new StallException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:0}s 无数据）：{file.Dest}（已收 {downloadedNow} 字节）");
                     }
                 }
 
@@ -293,7 +461,8 @@ public sealed class GameUpdateDownloader
             {
                 throw new InvalidDataException($"下载大小不符：{file.Dest}（期望 {file.Size}，实际 {new FileInfo(temp).Length}）");
             }
-            if (file.Md5 is not null && !VerifyMd5(temp, file.Md5, ct))
+            if (file.Md5 is not null &&
+                !(inlineMd5 is not null ? Md5Matches(inlineMd5.GetHashAndReset(), file.Md5) : VerifyMd5(temp, file.Md5, ct)))
             {
 
                 long bad = new FileInfo(temp).Length;
@@ -319,77 +488,111 @@ public sealed class GameUpdateDownloader
     {
         string dest = Path.Combine(_destDir, file.Dest);
         string temp = dest + TempSuffix;
-        string sidecar = temp + ".s";
         Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
 
         if (File.Exists(dest) && FileLengthMatches(dest, file.Size) && VerifyMd5(dest, file.Md5, ct))
         {
-            try { File.Delete(sidecar); } catch { }
             return;
         }
 
         int segCount = SegmentCount(file.Size);
-        long segSize = file.Size / segCount;
-        long[]? loaded = ReadSegmentProgress(sidecar, segCount, file.Size);
-        if (loaded == null || !File.Exists(temp) || new FileInfo(temp).Length != file.Size)
+        long chunkSize = ComputeStripeChunkSize(file.Size, segCount);
+        long blockCount = (file.Size + chunkSize - 1) / chunkSize;
+        long initial = File.Exists(temp) ? new FileInfo(temp).Length : 0;
+        if (initial > file.Size)
         {
 
-            Interlocked.Add(ref _received, -(loaded?.Sum() ?? 0));
+            Interlocked.Add(ref _received, -initial);
             try { File.Delete(temp); } catch { }
-            try { File.Delete(sidecar); } catch { }
-            loaded = new long[segCount];
-            using (var fs = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                fs.SetLength(file.Size);
-            }
+            initial = 0;
         }
-        long[] progress = loaded;
-        long startDone = progress.Sum();
+
+        long aligned = initial - initial % chunkSize;
+        if (aligned != initial)
+        {
+            using (var fs = new FileStream(temp, FileMode.Open, FileAccess.Write, FileShare.None))
+            {
+                fs.SetLength(aligned);
+            }
+            Interlocked.Add(ref _received, aligned - initial);
+            initial = aligned;
+        }
+        long startBlock = initial / chunkSize;
+
+        DownloadChannel[] segChannels = AssignSegments(file, segCount);
+
+        var channels = new Channel<SegmentBlock>[segCount];
+        for (int i = 0; i < segCount; i++)
+        {
+            channels[i] = Channel.CreateBounded<SegmentBlock>(new BoundedChannelOptions(SegmentBufferBlocks)
+            {
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,
+                SingleWriter = true,
+            });
+        }
+
+        var writer = Task.Run(async () =>
+        {
+            try
+            {
+                return await WriteSequentiallyAsync(temp, file, segCount, startBlock, blockCount, chunkSize, channels, ct);
+            }
+            catch
+            {
+
+                foreach (var ch in channels)
+                {
+                    ch.Writer.TryComplete();
+                }
+                throw;
+            }
+        }, ct);
 
         var segments = new Task[segCount];
         for (int i = 0; i < segCount; i++)
         {
             int index = i;
-            long from = index * segSize;
-            long to = index == segCount - 1 ? file.Size : from + segSize;
             segments[index] = Task.Run(async () =>
             {
-                long done = Math.Min(progress[index], to - from);
-                if (done >= to - from)
-                {
-                    return;
-                }
                 await limiter.WaitAsync(ct);
                 try
                 {
-                    await DownloadRangeAsync(file, temp, sidecar, index, from + done, to, progress, speedMeter, speedLimit, ct);
+                    await DownloadRangeAsync(segChannels[index], file, index, segCount, startBlock, blockCount, chunkSize,
+                        channels[index], speedMeter, speedLimit, ct);
                 }
                 finally
                 {
+
+                    channels[index].Writer.TryComplete();
                     limiter.Release();
                 }
             }, ct);
         }
-        await Task.WhenAll(segments);
-
-        for (int i = 0; i < segCount; i++)
+        try
         {
-            long len = i == segCount - 1 ? file.Size - (segCount - 1) * segSize : segSize;
-            if (progress[i] < len)
-            {
-                throw new InvalidDataException($"分段下载不完整：{file.Dest}（段 {i} 缺 {len - progress[i]} 字节）");
-            }
+            await Task.WhenAll(segments).ConfigureAwait(false);
         }
-        if (file.Md5 is not null && !VerifyMd5(temp, file.Md5, ct))
+        catch
+        {
+
+            try { await writer.ConfigureAwait(false); } catch { }
+            throw;
+        }
+        byte[]? inlineHash = await writer.ConfigureAwait(false);
+
+        if (new FileInfo(temp).Length != file.Size)
+        {
+            throw new InvalidDataException($"分段下载大小不符：{file.Dest}（期望 {file.Size}，实际 {new FileInfo(temp).Length}）");
+        }
+        if (file.Md5 is not null &&
+            !(inlineHash is not null ? Md5Matches(inlineHash, file.Md5) : VerifyMd5(temp, file.Md5, ct)))
         {
 
             File.Delete(temp);
-            File.Delete(sidecar);
             Interlocked.Add(ref _received, -file.Size);
-            Interlocked.Add(ref _newBytes, -(file.Size - startDone));
             throw new InvalidDataException($"下载 MD5 校验失败：{file.Dest}");
         }
-        File.Delete(sidecar);
         if (File.Exists(dest))
         {
             File.Delete(dest);
@@ -397,24 +600,112 @@ public sealed class GameUpdateDownloader
         File.Move(temp, dest);
     }
 
-    private async Task DownloadRangeAsync(GameResourceEntry file, string temp, string sidecar, int segIndex,
-        long from, long to, long[] progress, SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
+    private async Task<byte[]?> WriteSequentiallyAsync(string temp, GameResourceEntry file, int segCount,
+        long startBlock, long blockCount, long chunkSize, Channel<SegmentBlock>[] channels, CancellationToken ct)
     {
-        string baseUrl = file.FromFolder ?? _fallbackBaseUrl ?? _baseUrl;
-        string url = GameUpdateService.BuildFileUrl(_cdn, baseUrl, file.Dest);
-        using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Range = new RangeHeaderValue(from, to - 1);
+
+        IncrementalHash? md5 = startBlock == 0 && file.Md5 is not null
+            ? IncrementalHash.CreateHash(HashAlgorithmName.MD5)
+            : null;
+
+        FileStream? output = null;
+        try
+        {
+
+            for (long b = startBlock; b < blockCount; b++)
+            {
+                int seg = (int)(b % segCount);
+                long need = Math.Min(chunkSize, file.Size - b * chunkSize);
+                long done = 0;
+                while (done < need)
+                {
+                    SegmentBlock block;
+                    try
+                    {
+                        block = await channels[seg].Reader.ReadAsync(ct).ConfigureAwait(false);
+                    }
+                    catch (ChannelClosedException)
+                    {
+
+                        throw new InvalidDataException($"分段下载不完整：{file.Dest}（块 {b} 缺 {need - done} 字节）");
+                    }
+
+                    output ??= new FileStream(temp, FileMode.Append, FileAccess.Write, FileShare.None,
+                        ReadBlockSize, FileOptions.Asynchronous);
+
+                    await _diskWriteGate.WaitAsync(ct).ConfigureAwait(false);
+                    try
+                    {
+                        await output.WriteAsync(block.Buffer.AsMemory(0, block.Length), ct).ConfigureAwait(false);
+                        md5?.AppendData(block.Buffer.AsSpan(0, block.Length));
+                        ArrayPool<byte>.Shared.Return(block.Buffer);
+                        done += block.Length;
+                        Interlocked.Add(ref _received, block.Length);
+                        Interlocked.Add(ref _newBytes, block.Length);
+
+                        long burst = block.Length;
+                        while (done < need && burst < WriteBurstBytes
+                               && channels[seg].Reader.TryRead(out SegmentBlock extra))
+                        {
+                            await output.WriteAsync(extra.Buffer.AsMemory(0, extra.Length), ct).ConfigureAwait(false);
+                            md5?.AppendData(extra.Buffer.AsSpan(0, extra.Length));
+                            ArrayPool<byte>.Shared.Return(extra.Buffer);
+                            done += extra.Length;
+                            burst += extra.Length;
+                            Interlocked.Add(ref _received, extra.Length);
+                            Interlocked.Add(ref _newBytes, extra.Length);
+                        }
+                    }
+                    finally
+                    {
+                        _diskWriteGate.Release();
+                    }
+                }
+            }
+
+            return md5?.GetHashAndReset();
+        }
+        finally
+        {
+            if (output is not null)
+            {
+                await output.DisposeAsync().ConfigureAwait(false);
+            }
+        }
+    }
+
+    private async Task DownloadRangeAsync(DownloadChannel ch, GameResourceEntry file, int segIndex, int segCount,
+        long startBlock, long blockCount, long chunkSize, Channel<SegmentBlock> channel,
+        SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
+    {
+
+        long first = startBlock + ((segIndex - startBlock % segCount) + segCount) % segCount;
+        for (long b = first; b < blockCount; b += segCount)
+        {
+            long from = b * chunkSize;
+            long len = Math.Min(chunkSize, file.Size - from);
+            await DownloadBlockAsync(ch, file, segIndex, from, len, channel, speedMeter, speedLimit, ct);
+        }
+    }
+
+    private async Task DownloadBlockAsync(DownloadChannel ch, GameResourceEntry file, int segIndex,
+        long from, long len, Channel<SegmentBlock> channel,
+        SpeedMeter speedMeter, SpeedLimiter speedLimit, CancellationToken ct)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, BuildUrl(ch, file));
+        request.Headers.Range = new RangeHeaderValue(from, from + len - 1);
 
         using var stallCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         stallCts.CancelAfter(ReadStallTimeout);
         HttpResponseMessage resp;
         try
         {
-            resp = await GameUpdateService.SharedClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, stallCts.Token);
+            resp = await ch.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, stallCts.Token);
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
-            throw new IOException($"下载连接超时（{ReadStallTimeout.TotalSeconds:0}s 无响应）：{file.Dest}");
+            NoteStall(ch.Host);
+            throw new StallException($"下载连接超时（{ReadStallTimeout.TotalSeconds:0}s 无响应）：{file.Dest}");
         }
         using (resp)
         {
@@ -424,38 +715,45 @@ public sealed class GameUpdateDownloader
                 throw new RangeUnsupportedException($"服务器不认 Range（HTTP {(int)resp.StatusCode}）：{file.Dest}");
             }
             await using var source = await resp.Content.ReadAsStreamAsync(ct);
-
-            await using var output = new FileStream(temp, FileMode.Open, FileAccess.Write, FileShare.ReadWrite, 1 << 16);
-            output.Seek(from, SeekOrigin.Begin);
-
-            var buffer = new byte[1 << 16];
-            long pending = 0;
-            int read;
+            long remaining = len;
             try
             {
-                while ((read = await source.ReadAsync(buffer, stallCts.Token)) > 0)
+                while (remaining > 0)
                 {
-                    await speedLimit.WaitAsync(read, ct);
-                    await WriteGatedAsync(() => output.WriteAsync(buffer.AsMemory(0, read), ct), stallCts, ct);
-                    Interlocked.Add(ref _received, read);
-                    Interlocked.Add(ref _newBytes, read);
-                    speedMeter.Add(read);
-                    progress[segIndex] += read;
-                    pending += read;
-                    if (pending >= SegmentFlushBytes)
+                    byte[] buffer = ArrayPool<byte>.Shared.Rent(ReadBlockSize);
+
+                    int want = (int)Math.Min(ReadBlockSize, remaining);
+                    int read = await source.ReadAsync(buffer.AsMemory(0, want), stallCts.Token).ConfigureAwait(false);
+                    if (read <= 0)
                     {
-                        WriteSegmentProgress(sidecar, progress);
-                        pending = 0;
+                        ArrayPool<byte>.Shared.Return(buffer);
+                        break;
                     }
+                    await speedLimit.WaitAsync(read, ct).ConfigureAwait(false);
+
+                    await channel.Writer.WriteAsync(new SegmentBlock(buffer, read), ct).ConfigureAwait(false);
+                    speedMeter.Add(read);
+                    remaining -= read;
                     stallCts.CancelAfter(ReadStallTimeout);
                 }
             }
+            catch (ChannelClosedException)
+            {
+
+                return;
+            }
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
-                throw new IOException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:0}s 无数据）：{file.Dest}（段 {segIndex} 已收 {progress[segIndex]} 字节）");
+                NoteStall(ch.Host);
+                throw new StallException($"下载停滞超时（{ReadStallTimeout.TotalSeconds:0}s 无数据）：{file.Dest}（段 {segIndex}）");
             }
-            WriteSegmentProgress(sidecar, progress);
         }
+    }
+
+    private static long ComputeStripeChunkSize(long fileSize, int segCount)
+    {
+        long raw = fileSize / (long)Math.Max(segCount * TargetBlocksPerSegment, 1);
+        return Math.Clamp(raw, MinStripeChunkSize, MaxStripeChunkSize);
     }
 
     private int SegmentCount(long size)
@@ -465,72 +763,21 @@ public sealed class GameUpdateDownloader
             : 1;
     }
 
-    private static long[]? ReadSegmentProgress(string sidecar, int segCount, long fileSize)
-    {
-        try
-        {
-            if (!File.Exists(sidecar))
-            {
-                return null;
-            }
-            byte[] bytes = File.ReadAllBytes(sidecar);
-            if (bytes.Length != segCount * sizeof(long))
-            {
-                return null;
-            }
-            long segSize = fileSize / segCount;
-            var progress = new long[segCount];
-            for (int i = 0; i < segCount; i++)
-            {
-                long value = BitConverter.ToInt64(bytes, i * sizeof(long));
-                long max = i == segCount - 1 ? fileSize - (segCount - 1) * segSize : segSize;
-                if (value < 0 || value > max)
-                {
-                    return null;
-                }
-                progress[i] = value;
-            }
-            return progress;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private static void WriteSegmentProgress(string sidecar, long[] progress)
-    {
-        try
-        {
-            var bytes = new byte[progress.Length * sizeof(long)];
-            for (int i = 0; i < progress.Length; i++)
-            {
-                BitConverter.GetBytes(progress[i]).CopyTo(bytes, i * sizeof(long));
-            }
-            lock (progress)
-            {
-                File.WriteAllBytes(sidecar, bytes);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "段进度落盘失败：{Sidecar}", sidecar);
-        }
-    }
-
-    private long DeleteSegmentState(GameResourceEntry file)
-    {
-        string temp = Path.Combine(_destDir, file.Dest) + TempSuffix;
-        string sidecar = temp + ".s";
-        long sum = ReadSegmentProgress(sidecar, SegmentCount(file.Size), file.Size)?.Sum() ?? 0;
-        try { File.Delete(temp); } catch { }
-        try { File.Delete(sidecar); } catch { }
-        return sum;
-    }
-
     private sealed class RangeUnsupportedException : IOException
     {
         public RangeUnsupportedException(string message) : base(message) { }
+    }
+
+    private sealed class StallException : IOException
+    {
+        public StallException(string message) : base(message) { }
+    }
+
+    private readonly record struct SegmentBlock(byte[] Buffer, int Length);
+
+    private static bool Md5Matches(byte[] hash, string expected)
+    {
+        return string.Equals(Convert.ToHexStringLower(hash), expected, StringComparison.OrdinalIgnoreCase);
     }
 
     public static bool VerifyMd5(string path, string? expectedMd5, CancellationToken ct = default)

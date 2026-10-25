@@ -37,10 +37,6 @@
                         IsPaneToggleButtonVisible="False"
                         ItemInvoked="NavigationView_ItemInvoked"
                         PaneDisplayMode="LeftCompact">
-            <NavigationView.Resources>
-                <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
-                <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
-            </NavigationView.Resources>
 
             <NavigationView.PaneCustomContent>
                 <Border Height="52" />

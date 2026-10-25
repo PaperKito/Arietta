@@ -8,8 +8,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mf="using:Arietta.Frameworks"
              xmlns:mxi="using:Microsoft.Xaml.Interactivity"
-             xmlns:mxc="using:Microsoft.Xaml.Interactivity"
-             xmlns:xim="using:Microsoft.Xaml.Interactivity"
              x:DefaultBindMode="OneTime"
              mc:Ignorable="d">
 
@@ -127,12 +125,12 @@
                             </Storyboard>
                         </Grid.Resources>
                         <mxi:Interaction.Behaviors>
-                            <mxc:EventTriggerBehavior EventName="PointerEntered">
-                                <xim:ControlStoryboardAction Storyboard="{StaticResource GridZoomInStoryboard}" />
-                            </mxc:EventTriggerBehavior>
-                            <mxc:EventTriggerBehavior EventName="PointerExited">
-                                <xim:ControlStoryboardAction Storyboard="{StaticResource GridZoomOutStoryboard}" />
-                            </mxc:EventTriggerBehavior>
+                            <mxi:EventTriggerBehavior EventName="PointerEntered">
+                                <mxi:ControlStoryboardAction Storyboard="{StaticResource GridZoomInStoryboard}" />
+                            </mxi:EventTriggerBehavior>
+                            <mxi:EventTriggerBehavior EventName="PointerExited">
+                                <mxi:ControlStoryboardAction Storyboard="{StaticResource GridZoomOutStoryboard}" />
+                            </mxi:EventTriggerBehavior>
                         </mxi:Interaction.Behaviors>
                         <Image Name="Image_Thumb"
                                Width="206"

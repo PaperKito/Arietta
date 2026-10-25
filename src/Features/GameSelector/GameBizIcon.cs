@@ -37,8 +37,6 @@ public sealed partial class GameBizIcon
 
     public string DisplayName => $"{GameName} {ServerName}".Trim();
 
-    public string GameId => Biz.ToString();
-
     public bool IsPinned { get => field; set => SetProperty(ref field, value); }
 
     public bool IsSelected { get => field; set => SetProperty(ref field, value); }

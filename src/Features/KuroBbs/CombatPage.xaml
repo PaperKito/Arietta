@@ -74,9 +74,9 @@
                                            VerticalAlignment="Center"
                                            Source="{x:Bind RankSource}"
                                            Visibility="{x:Bind RankIconVisibility}" />
+
                                     <TextBlock FontSize="13"
                                                Text="{x:Bind ValueLabel}"
-                                               Visibility="{x:Bind ValueVisibility}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
                             </StackPanel>

@@ -68,7 +68,7 @@ public sealed partial class DataTerminalWindow : Window
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<DataTerminalWindow>().LogWarning(ex, "配置数据终端窗口标题栏失败");
+            AppConfig.GetLogger<DataTerminalWindow>().LogWarning(ex, "Failed to set data terminal window title bar");
         }
     }
 
@@ -146,7 +146,7 @@ public sealed partial class DataTerminalWindow : Window
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<DataTerminalWindow>().LogError(ex, "打开数据终端失败");
+            AppConfig.GetLogger<DataTerminalWindow>().LogError(ex, "Failed to open data terminal");
             ShowPlaceholder(string.Format(Lang.Instance.DataTerminal_LoadFailed, ex.Message));
         }
     }
@@ -158,6 +158,8 @@ public sealed partial class DataTerminalWindow : Window
         {
             return;
         }
+
+        Arietta.Helpers.WebviewHost.UseDataFolder();
         await Web.EnsureCoreWebView2Async();
         if (Web.CoreWebView2 is null)
         {
@@ -190,7 +192,7 @@ public sealed partial class DataTerminalWindow : Window
                 string message = args.TryGetWebMessageAsString();
                 if (message.Contains("__mwl:"))
                 {
-                    AppConfig.GetLogger<DataTerminalWindow>().LogWarning("[数据终端 JS] {Message}", message);
+                    AppConfig.GetLogger<DataTerminalWindow>().LogWarning("[Data terminal JS] {Message}", message);
                 }
             }
             catch { }
@@ -245,7 +247,7 @@ public sealed partial class DataTerminalWindow : Window
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<DataTerminalWindow>().LogWarning(ex, "写入库街区 Cookie 失败");
+            AppConfig.GetLogger<DataTerminalWindow>().LogWarning(ex, "Failed to write KuroBBS cookies");
         }
     }
 

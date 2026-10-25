@@ -66,8 +66,7 @@ internal static class DatabaseSnapshot
 
     private static byte[] Concat(byte[] head, byte[] tail) => [.. head, .. tail];
 
-
-    private static void TryDelete(string file)
+    internal static void TryDelete(string file)
     {
         try
         {

@@ -19,6 +19,11 @@ public sealed partial class MainWindow : WindowEx
         MainWindowId = AppWindow.Id;
         this.InitializeComponent();
         InitializeMainWindow();
+
+        if (AppConfig.GetConfig("WelcomeShown") != "1")
+        {
+            WelcomeOverlayHost.Visibility = Visibility.Visible;
+        }
     }
 
 

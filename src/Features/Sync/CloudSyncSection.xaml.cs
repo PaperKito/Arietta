@@ -52,10 +52,6 @@ public sealed partial class CloudSyncSection : UserControl
 
     private void SaveConfig()
     {
-        if (_cloudSync is null)
-        {
-            return;
-        }
 
         _cloudSync.ApplyAutoSync(ToggleSwitch_EnableSync.IsOn);
     }

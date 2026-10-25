@@ -12,8 +12,6 @@ namespace Arietta.Features.GachaLog;
 public static class GachaStore
 {
 
-    private const string GameExePathConfigKey = "GameExePath";
-
     private const string ParamsKeyPrefix = "gacha_params_";
 
     private static string LegacyFolder => Path.Combine(AppConfig.LocalFolder, "gacha");
@@ -47,25 +45,6 @@ public static class GachaStore
             return connection
                 .Query<string>($"SELECT DISTINCT PlayerId FROM {DatabaseSchema.Tables.GachaLogItem} ORDER BY PlayerId;")
                 .ToArray();
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
-    public static List<(int ResourceId, string Name, int QualityLevel)> LoadDistinctItems()
-    {
-        try
-        {
-            using var connection = DatabaseService.CreateConnection();
-            var rows = connection.Query<GachaRow>(
-                $"SELECT ResourceId, Name, QualityLevel FROM {DatabaseSchema.Tables.GachaLogItem} " +
-                $"WHERE Name IS NOT NULL AND Name <> '' GROUP BY ResourceId, Name, QualityLevel;");
-            return rows
-                .Where(r => r.ResourceId > 0 && !string.IsNullOrWhiteSpace(r.Name))
-                .Select(r => (r.ResourceId, r.Name!, r.QualityLevel))
-                .ToList();
         }
         catch
         {
@@ -207,12 +186,6 @@ public static class GachaStore
         {
             return false;
         }
-    }
-
-
-    public static DateTime? GetParamsTime(string playerId)
-    {
-        return DatabaseService.GetUpdateTime(ParamsKeyPrefix + playerId)?.LocalDateTime;
     }
 
 

@@ -104,7 +104,7 @@ internal static class GameAutoSearch
             }
             catch (Exception ex)
             {
-                AppConfig.GetLogger("GameAutoSearch").LogWarning(ex, "写官方安装账本失败 {Key}", keyName);
+                AppConfig.GetLogger("GameAutoSearch").LogWarning(ex, "Failed to write official install ledger {Key}", keyName);
             }
         }
     }
@@ -126,7 +126,7 @@ internal static class GameAutoSearch
         catch (Exception ex)
         {
 
-            AppConfig.GetLogger("GameAutoSearch").LogInformation(ex, "elevated 写 HKLM 账本被取消或失败 {SubKey}", subKey);
+            AppConfig.GetLogger("GameAutoSearch").LogInformation(ex, "Elevated HKLM ledger write cancelled or failed {SubKey}", subKey);
         }
     }
 

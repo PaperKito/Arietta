@@ -33,14 +33,12 @@ public static class GachaIconSource
 
     private static Dictionary<string, string>? _index;
 
-    private static DateTimeOffset _indexFetchedAt;
-
 
     #region 索引：内存 → 磁盘 → 库街区
 
-    public static async Task<Dictionary<string, string>?> GetIndexAsync(bool force = false, CancellationToken ct = default)
+    private static async Task<Dictionary<string, string>?> GetIndexAsync(CancellationToken ct = default)
     {
-        if (!force && _index is not null)
+        if (_index is not null)
         {
             return _index;
         }
@@ -48,33 +46,28 @@ public static class GachaIconSource
         await _indexLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            if (!force && _index is not null)
+            if (_index is not null)
             {
                 return _index;
             }
 
             IndexFileModel? disk = TryLoadDiskIndex();
-            if (!force && disk is not null && DateTimeOffset.UtcNow - disk.FetchedAt < IndexLifetime)
+            if (disk is not null && DateTimeOffset.UtcNow - disk.FetchedAt < IndexLifetime)
             {
-                _index = disk.Items;
-                _indexFetchedAt = disk.FetchedAt;
-                return _index;
+                return _index = disk.Items;
             }
 
             Dictionary<string, string>? fresh = await FetchIndexAsync(ct).ConfigureAwait(false);
             if (fresh is { Count: > 0 })
             {
                 _index = fresh;
-                _indexFetchedAt = DateTimeOffset.UtcNow;
                 TrySaveDiskIndex(fresh);
                 return fresh;
             }
 
             if (disk is not null)
             {
-                _index = disk.Items;
-                _indexFetchedAt = disk.FetchedAt;
-                return _index;
+                return _index = disk.Items;
             }
             return null;
         }
@@ -139,12 +132,12 @@ public static class GachaIconSource
             {
                 return null;
             }
-            _logger.LogInformation("库街区养成计算器图标索引已刷新：{Count} 条", index.Count);
+            _logger.LogInformation("KuroBBS cultivation calculator icon index refreshed: {Count} entries", index.Count);
             return index;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "拉取库街区养成计算器图标索引失败");
+            _logger.LogError(e, "Failed to fetch KuroBBS cultivation calculator icon index");
             return null;
         }
     }
@@ -183,13 +176,13 @@ public static class GachaIconSource
             int added = index.Count - before;
             if (added > 0)
             {
-                _logger.LogInformation("养成消耗清单补充材料图标 {Added} 条（含贝币等资源）", added);
+                _logger.LogInformation("Cultivation cost list: added {Added} material icons (incl. Shell Credit etc.)", added);
             }
         }
         catch (Exception e)
         {
 
-            _logger.LogDebug(e, "收集养成材料图标失败");
+            _logger.LogDebug(e, "Failed to collect cultivation material icons");
         }
     }
 
@@ -216,7 +209,7 @@ public static class GachaIconSource
             return null;
         }
 
-        var index = await GetIndexAsync(false, ct).ConfigureAwait(false);
+        var index = await GetIndexAsync(ct).ConfigureAwait(false);
         if (index is not null && index.TryGetValue(name.Trim(), out string? url))
         {
             return url;
@@ -224,7 +217,7 @@ public static class GachaIconSource
         return await GachaIconService.LookupWikiUrlAsync(name, ct).ConfigureAwait(false);
     }
 
-    public static async Task<string?> EnsureCachedAsync(int resourceId, string name, bool overwrite = false, CancellationToken ct = default)
+    public static async Task<string?> EnsureCachedAsync(int resourceId, string name, CancellationToken ct = default)
     {
         if (resourceId <= 0 || string.IsNullOrWhiteSpace(name))
         {
@@ -232,7 +225,7 @@ public static class GachaIconSource
         }
         Directory.CreateDirectory(CacheFolder);
         string file = Path.Combine(CacheFolder, $"{resourceId}.png");
-        if (File.Exists(file) && !overwrite)
+        if (File.Exists(file))
         {
             return file;
         }
@@ -249,7 +242,7 @@ public static class GachaIconSource
         }
         catch (Exception e)
         {
-            _logger.LogWarning(e, "图标下载失败：{Name} #{ResourceId}", name, resourceId);
+            _logger.LogWarning(e, "Icon download failed: {Name} #{ResourceId}", name, resourceId);
             return null;
         }
     }

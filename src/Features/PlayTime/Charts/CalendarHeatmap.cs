@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Windows.Foundation;
 
 namespace Arietta.Features.PlayTime;
@@ -17,8 +18,6 @@ public sealed class CalendarHeatmap : Grid
     public double CellGap { get; set; } = 1.0;
 
     public double? ScaleMax { get; set; }
-
-    public bool ShowMonthSplit { get; set; }
 
     private const double WeekdayLabelRightMargin = 6;
 
@@ -33,12 +32,9 @@ public sealed class CalendarHeatmap : Grid
     private Brush[] _levelBrushes = Array.Empty<Brush>();
     private readonly List<FrameworkElement> _itemSlots = new();
     private readonly List<(int FirstK, TextBlock Label)> _monthLabels = new();
-    private readonly List<(int LeftK, int RightK)> _monthBoundaries = new();
-    private readonly List<Polyline> _monthPolyLines = new();
 
     private readonly Canvas _plate = new();
     private readonly Canvas _monthLayer = new() { Height = 18 };
-    private readonly Canvas _dividerLayer = new() { IsHitTestVisible = false };
     private readonly Grid _weekdayColumn = new();
     private readonly HoverCard _hoverCard = new();
 
@@ -83,10 +79,6 @@ public sealed class CalendarHeatmap : Grid
         SetRow(_plate, 0);
         SetColumn(_plate, 1);
         Children.Add(_plate);
-
-        SetRow(_dividerLayer, 0);
-        SetColumn(_dividerLayer, 1);
-        Children.Add(_dividerLayer);
 
         SetRow(_hoverCard, 0);
         SetColumn(_hoverCard, 0);
@@ -162,10 +154,7 @@ public sealed class CalendarHeatmap : Grid
         _hoverCard.Clear();
         _plate.Children.Clear();
         _monthLayer.Children.Clear();
-        _dividerLayer.Children.Clear();
         _monthLabels.Clear();
-        _monthBoundaries.Clear();
-        _monthPolyLines.Clear();
         _weekdayColumn.Children.Clear();
         _weekdayColumn.RowDefinitions.Clear();
 
@@ -220,7 +209,6 @@ public sealed class CalendarHeatmap : Grid
         }
 
         int currentMonth = -1;
-        int lastK = -1;
         int dayIndex = 0;
         foreach (var day in days)
         {
@@ -243,25 +231,8 @@ public sealed class CalendarHeatmap : Grid
                     _monthLayer.Children.Add(label);
                     _monthLabels.Add((k, label));
                 }
-                if (ShowMonthSplit && lastK >= 0)
-                {
-
-                    var polyline = new Polyline
-                    {
-                        Stroke = ChartHelpers.GetResource<Brush>("ControlStrongStrokeColorDefaultBrush"),
-                        StrokeThickness = 1,
-                        Opacity = 0.45,
-                        StrokeLineJoin = PenLineJoin.Round,
-                        IsHitTestVisible = false,
-                        Points = new PointCollection { new(0, 0), new(0, 0), new(0, 0), new(0, 0) },
-                    };
-                    _dividerLayer.Children.Add(polyline);
-                    _monthBoundaries.Add((lastK, k));
-                    _monthPolyLines.Add(polyline);
-                }
             }
             var daySlot = CreateSlot(day, scaleMax, transparent);
-            lastK = k;
             dayIndex++;
             _itemSlots.Add(daySlot);
         }
@@ -335,9 +306,9 @@ public sealed class CalendarHeatmap : Grid
 
     private void PlaceMonthOverlays()
     {
-        var p0 = _itemSlots[0].TransformToVisual(_dividerLayer).TransformPoint(new Point(0, 0));
-        var p1 = _itemSlots[1].TransformToVisual(_dividerLayer).TransformPoint(new Point(0, 0));
-        var p7 = _itemSlots[7].TransformToVisual(_dividerLayer).TransformPoint(new Point(0, 0));
+        var p0 = _itemSlots[0].TransformToVisual(_plate).TransformPoint(new Point(0, 0));
+        var p1 = _itemSlots[1].TransformToVisual(_plate).TransformPoint(new Point(0, 0));
+        var p7 = _itemSlots[7].TransformToVisual(_plate).TransformPoint(new Point(0, 0));
         double baseX = p0.X;
         double baseY = p0.Y;
         double colW = p7.X - p0.X;
@@ -347,7 +318,6 @@ public sealed class CalendarHeatmap : Grid
             colW = _pitch;
             rowH = _pitch;
         }
-        double height = baseY + 7 * rowH;
 
         foreach (var (firstK, label) in _monthLabels)
         {
@@ -357,45 +327,12 @@ public sealed class CalendarHeatmap : Grid
             Canvas.SetLeft(label, left);
             Canvas.SetTop(label, 2);
         }
-        for (int i = 0; i < _monthBoundaries.Count; i++)
-        {
-            var (_, rightK) = _monthBoundaries[i];
-            int colR = rightK / 7;
-            int rowR = rightK % 7;
-            double xLeft = Math.Floor(baseX + colR * colW) + 0.5;
-            if (rowR == 0)
-            {
-                _monthPolyLines[i].Points = new PointCollection
-                {
-                    new(xLeft, 0),
-                    new(xLeft, height),
-                    new(xLeft, height),
-                    new(xLeft, height),
-                };
-            }
-            else
-            {
-                double xRight = Math.Floor(baseX + (colR + 1) * colW) + 0.5;
-                double jogY = Math.Floor(baseY + rowR * rowH) + 0.5;
-                _monthPolyLines[i].Points = new PointCollection
-                {
-                    new(xRight, 0),
-                    new(xRight, jogY),
-                    new(xLeft, jogY),
-                    new(xLeft, height),
-                };
-            }
-        }
     }
 
 
     private static double ComputeScaleMax(List<HeatmapDayItem> days)
     {
-        double max = 0;
-        foreach (var d in days)
-        {
-            max = Math.Max(max, d.Value);
-        }
+        double max = days.Max(d => d.Value);
         return max > 0 ? max : 1;
     }
 

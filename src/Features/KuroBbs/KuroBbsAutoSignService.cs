@@ -156,7 +156,7 @@ public static class KuroBbsAutoSignService
         catch (Exception ex)
         {
 
-            Log.LogError(ex, "自动签到：本轮中途异常，未完成的项不记「今天已做」");
+            Log.LogError(ex, "Auto check-in: exception mid-round, unfinished items not marked \"done today\"");
             KuroBbsUi.HandleException(ex, Lang.Instance.KuroBbs_AutoSignFailedToast);
         }
         finally
@@ -180,13 +180,13 @@ public static class KuroBbsAutoSignService
             {
                 MarkDone(account, ItemCommunity);
             }
-            Log.LogInformation("自动签到 · {Account} 库街区社区：code={Code} success={Ok} msg={Msg}",
+            Log.LogInformation("Auto check-in · {Account} KuroBBS community: code={Code} success={Ok} msg={Msg}",
                 AccountLabel(account, -1), result.Code, ok, result.Msg);
             return new SignResult(name, ok, SignMessage(result.Msg, ok));
         }
         catch (Exception ex)
         {
-            Log.LogWarning(ex, "自动签到 · {Account} 库街区社区：请求异常，不记「今天已做」", AccountLabel(account, -1));
+            Log.LogWarning(ex, "Auto check-in · {Account} KuroBBS community: request exception, not marked \"done today\"", AccountLabel(account, -1));
             return new SignResult(name, false, Lang.Instance.KuroBbs_SignFail);
         }
     }
@@ -203,7 +203,7 @@ public static class KuroBbsAutoSignService
             if (string.IsNullOrEmpty(account.RoleId))
             {
 
-                Log.LogInformation("自动签到 · {Account} 鸣潮：账号尚未查到角色 id，本轮跳过", AccountLabel(account, -1));
+                Log.LogInformation("Auto check-in · {Account} Wuthering Waves: character id not found yet, skipping this round", AccountLabel(account, -1));
                 return null;
             }
             var result = await KuroBbsClient.Instance.SignInAsync(account);
@@ -211,13 +211,13 @@ public static class KuroBbsAutoSignService
             {
                 MarkDone(account, ItemWuwa);
             }
-            Log.LogInformation("自动签到 · {Account} 鸣潮：code={Code} success={Ok} msg={Msg}",
+            Log.LogInformation("Auto check-in · {Account} Wuthering Waves: code={Code} success={Ok} msg={Msg}",
                 AccountLabel(account, -1), result.Code, result.IsSuccess, result.Msg);
             return new SignResult(name, result.IsSuccess, SignMessage(result.Msg, result.IsSuccess));
         }
         catch (Exception ex)
         {
-            Log.LogWarning(ex, "自动签到 · {Account} 鸣潮：请求异常，不记「今天已做」", AccountLabel(account, -1));
+            Log.LogWarning(ex, "Auto check-in · {Account} Wuthering Waves: request exception, not marked \"done today\"", AccountLabel(account, -1));
             return new SignResult(name, false, Lang.Instance.KuroBbs_SignFail);
         }
     }
@@ -242,7 +242,7 @@ public static class KuroBbsAutoSignService
                 {
                     MarkDone(account, ItemPgr);
                 }
-                Log.LogInformation("自动签到 · {Account} 战双：没有可用的战双角色（结论确定={Definite}）", label, definite);
+                Log.LogInformation("Auto check-in · {Account} PGR: no usable PGR character (definite={Definite})", label, definite);
 
                 return null;
             }
@@ -252,13 +252,13 @@ public static class KuroBbsAutoSignService
             {
                 MarkDone(account, ItemPgr);
             }
-            Log.LogInformation("自动签到 · {Account} 战双：code={Code} success={Ok} msg={Msg}",
+            Log.LogInformation("Auto check-in · {Account} PGR: code={Code} success={Ok} msg={Msg}",
                 label, result.Code, result.IsSuccess, result.Msg);
             return new SignResult(name, result.IsSuccess, SignMessage(result.Msg, result.IsSuccess));
         }
         catch (Exception ex)
         {
-            Log.LogWarning(ex, "自动签到 · {Account} 战双：请求异常，不记「今天已做」", label);
+            Log.LogWarning(ex, "Auto check-in · {Account} PGR: request exception, not marked \"done today\"", label);
             return new SignResult(name, false, Lang.Instance.KuroBbs_SignFail);
         }
     }

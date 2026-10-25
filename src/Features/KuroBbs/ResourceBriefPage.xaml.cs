@@ -249,73 +249,12 @@ public sealed partial class ResourceBriefPage : PageBase
         {
             return;
         }
-        long total = items.Sum(i => Math.Max(i.Num, 0));
-        if (total <= 0)
-        {
-            return;
-        }
 
-        var plan = new List<(Border Segment, double Share)>();
-        void AnimateSegments(double totalWidth)
-        {
-            for (int k = 0; k < plan.Count; k++)
-            {
-                KuroBbsUi.AnimateWidth(plan[k].Segment, Math.Max(4, totalWidth * plan[k].Share), 200 + k * 120);
-            }
-        }
-        foreach (var (item, i) in items.Select((x, i) => (x, i)))
-        {
-            if (item.Num <= 0)
-            {
-                continue;
-            }
-            var brush = new SolidColorBrush(Palette[i % Palette.Length]);
-            var segment = new Border
-            {
-                Height = 18,
-                Width = 0,
-                CornerRadius = new CornerRadius(i == 0 ? 9 : 0, 0, 0, i == 0 ? 9 : 0),
-                Background = brush,
-                VerticalAlignment = VerticalAlignment.Stretch,
-            };
-            barHost.Children.Add(segment);
-            plan.Add((segment, (double)item.Num / total));
-
-            var legendItem = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };
-            legendItem.Children.Add(new Border
-            {
-                Width = 10,
-                Height = 10,
-                CornerRadius = new CornerRadius(2),
-                Background = brush,
-                VerticalAlignment = VerticalAlignment.Center,
-            });
-            legendItem.Children.Add(new TextBlock
-            {
-                Text = $"{item.Type} {item.Num * 100 / total}%",
-                FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center,
-            });
-            legend.Children.Add(legendItem);
-        }
-
-        if (barHost.ActualWidth > 0)
-        {
-            AnimateSegments(barHost.ActualWidth);
-        }
-        else
-        {
-            SizeChangedEventHandler handler = null;
-            handler = (s, e) =>
-            {
-                barHost.SizeChanged -= handler;
-                if (e.NewSize.Width > 0)
-                {
-                    AnimateSegments(e.NewSize.Width);
-                }
-            };
-            barHost.SizeChanged += handler;
-        }
+        KuroBbsUi.AddCompositionBar(barHost, legend, barHost,
+            items.Select((x, i) => (x.Type ?? "", x.Num,
+                (Brush)new SolidColorBrush(Palette[i % Palette.Length]),
+                new CornerRadius(i == 0 ? 9 : 0, 0, 0, i == 0 ? 9 : 0))).ToList(),
+            barHeight: 18, minWidth: 4, legendItemSpacing: 4, baseDelayMs: 200, stepDelayMs: 120);
     }
 
     private void FillItemList(List<KuroBriefingItem>? items)
@@ -369,14 +308,8 @@ public sealed partial class ResourceBriefPage : PageBase
 
                 int delayMs = 250 + i * 100;
                 double ratio = (double)item.Num / max;
-                SizeChangedEventHandler handler = null;
-                handler = (s, e) =>
-                {
-                    row.SizeChanged -= handler;
-                    double available = Math.Max(0, e.NewSize.Width - 110 - 90 - 16);
-                    KuroBbsUi.AnimateWidth(bar, available * ratio, delayMs);
-                };
-                row.SizeChanged += handler;
+                KuroBbsUi.WhenMeasured(row, width =>
+                    KuroBbsUi.AnimateWidth(bar, Math.Max(0, width - 110 - 90 - 16) * ratio, delayMs));
             }
 
             StackPanel_Items.Children.Add(row);

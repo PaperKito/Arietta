@@ -124,12 +124,6 @@ public static class KuroBbsAccountStore
         return _accounts[idx];
     }
 
-
-    public static void SwitchTo(int index)
-    {
-        SwitchTo(index, pgr: false);
-    }
-
     public static void SwitchTo(int index, bool pgr)
     {
         EnsureLoaded();
@@ -218,7 +212,7 @@ public static class KuroBbsAccountStore
         }
         var roles = await KuroBbsClient.Instance.SeekGameRoleAsync(account.Token, 2);
         account.PgrRoleCheckedAt = DateTimeOffset.UtcNow;
-        Log.LogInformation("战双角色查询：code={Code} success={Success} 条数={Count}",
+        Log.LogInformation("PGR character query: code={Code} success={Success} count={Count}",
             roles?.Code, roles?.IsSuccess, roles?.Data?.Count);
         if (roles is { IsSuccess: true, Data: { Count: > 0 } })
         {
@@ -237,7 +231,7 @@ public static class KuroBbsAccountStore
         if (roles is { IsSuccess: true })
         {
             account.HasPgrRole = false;
-            Log.LogInformation("战双角色查询：{Cuid} 没有战双角色，账号切换列表不再列出它", account.UserId);
+            Log.LogInformation("PGR character query: {Cuid} has no PGR characters, removed from account switch list", account.UserId);
             AddOrUpdate(account, setCurrent: false);
         }
         return false;

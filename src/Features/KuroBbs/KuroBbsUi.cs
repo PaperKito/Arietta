@@ -6,6 +6,8 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using Arietta.Helpers;
 using Arietta.Localization;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
@@ -20,14 +22,17 @@ internal static class KuroBbsUi
     }
 
     public static void AnimateWidth(Border element, double targetWidth, int delayMs)
+        => AnimateDouble(element, "Width", Math.Max(0, targetWidth), delayMs, 500);
+
+    public static void AnimateDouble(UIElement element, string property, double to, int delayMs, int durationMs)
     {
         try
         {
             var animation = new DoubleAnimation
             {
                 From = 0,
-                To = Math.Max(0, targetWidth),
-                Duration = new Duration(TimeSpan.FromMilliseconds(500)),
+                To = to,
+                Duration = new Duration(TimeSpan.FromMilliseconds(durationMs)),
                 BeginTime = TimeSpan.FromMilliseconds(delayMs),
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
                 EnableDependentAnimation = true,
@@ -35,10 +40,90 @@ internal static class KuroBbsUi
             var storyboard = new Storyboard();
             storyboard.Children.Add(animation);
             Storyboard.SetTarget(animation, element);
-            Storyboard.SetTargetProperty(animation, "Width");
+            Storyboard.SetTargetProperty(animation, property);
             storyboard.Begin();
         }
         catch { }
+    }
+
+    public static void WhenMeasured(FrameworkElement host, Action<double> action)
+    {
+        if (host.ActualWidth > 0)
+        {
+            action(host.ActualWidth);
+            return;
+        }
+        SizeChangedEventHandler handler = null;
+        handler = (s, e) =>
+        {
+            host.SizeChanged -= handler;
+            if (e.NewSize.Width > 0)
+            {
+                action(e.NewSize.Width);
+            }
+        };
+        host.SizeChanged += handler;
+    }
+
+    public static void AddCompositionBar(
+        StackPanel barHost,
+        StackPanel legend,
+        FrameworkElement measureHost,
+        IReadOnlyList<(string Label, long Value, Brush SegmentBrush, CornerRadius Corners)> segments,
+        double barHeight,
+        int minWidth,
+        int legendItemSpacing,
+        int baseDelayMs,
+        int stepDelayMs)
+    {
+        long total = segments.Sum(s => Math.Max(s.Value, 0));
+        if (total <= 0)
+        {
+            return;
+        }
+        var plan = new List<(Border Segment, double Share)>();
+        foreach (var (label, value, brush, corners) in segments)
+        {
+            if (value <= 0)
+            {
+                continue;
+            }
+            var segment = new Border
+            {
+                Height = barHeight,
+                Width = 0,
+                CornerRadius = corners,
+                Background = brush,
+                VerticalAlignment = VerticalAlignment.Stretch,
+            };
+            barHost.Children.Add(segment);
+            plan.Add((segment, (double)value / total));
+
+            var legendItem = new StackPanel { Orientation = Orientation.Horizontal, Spacing = legendItemSpacing };
+            legendItem.Children.Add(new Border
+            {
+                Width = 10,
+                Height = 10,
+                CornerRadius = new CornerRadius(2),
+                Background = brush,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            legendItem.Children.Add(new TextBlock
+            {
+                Text = $"{label} {value * 100 / total}%",
+                FontSize = 11,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            legend.Children.Add(legendItem);
+        }
+
+        WhenMeasured(measureHost, totalWidth =>
+        {
+            for (int k = 0; k < plan.Count; k++)
+            {
+                AnimateWidth(plan[k].Segment, Math.Max(minWidth, totalWidth * plan[k].Share), baseDelayMs + k * stepDelayMs);
+            }
+        });
     }
 
     public static Border KuroCard(

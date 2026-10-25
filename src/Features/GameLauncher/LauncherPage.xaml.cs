@@ -142,21 +142,6 @@ public sealed partial class LauncherPage : PageBase
     {
 
         var biz = CurrentGameBiz;
-        var entry = GameRegistry.GetEntry(biz);
-        if (entry.CloudUrl is { } url)
-        {
-
-            try
-            {
-                Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
-                ApplyAfterLaunchWindowAction();
-            }
-            catch (Exception ex)
-            {
-                InAppToast.MainWindow?.Error(ex);
-            }
-            return;
-        }
 
         bool isGameExe = false;
         string? exe = GameRegistry.GetEnabledThirdPartyToolPath(biz);
@@ -602,7 +587,7 @@ public sealed partial class LauncherPage : PageBase
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<LauncherPage>().LogWarning(ex, "检查游戏更新失败 {Biz}", biz);
+            AppConfig.GetLogger<LauncherPage>().LogWarning(ex, "Failed to check game update {Biz}", biz);
         }
     }
 
@@ -786,10 +771,6 @@ public sealed partial class LauncherPage : PageBase
             GameUpdateSession.Current.Cancel();
             return;
         }
-        if (GameUpdateSession.Current.IsBusy)
-        {
-            return;
-        }
         await RunUpdateActionAsync(GameUpdateService.UpdateKind.Predownload);
     }
 
@@ -942,7 +923,7 @@ public sealed partial class LauncherPage : PageBase
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<LauncherPage>().LogError(ex, "安装游戏失败 {Biz}", biz);
+            AppConfig.GetLogger<LauncherPage>().LogError(ex, "Failed to install game {Biz}", biz);
             InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_InstallGame);
         }
     }
@@ -992,7 +973,7 @@ public sealed partial class LauncherPage : PageBase
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<LauncherPage>().LogError(ex, "定位游戏失败 {Biz}", biz);
+            AppConfig.GetLogger<LauncherPage>().LogError(ex, "Failed to locate game {Biz}", biz);
             InAppToast.MainWindow?.Error(ex, Lang.Instance.InstallGameDialog_LocateGame);
         }
     }
@@ -1042,15 +1023,6 @@ public sealed partial class LauncherPage : PageBase
 
         if (GameState is GameState.GameIsRunning)
         {
-            return;
-        }
-        var entry = GameRegistry.GetEntry(CurrentGameBiz);
-        if (entry.CloudUrl is not null)
-        {
-
-            GameState = GameState.StartGame;
-            RunningGameInfo = null;
-            ApplyUpdateStateToMainButton();
             return;
         }
 

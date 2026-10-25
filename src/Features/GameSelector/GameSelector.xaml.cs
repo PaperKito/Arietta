@@ -353,17 +353,16 @@ public sealed partial class GameSelector : UserControl
         SelectCore(icon.Biz);
     }
 
-    private bool SelectCore(GameBiz biz)
+    private void SelectCore(GameBiz biz)
     {
         if (biz == CurrentGameBiz)
         {
-            return true;
+            return;
         }
         CurrentGameBiz = biz;
         AppConfig.SetConfig("CurrentGameBiz", biz.ToString());
         SyncSelection();
         CurrentGameChanged?.Invoke(this, biz);
-        return true;
     }
 
 
@@ -485,25 +484,14 @@ public sealed partial class GameSelector : UserControl
         {
             if (sender is FrameworkElement fe && fe.DataContext is GameBizIcon server)
             {
-                bool selected;
-                try
-                {
-                    selected = SelectCore(Enum.Parse<GameBiz>(server.GameId, true));
-                }
-                catch
-                {
-                    selected = false;
-                }
-                if (selected)
-                {
+                SelectCore(server.Biz);
 
-                    if (VisualTreeHelper.GetOpenPopupsForXamlRoot(this.XamlRoot).FirstOrDefault() is Popup popup)
-                    {
-                        popup.IsOpen = false;
-                    }
-                    _isGameBizDisplayPressed = false;
-                    HideFullBackground();
+                if (VisualTreeHelper.GetOpenPopupsForXamlRoot(this.XamlRoot).FirstOrDefault() is Popup popup)
+                {
+                    popup.IsOpen = false;
                 }
+                _isGameBizDisplayPressed = false;
+                HideFullBackground();
             }
         }
         catch { }
@@ -634,10 +622,6 @@ public sealed partial class GameSelector : UserControl
             {
                 foreach (var server in group.Servers)
                 {
-                    if (server.CloudUrl is not null)
-                    {
-                        continue;
-                    }
                     string key = GameRegistry.GetExePathConfigKey(server.Biz);
                     string? exe = AppConfig.GetConfig(key);
                     if (!string.IsNullOrWhiteSpace(exe) && File.Exists(exe))

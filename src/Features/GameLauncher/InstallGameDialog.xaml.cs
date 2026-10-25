@@ -195,10 +195,6 @@ public sealed partial class InstallGameDialog : ContentDialog
         }
     }
 
-    private void TextBlock_IsTextTrimmedChanged(TextBlock sender, IsTextTrimmedChangedEventArgs e)
-    {
-    }
-
     private static string TierLabel(string name) => name.ToUpperInvariant() switch
     {
         "UHD" => Lang.Instance.InstallGameDialog_TierUHD,

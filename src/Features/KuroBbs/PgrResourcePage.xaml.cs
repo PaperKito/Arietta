@@ -29,7 +29,6 @@ public sealed partial class PgrResourcePage : PageBase
     private long _peakBlack = 1;
     private long _peakDevelop = 1;
     private long _peakTrade = 1;
-    private bool _loading;
 
     private List<KuroPgrResourceMonth> _allMonths = [];
 
@@ -159,7 +158,7 @@ public sealed partial class PgrResourcePage : PageBase
 
     private void ListView_Periods_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ListView_Periods.SelectedItem is not PgrResourcePeriodItem item || _loading)
+        if (ListView_Periods.SelectedItem is not PgrResourcePeriodItem item)
         {
             return;
         }
@@ -252,78 +251,25 @@ public sealed partial class PgrResourcePage : PageBase
 
     private static void AddCompositionBar(StackPanel host, IReadOnlyList<(string Label, long Value)> segments, Color[] palette)
     {
-        long total = segments.Sum(s => Math.Max(s.Value, 0));
-        if (total <= 0)
+        var rendered = segments.Where(s => s.Value > 0).ToList();
+        if (rendered.Count == 0)
         {
             return;
         }
-
-        var rendered = segments.Where(s => s.Value > 0).ToList();
         var bar = new StackPanel { Orientation = Orientation.Horizontal };
         var legend = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 14, Margin = new Thickness(0, 4, 0, 0) };
-        var plan = new List<(Border Segment, double Share)>();
-        for (int i = 0; i < rendered.Count; i++)
-        {
-            var (label, value) = rendered[i];
-            var brush = new SolidColorBrush(palette[i % palette.Length]);
-            var segment = new Border
-            {
-                Height = 14,
-                Width = 0,
-                CornerRadius = new CornerRadius(
-                    i == 0 ? 7 : 0,
-                    i == rendered.Count - 1 ? 7 : 0,
-                    i == rendered.Count - 1 ? 7 : 0,
-                    i == 0 ? 7 : 0),
-                Background = brush,
-            };
-            bar.Children.Add(segment);
-            plan.Add((segment, (double)value / total));
-
-            var legendItem = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 5 };
-            legendItem.Children.Add(new Border
-            {
-                Width = 10,
-                Height = 10,
-                CornerRadius = new CornerRadius(2),
-                Background = brush,
-                VerticalAlignment = VerticalAlignment.Center,
-            });
-            legendItem.Children.Add(new TextBlock
-            {
-                Text = $"{label} {value * 100 / total}%",
-                FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center,
-            });
-            legend.Children.Add(legendItem);
-        }
         host.Children.Add(bar);
         host.Children.Add(legend);
 
-        void AnimateSegments(double totalWidth)
-        {
-            for (int k = 0; k < plan.Count; k++)
-            {
-                KuroBbsUi.AnimateWidth(plan[k].Segment, Math.Max(3, totalWidth * plan[k].Share), 150 + k * 110);
-            }
-        }
-        if (host.ActualWidth > 0)
-        {
-            AnimateSegments(host.ActualWidth);
-        }
-        else
-        {
-            SizeChangedEventHandler handler = null;
-            handler = (s, e) =>
-            {
-                host.SizeChanged -= handler;
-                if (e.NewSize.Width > 0)
-                {
-                    AnimateSegments(e.NewSize.Width);
-                }
-            };
-            host.SizeChanged += handler;
-        }
+        KuroBbsUi.AddCompositionBar(bar, legend, host,
+            rendered.Select((s, i) => (s.Label, s.Value,
+                (Brush)new SolidColorBrush(palette[i % palette.Length]),
+                new CornerRadius(
+                    i == 0 ? 7 : 0,
+                    i == rendered.Count - 1 ? 7 : 0,
+                    i == rendered.Count - 1 ? 7 : 0,
+                    i == 0 ? 7 : 0))).ToList(),
+            barHeight: 14, minWidth: 3, legendItemSpacing: 5, baseDelayMs: 150, stepDelayMs: 110);
     }
 
     private void FillMonthlyTable(PgrResourcePeriodItem item)
@@ -414,30 +360,10 @@ public sealed partial class PgrResourcePage : PageBase
                     : new SolidColorBrush(Colors.Transparent),
                 Child = row,
             };
-            FadeIn(wrapper, 30 * r);
+
+            KuroBbsUi.AnimateDouble(wrapper, "Opacity", 1, 30 * r, 220);
             StackPanel_Items.Children.Add(wrapper);
         }
-    }
-
-    private static void FadeIn(UIElement element, int delayMs)
-    {
-        try
-        {
-            var animation = new DoubleAnimation
-            {
-                From = 0,
-                To = 1,
-                Duration = new Duration(TimeSpan.FromMilliseconds(220)),
-                BeginTime = TimeSpan.FromMilliseconds(delayMs),
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
-            };
-            var storyboard = new Storyboard();
-            storyboard.Children.Add(animation);
-            Storyboard.SetTarget(animation, element);
-            Storyboard.SetTargetProperty(animation, "Opacity");
-            storyboard.Begin();
-        }
-        catch { }
     }
 
 

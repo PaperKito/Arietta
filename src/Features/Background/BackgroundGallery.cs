@@ -29,8 +29,6 @@ public sealed class BackgroundItem
 
     public bool IsOfficial { get; set; }
 
-    public bool IsCustom { get; set; }
-
     public ImageSource? Thumbnail { get; set; }
 
     public bool IsVideo => Kind == BackgroundKind.Video;
@@ -41,8 +39,6 @@ public static class BackgroundGallery
     public const string OfficialId = "official";
 
     public const string OfficialStaticId = "official_static";
-
-    public const string DefaultId = "default";
 
     private static readonly string[] ImageExtensions = { ".jpg", ".jpeg", ".png", ".bmp", ".webp", ".gif" };
     private static readonly string[] VideoExtensions = { ".mp4", ".mkv", ".webm" };
@@ -111,7 +107,6 @@ public static class BackgroundGallery
                 Name = Path.GetFileNameWithoutExtension(file),
                 FilePath = file,
                 Kind = IsVideoPath(file) ? BackgroundKind.Video : BackgroundKind.Image,
-                IsCustom = true,
                 Thumbnail = BuildThumbnail(file),
             });
         }

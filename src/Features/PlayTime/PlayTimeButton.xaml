@@ -8,31 +8,28 @@
              x:DefaultBindMode="OneWay"
              Loaded="UserControl_Loaded"
              mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal"
-                Spacing="8">
 
-        <Border Name="Border_Playtime"
-                Height="44"
-                Background="{ThemeResource CustomOverlayAcrylicBrush}"
-                CornerRadius="22"
-                Shadow="{StaticResource ThemeShadow}"
-                Translation="0,0,16">
-            <Button HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    BorderThickness="0"
-                    Click="Button_OpenStats_Click">
-                <StackPanel Margin="4,2,4,0"
-                            Orientation="Horizontal"
-                            Spacing="8">
-                    <FontIcon FontSize="20"
-                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                              Glyph="&#xE823;" />
-                    <TextBlock FontWeight="SemiBold"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               Text="{x:Bind local:PlayTimeButton.TimeSpanToString(PlayTimeTotal)}" />
-                </StackPanel>
-            </Button>
-        </Border>
-
-    </StackPanel>
+    <Border Name="Border_Playtime"
+            Height="44"
+            HorizontalAlignment="Left"
+            Background="{ThemeResource CustomOverlayAcrylicBrush}"
+            CornerRadius="22"
+            Shadow="{StaticResource ThemeShadow}"
+            Translation="0,0,16">
+        <Button HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                BorderThickness="0"
+                Click="Button_OpenStats_Click">
+            <StackPanel Margin="4,2,4,0"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                <FontIcon FontSize="20"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          Glyph="&#xE823;" />
+                <TextBlock FontWeight="SemiBold"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind local:PlayTimeButton.TimeSpanToString(PlayTimeTotal)}" />
+            </StackPanel>
+        </Button>
+    </Border>
 </UserControl>

@@ -17,8 +17,6 @@ namespace Arietta.Features.GameLauncher;
 public static class DailyBriefingPanel
 {
 
-    public static string IconFolder => Path.Combine(AppConfig.LocalFolder, "widget-icons");
-
     private const string BundledIconWuwa = "ms-appx:///Assets/Image/Common/1789406285416.png";
 
     private const string BundledIconPgr = "ms-appx:///Assets/Image/Common/actionIcon.png";

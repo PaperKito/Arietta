@@ -40,7 +40,7 @@ internal static class BackgroundAccentService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "取背景主题色失败: {Path}", accentSourcePath);
+                _logger.LogWarning(ex, "Failed to get background accent color: {Path}", accentSourcePath);
             }
 
             Color effective = color ?? AccentColorHelper.DefaultAccent;
@@ -61,14 +61,14 @@ internal static class BackgroundAccentService
                     MainWindow? window = MainWindow.Current;
                     window?.ChangeAccentColor();
 
-                    _logger.LogInformation("背景主题色 {Color}（来源 {Source}）；{Resolved}",
+                    _logger.LogInformation("Background accent color {Color} (from {Source}); {Resolved}",
                                            ToHex(effective),
                                            accentSourcePath ?? "无（还原默认）",
                                            AccentColorHelper.DescribeResolvedAccent());
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "应用背景主题色失败");
+                    _logger.LogWarning(ex, "Failed to apply background accent color");
                 }
             }
 

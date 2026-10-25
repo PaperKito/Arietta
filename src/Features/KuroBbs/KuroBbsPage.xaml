@@ -20,8 +20,6 @@
                         OpenPaneLength="248"
                         PaneDisplayMode="Left">
             <NavigationView.Resources>
-                <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
-                <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
                 <Thickness x:Key="NavigationViewContentMargin">0</Thickness>
                 <Thickness x:Key="NavigationViewHeaderMargin">0</Thickness>
                 <x:Double x:Key="PaneToggleButtonHeight">0</x:Double>
@@ -69,7 +67,6 @@
                         <TextBlock x:Name="TextBlock_AccountName" TextTrimming="CharacterEllipsis" />
                         <TextBlock FontSize="12"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}">
-                            <Run x:Name="Run_AccountRegion" /><Run Text="" />
                             <Run x:Name="Run_AccountLevelLabel" Text="{x:Bind lang:Lang.Instance.KuroBbs_AccountLevelLabel, Mode=OneWay}" /><Run x:Name="Run_AccountLevel" />
                         </TextBlock>
                     </StackPanel>

@@ -106,7 +106,7 @@ public partial class GachaLogViewModel : ObservableObject
                 parameters = SelectedPlayer is null ? null : GachaStore.LoadParams(SelectedPlayer);
                 if (parameters is null || string.IsNullOrEmpty(parameters.RecordId))
                 {
-                    SetStatus(Lang.Instance.GachaLogPage_NoSavedUrl, true);
+                    SetStatus(Lang.Instance.GachaLogPage_NoSavedUrl);
                     return;
                 }
             }
@@ -129,7 +129,7 @@ public partial class GachaLogViewModel : ObservableObject
                 }
                 if (fromLog is null)
                 {
-                    SetStatus(Lang.Instance.GachaLogPage_LogNotFound, true);
+                    SetStatus(Lang.Instance.GachaLogPage_LogNotFound);
                     return;
                 }
                 parameters = fromLog;
@@ -143,16 +143,12 @@ public partial class GachaLogViewModel : ObservableObject
     {
         if (SelectedPlayer is not { } playerId)
         {
-            SetStatus(Lang.Instance.GachaLogPage_NoSavedUrl, true);
+            SetStatus(Lang.Instance.GachaLogPage_NoSavedUrl);
             return;
         }
-        if (GachaStore.ClearParams(playerId))
+        if (!GachaStore.ClearParams(playerId))
         {
-            SetStatus(Lang.Instance.GachaLogPage_ClearSavedUrlDone, false);
-        }
-        else
-        {
-            SetStatus(Lang.Instance.GachaLogPage_NoSavedUrl, true);
+            SetStatus(Lang.Instance.GachaLogPage_NoSavedUrl);
         }
     }
 
@@ -196,7 +192,7 @@ public partial class GachaLogViewModel : ObservableObject
         }
         if (string.IsNullOrWhiteSpace(url) || !url.Contains("#/record", StringComparison.OrdinalIgnoreCase))
         {
-            SetStatus(Lang.Instance.GachaLogPage_UrlInvalid, true);
+            SetStatus(Lang.Instance.GachaLogPage_UrlInvalid);
             return;
         }
         await RunBusyAsync(async () =>
@@ -204,7 +200,7 @@ public partial class GachaLogViewModel : ObservableObject
             var parameters = GachaLogUtil.GetParamFromUrl(url.Trim());
             if (string.IsNullOrEmpty(parameters.PlayerId) || string.IsNullOrEmpty(parameters.RecordId))
             {
-                SetStatus(Lang.Instance.GachaLogPage_UrlInvalid, true);
+                SetStatus(Lang.Instance.GachaLogPage_UrlInvalid);
                 return;
             }
             await FetchAndSaveAsync(parameters);
@@ -281,7 +277,7 @@ public partial class GachaLogViewModel : ObservableObject
         string? url = logFile is null ? null : GachaLogUtil.GetLogFileUrl(logFile);
         if (url is null)
         {
-            SetStatus(Lang.Instance.GachaLogPage_UrlNotFound, true);
+            SetStatus(Lang.Instance.GachaLogPage_UrlNotFound);
             return;
         }
         try
@@ -289,11 +285,10 @@ public partial class GachaLogViewModel : ObservableObject
             var package = new Windows.ApplicationModel.DataTransfer.DataPackage();
             package.SetText(url);
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
-            SetStatus(Lang.Instance.GachaLogPage_UrlCopied, false);
         }
         catch (Exception e)
         {
-            AppConfig.GetLogger<GachaLogViewModel>().LogError(e, "复制链接失败");
+            AppConfig.GetLogger<GachaLogViewModel>().LogError(e, "Failed to copy link");
         }
     }
 
@@ -311,7 +306,7 @@ public partial class GachaLogViewModel : ObservableObject
         }
         catch (Exception e)
         {
-            AppConfig.GetLogger<GachaLogViewModel>().LogError(e, "打开数据目录失败");
+            AppConfig.GetLogger<GachaLogViewModel>().LogError(e, "Failed to open data directory");
         }
     }
 
@@ -334,7 +329,6 @@ public partial class GachaLogViewModel : ObservableObject
         {
             LoadPlayerData(null);
         }
-        SetStatus(string.Format(Lang.Instance.GachaLogPage_PlayerDeleted, playerId), false);
     }
 
     public void ApplyVisiblePools()
@@ -401,12 +395,9 @@ public partial class GachaLogViewModel : ObservableObject
         }
     }
 
-    private void SetStatus(string message, bool isError, string? title = null)
+    private void SetStatus(string message, string? title = null)
     {
-        if (isError)
-        {
-            InAppToast.MainWindow?.Error(title ?? Lang.Instance.GachaLogPage_Refresh, message);
-        }
+        InAppToast.MainWindow?.Error(title ?? Lang.Instance.GachaLogPage_Refresh, message);
     }
 
     private async Task RunBusyAsync(Func<Task> action, string logMessage, string failFormat, string? toastTitle = null)
@@ -419,7 +410,7 @@ public partial class GachaLogViewModel : ObservableObject
         catch (Exception e)
         {
             AppConfig.GetLogger<GachaLogViewModel>().LogError(e, logMessage);
-            SetStatus(string.Format(failFormat, e.Message), true, toastTitle);
+            SetStatus(string.Format(failFormat, e.Message), toastTitle);
         }
         finally
         {
@@ -474,11 +465,10 @@ public partial class GachaLogViewModel : ObservableObject
         string playerId = string.IsNullOrEmpty(filePlayerId) ? SelectedPlayer ?? "" : filePlayerId;
         if (string.IsNullOrEmpty(playerId))
         {
-            SetStatus(Lang.Instance.GachaLogPage_ImportFailNoPlayer, true, Lang.Instance.GachaLogPage_ImportExport);
+            SetStatus(Lang.Instance.GachaLogPage_ImportFailNoPlayer, Lang.Instance.GachaLogPage_ImportExport);
             return;
         }
 
-        int count = pool.Values.Sum(r => r.Count);
         await Task.Run(() => GachaStore.Save(playerId, pool, GachaStore.LoadParams(playerId) ?? new GachaParams { PlayerId = playerId }));
 
         if (!Players.Contains(playerId))
@@ -491,13 +481,11 @@ public partial class GachaLogViewModel : ObservableObject
         {
             LoadPlayerData(playerId);
         }
-        SetStatus(string.Format(Lang.Instance.GachaLogPage_ImportOk, playerId, count), false, Lang.Instance.GachaLogPage_ImportExport);
     }
 }
 
 public partial class PoolViewModel : ObservableObject
 {
-    public string PoolId { get; }
     public string Name { get; }
     public int Total { get; }
     public string Range { get; }
@@ -529,7 +517,6 @@ public partial class PoolViewModel : ObservableObject
 
     public PoolViewModel(PoolStat stat)
     {
-        PoolId = stat.PoolId;
         Name = GachaPools.GetName(stat.PoolId);
         Total = stat.Total;
         Range = stat.Total > 0 ? $"{FormatTime(stat.StartTime)} - {FormatTime(stat.EndTime)}" : "";
@@ -572,27 +559,22 @@ public partial class PoolViewModel : ObservableObject
     }
 }
 
-public abstract class GachaIconItem : System.ComponentModel.INotifyPropertyChanged
+public abstract class GachaIconItem : ObservableObject
 {
     public ImageSource? Icon { get; protected set; }
 
     public Visibility IconVisibility { get; protected set; }
 
-    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
-
-    protected void OnPropertyChanged(string propertyName) =>
-        PropertyChanged?.Invoke(this, new(propertyName));
-
     protected async Task LoadIconAsync(int resourceId, string name)
     {
-        string? file = await GachaIconService.EnsureCachedAsync(resourceId, name).ConfigureAwait(true);
+        string? file = await GachaIconSource.EnsureCachedAsync(resourceId, name).ConfigureAwait(true);
         if (file is null)
         {
             return;
         }
         Icon = GachaIcon.FromFile(file);
         IconVisibility = Icon is null ? Visibility.Collapsed : Visibility.Visible;
-        AppConfig.GetLogger(GetType().FullName ?? "GachaIconItem").LogDebug("补图完成 {Name} #{ResourceId} 线程{ThreadId} 解码{Ok}",
+        AppConfig.GetLogger(GetType().FullName ?? "GachaIconItem").LogDebug("Icon fill complete {Name} #{ResourceId} thread {ThreadId} decode {Ok}",
             name, resourceId, Environment.CurrentManagedThreadId, Icon is not null);
         OnPropertyChanged(nameof(Icon));
         OnPropertyChanged(nameof(IconVisibility));

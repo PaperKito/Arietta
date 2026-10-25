@@ -122,7 +122,7 @@ internal static class ResourceRecordStore
         }
     }
 
-    public static void SavePgrMonth(string roleId, int year, int month, string? title,
+    private static void SavePgrMonth(string roleId, int year, int month, string? title,
         int blackCard, int developResource, int tradeCredit)
         => UpsertResourceRecord(PgrBiz, roleId, PgrPeriodType, year * 100 + month, title,
             JsonSerializer.Serialize(new PgrMonthPayload(blackCard, developResource, tradeCredit), JsonOptions));

@@ -92,7 +92,6 @@ internal static class LangEn
         ["KuroBbs_TowerOfAdversity"] = "Tower of Adversity",
         ["KuroBbs_SongOfVoidSea"] = "Song of the Void Sea",
         ["KuroBbs_DoomsdayMatrix"] = "Doomsday Matrix",
-        ["KuroBbs_ComingSoon"] = "{0} is under development",
         ["KuroBbs_TokenExpired"] = "Kuro BBS login expired",
         ["KuroBbs_TokenExpiredDesc"] = "Go to Settings → Kuro BBS Account to re-capture or re-enter the token",
 
@@ -179,7 +178,6 @@ internal static class LangEn
         ["GachaLogPage_HidePools"] = "Hide Banners",
         ["GachaLogPage_ExportAs"] = "Export as",
         ["GachaLogPage_ImportRecords"] = "Import Records (Choose File)",
-        ["GachaLogPage_ImportOk"] = "Imported: player {0}, {1} records (duplicates removed automatically)",
         ["GachaLogPage_ImportFail"] = "Import failed: {0}",
         ["GachaLogPage_ImportFailNoPlayer"] = "The file contains no account info and no account is selected, so its owner can't be determined",
         ["GachaLogPage_OtherSettings"] = "Other Settings",
@@ -187,7 +185,6 @@ internal static class LangEn
         ["GachaLogPage_LinkHelpDesc"] = "Delete the cache folder and restart the game",
         ["GachaLogPage_ClearSavedUrl"] = "Delete Cache Folder",
         ["GachaLogPage_ClearSavedUrlConfirm"] = "Delete the locally saved convene link? (Records already pulled won't be deleted.)",
-        ["GachaLogPage_ClearSavedUrlDone"] = "Saved convene link cleared. Open the 'Convene Details' page in game again.",
         ["GachaLogPage_Language"] = "Language",
         ["GachaLogPage_LanguageSaved"] = "Language saved. Item names switched instantly via the built-in translation table (items missing from it keep their original name until the next record update).",
         ["GachaLogPage_LanguageApplied"] = "Renamed {0} records to {1}",
@@ -198,11 +195,8 @@ internal static class LangEn
         ["GachaLogPage_FetchEmptyDesc"] = "The API returned no error but every banner is empty — the link may have expired. Open 'Convene Details' in game and try again.",
         ["GachaLogPage_RefetchFromCloudGame"] = "Refetch via cloud game",
         ["GachaLogPage_UpdateFailed"] = "Failed to update convene records: {0}",
-        ["GachaLogPage_FetchFailed"] = "Failed to fetch convene data. Please try again.",
         ["GachaLogPage_LogNotFound"] = "Game log or convene link not found: locate the game (Wuthering Waves.exe) in Settings and open 'Convene Details' in game once, or choose 'Import via URL' from the 'Update Records' menu",
         ["GachaLogPage_UrlNotFound"] = "Convene link not found. Open the 'Convene Details' page in game once.",
-        ["GachaLogPage_UrlCopied"] = "Convene link copied to clipboard",
-        ["GachaLogPage_PlayerDeleted"] = "Local convene records for UID {0} have been deleted",
         ["GachaLogPage_DeleteConfirmText"] = "All local convene records for UID {0} will be deleted. This cannot be undone.",
         ["GachaLogPage_EmptyTitle"] = "No convene records yet",
         ["GachaLogPage_EmptyDesc"] = "Locate the game folder in Settings, open the 'Convene Details' page in game once, then come back here and tap 'Update Records' to sync.",
@@ -226,15 +220,12 @@ internal static class LangEn
 
         ["SettingPage_Language"] = "Language",
 
-        ["GameUpdate_PredownloadAvailable"] = "Pre-download for version {0} is available",
-        ["GameUpdate_Predownloaded"] = "{0} pre-downloaded. It can be installed directly once the update opens.",
         ["GameUpdate_PredownloadButton"] = "Pre-download",
         ["GameUpdate_ContinuePredownload"] = "Continue Pre-download",
         ["GameUpdate_PredownloadFinished"] = "Pre-download complete",
         ["GameUpdate_PackageSize"] = "Package size ",
         ["GameUpdate_SpaceRequired"] = "Space required ",
         ["GameUpdate_PredownloadedSize"] = "Pre-downloaded ",
-        ["GameUpdate_ConfirmPredownload"] = "Pre-download version {0}? Total download {1}. Files are staged in the predownload folder inside the game folder, and nothing is re-downloaded when you apply the update after it goes live.",
         ["GameUpdate_Applying"] = "Extracting update…",
         ["GameUpdate_Pausing"] = "Pausing…",
         ["GameUpdate_Predownloading"] = "Pre-downloading {0}…",
@@ -322,7 +313,9 @@ internal static class LangEn
         ["FilePage_SpeedLimit"] = "Speed Limit",
         ["FilePage_SpeedLimitDesc"] = "0 means no limit",
         ["FilePage_DownloadThreads"] = "Multi-threaded",
-        ["FilePage_DownloadThreadsDesc"] = "Number of simultaneous download connections. Too much parallelism slows HDDs down due to seek. Changes take effect on the next download.",
+        ["FilePage_DownloadThreadsDesc"] = "Excessive parallelism slows HDDs down due to seek. Changes take effect on the next download.",
+        ["FilePage_DownloadThreadsAuto"] = "Auto",
+        ["FilePage_DownloadThreadsManual"] = "Manual",
 
         ["KuroBbs_RefreshInfo"] = "Refresh Info",
         ["KuroBbs_Login"] = "Log In",
@@ -389,9 +382,6 @@ internal static class LangEn
         ["CombatPage_Locked"] = "{0} is locked this period or has no data",
         ["CombatPage_NoData"] = "No data: the server hasn't generated this period's records yet. Open '{0}' in the Kuro BBS app to refresh the data, then try again.",
         ["CombatPage_StatsPeriod"] = "Stats period {0} - {1}",
-        ["CombatPage_ClearRecords"] = "Clear combat records",
-        ["CombatPage_ClearRecordsConfirm"] = "This deletes all locally saved period records of '{0}' and cannot be undone. Clear them?",
-        ["CombatPage_Clear"] = "Clear",
 
         ["PlayTimeStatsDialog_TotalPlaytime"] = "Total Playtime",
         ["PlayTimeStatsDialog_Started0Times"] = "Started {0} times",
@@ -431,7 +421,6 @@ internal static class LangEn
         ["LauncherPage_RepairGame"] = "Repair Game",
         ["LauncherPage_ShowGameAnnouncement"] = "Show Game Notices",
         ["LauncherPage_UninstallGame"] = "Uninstall Game",
-        ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "Mapped network drives are not supported. Use a network share path starting with double backslashes.",
 
         ["SettingPage_BgSizeTip"] = "Background Size Tip",
         ["SettingPage_CustomBackgroundSupportVideo"] = "Custom background supports video",
@@ -449,7 +438,6 @@ internal static class LangEn
         ["GameSettingPage_HDRNotEnabled"] = "Windows HDR is not enabled yet; this may not take effect",
         ["GameSettingPage_GameNotInstalled"] = "Game not installed",
         ["GameSettingPage_GameNotInstalledDesc"] = "Set the game path on the launcher page first",
-        ["GameSettingPage_CloudGameNotSupport"] = "Cloud gaming doesn't need local game settings",
         ["GameSettingPage_SettingNotEffect"] = "Settings applied while the game is running won't take effect",
         ["GameSettingPage_ResolutionMustBeGreaterThan0"] = "Resolution must be greater than 0",
         ["GameSettingPage_LoadFailed"] = "Failed to read game settings",
@@ -470,7 +458,26 @@ internal static class LangEn
         ["SettingPage_TransparencyEffects"] = "Transparency effects",
         ["SettingPage_AnimationEffects"] = "Animation effects",
 
-        ["SettingPage_CurrentVersion"] = "Current version:",
+        ["SettingPage_CurrentVersion"] = "Version:",
+
+        ["SettingPage_CheckUpdate"] = "Check for updates",
+        ["SettingPage_CheckingUpdate"] = "Checking for updates…",
+        ["SettingPage_UpToDate"] = "Already up to date",
+        ["SettingPage_UpdateAvailable"] = "New version available",
+        ["SettingPage_UpdateDownload"] = "Download and install",
+        ["SettingPage_UpdateReady"] = "New version is ready, restart the app to finish installing",
+        ["SettingPage_UpdateFailed"] = "Update failed",
+        ["SettingPage_UpdateDevLayout"] = "Running from a development directory; installing updates requires the portable layout",
+
+        ["UpdateDialog_IgnoreVersion"] = "Skip this version",
+
+        ["UpdateWindow_UpdateNow"] = "Update now",
+        ["UpdateWindow_PackageSize"] = "Package size",
+        ["UpdateWindow_Channel"] = "Release channel",
+        ["UpdateWindow_ReleasePage"] = "Release page",
+        ["UpdateWindow_UpdateHistory"] = "Update history",
+        ["UpdateWindow_LoadingHistory"] = "Loading update history…",
+        ["UpdateWindow_RemindLater"] = "Remind me later",
 
         ["SettingPage_About_Links"] = "Links",
         ["SettingPage_ProjectHomepage"] = "Project Homepage",
@@ -607,6 +614,18 @@ internal static class LangEn
         ["RolePage_WeaponLevel"] = "LV.{0} · Ascension {1}",
 
         ["Common_UnknownError"] = "Unknown error",
+
+        ["Welcome_Title"] = "Dear player, welcome to Arietta!",
+        ["Welcome_Desc"] = "A launcher built for Kuro Games titles, helping you manage your games with ease and enjoy a better experience.",
+        ["Welcome_DataFolderDesc"] = "All of your personal data will be stored in the following folder, which is important.",
+        ["Welcome_EnvCheckIntro"] = "A few essential environment checks are needed before we start.",
+        ["Welcome_WebView2"] = "WebView2 Runtime",
+        ["Welcome_NotInstalled"] = "Not installed",
+        ["Welcome_SuggestIntro"] = "For a better experience, it is recommended to enable the following features in Windows settings.",
+        ["Welcome_Transparency"] = "Transparency effects",
+        ["Welcome_Animation"] = "Animation effects",
+        ["Welcome_Footer"] = "When everything is ready, click the button in the bottom-right corner to begin.",
+        ["Welcome_Start"] = "Arietta, start!",
     };
 
 }

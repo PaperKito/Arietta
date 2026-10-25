@@ -16,7 +16,6 @@
         <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
         <Thickness x:Key="ContentDialogPadding">0</Thickness>
         <StaticResource x:Key="ContentDialogSmokeFill" ResourceKey="ControlFillColorTransparentBrush" />
-        <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="ControlFillColorTransparentBrush" />
     </ContentDialog.Resources>
 
     <Grid Width="800"
@@ -30,8 +29,6 @@
                         OpenPaneLength="200"
                         PaneDisplayMode="Left">
             <NavigationView.Resources>
-                <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
-                <Thickness x:Key="NavigationViewContentGridBorderThickness">0</Thickness>
                 <Thickness x:Key="NavigationViewContentMargin">0</Thickness>
                 <Thickness x:Key="NavigationViewHeaderMargin">0</Thickness>
                 <x:Double x:Key="PaneToggleButtonHeight">0</x:Double>
@@ -138,13 +135,6 @@
                             </Button>
                         </Grid>
 
-                        <TextBlock x:Name="TextBlock_NetworkDriveWarning"
-                                   FontSize="12"
-                                   Foreground="{ThemeResource SystemFillColorCautionBrush}"
-                                   Text="{x:Bind lang:Lang.Instance.InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes, Mode=OneWay}"
-                                   TextWrapping="Wrap"
-                                   Visibility="Collapsed" />
-
                         <Grid x:Name="Grid_UninstallWarning"
                               ColumnSpacing="12"
                               RowSpacing="8"
@@ -248,7 +238,6 @@
                                     Visibility="{x:Bind GameSize, Converter={StaticResource ObjectToVisibilityConverter}}">
                                 <TextBlock>
                                     <Run Text="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_Size, Mode=OneWay}" />
-                                    <Run Text="" />
                                     <Run Text="{x:Bind GameSize}" />
                                 </TextBlock>
                             </Button>

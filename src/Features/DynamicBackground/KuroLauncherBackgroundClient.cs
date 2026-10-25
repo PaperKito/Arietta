@@ -24,8 +24,6 @@ public sealed record KuroLauncherApp(string GameId, string AppId, string AppKey)
 
 public sealed class KuroBackgroundInfo
 {
-    [JsonPropertyName("functionSwitch")]
-    public int FunctionSwitch { get; set; }
 
     [JsonPropertyName("backgroundFile")]
     public string? BackgroundFile { get; set; }
@@ -44,9 +42,6 @@ public sealed class KuroBackgroundInfo
 
     [JsonIgnore]
     public bool IsVideo => BackgroundFileType == 2;
-
-    [JsonIgnore]
-    public string? Identity => BackgroundFile;
 }
 
 public static class KuroLauncherBackgroundClient

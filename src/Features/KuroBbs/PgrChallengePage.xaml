@@ -23,11 +23,6 @@
                     <TextBlock VerticalAlignment="Center" Text="{x:Bind lang:Lang.Instance.RolePage_Refresh, Mode=OneWay}" />
                 </StackPanel>
             </Button>
-
-            <TextBlock x:Name="TextBlock_Subtitle"
-                       FontSize="12"
-                       Visibility="Collapsed"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
         </StackPanel>
 
         <ScrollViewer Grid.Row="1">

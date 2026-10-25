@@ -18,7 +18,7 @@ public static class GachaLanguageSettings
             string? raw = Raw;
             string? code = raw is null ? AnnouncementLanguageSettings.Selected : raw;
 
-            return Normalize(code) ?? Normalize(CultureInfo.CurrentUICulture.Name) ?? FallbackLanguage;
+            return AnnouncementLanguageSettings.Normalize(code) ?? AnnouncementLanguageSettings.Normalize(CultureInfo.CurrentUICulture.Name) ?? FallbackLanguage;
         }
     }
 
@@ -36,16 +36,6 @@ public static class GachaLanguageSettings
     public static void SetSelected(string? code)
     {
         AppConfig.SetConfig(ConfigKey, string.IsNullOrWhiteSpace(code) ? null : code.Trim());
-    }
-
-    public static void SyncFromLauncher(string? code)
-    {
-        SetSelected(code);
-    }
-
-    public static string? Normalize(string? language)
-    {
-        return AnnouncementLanguageSettings.Normalize(language);
     }
 
     public static string GetDisplayName(string code)

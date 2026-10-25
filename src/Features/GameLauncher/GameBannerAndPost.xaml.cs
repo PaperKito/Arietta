@@ -87,7 +87,7 @@ public sealed partial class GameBannerAndPost : UserControl
         catch (Exception ex)
         {
 
-            AppConfig.GetLogger<GameBannerAndPost>().LogError(ex, "公告加载出现未预期异常");
+            AppConfig.GetLogger<GameBannerAndPost>().LogError(ex, "Unexpected exception while loading announcements");
             InAppToast.MainWindow?.Warning(Lang.Instance.Notice_LoadFailed);
             Show(false);
         }

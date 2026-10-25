@@ -40,8 +40,6 @@ internal sealed class CloudSyncConfig
 
     #region 同步锚点
 
-    public string DeviceId { get; set; } = "";
-
     public string LastLocalVersion { get; set; } = "";
 
     public string LastRemoteETag { get; set; } = "";
@@ -101,15 +99,6 @@ internal sealed class CloudSyncConfig
             File.WriteAllText(ConfigFile, JsonSerializer.Serialize(this, JsonOptions));
         }
         catch { }
-    }
-
-    public string EnsureDeviceId()
-    {
-        if (string.IsNullOrWhiteSpace(DeviceId))
-        {
-            DeviceId = Guid.NewGuid().ToString("N");
-        }
-        return DeviceId;
     }
 
 }

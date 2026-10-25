@@ -79,16 +79,6 @@ internal static class DatabaseService
         }
     }
 
-    public static void Reload()
-    {
-        lock (_lock)
-        {
-            _databasePath = null;
-            _initialized = false;
-        }
-        EnsureDatabaseCreated();
-    }
-
     private static void ApplyJournalMode(SqliteConnection connection)
     {
         try
@@ -158,25 +148,6 @@ internal static class DatabaseService
             }
         }
         catch { }
-    }
-
-    public static void ReplaceDatabase(string snapshotFile)
-    {
-        lock (_lock)
-        {
-            SqliteConnection.ClearAllPools();
-            string target = DatabasePath;
-            string wal = target + "-wal";
-            string shm = target + "-shm";
-
-            DeleteIfExists(wal);
-            DeleteIfExists(shm);
-            File.Copy(snapshotFile, target, overwrite: true);
-            DeleteIfExists(wal);
-            DeleteIfExists(shm);
-            _initialized = false;
-        }
-        EnsureDatabaseCreated();
     }
 
     public static bool IntegrityCheck(string databaseFile, out string message)

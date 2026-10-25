@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
 
-public sealed record KuroBbsFeature(string Title, string Glyph);
+public sealed record KuroBbsFeature(string Title);
 
 public static class KuroBbsEvents
 {
@@ -30,15 +30,15 @@ public sealed partial class KuroBbsPage : PageBase
 {
     private static ILogger Log => AppConfig.GetLogger("KuroBbsPage");
 
-    private static readonly KuroBbsFeature SignInFeature = new(Lang.Instance.KuroBbs_SignIn, "\uE787");
+    private static readonly KuroBbsFeature SignInFeature = new(Lang.Instance.KuroBbs_SignIn);
 
-    private static readonly KuroBbsFeature DataTerminalFeature = new(Lang.Instance.KuroBbs_DataTerminal, "\uE8B7");
+    private static readonly KuroBbsFeature DataTerminalFeature = new(Lang.Instance.KuroBbs_DataTerminal);
 
-    private static readonly KuroBbsFeature PgrRoleFeature = new(Lang.Instance.KuroBbs_PgrRole, "\uE716");
-    private static readonly KuroBbsFeature PgrResourceFeature = new(Lang.Instance.KuroBbs_PgrResource, "\uE8A5");
-    private static readonly KuroBbsFeature PgrCageFeature = new(Lang.Instance.KuroBbs_PgrCage, "\uE734");
-    private static readonly KuroBbsFeature PgrWarAreaFeature = new(Lang.Instance.KuroBbs_PgrWarArea, "\uE945");
-    private static readonly KuroBbsFeature PgrTransfiniteFeature = new(Lang.Instance.KuroBbs_PgrTransfinite, "\uE774");
+    private static readonly KuroBbsFeature PgrRoleFeature = new(Lang.Instance.KuroBbs_PgrRole);
+    private static readonly KuroBbsFeature PgrResourceFeature = new(Lang.Instance.KuroBbs_PgrResource);
+    private static readonly KuroBbsFeature PgrCageFeature = new(Lang.Instance.KuroBbs_PgrCage);
+    private static readonly KuroBbsFeature PgrWarAreaFeature = new(Lang.Instance.KuroBbs_PgrWarArea);
+    private static readonly KuroBbsFeature PgrTransfiniteFeature = new(Lang.Instance.KuroBbs_PgrTransfinite);
 
     private static bool IsPgr => MainView.CurrentGameBiz.IsPunishingGrayRaven();
 
@@ -234,7 +234,7 @@ public sealed partial class KuroBbsPage : PageBase
             var accData = await KuroBbsClient.Instance.GetPgrAccountDataAsync(account);
             if (accData is not { IsSuccess: true, Data: { } data })
             {
-                Log.LogWarning("战双 accountData 回填失败：code={Code} msg={Msg}", accData?.Code, accData?.Msg);
+                Log.LogWarning("PGR accountData backfill failed: code={Code} msg={Msg}", accData?.Code, accData?.Msg);
                 return;
             }
             bool dirty = false;
@@ -260,7 +260,7 @@ public sealed partial class KuroBbsPage : PageBase
         }
         catch (Exception ex)
         {
-            Log.LogWarning(ex, "战双 accountData 回填异常");
+            Log.LogWarning(ex, "PGR accountData backfill exception");
         }
     }
 
@@ -524,17 +524,17 @@ public sealed partial class KuroBbsPage : PageBase
     {
         return tag switch
         {
-            "Role" => new KuroBbsFeature(Lang.Instance.KuroBbs_Role, "\uE716"),
+            "Role" => new KuroBbsFeature(Lang.Instance.KuroBbs_Role),
             "PgrRole" => PgrRoleFeature,
             "PgrResource" => PgrResourceFeature,
             "PgrCage" => PgrCageFeature,
             "PgrWarArea" => PgrWarAreaFeature,
             "PgrTransfinite" => PgrTransfiniteFeature,
             "DataTerminal" => DataTerminalFeature,
-            "ResourceBrief" => new KuroBbsFeature(Lang.Instance.KuroBbs_ResourceBrief, "\uE8A5"),
-            "TowerOfAdversity" => new KuroBbsFeature(Lang.Instance.KuroBbs_TowerOfAdversity, "\uE945"),
-            "SongOfVoidSea" => new KuroBbsFeature(Lang.Instance.KuroBbs_SongOfVoidSea, "\uE774"),
-            "DoomsdayMatrix" => new KuroBbsFeature(Lang.Instance.KuroBbs_DoomsdayMatrix, "\uE9D9"),
+            "ResourceBrief" => new KuroBbsFeature(Lang.Instance.KuroBbs_ResourceBrief),
+            "TowerOfAdversity" => new KuroBbsFeature(Lang.Instance.KuroBbs_TowerOfAdversity),
+            "SongOfVoidSea" => new KuroBbsFeature(Lang.Instance.KuroBbs_SongOfVoidSea),
+            "DoomsdayMatrix" => new KuroBbsFeature(Lang.Instance.KuroBbs_DoomsdayMatrix),
             _ => SignInFeature,
         };
     }

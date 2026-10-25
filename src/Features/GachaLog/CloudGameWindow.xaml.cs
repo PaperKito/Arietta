@@ -13,8 +13,6 @@ namespace Arietta.Features.GachaLog;
 public sealed partial class CloudGameWindow : Window
 {
 
-    private const string CloudApiPrefix = "https://cloud-game-sh.aki-game.com/";
-
     private readonly Func<GachaParams, Task> _onGrabbed;
 
     private string? _capturedCookie;
@@ -40,6 +38,8 @@ public sealed partial class CloudGameWindow : Window
     {
         try
         {
+
+            Arietta.Helpers.WebviewHost.UseDataFolder();
             await Web.EnsureCoreWebView2Async();
 
             Web.CoreWebView2.WebResourceResponseReceived -= CaptureCloudApiHeaders;
@@ -50,7 +50,7 @@ public sealed partial class CloudGameWindow : Window
         }
         catch (Exception e)
         {
-            AppConfig.GetLogger<CloudGameWindow>().LogError(e, "初始化 WebView2 失败");
+            AppConfig.GetLogger<CloudGameWindow>().LogError(e, "Failed to initialize WebView2");
             SetStatus(Lang.Instance.CloudGame_StatusNoRuntime, false);
             Button_Grab.IsEnabled = false;
         }
@@ -62,7 +62,7 @@ public sealed partial class CloudGameWindow : Window
         try
         {
             string uri = args.Request.Uri;
-            if (!uri.StartsWith(CloudApiPrefix, StringComparison.OrdinalIgnoreCase))
+            if (!uri.StartsWith(CloudGameClient.CloudApiBase, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
@@ -90,7 +90,7 @@ public sealed partial class CloudGameWindow : Window
         }
         catch (Exception e)
         {
-            AppConfig.GetLogger<CloudGameWindow>().LogWarning(e, "截获云游戏请求头失败");
+            AppConfig.GetLogger<CloudGameWindow>().LogWarning(e, "Failed to intercept cloud gaming request headers");
         }
     }
 
@@ -139,7 +139,7 @@ public sealed partial class CloudGameWindow : Window
         }
         catch (Exception ex)
         {
-            AppConfig.GetLogger<CloudGameWindow>().LogError(ex, "获取云游戏唤取链接失败");
+            AppConfig.GetLogger<CloudGameWindow>().LogError(ex, "Failed to get cloud gaming launch link");
             SetStatus(string.Format(Lang.Instance.CloudGame_StatusFailReason, ex.Message), true);
         }
         finally

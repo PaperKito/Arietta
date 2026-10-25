@@ -355,13 +355,7 @@ public sealed class KuroBbsClient
     private static string RandomDevCode()
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var sb = new System.Text.StringBuilder(32);
-        var random = Random.Shared;
-        for (int i = 0; i < 32; i++)
-        {
-            sb.Append(chars[random.Next(chars.Length)]);
-        }
-        return sb.ToString();
+        return new string(Random.Shared.GetItems<char>(chars, 32));
     }
 
     #endregion
@@ -912,7 +906,7 @@ public sealed class KuroBbsClient
         }
         catch (JsonException e)
         {
-            _logger.LogWarning("库街区响应严格解析失败，降级宽松解析：{Url} | {Error}", url, e.Message);
+            _logger.LogWarning("KuroBBS strict parse failed, falling back to lenient parse: {Url} | {Error}", url, e.Message);
             return JsonSerializer.Deserialize<T>(json, LenientJson.Options);
         }
     }

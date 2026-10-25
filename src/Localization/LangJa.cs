@@ -80,7 +80,6 @@ internal static class LangJa
         ["KuroBbs_TowerOfAdversity"] = "逆境深塔",
         ["KuroBbs_SongOfVoidSea"] = "冥歌海虚",
         ["KuroBbs_DoomsdayMatrix"] = "終焉マトリクス",
-        ["KuroBbs_ComingSoon"] = "{0}は開発中です",
         ["KuroBbs_TokenExpired"] = "クロBBSのログインの有効期限が切れました",
         ["KuroBbs_TokenExpiredDesc"] = "設定 → クロBBSアカウント で token を再取得または入力してください",
 
@@ -167,7 +166,6 @@ internal static class LangJa
         ["GachaLogPage_HidePools"] = "バナーを非表示",
         ["GachaLogPage_ExportAs"] = "エクスポート",
         ["GachaLogPage_ImportRecords"] = "記録をインポート（ファイルを選択）",
-        ["GachaLogPage_ImportOk"] = "インポート成功：プレイヤー {0}、合計 {1} 件の記録（重複記録は自動的に除外されます）",
         ["GachaLogPage_ImportFail"] = "インポートに失敗しました：{0}",
         ["GachaLogPage_ImportFailNoPlayer"] = "ファイルにアカウント情報が含まれず、現在選択中のアカウントもないため、所有者を特定できません",
         ["GachaLogPage_OtherSettings"] = "その他の設定",
@@ -175,7 +173,6 @@ internal static class LangJa
         ["GachaLogPage_LinkHelpDesc"] = "キャッシュフォルダを削除してからゲームを再起動してください",
         ["GachaLogPage_ClearSavedUrl"] = "キャッシュフォルダを削除",
         ["GachaLogPage_ClearSavedUrlConfirm"] = "ローカルに保存した喚取リンクを削除しますか？（取得済みのガチャ記録は削除されません）",
-        ["GachaLogPage_ClearSavedUrlDone"] = "保存済みの喚取リンクをクリアしました。ゲーム内で「喚取記録」ページを再度開いてください",
         ["GachaLogPage_Language"] = "言語",
         ["GachaLogPage_LanguageSaved"] = "言語を保存しました。次回の記録更新時に有効になります",
         ["GachaLogPage_LanguageApplied"] = "{0} 件の記録のアイテム名を {1} に変更しました",
@@ -185,11 +182,8 @@ internal static class LangJa
         ["GachaLogPage_FetchEmpty"] = "喚取記録を1件も取得できませんでした",
         ["GachaLogPage_FetchEmptyDesc"] = "API はエラーを返していませんが、すべてのバナーに記録がありません。リンクの有効期限が切れている可能性があるため、ゲーム内で「喚取記録」を再度開いてから再試行してください",
         ["GachaLogPage_UpdateFailed"] = "喚取履歴の更新に失敗しました：{0}",
-        ["GachaLogPage_FetchFailed"] = "喚取データの取得に失敗しました。もう一度お試しください",
         ["GachaLogPage_LogNotFound"] = "ゲームログまたは喚取リンクが見つかりません：先に設定でゲーム（Wuthering Waves.exe）を指定し、ゲーム内で「喚取記録」ページを一度開くか、「記録を更新」メニューから「リンクを貼り付けてインポート」を選択してください",
         ["GachaLogPage_UrlNotFound"] = "喚取リンクが見つかりません。ゲーム内で「喚取記録」ページを一度開いてください",
-        ["GachaLogPage_UrlCopied"] = "喚取リンクをクリップボードにコピーしました",
-        ["GachaLogPage_PlayerDeleted"] = "UID {0} のローカル喚取記録を削除しました",
         ["GachaLogPage_DeleteConfirmText"] = "UID {0} のローカル喚取記録をすべて削除します。この操作は取り消せません。",
         ["GachaLogPage_EmptyTitle"] = "喚取履歴はまだありません",
         ["GachaLogPage_EmptyDesc"] = "先に設定でゲームフォルダを指定し、ゲーム内で「喚取記録」ページを一度開いてから、ここに戻って「記録を更新」をクリックすると同期できます。",
@@ -213,15 +207,12 @@ internal static class LangJa
 
         ["SettingPage_Language"] = "言語",
 
-        ["GameUpdate_PredownloadAvailable"] = "新バージョン {0} の事前ダウンロードが開始されました",
-        ["GameUpdate_Predownloaded"] = "{0} は事前ダウンロード済みです。アップデート開始後にそのままインストールできます",
         ["GameUpdate_PredownloadButton"] = "事前ダウンロード",
         ["GameUpdate_ContinuePredownload"] = "事前ダウンロードを続行",
         ["GameUpdate_PredownloadFinished"] = "事前ダウンロード完了",
         ["GameUpdate_PackageSize"] = "パッケージサイズ ",
         ["GameUpdate_SpaceRequired"] = "必要な容量 ",
         ["GameUpdate_PredownloadedSize"] = "事前ダウンロード済み ",
-        ["GameUpdate_ConfirmPredownload"] = "バージョン {0} を事前ダウンロードしますか？合計 {1} のダウンロードが必要です。ファイルはゲームフォルダ内の predownload フォルダに保存され、公式アップデートの適用時に再ダウンロードは不要です。",
         ["GameUpdate_Applying"] = "アップデートを展開中…",
         ["GameUpdate_Pausing"] = "一時停止中…",
         ["GameUpdate_Predownloading"] = "{0} を事前ダウンロード中…",
@@ -295,7 +286,9 @@ internal static class LangJa
         ["FilePage_SpeedLimit"] = "速度制限",
         ["FilePage_SpeedLimitDesc"] = "0で制限なし",
         ["FilePage_DownloadThreads"] = "マルチスレッド",
-        ["FilePage_DownloadThreadsDesc"] = "同時に張るダウンロード接続数。HDD では並列が多すぎるとシークでかえって遅くなります。変更は次回から有効。",
+        ["FilePage_DownloadThreadsDesc"] = "HDD では並列が多すぎるとシークでかえって遅くなります。変更は次回から有効。",
+        ["FilePage_DownloadThreadsAuto"] = "自動",
+        ["FilePage_DownloadThreadsManual"] = "手動",
 
         ["KuroBbs_RefreshInfo"] = "情報を更新",
         ["KuroBbs_Login"] = "ログイン",
@@ -362,9 +355,6 @@ internal static class LangJa
         ["CombatPage_Locked"] = "{0} は今期未解放またはデータなし",
         ["CombatPage_NoData"] = "データなし：サーバーはまだ今期の記録を生成していません。先にクロBBSアプリで「{0}」ページを開いてデータを更新してから、再試行してください",
         ["CombatPage_StatsPeriod"] = "統計期間 {0} - {1}",
-        ["CombatPage_ClearRecords"] = "戦績記録を削除",
-        ["CombatPage_ClearRecordsConfirm"] = "この端末に保存された「{0}」の全期間の記録を削除します。元に戻せません。削除しますか？",
-        ["CombatPage_Clear"] = "削除",
 
         ["PlayTimeStatsDialog_TotalPlaytime"] = "合計プレイ時間",
         ["PlayTimeStatsDialog_Started0Times"] = "起動 {0} 回",
@@ -394,7 +384,6 @@ internal static class LangJa
         ["LauncherPage_RepairGame"] = "ゲームを修復",
         ["LauncherPage_ShowGameAnnouncement"] = "ゲームのお知らせを表示",
         ["LauncherPage_UninstallGame"] = "ゲームをアンインストール",
-        ["InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes"] = "マップ済みネットワークドライブはサポートされていません。2 つの連続するバックスラッシュで始まるネットワーク共有パスを使用してください",
 
 
         ["Common_Select"] = "選択",
@@ -409,7 +398,6 @@ internal static class LangJa
         ["GameSettingPage_Resolution"] = "解像度",
         ["GameSettingPage_FullScreen"] = "フルスクリーン",
         ["GameSettingPage_PgrFullscreenBlockedTip"] = "現在のディスプレイの解像度がゲームの対応上限を超えているため、フルスクリーンは正常に使用できません",
-        ["GameSettingPage_UsePopupWindow"] = "ボーダーレスウィンドウ",
         ["GameSettingPage_CustomResolution"] = "カスタム解像度",
         ["GameSettingPage_CustomResolutionTip"] = "カスタム解像度は「ウィンドウ」表示モードで有効になります",
         ["GameSettingPage_VoiceLanguage"] = "音声言語",
@@ -420,7 +408,6 @@ internal static class LangJa
         ["GameSettingPage_HDRNotEnabled"] = "Windows の HDR がまだ有効でないため、有効にしても反映されない場合があります",
         ["GameSettingPage_GameNotInstalled"] = "ゲームが未インストールです",
         ["GameSettingPage_GameNotInstalledDesc"] = "先にランチャーページでゲームパスを設定してください",
-        ["GameSettingPage_CloudGameNotSupport"] = "クラウドゲームではローカルのゲーム設定は不要です",
         ["GameSettingPage_SettingNotEffect"] = "ゲーム実行中に適用した設定は反映されません",
         ["GameSettingPage_ResolutionMustBeGreaterThan0"] = "解像度は 0 より大きい値にしてください",
         ["GameSettingPage_LoadFailed"] = "ゲーム設定の読み取りに失敗しました",
@@ -571,6 +558,18 @@ internal static class LangJa
         ["RolePage_WeaponLevel"] = "LV.{0} · 突破{1}",
 
         ["Common_UnknownError"] = "不明なエラー",
+
+        ["Welcome_Title"] = "プレイヤーの皆さん、Arietta へようこそ！",
+        ["Welcome_Desc"] = "クーバーゲームズのタイトル専用ランチャー。ゲーム管理をより簡単に、より快適な体験をお届けします。",
+        ["Welcome_DataFolderDesc"] = "すべての個人データは以下のフォルダーに保存されます。このフォルダーは重要です。",
+        ["Welcome_EnvCheckIntro"] = "開始前にいくつかの必要な環境を確認します。",
+        ["Welcome_WebView2"] = "WebView2 Runtime",
+        ["Welcome_NotInstalled"] = "未インストール",
+        ["Welcome_SuggestIntro"] = "より良い体験のために、システム設定で以下の機能を有効にすることをお勧めします。",
+        ["Welcome_Transparency"] = "透明効果",
+        ["Welcome_Animation"] = "アニメーション効果",
+        ["Welcome_Footer"] = "確認が終わったら、右下のボタンをクリックして始めましょう。",
+        ["Welcome_Start"] = "Arietta、起動！",
     };
 
 }

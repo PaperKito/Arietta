@@ -16,7 +16,6 @@
         <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
         <Thickness x:Key="ContentDialogPadding">0</Thickness>
         <StaticResource x:Key="ContentDialogSmokeFill" ResourceKey="ControlFillColorTransparentBrush" />
-        <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="ControlFillColorTransparentBrush" />
     </ContentDialog.Resources>
 
     <Grid Width="560" Padding="24">
@@ -43,7 +42,6 @@
                            FontSize="14"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            IsTextScaleFactorEnabled="False"
-                           IsTextTrimmedChanged="TextBlock_IsTextTrimmedChanged"
                            MaxLines="2"
                            Text="{x:Bind InstallationPath}"
                            TextTrimming="CharacterEllipsis"

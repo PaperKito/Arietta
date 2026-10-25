@@ -14,8 +14,6 @@ internal enum CloudSyncAction
     TestConnection,
     Push,
     Pull,
-    Merge,
-    Restore,
     Skipped,
 }
 
@@ -67,7 +65,6 @@ internal sealed class CloudSyncService
 
         _config.AutoSync = autoSync;
         _config.Preference = preference;
-        _config.EnsureDeviceId();
         _config.Save();
     }
 
@@ -76,7 +73,6 @@ internal sealed class CloudSyncService
     public void ApplyAutoSync(bool autoSync)
     {
         _config.AutoSync = autoSync;
-        _config.EnsureDeviceId();
         _config.Save();
     }
 
@@ -231,56 +227,6 @@ internal sealed class CloudSyncService
         }
     }
 
-    public async Task<CloudSyncResult> ForceRestoreAsync(CancellationToken ct = default)
-    {
-        if (!IsConfigured)
-        {
-            return CloudSyncResult.Fail(CloudSyncAction.Restore, NotConfiguredMessage);
-        }
-        await _gate.WaitAsync(ct);
-        try
-        {
-            using var client = CreateClient();
-            var (content, etag) = await client.DownloadAsync(RemoteFilePath, ct);
-            if (content is null)
-            {
-                return CloudSyncResult.Fail(CloudSyncAction.Restore, "云端没有备份文件");
-            }
-            string tempDatabase = Path.Combine(Path.GetTempPath(), "Arietta", $"restore_{Guid.NewGuid():N}.db");
-            try
-            {
-                byte[] database = DatabaseSnapshot.Extract(content);
-                Directory.CreateDirectory(Path.GetDirectoryName(tempDatabase)!);
-                await File.WriteAllBytesAsync(tempDatabase, database, ct);
-                if (!DatabaseService.IntegrityCheck(tempDatabase, out string message))
-                {
-                    return CloudSyncResult.Fail(CloudSyncAction.Restore, $"云端备份已损坏：{message}");
-                }
-                SaveLocalBackup();
-                DatabaseService.ReplaceDatabase(tempDatabase);
-
-                _config.LastRemoteETag = etag ?? "";
-                _config.LastLocalVersion = DatabaseService.GetContentVersion();
-                _config.LastSyncTime = DateTimeOffset.Now;
-                _config.Save();
-                return CloudSyncResult.Ok(CloudSyncAction.Restore, "已用云端备份覆盖本地数据");
-            }
-            finally
-            {
-                TryDelete(tempDatabase);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Restore from WebDAV");
-            return CloudSyncResult.Fail(CloudSyncAction.Restore, ex.Message, ex);
-        }
-        finally
-        {
-            _gate.Release();
-        }
-    }
-
     #endregion
 
 
@@ -363,7 +309,7 @@ internal sealed class CloudSyncService
                 return CloudSyncResult.Fail(CloudSyncAction.Pull, $"云端备份已损坏：{message}");
             }
 
-            MergeResult merge = DatabaseMergeService.MergeFromFile(tempDatabase, _config.Preference);
+            string mergeMessage = DatabaseMergeService.MergeFromFile(tempDatabase, _config.Preference);
             SaveLocalBackup();
 
             _config.LastRemoteETag = etag ?? "";
@@ -371,7 +317,7 @@ internal sealed class CloudSyncService
             _config.LastSyncTime = DateTimeOffset.Now;
             _config.Save();
 
-            return CloudSyncResult.Ok(CloudSyncAction.Pull, merge.Message);
+            return CloudSyncResult.Ok(CloudSyncAction.Pull, mergeMessage);
         }
         catch (InvalidDataException ex)
         {
@@ -379,7 +325,7 @@ internal sealed class CloudSyncService
         }
         finally
         {
-            TryDelete(tempDatabase);
+            DatabaseSnapshot.TryDelete(tempDatabase);
         }
     }
 
@@ -396,7 +342,7 @@ internal sealed class CloudSyncService
                 .ToList();
             foreach (string path in old)
             {
-                TryDelete(path);
+                DatabaseSnapshot.TryDelete(path);
             }
         }
         catch (Exception ex)
@@ -440,19 +386,6 @@ internal sealed class CloudSyncService
         try
         {
             StatusChanged?.Invoke(this, result);
-        }
-        catch { }
-    }
-
-
-    private static void TryDelete(string file)
-    {
-        try
-        {
-            if (File.Exists(file))
-            {
-                File.Delete(file);
-            }
         }
         catch { }
     }

@@ -81,7 +81,7 @@ public sealed partial class GeneralSetting : PageBase
         string? code = _languageOptions[index].Code;
         AnnouncementLanguageSettings.SetSelected(code);
 
-        GachaLanguageSettings.SyncFromLauncher(code);
+        GachaLanguageSettings.SetSelected(code);
         GameNoticeService.InvalidateCache();
 
         GameLauncherSettingDialog.RaiseAnnouncementSettingChanged();

@@ -32,11 +32,6 @@ public static class GachaIconService
 
     private static readonly SemaphoreSlim _indexLoadLock = new(1, 1);
 
-    public static Task<string?> EnsureCachedAsync(int resourceId, string name)
-    {
-        return GachaIconSource.EnsureCachedAsync(resourceId, name, overwrite: false);
-    }
-
     internal static async Task<string?> LookupWikiUrlAsync(string name, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(name))

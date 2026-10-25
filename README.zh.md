@@ -49,7 +49,7 @@ Arietta 旨在解决官方启动器的不足，它支持 Kuro Games 旗下所有
 
 ## 赞助
 
-开发不易，如果你觉得 Arietta 好用，可以在[赞助页面](https://paperkitoblog-dpbyupmog00q.edgeone.dev/sponsor/)赞助我。
+开发不易，如果你觉得 Arietta 好用，可以在[赞助页面](https://paperkitoblog.edgeone.dev/sponsor/)赞助我。
 
 ## 许可
 

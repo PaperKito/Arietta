@@ -95,15 +95,6 @@ public sealed partial class SystemTrayWindow : WindowEx
 
 
     [RelayCommand]
-    public override void Hide()
-    {
-        base.Hide();
-    }
-
-
-
-
-    [RelayCommand]
     public void ShowMainWindow()
     {
         App.Current.EnsureMainWindow();

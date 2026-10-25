@@ -133,7 +133,7 @@
                         Orientation="Horizontal">
                 <Button Height="36"
                         BorderThickness="0"
-                        Click="Button_Apply_Click"
+                        Command="{x:Bind ApplySettingCommand}"
                         CornerRadius="18"
                         IsEnabled="{x:Bind IsApplyButtonEnable}"
                         Style="{ThemeResource AccentButtonStyle}">

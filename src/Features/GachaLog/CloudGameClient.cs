@@ -14,7 +14,7 @@ public static class CloudGameClient
 
     public const string CloudHomePage = "https://mc.kurogames.com/cloud/index.html";
 
-    private const string CloudApiBase = "https://cloud-game-sh.aki-game.com/";
+    public const string CloudApiBase = "https://cloud-game-sh.aki-game.com/";
 
     public const string CloudCardPoolId = "5c13a63f85465e9fcc0f24d6efb15083";
 

@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mf:WindowEx x:Class="Arietta.Features.Setting.UpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mf="using:Arietta.Frameworks"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+
+    <Grid x:Name="RootGrid">
+        <Grid.ColumnDefinitions>
+
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="0"
+              Grid.Column="0"
+              Margin="24,8,20,20">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0"
+                        Spacing="8">
+                <TextBlock x:Name="TextBlock_Title"
+                           FontSize="20" />
+                <StackPanel Margin="0,8,0,0"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                    <TextBlock x:Name="TextBlock_OldVersion"
+                               VerticalAlignment="Bottom"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <FontIcon VerticalAlignment="Bottom"
+                              FontSize="16"
+                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                              Glyph="&#xEBE7;" />
+                    <TextBlock x:Name="TextBlock_NewVersion"
+                               VerticalAlignment="Bottom"
+                               Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                               FontWeight="SemiBold" />
+                </StackPanel>
+            </StackPanel>
+
+            <Grid Grid.Row="1"
+                  Margin="0,14,0,0"
+                  ColumnSpacing="12"
+                  RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           x:Name="TextBlock_SizeLabel" />
+                <TextBlock Grid.Row="0"
+                           Grid.Column="1"
+                           IsTextSelectionEnabled="True"
+                           x:Name="TextBlock_Size" />
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           x:Name="TextBlock_ChannelLabel" />
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
+                           Text="GitHub Releases" />
+            </Grid>
+
+            <StackPanel Grid.Row="2"
+                        Margin="0,12,0,0"
+                        Spacing="4">
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           x:Name="TextBlock_LinksLabel" />
+                <HyperlinkButton Click="HyperlinkButton_Release_Click"
+                                 Content=""
+                                 Padding="0"
+                                 x:Name="HyperlinkButton_Release" />
+                <HyperlinkButton Click="HyperlinkButton_History_Click"
+                                 Content=""
+                                 Padding="0"
+                                 x:Name="HyperlinkButton_History" />
+            </StackPanel>
+
+            <MenuFlyoutSeparator Grid.Row="3"
+                                 Margin="0,12,0,0" />
+
+            <StackPanel Grid.Row="5"
+                        Spacing="4"
+                        Visibility="Collapsed"
+                        x:Name="Panel_Progress">
+                <Grid>
+                    <TextBlock HorizontalAlignment="Left"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               x:Name="TextBlock_Bytes" />
+                    <TextBlock HorizontalAlignment="Right"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               x:Name="TextBlock_Percent" />
+                </Grid>
+                <ProgressBar Maximum="100"
+                             x:Name="ProgressBar_Download" />
+                <TextBlock FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           TextWrapping="Wrap"
+                           x:Name="TextBlock_ProgressMessage" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="6"
+                        Margin="0,12,0,0"
+                        Orientation="Horizontal"
+                        Spacing="24">
+
+                <Button Height="36"
+                        Padding="20,0,20,0"
+                        BorderThickness="0"
+                        CornerRadius="18"
+                        Style="{ThemeResource AccentButtonStyle}"
+                        Click="OnUpdateNowClick"
+                        x:Name="Button_UpdateNow" />
+
+                <Grid>
+                    <SplitButton Height="36"
+                                 BorderThickness="0"
+                                 CornerRadius="18"
+                                 Opacity="0"
+                                 Click="OnRemindLaterClick"
+                                 PointerEntered="SplitButton_RemindLater_PointerEntered"
+                                 PointerExited="SplitButton_RemindLater_PointerExited"
+                                 x:Name="SplitButton_RemindLater">
+                        <TextBlock Margin="4,0,0,0"
+                                   Foreground="Transparent"
+                                   Text="{x:Bind RemindLaterText}" />
+                        <SplitButton.Flyout>
+                            <MenuFlyout Placement="Top">
+                                <MenuFlyoutItem Click="OnIgnoreVersionClick"
+                                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                                x:Name="MenuFlyoutItem_Ignore" />
+                            </MenuFlyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+                    <TextBlock Margin="16,0,0,0"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                               IsHitTestVisible="False"
+                               Text="{x:Bind RemindLaterText}" />
+                </Grid>
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="0"
+              Grid.Column="1"
+              Margin="0,32,0,8">
+            <WebView2 x:Name="NotesWeb"
+                      DefaultBackgroundColor="Transparent"
+                      Loaded="NotesWeb_Loaded" />
+            <ScrollViewer Padding="24,4,24,12"
+                          Visibility="Collapsed"
+                          x:Name="Scroll_NotesFallback">
+                <TextBlock IsTextSelectionEnabled="True"
+                           TextWrapping="Wrap"
+                           x:Name="TextBlock_NotesFallback" />
+            </ScrollViewer>
+        </Grid>
+
+    </Grid>
+</mf:WindowEx>

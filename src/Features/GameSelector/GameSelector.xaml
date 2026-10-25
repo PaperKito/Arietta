@@ -6,8 +6,8 @@
              xmlns:local="using:Arietta.Features.GameSelector"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mxi="using:Microsoft.Xaml.Interactivity"
-             xmlns:mxic="using:Microsoft.Xaml.Interactivity"
-             xmlns:mxim="using:Microsoft.Xaml.Interactivity"
+            
+            
              xmlns:sh="using:Arietta.Helpers"
              xmlns:lang="using:Arietta.Localization"
              x:DefaultBindMode="OneWay"
@@ -186,12 +186,12 @@
                                     </Grid.Resources>
 
                                     <mxi:Interaction.Behaviors>
-                                        <mxic:EventTriggerBehavior EventName="PointerEntered">
-                                            <mxim:ControlStoryboardAction Storyboard="{StaticResource PointerInStoryboard}" />
-                                        </mxic:EventTriggerBehavior>
-                                        <mxic:EventTriggerBehavior EventName="PointerExited">
-                                            <mxim:ControlStoryboardAction Storyboard="{StaticResource PointerOutStoryboard}" />
-                                        </mxic:EventTriggerBehavior>
+                                        <mxi:EventTriggerBehavior EventName="PointerEntered">
+                                            <mxi:ControlStoryboardAction Storyboard="{StaticResource PointerInStoryboard}" />
+                                        </mxi:EventTriggerBehavior>
+                                        <mxi:EventTriggerBehavior EventName="PointerExited">
+                                            <mxi:ControlStoryboardAction Storyboard="{StaticResource PointerOutStoryboard}" />
+                                        </mxi:EventTriggerBehavior>
                                     </mxi:Interaction.Behaviors>
 
                                     <FlyoutBase.AttachedFlyout>
@@ -499,7 +499,6 @@
                               PointerEntered="Grid_GameIcon_PointerEntered"
                               PointerExited="Grid_GameIcon_PointerExited"
                               Shadow="{ThemeResource ThemeShadow}"
-                              Tag="{x:Bind GameId}"
                               ToolTipService.ToolTip="{x:Bind DisplayName}"
                               Tapped="Grid_GameIcon_Tapped"
                               Translation="0,0,16">

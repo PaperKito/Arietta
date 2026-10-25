@@ -259,7 +259,7 @@ public sealed partial class PgrRolePage : PageBase
         StackPanel_DetailBadges.Children.Clear();
         if (!string.IsNullOrEmpty(career))
         {
-            StackPanel_DetailBadges.Children.Add(MakeBadge(career!, true));
+            StackPanel_DetailBadges.Children.Add(MakeBadge(career!));
         }
         if (!string.IsNullOrEmpty(element))
         {
@@ -867,14 +867,13 @@ public sealed partial class PgrRolePage : PageBase
     private static Border MakeDivider() => KuroBbsUi.MakeDivider("CardStrokeColorDefaultBrush", 1, new Thickness(0, 6, 0, 2));
 
 
-    private static Border MakeBadge(string text, bool accent)
+    private static Border MakeBadge(string text)
     {
-        string key = accent ? "AccentFillColorDefaultBrush" : "SubtleFillColorSecondaryBrush";
         return new Border
         {
             Padding = new Thickness(6, 1, 6, 1),
             CornerRadius = new CornerRadius(4),
-            Background = (Brush)Application.Current.Resources[key],
+            Background = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
             Child = new TextBlock { FontSize = 11, Text = text },
         };
     }
@@ -973,7 +972,7 @@ public sealed partial class PgrRolePage : PageBase
 
         if (!string.IsNullOrEmpty(info.Badge))
         {
-            var badge = MakeBadge(info.Badge!, true);
+            var badge = MakeBadge(info.Badge!);
             badge.VerticalAlignment = VerticalAlignment.Center;
             Grid.SetColumn(badge, 2);
             head.Children.Add(badge);

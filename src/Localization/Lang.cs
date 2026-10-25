@@ -183,7 +183,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string KuroBbs_TowerOfAdversity => T();
     public string KuroBbs_SongOfVoidSea => T();
     public string KuroBbs_DoomsdayMatrix => T();
-    public string KuroBbs_ComingSoon => T();
     public string KuroBbs_TokenExpired => T();
     public string KuroBbs_TokenExpiredDesc => T();
 
@@ -276,7 +275,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string GachaLogPage_ExportFormatExcel => T();
     public string GachaLogPage_ExportFormatCsv => T();
     public string GachaLogPage_ImportRecords => T();
-    public string GachaLogPage_ImportOk => T();
     public string GachaLogPage_ImportFail => T();
     public string GachaLogPage_ImportFailNoPlayer => T();
 
@@ -285,7 +283,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string GachaLogPage_LinkHelpDesc => T();
     public string GachaLogPage_ClearSavedUrl => T();
     public string GachaLogPage_ClearSavedUrlConfirm => T();
-    public string GachaLogPage_ClearSavedUrlDone => T();
     public string GachaLogPage_Language => T();
     public string GachaLogPage_LanguageSaved => T();
     public string GachaLogPage_LanguageApplied => T();
@@ -307,11 +304,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string GachaLogPage_FetchEmptyDesc => T();
     public string GachaLogPage_RefetchFromCloudGame => T();
     public string GachaLogPage_UpdateFailed => T();
-    public string GachaLogPage_FetchFailed => T();
     public string GachaLogPage_LogNotFound => T();
     public string GachaLogPage_UrlNotFound => T();
-    public string GachaLogPage_UrlCopied => T();
-    public string GachaLogPage_PlayerDeleted => T();
     public string GachaLogPage_DeleteConfirmText => T();
     public string GachaLogPage_EmptyTitle => T();
     public string GachaLogPage_EmptyDesc => T();
@@ -344,11 +338,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string Language_Thai => "ไทย";
     public string Language_PortugueseBrazil => "Português (Brasil)";
 
-    public string GameUpdate_PredownloadAvailable => T();
-    public string GameUpdate_Predownloaded => T();
     public string GameUpdate_PredownloadButton => T();
     public string GameUpdate_ContinuePredownload => T();
-    public string GameUpdate_ConfirmPredownload => T();
     public string GameUpdate_PredownloadTitle => T();
     public string GameUpdate_PackageSize => T();
     public string GameUpdate_SpaceRequired => T();
@@ -450,6 +441,8 @@ public sealed class Lang : INotifyPropertyChanged
 
     public string FilePage_DownloadThreads => T();
     public string FilePage_DownloadThreadsDesc => T();
+    public string FilePage_DownloadThreadsAuto => T();
+    public string FilePage_DownloadThreadsManual => T();
 
     public string KuroBbs_RefreshInfo => T();
     public string KuroBbs_Login => T();
@@ -523,9 +516,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string CombatPage_Locked => T();
     public string CombatPage_NoData => T();
     public string CombatPage_StatsPeriod => T();
-    public string CombatPage_ClearRecords => T();
-    public string CombatPage_ClearRecordsConfirm => T();
-    public string CombatPage_Clear => T();
 
     public string PlayTimeStatsDialog_TotalPlaytime => T();
     public string PlayTimeStatsDialog_Started0Times => T();
@@ -570,7 +560,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string LauncherPage_UninstallGame => T();
     public string LauncherPage_CustomStartExecutable => T();
 
-    public string InstallGameDialog_MappedNetworkDrivesAreNotSupportedPleaseUseANetworkSharePathStartingWithDoubleBackslashes => T();
 
     public string Language_Chinese => "简体中文";
     public string Language_English => "English";
@@ -599,7 +588,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameSettingPage_HDRNotEnabled => T();
     public string GameSettingPage_GameNotInstalled => T();
     public string GameSettingPage_GameNotInstalledDesc => T();
-    public string GameSettingPage_CloudGameNotSupport => T();
     public string GameSettingPage_SettingNotEffect => T();
     public string GameSettingPage_ResolutionMustBeGreaterThan0 => T();
     public string GameSettingPage_LoadFailed => T();
@@ -623,6 +611,25 @@ public sealed class Lang : INotifyPropertyChanged
     public string SettingPage_CurrentVersion => T();
 
     public string SettingPage_About_Copyright => T();
+
+    public string SettingPage_CheckUpdate => T();
+    public string SettingPage_CheckingUpdate => T();
+    public string SettingPage_UpToDate => T();
+    public string SettingPage_UpdateAvailable => T();
+    public string SettingPage_UpdateDownload => T();
+    public string SettingPage_UpdateReady => T();
+    public string SettingPage_UpdateFailed => T();
+    public string SettingPage_UpdateDevLayout => T();
+
+    public string UpdateDialog_IgnoreVersion => T();
+
+    public string UpdateWindow_UpdateNow => T();
+    public string UpdateWindow_PackageSize => T();
+    public string UpdateWindow_Channel => T();
+    public string UpdateWindow_ReleasePage => T();
+    public string UpdateWindow_UpdateHistory => T();
+    public string UpdateWindow_LoadingHistory => T();
+    public string UpdateWindow_RemindLater => T();
 
     public string SettingPage_About_Links => T();
     public string SettingPage_ProjectHomepage => T();
@@ -761,5 +768,17 @@ public sealed class Lang : INotifyPropertyChanged
     public string RolePage_WeaponLevel => T();
 
     public string Common_UnknownError => T();
+
+    public string Welcome_Title => T();
+    public string Welcome_Desc => T();
+    public string Welcome_DataFolderDesc => T();
+    public string Welcome_EnvCheckIntro => T();
+    public string Welcome_WebView2 => T();
+    public string Welcome_NotInstalled => T();
+    public string Welcome_SuggestIntro => T();
+    public string Welcome_Transparency => T();
+    public string Welcome_Animation => T();
+    public string Welcome_Footer => T();
+    public string Welcome_Start => T();
 
 }

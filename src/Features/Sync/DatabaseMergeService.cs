@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 namespace Arietta.Features.Sync;
 
-internal sealed record MergeResult(bool Success, string Message, int RowsAdded, int SettingInserted, IReadOnlyList<string> ConflictingKeys);
-
 internal static class DatabaseMergeService
 {
     private static readonly string[] PlayTimeItemColumns =
@@ -19,14 +17,13 @@ internal static class DatabaseMergeService
     private static readonly string[] GachaLogItemColumns =
         ["PlayerId", "CardPoolType", "ResourceId", "QualityLevel", "ResourceType", "Name", "Count", "Time", "SubSeq"];
 
-    public static MergeResult MergeFromFile(string remoteDatabaseFile, SyncPreference preference = SyncPreference.LocalFirst)
+    public static string MergeFromFile(string remoteDatabaseFile, SyncPreference preference = SyncPreference.LocalFirst)
     {
         using var connection = DatabaseService.CreateConnection();
         connection.Execute("ATTACH DATABASE @path AS remote;", new { path = remoteDatabaseFile });
         try
         {
             Dictionary<string, int> before = CountRows(connection, "main");
-            int settingInserted;
 
             using (var transaction = connection.BeginTransaction())
             {
@@ -39,7 +36,7 @@ internal static class DatabaseMergeService
                 MergeCombatRecord(connection, transaction);
                 MergeTowerFloorRecord(connection, transaction);
 
-                settingInserted = MergeSetting(connection, transaction, preference);
+                MergeSetting(connection, transaction, preference);
 
                 transaction.Commit();
             }
@@ -54,7 +51,7 @@ internal static class DatabaseMergeService
             string message = added == 0
                 ? "本地已是最新，无需合并"
                 : $"合并完成：新增 {added} 条记录";
-            return new MergeResult(true, message, added, settingInserted, ConflictingKeys(connection));
+            return message;
         }
         finally
         {
@@ -169,26 +166,6 @@ internal static class DatabaseMergeService
         }
 
         return inserted + updated;
-    }
-
-
-    private static IReadOnlyList<string> ConflictingKeys(SqliteConnection connection)
-    {
-        var keys = new List<string>();
-        if (!RemoteTableExists(connection, DatabaseSchema.Tables.Setting))
-        {
-            return keys;
-        }
-        try
-        {
-            keys.AddRange(connection.Query<string>("""
-                SELECT r.Key FROM remote.Setting r
-                JOIN main.Setting m ON m.Key = r.Key
-                WHERE r.Value IS NOT m.Value;
-                """));
-        }
-        catch { }
-        return keys;
     }
 
 

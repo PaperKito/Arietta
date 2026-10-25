@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
 using Arietta.Features.ViewHost;
@@ -65,6 +66,23 @@ public partial class App : Application
         m_MainWindow = new MainWindow();
         m_MainWindow.Activate();
 
+        _ = Features.Setting.SelfUpdateService.CleanupLeftoversAsync();
+
+        _ = Features.Setting.SelfUpdateService.AutoCheckAsync();
+
+        if (AppConfig.CommandLineArgs.Contains("--fake-update"))
+        {
+            var fakeTimer = new System.Timers.Timer(3000) { AutoReset = false };
+            fakeTimer.Elapsed += (_, _) => ShowUpdateDialog(new Features.Setting.SelfUpdateInfo(
+                "9.9.9", "https://github.com/PaperKito/Arietta/releases/latest",
+                "## Arietta v9.9.9（模拟更新）\n" +
+                "- 模拟用的假版本说明，Markdown 渲染预览\n" +
+                "- 支持**加粗**、[链接](https://github.com)与列表\n" +
+                "- 点「立即更新」在开发树只会提示开发布局，不会真下载",
+                "https://example.invalid/Arietta-portable.zip", 0, null));
+            fakeTimer.Start();
+        }
+
         _ = Features.KuroBbs.KuroBbsAutoSignService.RunDailyOnceAsync();
 
         m_TrayWindow = new Features.ViewHost.SystemTrayWindow();
@@ -129,6 +147,29 @@ public partial class App : Application
     public MainWindow? MainWindow => m_MainWindow;
 
 
+    private Features.Setting.UpdateWindow? m_updateWindow;
+
+    public void ShowUpdateDialog(Features.Setting.SelfUpdateInfo info)
+    {
+        _uiDispatcherQueue.TryEnqueue(() =>
+        {
+            try
+            {
+                if (m_updateWindow is null)
+                {
+                    m_updateWindow = new Features.Setting.UpdateWindow(info);
+                    m_updateWindow.Closed += (_, _) => m_updateWindow = null;
+                }
+                m_updateWindow.Show();
+            }
+            catch (Exception ex)
+            {
+                AppConfig.GetLogger<App>().LogWarning(ex, "Failed to show update window");
+            }
+        });
+    }
+
+
     public void EnsureMainWindow()
     {
         m_MainWindow ??= new MainWindow();
@@ -153,29 +194,6 @@ public partial class App : Application
         try { m_AppInstance?.UnregisterKey(); } catch { }
 
         try { Features.Gamepad.GamepadController.RestoreGameBarRegistry(); } catch { }
-        ExitProcess(0);
-    }
-
-    public void RestartApp()
-    {
-        try { m_TrayWindow?.DisposeTrayIcon(); } catch { }
-        try { m_AppInstance?.UnregisterKey(); } catch { }
-        try { Features.Gamepad.GamepadController.RestoreGameBarRegistry(); } catch { }
-        try
-        {
-            if (Environment.ProcessPath is { } exe)
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = exe,
-                    UseShellExecute = true,
-                });
-            }
-        }
-        catch
-        {
-
-        }
         ExitProcess(0);
     }
 

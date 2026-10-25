@@ -23,8 +23,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 {
     private readonly ILogger<GameLauncherSettingDialog> _logger = AppConfig.GetLogger<GameLauncherSettingDialog>();
 
-    public GameLauncherSettingDialog() : this(GameBiz.WutheringWaves) { }
-
     public GameLauncherSettingDialog(GameBiz biz)
     {
         CurrentGameBiz = biz;
@@ -535,26 +533,28 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         }
     }
 
-    [RelayCommand]
-    private void OpenInstalGameFolder()
+    private void OpenAndSelect(string? path, string logName)
     {
         try
         {
-            if (InstallPath is { } path && File.Exists(path))
+            if (path is { } p && File.Exists(p))
             {
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "explorer.exe",
-                    Arguments = $"/select,\"{path}\"",
+                    Arguments = $"/select,\"{p}\"",
                     UseShellExecute = true,
                 });
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Open install game folder");
+            _logger.LogError(ex, logName);
         }
     }
+
+    [RelayCommand]
+    private void OpenInstalGameFolder() => OpenAndSelect(InstallPath, "Open install game folder");
 
     [RelayCommand]
     private void DeleteGameInstllPath()
@@ -586,7 +586,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             _repairBusy = true;
             _repairCts = new System.Threading.CancellationTokenSource();
             var progress = new Progress<GameDownloadProgress>(OnRepairProgress);
-            var result = await GameUpdateService.VerifyAsync(CurrentGameBiz, quick: false, progress, _repairCts.Token);
+            var result = await GameUpdateService.VerifyAsync(CurrentGameBiz, progress, _repairCts.Token);
             if (result is null)
             {
                 ShowRepairError(Lang.Instance.GameUpdate_VerifyNoManifest);
@@ -816,25 +816,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     public static event EventHandler<string>? CustomBackgroundChanged;
 
     [RelayCommand]
-    private void OpenCustomBg()
-    {
-        try
-        {
-            if (CustomBg is { } path && File.Exists(path))
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "explorer.exe",
-                    Arguments = $"/select,\"{path}\"",
-                    UseShellExecute = true,
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Open custom background");
-        }
-    }
+    private void OpenCustomBg() => OpenAndSelect(CustomBg, "Open custom background");
 
     [RelayCommand]
     private void DeleteCustomBg()
@@ -887,25 +869,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     }
 
     [RelayCommand]
-    private void OpenThirdPartyToolFolder()
-    {
-        try
-        {
-            if (ThirdPartyToolPath is { } path && File.Exists(path))
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = "explorer.exe",
-                    Arguments = $"/select,\"{path}\"",
-                    UseShellExecute = true,
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Open third party tool folder");
-        }
-    }
+    private void OpenThirdPartyToolFolder() => OpenAndSelect(ThirdPartyToolPath, "Open third party tool folder");
 
     [RelayCommand]
     private void DeleteThirdPartyToolPath()

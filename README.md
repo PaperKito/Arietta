@@ -49,7 +49,7 @@ To build the app locally, you need the latest Visual Studio with the following w
 
 ## Sponsor
 
-Development takes real effort. If you find Arietta useful, you can sponsor me via [the sponsor page](https://paperkitoblog-dpbyupmog00q.edgeone.dev/sponsor/).
+Development takes real effort. If you find Arietta useful, you can sponsor me via [the sponsor page](https://paperkitoblog.edgeone.dev/sponsor/).
 
 ## License
 

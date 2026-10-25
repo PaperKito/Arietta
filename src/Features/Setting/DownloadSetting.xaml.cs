@@ -49,12 +49,18 @@ public sealed partial class DownloadSetting : PageBase
 
     private void RefreshThreads()
     {
+        _restoringDownload = true;
 
+        bool auto = !int.TryParse(AppConfig.GetConfig(GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsConfigKey), out int manual)
+                    || manual == 0;
         Slider_Threads.Minimum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMin;
         Slider_Threads.Maximum = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMax;
         Slider_Threads.Value = GameLauncher.GameUpdate.GameUpdateService.DownloadThreads;
+        Panel_ThreadsRow.Visibility = auto ? Visibility.Collapsed : Visibility.Visible;
+        (auto ? Radio_ThreadsAuto : Radio_ThreadsManual).IsChecked = true;
         Text_ThreadsMax.Text = GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsMax.ToString();
         _threadsReady = true;
+        _restoringDownload = false;
     }
 
 
@@ -84,6 +90,23 @@ public sealed partial class DownloadSetting : PageBase
         }
         AppConfig.SetConfig(GameLauncher.GameUpdate.GameUpdateService.SpeedLimitConfigKey,
             ((long)mb).ToString());
+    }
+
+
+    private void Radio_Threads_ModeChanged(object sender, RoutedEventArgs e)
+    {
+
+        if (_restoringDownload || !_threadsReady || sender is not RadioButton { IsChecked: true })
+        {
+            return;
+        }
+
+        AppConfig.SetConfig(GameLauncher.GameUpdate.GameUpdateService.DownloadThreadsConfigKey,
+            Radio_ThreadsAuto.IsChecked == true
+                ? "0"
+                : ((int)Math.Round(Slider_Threads.Value)).ToString());
+        bool auto = Radio_ThreadsAuto.IsChecked == true;
+        Panel_ThreadsRow.Visibility = auto ? Visibility.Collapsed : Visibility.Visible;
     }
 
 

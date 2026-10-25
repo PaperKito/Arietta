@@ -161,7 +161,7 @@ internal class PlayTimeRecordService
         }
     }
 
-    public Task<Process?> StartProcessToLogAsync(GameId gameId, int? anchorPid = null)
+    public Task StartProcessToLogAsync(GameId gameId, int? anchorPid = null)
     {
         try
         {
@@ -172,7 +172,7 @@ internal class PlayTimeRecordService
         {
             _logger.LogError(ex, "Start process to log play time: {biz}", gameId.GameBiz);
         }
-        return Task.FromResult<Process?>(null);
+        return Task.CompletedTask;
     }
 
     public Task StartProcessToLogAsync(GameId gameId, int launchedPid, string launchedProcessName)
@@ -239,7 +239,7 @@ internal class PlayTimeRecordService
                     await LogPlayTimeAsync(biz, lastResort.Id);
                     return;
                 }
-                _logger.LogWarning("30 秒内没找到游戏进程（{biz}），本次不记录时长：{names}", biz, string.Join("/", names));
+                _logger.LogWarning("No game process found within 30s ({biz}), playtime not recorded: {names}", biz, string.Join("/", names));
                 return;
             }
         }

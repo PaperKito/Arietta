@@ -21,6 +21,57 @@
         <SolidColorBrush x:Key="GachaStar3" Color="#5EAAED" />
         <SolidColorBrush x:Key="GachaStar5Avg" Color="#3BA272" />
 
+        <DataTemplate x:Key="BarItemTemplate" x:DataType="local:BarItemViewModel">
+            <Grid Height="30" ToolTipService.ToolTip="{Binding Time}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" MinWidth="28" />
+                </Grid.ColumnDefinitions>
+
+                <Border Width="28"
+                        Height="28"
+                        Margin="0,0,4,0"
+                        CornerRadius="4"
+                        Visibility="{x:Bind IconVisibility, Mode=OneWay}">
+                    <Border.Background>
+                        <ImageBrush AlignmentY="Top"
+                                    ImageSource="{x:Bind Icon, Mode=OneWay}"
+                                    Stretch="UniformToFill" />
+                    </Border.Background>
+                </Border>
+                <Border Grid.Column="1"
+                        Height="22"
+                        Margin="-4,0,-4,0"
+                        VerticalAlignment="Center"
+                        Background="{x:Bind BarBrush}"
+                        CornerRadius="2" />
+                <TextBlock x:Name="NameText"
+                           Grid.Column="1"
+                           Margin="2,0,0,0"
+                           VerticalAlignment="Center"
+                           FontSize="13"
+                           Foreground="{StaticResource GachaTextPrimary}"
+                           Text="{x:Bind Name}"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Column="2"
+                           Margin="8,0,4,0"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           FontStyle="Italic"
+                           Foreground="{StaticResource GachaStar5}"
+                           Text="up!"
+                           Visibility="{x:Bind UpVisibility}" />
+                <TextBlock x:Name="PityText"
+                           Grid.Column="3"
+                           VerticalAlignment="Center"
+                           FontSize="13"
+                           Foreground="{StaticResource GachaTextPrimary}"
+                           Text="{x:Bind Pity}"
+                           TextAlignment="Right" />
+            </Grid>
+        </DataTemplate>
     </mf:PageBase.Resources>
 
 
@@ -398,110 +449,13 @@
                                             </cwc:Segmented>
 
                                             <ItemsControl Margin="0,2,0,0"
+                                                          ItemTemplate="{StaticResource BarItemTemplate}"
                                                           ItemsSource="{x:Bind Items5}"
-                                                          Visibility="{x:Bind Is5Selected, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate x:DataType="local:BarItemViewModel">
-                                                        <Grid Height="30" ToolTipService.ToolTip="{Binding Time}">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="32" />
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="Auto" MinWidth="28" />
-                                                            </Grid.ColumnDefinitions>
-
-                                                            <Border Width="28"
-                                                                    Height="28"
-                                                                    Margin="0,0,4,0"
-                                                                    CornerRadius="4"
-                                                                    Visibility="{x:Bind IconVisibility, Mode=OneWay}">
-                                                                <Border.Background>
-                                                                    <ImageBrush AlignmentY="Top"
-                                                                                ImageSource="{x:Bind Icon, Mode=OneWay}"
-                                                                                Stretch="UniformToFill" />
-                                                                </Border.Background>
-                                                            </Border>
-                                                            <Border Grid.Column="1"
-                                                                    Height="22"
-                                                                    Margin="-4,0,-4,0"
-                                                                    VerticalAlignment="Center"
-                                                                    Background="{x:Bind BarBrush}"
-                                                                    CornerRadius="2" />
-                                                            <TextBlock x:Name="NameText"
-                                                                       Grid.Column="1"
-                                                                       Margin="2,0,0,0"
-                                                                       VerticalAlignment="Center"
-                                                                       FontSize="13"
-                                                                       Foreground="{StaticResource GachaTextPrimary}"
-                                                                       Text="{x:Bind Name}"
-                                                                       TextTrimming="CharacterEllipsis" />
-                                                            <TextBlock Grid.Column="2"
-                                                                       Margin="8,0,4,0"
-                                                                       VerticalAlignment="Center"
-                                                                       FontSize="12"
-                                                                       FontStyle="Italic"
-                                                                       Foreground="{StaticResource GachaStar5}"
-                                                                       Text="up!"
-                                                                       Visibility="{x:Bind UpVisibility}" />
-                                                            <TextBlock x:Name="PityText"
-                                                                       Grid.Column="3"
-                                                                       VerticalAlignment="Center"
-                                                                       FontSize="13"
-                                                                       Foreground="{StaticResource GachaTextPrimary}"
-                                                                       Text="{x:Bind Pity}"
-                                                                       TextAlignment="Right" />
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                                          Visibility="{x:Bind Is5Selected, Converter={StaticResource BoolToVisibilityConverter}}" />
                                             <ItemsControl Margin="0,2,0,0"
+                                                          ItemTemplate="{StaticResource BarItemTemplate}"
                                                           ItemsSource="{x:Bind Items4}"
-                                                          Visibility="{x:Bind Is4Selected, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate x:DataType="local:BarItemViewModel">
-                                                        <Grid Height="30" ToolTipService.ToolTip="{Binding Time}">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="32" />
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" MinWidth="28" />
-                                                            </Grid.ColumnDefinitions>
-
-                                                            <Border Width="28"
-                                                                    Height="28"
-                                                                    Margin="0,0,4,0"
-                                                                    CornerRadius="4"
-                                                                    Visibility="{x:Bind IconVisibility, Mode=OneWay}">
-                                                                <Border.Background>
-                                                                    <ImageBrush AlignmentY="Top"
-                                                                                ImageSource="{x:Bind Icon, Mode=OneWay}"
-                                                                                Stretch="UniformToFill" />
-                                                                </Border.Background>
-                                                            </Border>
-                                                            <Border Grid.Column="1"
-                                                                    Height="22"
-                                                                    Margin="-4,0,-4,0"
-                                                                    VerticalAlignment="Center"
-                                                                    Background="{x:Bind BarBrush}"
-                                                                    CornerRadius="2" />
-                                                            <TextBlock x:Name="NameText"
-                                                                       Grid.Column="1"
-                                                                       Margin="2,0,0,0"
-                                                                       VerticalAlignment="Center"
-                                                                       FontSize="13"
-                                                                       Foreground="{StaticResource GachaTextPrimary}"
-                                                                       Text="{x:Bind Name}"
-                                                                       TextTrimming="CharacterEllipsis" />
-                                                            <TextBlock x:Name="PityText"
-                                                                       Grid.Column="2"
-                                                                       VerticalAlignment="Center"
-                                                                       FontSize="13"
-                                                                       Foreground="{StaticResource GachaTextPrimary}"
-                                                                       Text="{x:Bind Pity}"
-                                                                       TextAlignment="Right" />
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                                          Visibility="{x:Bind Is4Selected, Converter={StaticResource BoolToVisibilityConverter}}" />
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>

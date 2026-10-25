@@ -111,8 +111,6 @@ public static class GameNoticeService
         _cache.Clear();
     }
 
-    public static string? LastError { get; private set; }
-
     public static NoticeFailureKind LastFailure { get; private set; }
 
     public static async Task<(List<GameBannerItem> Banners, List<GamePostGroup> Groups)?> GetAsync(GameBiz biz)
@@ -121,17 +119,15 @@ public static class GameNoticeService
 
         if (!Configs.TryGetValue(biz, out var cfg) && !Configs.TryGetValue(biz.GetBaseBiz(), out cfg))
         {
-            LastError = $"{biz} 未配置通知接口";
             LastFailure = NoticeFailureKind.Error;
-            _logger.LogWarning("通知接口未配置：{Biz}", biz);
+            _logger.LogWarning("Notification API not configured: {Biz}", biz);
             return null;
         }
 
         if (!cfg.HasAnnouncement)
         {
-            LastError = null;
             LastFailure = NoticeFailureKind.NotSupported;
-            _logger.LogInformation("该渠道无公告内容，跳过加载：{Biz}", biz);
+            _logger.LogInformation("No announcement content for this channel, skipping: {Biz}", biz);
             return null;
         }
 
@@ -146,9 +142,8 @@ public static class GameNoticeService
 
         if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
         {
-            LastError = null;
             LastFailure = NoticeFailureKind.Offline;
-            _logger.LogInformation("当前无网络连接，跳过公告加载：{Biz}", biz);
+            _logger.LogInformation("No network connection, skipping announcement load: {Biz}", biz);
             return _cache.TryGetValue(biz, out var offline) ? (offline.Banners, offline.Groups) : null;
         }
 
@@ -162,14 +157,12 @@ public static class GameNoticeService
 
         if (result is not null)
         {
-            LastError = null;
             _cache[biz] = (result.Value.Banners, result.Value.Groups, lang, DateTimeOffset.Now);
             return result;
         }
 
-        LastError = string.Join(" | ", failures);
         LastFailure = NoticeFailureKind.Error;
-        _logger.LogWarning("公告全部 CDN 加载失败：{Biz} lang={Lang} {Detail}", biz, lang, LastError);
+        _logger.LogWarning("All announcement CDNs failed: {Biz} lang={Lang} {Detail}", biz, lang, string.Join(" | ", failures));
         return _cache.TryGetValue(biz, out var old) ? (old.Banners, old.Groups) : null;
     }
 

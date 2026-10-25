@@ -5,7 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -15,6 +17,17 @@ using Microsoft.Extensions.Logging;
 using Arietta.Core;
 
 namespace Arietta.Features.GameLauncher.GameUpdate;
+
+public sealed record DownloadChannel(HttpClient Client, string Host, double ScoreBytesPerSec)
+{
+
+    public string Label
+    {
+        get { try { return new Uri(Host).Host; } catch { return Host; } }
+    }
+}
+
+public sealed record DownloadChannelSet(IReadOnlyList<DownloadChannel> Channels, string Mode);
 
 public static class GameUpdateService
 {
@@ -47,7 +60,167 @@ public static class GameUpdateService
 
     private static readonly HttpClient Client = SharedHttp.GameUpdateJson;
 
-    private static readonly HttpClient DownloadClient = SharedHttp.GameUpdateDownload;
+    private const long ProbeBytes = 1 << 20;
+
+    private const long ProbeMinBytes = 256 << 10;
+
+    private static readonly TimeSpan ProbeTimeout = TimeSpan.FromSeconds(3);
+
+    private static (string Key, DownloadChannelSet Set, DateTimeOffset Time)? _channelCache;
+
+    private static readonly TimeSpan ChannelCacheLifetime = TimeSpan.FromMinutes(5);
+
+    private const int MaxDownloadChannels = 4;
+
+    internal static async Task<DownloadChannelSet> EnsureDownloadChannelSetAsync(
+        GameBiz biz, string? probeRel, bool forceRefresh = false, CancellationToken ct = default)
+    {
+        bool proxyActive = SharedHttp.IsSystemProxyActive();
+        string cacheKey = $"{biz}|auto|{proxyActive}";
+        if (!forceRefresh && _channelCache is { } hit && hit.Key == cacheKey && DateTimeOffset.Now - hit.Time < ChannelCacheLifetime)
+        {
+            return hit.Set;
+        }
+
+        var cdnItems = await GetCdnListAsync(biz);
+        List<string> hosts = cdnItems.Where(c => c.Url != null).Select(c => c.Url!).Distinct().ToList();
+        if (hosts.Count == 0)
+        {
+            hosts = [IndexBases[0] + "/"];
+        }
+        HttpClient direct = SharedHttp.GameUpdateDownload;
+        HttpClient viaProxy = SharedHttp.GameUpdateDownloadViaProxy;
+
+        HttpClient client;
+        List<DownloadChannel> ranked;
+        if (!proxyActive)
+        {
+            client = direct;
+            ranked = await RankHostsAsync(direct, hosts, cdnItems, probeRel, ct);
+        }
+        else
+        {
+
+            var directRanked = await RankHostsAsync(direct, hosts, cdnItems, probeRel, ct);
+            var proxyRanked = await RankHostsAsync(viaProxy, hosts, cdnItems, probeRel, ct);
+            double directBest = directRanked.Count > 0 ? directRanked[0].ScoreBytesPerSec : 0;
+            double proxyBest = proxyRanked.Count > 0 ? proxyRanked[0].ScoreBytesPerSec : 0;
+            if (directBest == 0 && proxyBest == 0)
+            {
+
+                bool directReachable = await ProbeReachableAsync(direct, hosts[0], ct);
+                _logger.LogInformation(
+                    "Download channel: probe inconclusive, CDN {Reachable} directly, {Decision}",
+                    directReachable ? "reachable" : "unreachable", directReachable ? "going direct" : "falling back to system proxy");
+                client = directReachable ? direct : viaProxy;
+                ranked = await RankHostsAsync(client, hosts, cdnItems, null, ct);
+            }
+            else if (directBest >= proxyBest)
+            {
+                client = direct;
+                ranked = directRanked;
+            }
+            else
+            {
+                client = viaProxy;
+                ranked = proxyRanked;
+            }
+        }
+
+        var set = new DownloadChannelSet(ranked, ReferenceEquals(client, direct) ? "direct" : "proxy");
+        _channelCache = (cacheKey, set, DateTimeOffset.Now);
+        _logger.LogInformation("Download channel: {Mode}, {Count} hosts ranked: {Ranking}",
+            set.Mode, ranked.Count,
+            string.Join(", ", ranked.Select(c => $"{c.Label}={c.ScoreBytesPerSec / 1048576.0:0.0}MB/s")));
+        return set;
+    }
+
+    private static async Task<List<DownloadChannel>> RankHostsAsync(
+        HttpClient client, List<string> hosts, List<GameCdnItem> cdnItems, string? probeRel, CancellationToken ct)
+    {
+        Dictionary<string, double> scores = await ScoreHostsAsync(client, hosts, probeRel, ct);
+        if (probeRel is not null && scores.Values.All(s => s <= 0))
+        {
+            scores = await ScoreHostsAsync(client, hosts, null, ct);
+        }
+        double weightOf(string host) => cdnItems.FirstOrDefault(c => c.Url == host)?.P ?? 0;
+        var ranked = hosts
+            .Select(h => new DownloadChannel(client, h, scores.GetValueOrDefault(h)))
+            .OrderByDescending(c => c.ScoreBytesPerSec)
+            .ThenByDescending(c => weightOf(c.Host))
+            .ToList();
+        if (probeRel is null)
+        {
+
+            var alive = ranked.Where(c => c.ScoreBytesPerSec > 0).ToList();
+            if (alive.Count > 0)
+            {
+                ranked = alive;
+            }
+        }
+        return ranked.Take(MaxDownloadChannels).ToList();
+    }
+
+    private static async Task<Dictionary<string, double>> ScoreHostsAsync(
+        HttpClient client, List<string> hosts, string? probeRel, CancellationToken ct)
+    {
+        var pairs = await Task.WhenAll(hosts.Select(async h => (Host: h, Score: probeRel is null
+            ? (await ProbeReachableAsync(client, h, ct) ? 1.0 : 0.0)
+            : await ProbeUrlAsync(client, h + probeRel, ct))));
+        return pairs.ToDictionary(p => p.Host, p => p.Score);
+    }
+
+    private static async Task<double> ProbeUrlAsync(HttpClient client, string url, CancellationToken ct)
+    {
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(ProbeTimeout);
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Range = new RangeHeaderValue(0, ProbeBytes - 1);
+            using var resp = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+            if ((int)resp.StatusCode is not ((int)HttpStatusCode.OK or (int)HttpStatusCode.PartialContent))
+            {
+                return 0;
+            }
+            await using var stream = resp.Content.ReadAsStream(cts.Token);
+            var buffer = new byte[1 << 16];
+            long total = 0;
+            var sw = Stopwatch.StartNew();
+            while (total < ProbeBytes)
+            {
+                int read = await stream.ReadAsync(
+                    buffer.AsMemory(0, (int)Math.Min(buffer.Length, ProbeBytes - total)), cts.Token);
+                if (read <= 0)
+                {
+                    break;
+                }
+                total += read;
+            }
+            sw.Stop();
+            return total >= ProbeMinBytes ? total / sw.Elapsed.TotalSeconds : 0;
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    private static async Task<bool> ProbeReachableAsync(HttpClient client, string url, CancellationToken ct)
+    {
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(ProbeTimeout);
+            using var request = new HttpRequestMessage(HttpMethod.Head, url);
+            using var resp = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     private static readonly ILogger _logger = AppConfig.GetLogger<LogTag>();
 
@@ -99,7 +272,7 @@ public static class GameUpdateService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "版本索引拉取失败 {Url}", url);
+                _logger.LogWarning(ex, "Failed to fetch version index {Url}", url);
             }
         }
         return null;
@@ -140,10 +313,10 @@ public static class GameUpdateService
                     if (index?.ResourcePacks is not { Count: > 0 } || index.Bundles is not { Count: > 0 })
                     {
 
-                        _logger.LogInformation("分档索引 {Url}：200 但无 resourcePacks/bundles（旧格式内容）", url);
+                        _logger.LogInformation("Branch index {Url}: 200 but no resourcePacks/bundles (legacy format)", url);
                         continue;
                     }
-                    _logger.LogInformation("分档索引 {Biz}：{Count} 档（{Names}），来源 {Url}",
+                    _logger.LogInformation("Branch index {Biz}: {Count} branches ({Names}), from {Url}",
                         biz, index.Bundles!.Count, string.Join("/", index.Bundles.Keys), url);
                     _tierCache[biz] = (index, DateTimeOffset.Now);
                     return index;
@@ -154,12 +327,12 @@ public static class GameUpdateService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "分档索引拉取失败 {Url}", url);
+                    _logger.LogWarning(ex, "Failed to fetch branch index {Url}", url);
                 }
             }
         }
 
-        _logger.LogInformation("分档索引 {Biz}：所有探测点均无分档内容，按无分档处理", biz);
+        _logger.LogInformation("Branch index {Biz}: no branch content at any probe point, treating as no branches", biz);
         return null;
     }
 
@@ -219,19 +392,9 @@ public static class GameUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "读取本地游戏版本失败 {Biz}", biz);
+            _logger.LogWarning(ex, "Failed to read local game version {Biz}", biz);
         }
         return null;
-    }
-
-    private static void WriteLocalVersion(GameBiz biz, string version)
-    {
-        string? dir = GetGameDir(biz);
-        if (dir is null)
-        {
-            return;
-        }
-        WriteLocalVersion(dir, version);
     }
 
     private static void WriteLocalVersion(string dir, string version)
@@ -249,7 +412,7 @@ public static class GameUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "回写 launcherDownloadConfig.json 失败 {Dir}", dir);
+            _logger.LogWarning(ex, "Failed to write back launcherDownloadConfig.json {Dir}", dir);
         }
     }
 
@@ -464,30 +627,25 @@ public static class GameUpdateService
         return $"{cdn}{baseUrl}{dest}";
     }
 
-    internal static HttpClient SharedClient => DownloadClient;
+    private static string? BuildProbeRel(IReadOnlyCollection<GameResourceEntry> files, string? zipBaseUrl, string? baseUrl)
+    {
+        if (files.Count == 0)
+        {
+            return null;
+        }
+        var file = files.MinBy(f => f.Size)!;
+        return (file.FromFolder ?? zipBaseUrl ?? baseUrl) + file.Dest;
+    }
 
-    private static async Task<string> GetDownloadCdnAsync(GameBiz biz)
+    private static async Task<List<GameCdnItem>> GetCdnListAsync(GameBiz biz)
     {
         var index = await GetIndexAsync(biz);
         var list = index?.Default?.CdnList;
         if (list is { Count: > 0 })
         {
-            int totalWeight = list.Sum(c => c.P);
-            if (totalWeight > 0)
-            {
-                int roll = Random.Shared.Next(totalWeight);
-                foreach (var cdn in list)
-                {
-                    roll -= cdn.P;
-                    if (roll < 0 && cdn.Url != null)
-                    {
-                        return cdn.Url;
-                    }
-                }
-            }
-            return list[0].Url ?? "";
+            return list;
         }
-        return IndexBases[0] + "/";
+        return [new GameCdnItem { Url = IndexBases[0] + "/" }];
     }
 
     public sealed record DownloadPlan(
@@ -568,7 +726,7 @@ public static class GameUpdateService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "文件清单拉取失败 {Url}", url);
+                _logger.LogWarning(ex, "Failed to fetch file manifest {Url}", url);
             }
         }
         return null;
@@ -634,30 +792,13 @@ public static class GameUpdateService
             {
                 try
                 {
+
                     string sidecar = path + ".s";
                     if (File.Exists(sidecar))
                     {
-                        byte[] bytes = File.ReadAllBytes(sidecar);
-                        if (bytes.Length > 0 && bytes.Length % sizeof(long) == 0)
-                        {
-                            long sum = 0;
-                            bool valid = true;
-                            for (int offset = 0; offset + sizeof(long) <= bytes.Length; offset += sizeof(long))
-                            {
-                                long value = BitConverter.ToInt64(bytes, offset);
-                                if (value < 0)
-                                {
-                                    valid = false;
-                                    break;
-                                }
-                                sum += value;
-                            }
-                            if (valid)
-                            {
-                                total += sum;
-                                continue;
-                            }
-                        }
+                        try { File.Delete(path); } catch { }
+                        try { File.Delete(sidecar); } catch { }
+                        continue;
                     }
                     total += new FileInfo(path).Length;
                 }
@@ -691,10 +832,20 @@ public static class GameUpdateService
     public const int DownloadThreadsMax = 16;
     public const int DownloadThreadsDefault = 16;
 
-    internal static int DownloadThreads =>
-        int.TryParse(AppConfig.GetConfig(DownloadThreadsConfigKey), out int value)
-            ? Math.Clamp(value, DownloadThreadsMin, DownloadThreadsMax)
-            : DownloadThreadsDefault;
+    internal static int DownloadThreads
+    {
+        get
+        {
+            string raw = AppConfig.GetConfig(DownloadThreadsConfigKey);
+            if (string.IsNullOrEmpty(raw) || raw == "0")
+            {
+                return DownloadThreadsDefault;
+            }
+            return int.TryParse(raw, out int value)
+                ? Math.Clamp(value, DownloadThreadsMin, DownloadThreadsMax)
+                : DownloadThreadsDefault;
+        }
+    }
 
     public static async Task<long> PredownloadAsync(
         GameBiz biz, GameUpdateState state, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
@@ -716,17 +867,18 @@ public static class GameUpdateService
         GameBiz biz, DownloadPlan plan, string stageDir, string? gameDir,
         IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
-        string cdn = await GetDownloadCdnAsync(biz);
+
+        DownloadChannelSet? channels = null;
         long downloaded = 0;
 
         var reportVerifying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Verifying);
 
         var directFiles = plan.DirectFiles;
-        _logger.LogInformation("PrepareStaging: 开始校验暂存区 {Count} 个文件 {Dir}", directFiles.Count, stageDir);
+        _logger.LogInformation("PrepareStaging: validating staging area, {Count} files at {Dir}", directFiles.Count, stageDir);
         var todo = await Task.Run(() => FilterOutdated(stageDir, directFiles,
             (done, total) => reportVerifying(done, total), ct), ct);
         reportVerifying(directFiles.Count, directFiles.Count, force: true);
-        _logger.LogInformation("PrepareStaging: 待下载 {Todo}/{Total}", todo.Count, directFiles.Count);
+        _logger.LogInformation("PrepareStaging: to download {Todo}/{Total}", todo.Count, directFiles.Count);
 
         if (todo.Count > 0)
         {
@@ -734,7 +886,7 @@ public static class GameUpdateService
                 (done, total) => reportVerifying(done, total), ct), ct);
             if (linked.Count > 0)
             {
-                _logger.LogInformation("PrepareStaging: 从其它区服客户端硬链接 {Count} 个文件，免下载", linked.Count);
+                _logger.LogInformation("PrepareStaging: hard-linked {Count} files from another server's client, download skipped", linked.Count);
                 var linkedDests = linked.Select(f => f.Dest).ToHashSet();
                 todo.RemoveAll(f => linkedDests.Contains(f.Dest));
             }
@@ -744,7 +896,10 @@ public static class GameUpdateService
         {
 
             long remainingTotal = todo.Sum(f => f.Size);
-            var downloader = new GameUpdateDownloader(cdn, plan.BaseUrl, stageDir, todo, 0, remainingTotal, plan.ZipBaseUrl);
+            string probeRel = BuildProbeRel(plan.DirectFiles, plan.ZipBaseUrl, plan.BaseUrl);
+            channels = await EnsureDownloadChannelSetAsync(biz, probeRel, ct: ct);
+            var downloader = new GameUpdateDownloader(channels, plan.BaseUrl, stageDir, todo, 0, remainingTotal, plan.ZipBaseUrl,
+                rebuildChannels: token => EnsureDownloadChannelSetAsync(biz, probeRel, forceRefresh: true, token));
             downloaded += await downloader.DownloadAsync(progress, ct);
         }
 
@@ -755,13 +910,14 @@ public static class GameUpdateService
             await Task.Run(() => TryHardLinkFromSiblings(biz, entries, stageDir,
                 (done, total) => reportVerifying(done, total), ct), ct);
 
-            _logger.LogInformation("PrepareStaging: 校验 {Count} 个分包内文件是否就位", entries.Count);
+            _logger.LogInformation("PrepareStaging: checking {Count} subpackage files are in place", entries.Count);
             bool allThere = await Task.Run(() => AllPresent(stageDir, gameDir, entries,
                 (done, total) => reportVerifying(done, total), ct), ct);
-            _logger.LogInformation("PrepareStaging: 分包内文件就位判定 {AllThere}（{Count} 条）", allThere, entries.Count);
+            _logger.LogInformation("PrepareStaging: subpackage files in place = {AllThere} ({Count} entries)", allThere, entries.Count);
             if (!allThere)
             {
-                downloaded += await DownloadAndExtractPackagesAsync(biz, plan, stageDir, cdn, progress, ct);
+                channels ??= await EnsureDownloadChannelSetAsync(biz, BuildProbeRel(plan.DirectFiles, plan.ZipBaseUrl, plan.BaseUrl), ct: ct);
+                downloaded += await DownloadAndExtractPackagesAsync(biz, plan, stageDir, channels, progress, ct);
             }
         }
         return downloaded;
@@ -811,7 +967,7 @@ public static class GameUpdateService
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogWarning(ex, "硬链接去重检查失败 {Dest}", file.Dest);
+                        _logger.LogWarning(ex, "Hard link dedup check failed {Dest}", file.Dest);
                     }
                 }
             }
@@ -875,7 +1031,7 @@ public static class GameUpdateService
             }
         }
         MergeVerifiedDests(cacheKey, verified);
-        _logger.LogInformation("安装预估（md5 校验）：{Total} 中 {Linked} 可从其它区服客户端硬链接复用 {Dir}",
+        _logger.LogInformation("Install estimate (md5 verified): {Linked} of {Total} hard-linkable from another server's client {Dir}",
             plan.TotalBytes, linked, installDir);
         HardLinkEstimateCache[cacheKey] = linked;
         return linked;
@@ -911,7 +1067,7 @@ public static class GameUpdateService
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "读取硬链接预估缓存失败 {File}", HardLinkCacheFile);
+                    _logger.LogWarning(ex, "Failed to read hard link estimate cache {File}", HardLinkCacheFile);
                     _verifiedDests = [];
                 }
             }
@@ -940,7 +1096,7 @@ public static class GameUpdateService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "保存硬链接预估缓存失败 {File}", HardLinkCacheFile);
+                _logger.LogWarning(ex, "Failed to save hard link estimate cache {File}", HardLinkCacheFile);
             }
         }
     }
@@ -992,7 +1148,7 @@ public static class GameUpdateService
     }
 
     private static async Task<long> DownloadAndExtractPackagesAsync(
-        GameBiz biz, DownloadPlan plan, string stageDir, string cdn,
+        GameBiz biz, DownloadPlan plan, string stageDir, DownloadChannelSet channels,
         IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
         string zipBase = plan.ZipBaseUrl
@@ -1002,7 +1158,7 @@ public static class GameUpdateService
         long alreadyOnDisk = 0;
         foreach (var info in plan.ZipPackages!)
         {
-            long size = await GetRemoteFileSizeAsync(cdn, zipBase, info.Dest, ct);
+            long size = await GetRemoteFileSizeAsync(channels.Channels[0].Host, zipBase, info.Dest, ct);
             if (size <= 0)
             {
                 throw new InvalidDataException(string.Format(Localization.Lang.Instance.GameUpdate_ErrFileMissing, info.Dest));
@@ -1024,7 +1180,9 @@ public static class GameUpdateService
         }
 
         long zipTotal = packages.Sum(p => p.Size);
-        var downloader = new GameUpdateDownloader(cdn, zipBase, stageDir, packages, alreadyOnDisk, zipTotal);
+        string probeRel = BuildProbeRel(plan.DirectFiles, plan.ZipBaseUrl, plan.BaseUrl);
+        var downloader = new GameUpdateDownloader(channels, zipBase, stageDir, packages, alreadyOnDisk, zipTotal,
+            rebuildChannels: token => EnsureDownloadChannelSetAsync(biz, probeRel, forceRefresh: true, token));
         long downloaded = await downloader.DownloadAsync(progress, ct);
 
         var reportApplying = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Applying);
@@ -1042,7 +1200,7 @@ public static class GameUpdateService
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "删除 krzip 包失败 {Dest}", info.Dest);
+                _logger.LogWarning(ex, "Failed to delete krzip package {Dest}", info.Dest);
             }
         }
         return downloaded;
@@ -1132,7 +1290,7 @@ public static class GameUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "分包大小获取失败（HEAD）{Url}", url);
+            _logger.LogWarning(ex, "Failed to get subpackage size (HEAD) {Url}", url);
         }
 
         using var rangeRequest = new HttpRequestMessage(HttpMethod.Get, url);
@@ -1235,14 +1393,14 @@ public static class GameUpdateService
             WriteLocalGameResources(gameDir, fullList);
         }
 
-        WriteLocalVersion(biz, version);
+        WriteLocalVersion(gameDir, version);
         if (keepStaging)
         {
-            CleanStagingRoots(biz, keepVersion: version);
+            CleanStagingRoots(gameDir, keepVersion: version);
         }
         else
         {
-            DeleteStaging(biz);
+            DeleteStaging(gameDir);
         }
         _cache.Remove(biz);
         return downloaded;
@@ -1310,13 +1468,13 @@ public static class GameUpdateService
             {
                 return true;
             }
-            _logger.LogWarning("硬链接失败（error={Error}），回退为移动 {From} -> {To}",
+            _logger.LogWarning("Hard link failed (error={Error}), falling back to move {From} -> {To}",
                 System.Runtime.InteropServices.Marshal.GetLastWin32Error(), existingFile, newLink);
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "硬链接异常，回退为移动 {From} -> {To}", existingFile, newLink);
+            _logger.LogWarning(ex, "Hard link exception, falling back to move {From} -> {To}", existingFile, newLink);
             return false;
         }
     }
@@ -1332,7 +1490,7 @@ public static class GameUpdateService
         {
             return;
         }
-        _logger.LogInformation("更新前关闭运行中的游戏进程 {Pid}（{Biz}）", running.Id, biz);
+        _logger.LogInformation("Killing running game process {Pid} before update ({Biz})", running.Id, biz);
         running.Kill(entireProcessTree: true);
         if (!running.WaitForExit(15000))
         {
@@ -1361,7 +1519,7 @@ public static class GameUpdateService
         var patchMd5 = plan.PatchFiles.ToDictionary(f => f.Dest, f => f.Md5, StringComparer.OrdinalIgnoreCase);
         var dstSet = plan.KrdiffDstFiles.Select(f => f.Dest).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var report = MakeThrottledReporter(progress, plan.TotalBytes, DownloadPhase.Patching);
-        _logger.LogInformation("krpdiff: {Count} 组补丁，最大组 dst {Bytes}，temp {Dir}", total, maxGroupBytes, tempDir);
+        _logger.LogInformation("krpdiff: {Count} patch groups, largest dst {Bytes}, temp {Dir}", total, maxGroupBytes, tempDir);
         long patchBytes = 0;
 
         for (int i = 0; i < total; i++)
@@ -1394,7 +1552,7 @@ public static class GameUpdateService
                     }
                 }
                 File.WriteAllText(marker, "ok");
-                _logger.LogInformation("krpdiff: 组 {Index}/{Total} 落位完成 {Dest}（{Files} 个文件）",
+                _logger.LogInformation("krpdiff: group {Index}/{Total} applied {Dest} ({Files} files)",
                     i + 1, total, group.Dest, dstFiles.Count);
             }
             patchBytes += dstFiles.Sum(f => f.Size);
@@ -1413,12 +1571,12 @@ public static class GameUpdateService
                 try { File.Delete(Path.Combine(gameDir, src.Dest)); } catch { }
             }
         }
-        try { Directory.Delete(tempDir, true); } catch (Exception ex) { _logger.LogWarning(ex, "krpdiff temp 清理失败 {Dir}", tempDir); }
+        try { Directory.Delete(tempDir, true); } catch (Exception ex) { _logger.LogWarning(ex, "krpdiff temp cleanup failed {Dir}", tempDir); }
         foreach (var patch in plan.PatchFiles)
         {
             try { File.Delete(Path.Combine(stageDir, patch.Dest)); } catch { }
         }
-        _logger.LogInformation("krpdiff: {Count} 组补丁应用完成", total);
+        _logger.LogInformation("krpdiff: {Count} patch groups applied", total);
     }
 
     private static string LocateHpatchz()
@@ -1459,11 +1617,6 @@ public static class GameUpdateService
         }
     }
 
-    private static void DeleteStaging(GameBiz biz)
-    {
-        DeleteStaging(GetGameDir(biz));
-    }
-
     private static void DeleteStaging(string? gameDir)
     {
         CleanStagingRoots(gameDir, keepVersion: null);
@@ -1480,13 +1633,8 @@ public static class GameUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "清理暂存目录失败 launcherDownload\\repair");
+            _logger.LogWarning(ex, "Failed to clean staging dir launcherDownload\\repair");
         }
-    }
-
-    private static void CleanStagingRoots(GameBiz biz, string? keepVersion)
-    {
-        CleanStagingRoots(GetGameDir(biz), keepVersion);
     }
 
     private static void CleanOrphanStaging(GameBiz biz, string localVersion)
@@ -1507,14 +1655,14 @@ public static class GameUpdateService
             {
                 if (CompareVersion(Path.GetFileName(dir), localVersion) <= 0)
                 {
-                    _logger.LogInformation("清理孤儿暂存 {Dir}（本地已是 {Local}）", dir, localVersion);
+                    _logger.LogInformation("Cleaning orphaned staging {Dir} (local is already {Local})", dir, localVersion);
                     Directory.Delete(dir, true);
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "孤儿暂存清理失败 {Biz}", biz);
+            _logger.LogWarning(ex, "Failed to clean orphaned staging {Biz}", biz);
         }
     }
 
@@ -1543,7 +1691,7 @@ public static class GameUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "清理暂存目录失败 {Path}", root);
+            _logger.LogWarning(ex, "Failed to clean staging dir {Path}", root);
         }
     }
 
@@ -1571,7 +1719,7 @@ public static class GameUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "写 LocalGameResources.json 失败");
+            _logger.LogWarning(ex, "Failed to write LocalGameResources.json");
         }
     }
 
@@ -1714,11 +1862,11 @@ public static class GameUpdateService
         if (FindGameExe(installDir, biz) is { } exe)
         {
             AppConfig.SetConfig(GameRegistry.GetExePathConfigKey(biz), exe);
-            _logger.LogInformation("Install: 已回填游戏 exe {Exe}", exe);
+            _logger.LogInformation("Install: game exe backfilled {Exe}", exe);
         }
         else
         {
-            _logger.LogWarning("Install: 安装目录里没找到游戏 exe {Biz}，请到设置里手动定位", biz);
+            _logger.LogWarning("Install: game exe not found in install dir {Biz}, locate it manually in settings", biz);
         }
 
         GameAutoSearch.WriteOfficialLedger(biz, installDir, elevateForHklm: true);
@@ -1754,7 +1902,7 @@ public static class GameUpdateService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Install: 遍历安装目录找 exe 失败 {Dir}", installDir);
+            _logger.LogWarning(ex, "Install: failed to scan install dir for exe {Dir}", installDir);
             return null;
         }
     }
@@ -1785,7 +1933,7 @@ public static class GameUpdateService
     }
 
     public static async Task<VerifyResult?> VerifyAsync(
-        GameBiz biz, bool quick, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
+        GameBiz biz, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
     {
         string? gameDir = GetGameDir(biz);
         string? local = GetLocalVersion(biz);
@@ -1833,27 +1981,20 @@ public static class GameUpdateService
             return null;
         }
 
-        List<GameResourceEntry> toCheck = files;
-        if (quick && index?.KeyFileCheckList is { } keyFiles)
-        {
-            var keySet = keyFiles.Select(NormalizeDest).ToHashSet(StringComparer.OrdinalIgnoreCase);
-            toCheck = files.Where(f => keySet.Contains(NormalizeDest(f.Dest))).ToList();
-        }
-
         var result = new VerifyResult
         {
             Version = local,
             CanRepair = canRepair,
             BaseUrl = baseUrl,
             TotalFiles = files.Count,
-            CheckedFiles = toCheck.Count,
+            CheckedFiles = files.Count,
         };
 
         var throttle = new Stopwatch();
         throttle.Start();
         int completed = 0;
         using var limiter = new SemaphoreSlim(8);
-        var tasks = toCheck.Select(file => Task.Run(async () =>
+        var tasks = files.Select(file => Task.Run(async () =>
         {
             await limiter.WaitAsync(ct);
             try
@@ -1867,7 +2008,7 @@ public static class GameUpdateService
                     }
                 }
                 int done = Interlocked.Increment(ref completed);
-                ReportVerify(progress, throttle, done, toCheck.Count, file.Dest);
+                ReportVerify(progress, throttle, done, files.Count, file.Dest);
             }
             finally
             {
@@ -1911,8 +2052,10 @@ public static class GameUpdateService
             return 0;
         }
         EnsureGameNotRunning(biz);
-        string cdn = await GetDownloadCdnAsync(biz);
-        var downloader = new GameUpdateDownloader(cdn, result.BaseUrl, gameDir, result.Damaged);
+        string probeRel = BuildProbeRel(result.Damaged, null, result.BaseUrl);
+        var channels = await EnsureDownloadChannelSetAsync(biz, probeRel, ct: ct);
+        var downloader = new GameUpdateDownloader(channels, result.BaseUrl, gameDir, result.Damaged,
+            rebuildChannels: token => EnsureDownloadChannelSetAsync(biz, probeRel, forceRefresh: true, token));
         long downloaded = await downloader.DownloadAsync(progress, ct);
 
         var index = await GetIndexAsync(biz);
@@ -1939,9 +2082,6 @@ public static class GameUpdateService
         }
         return GameUpdateDownloader.VerifyMd5(path, entry.Md5, ct);
     }
-
-    private static string NormalizeDest(string dest) =>
-        dest.Replace('\\', '/').Trim('/');
 
     #endregion
 }

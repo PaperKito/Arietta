@@ -24,8 +24,7 @@ public sealed partial class GameSettingPage : PageBase
 
     protected override void OnLoaded()
     {
-        InitializeResolutionItem();
-        _ = InitializeGameSettingAsync();
+        MainView_GameChanged(this, ViewHost.MainView.CurrentGameBiz);
     }
 
 
@@ -165,17 +164,14 @@ public sealed partial class GameSettingPage : PageBase
             _loading = true;
             IsApplyButtonEnable = false;
             var biz = ViewHost.MainView.CurrentGameBiz;
-            var entry = GameRegistry.GetEntry(biz);
-            if (entry.CloudUrl is not null || !GameSettingService.IsGameInstalled(biz))
+            if (!GameSettingService.IsGameInstalled(biz))
             {
 
                 StackPanel_NotInstalled.Visibility = Visibility.Visible;
                 IsBaseSettingEnable = false;
                 IsLanguageSettingEnable = false;
                 IsHdrSettingEnable = false;
-                TextBlock_GameNotInstalled.Text = entry.CloudUrl is not null
-                    ? Lang.Instance.GameSettingPage_CloudGameNotSupport
-                    : Lang.Instance.GameSettingPage_GameNotInstalled;
+                TextBlock_GameNotInstalled.Text = Lang.Instance.GameSettingPage_GameNotInstalled;
                 return;
             }
             StackPanel_NotInstalled.Visibility = Visibility.Collapsed;
@@ -354,13 +350,6 @@ public sealed partial class GameSettingPage : PageBase
             InAppToast.MainWindow?.Error(ex, Lang.Instance.GameSettingPage_ApplyFailed);
         }
     }
-
-
-    private void Button_Apply_Click(object sender, RoutedEventArgs e)
-    {
-        ApplySettingCommand.Execute(null);
-    }
-
 
 
     private DisplayInformation? _displayInformation;
