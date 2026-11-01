@@ -286,16 +286,25 @@ internal static class KuroBbsUi
         bool collapseRing,
         Action? beforeLoad,
         Func<KuroBbsAccount, Task> body,
-        string toastTitle)
+        string toastTitle,
+        UIElement? contentToHide = null)
     {
 
         var account = KuroBbsAccountStore.Load(pgr: true);
         if (account is null || string.IsNullOrEmpty(account.Token))
         {
             SetInfoBar(noAccountBar, true, foldInfoBar);
+            if (contentToHide is not null)
+            {
+                contentToHide.Visibility = Visibility.Collapsed;
+            }
             return;
         }
         SetInfoBar(noAccountBar, false, foldInfoBar);
+        if (contentToHide is not null)
+        {
+            contentToHide.Visibility = Visibility.Visible;
+        }
         if (errorBar is not null)
         {
             SetInfoBar(errorBar, false, foldInfoBar);
@@ -311,6 +320,10 @@ internal static class KuroBbsUi
             if (!await KuroBbsAccountStore.EnsurePgrRoleAsync(account))
             {
                 SetInfoBar(noAccountBar, true, foldInfoBar);
+                if (contentToHide is not null)
+                {
+                    contentToHide.Visibility = Visibility.Collapsed;
+                }
                 return;
             }
             await body(account);

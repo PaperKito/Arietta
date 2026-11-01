@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Arietta.Helpers;
@@ -22,7 +21,52 @@ public sealed record SelfUpdateInfo(
     string? Notes,
     string AssetUrl,
     long AssetSize,
-    string? Sha256Url);
+    string? Sha256);
+
+public enum SelfUpdateCheckStatus
+{
+
+    UpToDate,
+
+    UpdateAvailable,
+
+    Ignored,
+}
+
+public sealed record SelfUpdateCheckResult(
+    SelfUpdateCheckStatus Status,
+    SelfUpdateInfo? Info = null,
+    string? IgnoredVersion = null);
+
+public enum SelfUpdateErrorKind
+{
+
+    Network,
+
+    Timeout,
+
+    RateLimited,
+
+    NotFound,
+
+    BadResponse,
+
+    HttpError,
+
+    Checksum,
+
+    PackageInvalid,
+
+    Disk,
+}
+
+public sealed class SelfUpdateException(SelfUpdateErrorKind kind, string message, string? detail = null, Exception? inner = null)
+    : Exception(message, inner)
+{
+    public SelfUpdateErrorKind Kind { get; } = kind;
+
+    public string? Detail { get; } = detail;
+}
 
 public static class SelfUpdateService
 {
@@ -87,9 +131,11 @@ public static class SelfUpdateService
         return list;
     }
 
-    private static readonly string AssetName = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
+    public static string AssetName { get; } = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
         ? "Arietta-portable-win-arm64.zip"
         : "Arietta-portable-win-x64.zip";
+
+    private static readonly TimeSpan CheckTimeout = TimeSpan.FromSeconds(15);
 
     public const string IgnoreVersionConfigKey = "SelfUpdateIgnoreVersion";
 
@@ -152,8 +198,8 @@ public static class SelfUpdateService
         try
         {
             await Task.Delay(AutoCheckDelay);
-            SelfUpdateInfo? info = await CheckForUpdateAsync();
-            if (info is null)
+            SelfUpdateCheckResult result = await CheckForUpdateAsync();
+            if (result is not { Status: SelfUpdateCheckStatus.UpdateAvailable, Info: { } info })
             {
                 return;
             }
@@ -172,54 +218,137 @@ public static class SelfUpdateService
         _logger.LogInformation("SelfUpdate: version {Version} ignored", version);
     }
 
-    public static async Task<SelfUpdateInfo?> CheckForUpdateAsync(CancellationToken ct = default)
+    public static async Task<SelfUpdateCheckResult> CheckForUpdateAsync(CancellationToken ct = default)
     {
-        using var resp = await SharedHttp.SelfUpdate.GetAsync(LatestReleaseApi, ct);
-        string body = await resp.Content.ReadAsStringAsync(ct);
-        if (!resp.IsSuccessStatusCode)
+        using var limit = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        limit.CancelAfter(CheckTimeout);
+
+        string body;
+        int statusCode;
+        try
         {
-            throw new InvalidOperationException($"GitHub API {(int)resp.StatusCode}: {body}");
+            using var resp = await SharedHttp.SelfUpdate.GetAsync(LatestReleaseApi, limit.Token);
+            statusCode = (int)resp.StatusCode;
+            body = await resp.Content.ReadAsStringAsync(limit.Token);
         }
-        using var doc = JsonDocument.Parse(body);
-        var root = doc.RootElement;
-        string tag = root.GetProperty("tag_name").GetString() ?? "";
-        if (!TryParseVersion(tag, out Version version)
-            || version <= ParseVersion(AppConfig.AppVersion)
-            || (Version.TryParse(AppConfig.GetConfig(IgnoreVersionConfigKey), out var ignored) && version <= ignored))
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
-            return null;
+
+            throw new SelfUpdateException(SelfUpdateErrorKind.Timeout,
+                $"GitHub API check timed out after {CheckTimeout.TotalSeconds:F0}s");
+        }
+        catch (HttpRequestException ex)
+        {
+
+            throw new SelfUpdateException(SelfUpdateErrorKind.Network, ex.Message, inner: ex);
         }
 
-        JsonElement asset = default, sha = default;
-        bool hasAsset = false, hasSha = false;
-        foreach (var a in root.GetProperty("assets").EnumerateArray())
+        if (statusCode is < 200 or >= 300)
         {
-            string name = a.GetProperty("name").GetString() ?? "";
-            if (string.Equals(name, AssetName, StringComparison.OrdinalIgnoreCase))
-            {
-                asset = a;
-                hasAsset = true;
-            }
-            else if (string.Equals(name, AssetName + ".sha256", StringComparison.OrdinalIgnoreCase))
-            {
-                sha = a;
-                hasSha = true;
-            }
+            throw MapHttpFailure(statusCode, body);
         }
-        if (!hasAsset)
+
+        try
         {
-            throw new InvalidOperationException($"Release {tag} does not contain asset {AssetName}");
+            using var doc = JsonDocument.Parse(body);
+            JsonElement root = doc.RootElement;
+            string tag = root.GetProperty("tag_name").GetString() ?? "";
+            if (!TryParseVersion(tag, out Version version))
+            {
+                throw new SelfUpdateException(SelfUpdateErrorKind.BadResponse, $"unexpected tag '{tag}'", tag);
+            }
+            if (version <= ParseVersion(AppConfig.AppVersion))
+            {
+                return new SelfUpdateCheckResult(SelfUpdateCheckStatus.UpToDate);
+            }
+            if (Version.TryParse(AppConfig.GetConfig(IgnoreVersionConfigKey), out var ignored) && version <= ignored)
+            {
+                return new SelfUpdateCheckResult(SelfUpdateCheckStatus.Ignored, IgnoredVersion: version.ToString());
+            }
+
+            JsonElement asset = default;
+            bool hasAsset = false;
+            foreach (JsonElement a in root.GetProperty("assets").EnumerateArray())
+            {
+                if (string.Equals(a.GetProperty("name").GetString() ?? "", AssetName, StringComparison.OrdinalIgnoreCase))
+                {
+                    asset = a;
+                    hasAsset = true;
+                }
+            }
+            if (!hasAsset)
+            {
+
+                throw new SelfUpdateException(SelfUpdateErrorKind.BadResponse,
+                    $"Release {tag} does not contain asset {AssetName}");
+            }
+
+            string? sha256 = null;
+            if (asset.TryGetProperty("digest", out var digest) && digest.GetString() is { } dg)
+            {
+                sha256 = dg.StartsWith("sha256:", StringComparison.OrdinalIgnoreCase) ? dg["sha256:".Length..] : dg;
+            }
+            return new SelfUpdateCheckResult(SelfUpdateCheckStatus.UpdateAvailable, new SelfUpdateInfo(
+                version.ToString(),
+                root.GetProperty("html_url").GetString() ?? LatestReleaseApi,
+                root.TryGetProperty("body", out var notes) ? notes.GetString() : null,
+                asset.GetProperty("browser_download_url").GetString() ?? "",
+                asset.GetProperty("size").GetInt64(),
+                sha256));
         }
-        return new SelfUpdateInfo(
-            version.ToString(),
-            root.GetProperty("html_url").GetString() ?? LatestReleaseApi,
-            root.TryGetProperty("body", out var notes) ? notes.GetString() : null,
-            asset.GetProperty("browser_download_url").GetString() ?? "",
-            asset.GetProperty("size").GetInt64(),
-            hasSha ? sha.GetProperty("browser_download_url").GetString() : null);
+        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
+        {
+
+            throw new SelfUpdateException(SelfUpdateErrorKind.BadResponse, ex.Message, inner: ex);
+        }
+    }
+
+    private static SelfUpdateException MapHttpFailure(int statusCode, string body)
+    {
+        string code = statusCode.ToString();
+        if (statusCode == 404)
+        {
+            return new SelfUpdateException(SelfUpdateErrorKind.NotFound, "GitHub API 404", code);
+        }
+        if ((statusCode is 403 or 429) && body.Contains("rate limit", StringComparison.OrdinalIgnoreCase))
+        {
+            return new SelfUpdateException(SelfUpdateErrorKind.RateLimited, "GitHub API rate limited", code);
+        }
+        return new SelfUpdateException(SelfUpdateErrorKind.HttpError, $"GitHub API {code}", code);
     }
 
     public static async Task<string> DownloadAndStageAsync(SelfUpdateInfo info, IProgress<double>? progress, CancellationToken ct = default)
+    {
+        try
+        {
+            return await DownloadAndStageCoreAsync(info, progress, ct);
+        }
+        catch (SelfUpdateException)
+        {
+            throw;
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+
+            throw new SelfUpdateException(SelfUpdateErrorKind.Timeout, "download stalled");
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new SelfUpdateException(SelfUpdateErrorKind.Network, ex.Message, inner: ex);
+        }
+        catch (InvalidDataException ex)
+        {
+            throw new SelfUpdateException(SelfUpdateErrorKind.PackageInvalid, ex.Message, inner: ex);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+
+            throw new SelfUpdateException(SelfUpdateErrorKind.Disk, ex.Message, inner: ex);
+        }
+    }
+
+
+    private static async Task<string> DownloadAndStageCoreAsync(SelfUpdateInfo info, IProgress<double>? progress, CancellationToken ct)
     {
         Directory.CreateDirectory(_workDir);
         string zipPath = Path.Combine(_workDir, AssetName);
@@ -228,7 +357,12 @@ public static class SelfUpdateService
 
         using (var resp = await SharedHttp.SelfUpdate.GetAsync(info.AssetUrl, HttpCompletionOption.ResponseHeadersRead, ct))
         {
-            resp.EnsureSuccessStatusCode();
+            if (!resp.IsSuccessStatusCode)
+            {
+
+                throw new SelfUpdateException(SelfUpdateErrorKind.HttpError,
+                    $"asset HTTP {(int)resp.StatusCode}", ((int)resp.StatusCode).ToString());
+            }
             await using var src = await resp.Content.ReadAsStreamAsync(ct);
             await using var dst = new FileStream(zipPath, FileMode.Create, FileAccess.Write,
                 FileShare.None, 1 << 16, FileOptions.Asynchronous);
@@ -253,24 +387,25 @@ public static class SelfUpdateService
             }
             catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
-                throw new IOException($"下载停滞超时（60s 无数据），已收 {received} 字节");
+                throw new SelfUpdateException(SelfUpdateErrorKind.Timeout,
+                    $"download stalled at {received} bytes");
             }
             hash = sha256.GetHashAndReset();
         }
 
-        if (info.Sha256Url is not null)
+        if (info.Sha256 is not null)
         {
-            string expected = await SharedHttp.SelfUpdate.GetStringAsync(info.Sha256Url, ct);
             string actual = Convert.ToHexStringLower(hash);
-            var m = Regex.Match(expected, "[0-9a-fA-F]{64}");
-            if (!m.Success || !string.Equals(m.Value, actual, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(info.Sha256, actual, StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidDataException($"SHA256 mismatch (expected {m.Value}, got {actual})");
+                throw new SelfUpdateException(SelfUpdateErrorKind.Checksum,
+                    $"SHA256 mismatch (expected {info.Sha256}, got {actual})");
             }
         }
         else if (info.AssetSize > 0 && received != info.AssetSize)
         {
-            throw new InvalidDataException($"Size mismatch (expected {info.AssetSize}, got {received})");
+            throw new SelfUpdateException(SelfUpdateErrorKind.Checksum,
+                $"Size mismatch (expected {info.AssetSize}, got {received})");
         }
 
         string extract = Path.Combine(_workDir, "extract");
@@ -286,9 +421,32 @@ public static class SelfUpdateService
             newApp = Directory.EnumerateDirectories(extract)
                 .FirstOrDefault(d => File.Exists(Path.Combine(d, "app", "Arietta.dll"))) is { } outer
                 ? Path.Combine(outer, "app")
-                : throw new InvalidDataException("Extracted package does not contain app\\Arietta.dll");
+                : throw new SelfUpdateException(SelfUpdateErrorKind.PackageInvalid,
+                    "Extracted package does not contain app\\Arietta.dll");
         }
         return newApp;
+    }
+
+    public static (string Title, string Message) DescribeFailure(Exception ex)
+    {
+        var lang = Localization.Lang.Instance;
+        return ex switch
+        {
+            SelfUpdateException { Kind: SelfUpdateErrorKind.Network } => (lang.SettingPage_UpdateErrNetwork, lang.SettingPage_UpdateErrNetworkDesc),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.Timeout } => (lang.SettingPage_UpdateErrTimeout, lang.SettingPage_UpdateErrTimeoutDesc),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.RateLimited } => (lang.SettingPage_UpdateErrRateLimited, lang.SettingPage_UpdateErrRateLimitedDesc),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.NotFound } => (lang.SettingPage_UpdateErrNotFound, lang.SettingPage_UpdateErrNotFoundDesc),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.BadResponse } => (lang.SettingPage_UpdateErrBadResponse, lang.SettingPage_UpdateErrBadResponseDesc),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.HttpError, Detail: var code } =>
+                (lang.SettingPage_UpdateErrHttp, string.Format(lang.SettingPage_UpdateErrHttpDesc, code ?? "?")),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.Checksum } => (lang.SettingPage_UpdateErrChecksum, lang.SettingPage_UpdateErrChecksumDesc),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.PackageInvalid } => (lang.SettingPage_UpdateErrPackage, lang.SettingPage_UpdateErrPackageDesc),
+            SelfUpdateException { Kind: SelfUpdateErrorKind.Disk } => (lang.SettingPage_UpdateErrDisk, lang.SettingPage_UpdateErrDiskDesc),
+
+            HttpRequestException => (lang.SettingPage_UpdateErrNetwork, lang.SettingPage_UpdateErrNetworkDesc),
+            TaskCanceledException => (lang.SettingPage_UpdateErrTimeout, lang.SettingPage_UpdateErrTimeoutDesc),
+            _ => (lang.SettingPage_UpdateFailed, ex.Message),
+        };
     }
 
     public static void InstallNow(string newAppDir)

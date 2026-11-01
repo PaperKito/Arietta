@@ -71,9 +71,11 @@ public sealed partial class SignInPage : PageBase
         if (account is null || !account.IsValid)
         {
             InfoBar_NoAccount.IsOpen = true;
+            ScrollViewer_Content.Visibility = Visibility.Collapsed;
             return;
         }
         InfoBar_NoAccount.IsOpen = false;
+        ScrollViewer_Content.Visibility = Visibility.Visible;
         ProgressRing_Loading.IsActive = true;
         try
         {

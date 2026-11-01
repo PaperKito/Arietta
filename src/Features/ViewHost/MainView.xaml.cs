@@ -23,11 +23,15 @@ public sealed partial class MainView : UserControl
 
     public static event EventHandler<GameBiz>? GameChanged;
 
+    private static readonly Microsoft.UI.Xaml.Media.Imaging.BitmapImage DefaultBackground =
+        new(new Uri("ms-appx:///Assets/Image/bg_default.jpg"));
+
 
     public MainView()
     {
         this.InitializeComponent();
-        CurrentGameBiz = GameSelectorControl.CurrentGameBiz;
+
+        CurrentGameBiz = GameSelectorControl.CurrentGameBiz ?? GameBiz.WutheringWavesGlobal;
 
         UpdateNavVisibility();
         LoadCustomBackground(null, null);
@@ -35,14 +39,19 @@ public sealed partial class MainView : UserControl
 
         BackgroundGallery.SelectionChanged += OnBackgroundChanged;
         DynamicBackgroundStore.Updated += OnBackgroundChanged;
-        NavigateTo(typeof(LauncherPage), null, new SuppressNavigationTransitionInfo());
+
+        if (GameSelectorControl.HasSelection)
+        {
+            NavigateTo(typeof(LauncherPage), null, new SuppressNavigationTransitionInfo());
+        }
     }
 
     private async void LoadCustomBackground(object? sender, string? path)
     {
         try
         {
-            BackgroundItem? item = BackgroundGallery.Resolve(CurrentGameBiz);
+
+            BackgroundItem? item = GameSelectorControl.HasSelection ? BackgroundGallery.Resolve(CurrentGameBiz) : null;
 
             if (item is { Kind: BackgroundKind.Video } && item.FilePath is { Length: > 0 } video)
             {
@@ -58,15 +67,20 @@ public sealed partial class MainView : UserControl
             }
 
             DynamicBgHost.Stop();
-            Image_Background.Source = null;
             if (item?.FilePath is { Length: > 0 } image && File.Exists(image))
             {
+
                 var bitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
                 using (FileStream stream = File.OpenRead(image))
                 {
                     await bitmap.SetSourceAsync(stream.AsRandomAccessStream());
                 }
                 Image_Background.Source = bitmap;
+            }
+            else
+            {
+
+                Image_Background.Source = DefaultBackground;
             }
 
             BackgroundAccentService.Apply(item?.FilePath, DispatcherQueue);
@@ -108,13 +122,18 @@ public sealed partial class MainView : UserControl
 
     private void UpdateNavVisibility()
     {
-        NavigationViewItem_GachaLog.Visibility = GameRegistry.GetEntry(CurrentGameBiz).HasGachaPage
+
+        bool has = GameSelectorControl.HasSelection;
+        NavigationViewItem_Launcher.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
+        NavigationViewItem_GameSetting.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
+        NavigationViewItem_Screenshot.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
+        NavigationViewItem_GachaLog.Visibility = has && GameRegistry.GetEntry(CurrentGameBiz).HasGachaPage
             ? Visibility.Visible
             : Visibility.Collapsed;
 
-        NavigationViewItem_KuroBbs.Visibility = CurrentGameBiz.IsOverseas()
-            ? Visibility.Collapsed
-            : Visibility.Visible;
+        NavigationViewItem_KuroBbs.Visibility = has && !CurrentGameBiz.IsOverseas()
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
 

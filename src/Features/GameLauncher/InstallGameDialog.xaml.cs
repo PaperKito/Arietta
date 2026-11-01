@@ -43,7 +43,7 @@ public sealed partial class InstallGameDialog : ContentDialog
             foreach (var tier in tiers)
             {
                 _tierSizes[tier.Name] = tier.SizeBytes;
-                Segmented_Tier.Items.Add(new SegmentedItem { Content = TierLabel(tier.Name), Tag = tier.Name });
+                Segmented_Tier.Items.Add(new SegmentedItem { Content = GameUpdateService.TierDisplayName(tier.Name), Tag = tier.Name });
             }
             SelectedTier = tiers.FirstOrDefault(t => t.Name.Equals("HD", StringComparison.OrdinalIgnoreCase))?.Name
                 ?? tiers[0].Name;
@@ -194,14 +194,6 @@ public sealed partial class InstallGameDialog : ContentDialog
             }
         }
     }
-
-    private static string TierLabel(string name) => name.ToUpperInvariant() switch
-    {
-        "UHD" => Lang.Instance.InstallGameDialog_TierUHD,
-        "HD" => Lang.Instance.InstallGameDialog_TierHD,
-        "SD" => Lang.Instance.InstallGameDialog_TierSD,
-        _ => name,
-    };
 
     private async Task ApplyTierAsync()
     {

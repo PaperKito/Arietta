@@ -1,53 +1,16 @@
-# ---------- Build output ----------
 bin/
 obj/
-publish/
-[Bb]uild[Ll]og.*
-*.binlog
-*.ilk
-*.pdb
-*.opendb
-*.VC.db
-
-# MSIX / packaging intermediates (this project is not packaged, rules kept for local experiments)
-AppPackages/
-BundleArtifacts/
-Package.StoreAssociation.xml
-_pkginfo.txt
-*.appx
-*.appxbundle
-*.appxsym
-*.msix
-*.msixbundle
-
-# ---------- Visual Studio / editors ----------
 .vs/
-.vscode/
-.idea/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-*.userprefs
-*.svclog
-*.psess
-*.vsp
-*.vspx
+__pycache__/
+*.log
+.tmp/
+tools/.tmp_*
 
-# ---------- Runtime data folder (portable data: database / logs / credentials / cache) ----------
-# Release: <next to exe>\Arietta\    Debug: src\Arietta\
-# Contains Arietta.db, config.ini, log\, gacha\, DynamicBg\, CloudSync\ (sync.json holds DPAPI-encrypted sync credentials)
 src/Arietta/
-dist/**/Arietta/
-data/
-Arietta/
 *.db
 *.db-shm
 *.db-wal
-*.sqlite
-*.sqlite3
 
-# ---------- Keys and local secrets ----------
 *.pfx
 *.publishsettings
 *.key
@@ -56,50 +19,13 @@ secrets.json
 *.local.json
 .env
 .env.*
-CloudSync/sync.json
 
-# ---------- Logs and temporary artifacts ----------
-*.log
-*.tlog
-.tmp/
-tmp/
-vid_frames/
-*.xbf
-
-# ---------- Dependencies and tool caches ----------
-node_modules/
-__pycache__/
-tools/**/__pycache__/
-*.py[cod]
-.pytest_cache/
-.nuget/
-packages/
-
-# ---------- Misc / local references and external repos ----------
-Github/
-.zcode/
-.zcodeignore
-.workbuddy/
-.backup/
-backup/
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-*.swp
-*~
-
-# Output folder of the comment-stripping tool
-dist/NoComments/
-
-# Proprietary Xbox font (used by gamepad glyphs): not committed, shipped with the release package.
-# Source: Assets/Font/XboxFluent2.ttf from a local Starward install, or download from the Xbox Design System.
-src/Assets/Font/XboxFluent2.ttf
-
-# ---- Extra: packaging output and stray build folders ----
 dist/
 src/binx64*/
-tools/.tmp_*
+backup/
 
-# ---- Publish repo only: local commit helper scripts, never publish them ----
+src/Assets/Font/XboxFluent2.ttf
+src/Assets/Image/bg_default.jpg
+
 commit.bat
 commit.ps1

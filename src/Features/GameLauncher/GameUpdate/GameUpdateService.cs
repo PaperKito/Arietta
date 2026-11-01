@@ -416,6 +416,61 @@ public static class GameUpdateService
         }
     }
 
+    private static void WritePerPackVersions(string gameDir, string version, IEnumerable<string> packNames)
+    {
+        try
+        {
+            foreach (string pack in packNames)
+            {
+                string path = Path.Combine(gameDir, "launcherDownloadConfig", $"{pack}.json");
+                string? existing = null;
+                try
+                {
+                    if (File.Exists(path))
+                    {
+                        existing = JsonSerializer.Deserialize<LauncherPackVersion>(File.ReadAllText(path), JsonOptions)?.Version;
+                    }
+                }
+                catch { }
+                if (existing is not null && CompareVersion(existing, version) > 0)
+                {
+                    continue;
+                }
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                File.WriteAllText(path, JsonSerializer.Serialize(new LauncherPackVersion { PackName = pack, Version = version }, JsonOptions));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to write per-pack version records {Dir}", gameDir);
+        }
+    }
+
+    private static void HealPerPackVersions(string gameDir, string localVersion)
+    {
+        foreach (string pack in new[] { "common", "hd" })
+        {
+            string path = Path.Combine(gameDir, "launcherDownloadConfig", $"{pack}.json");
+            try
+            {
+                if (!File.Exists(path))
+                {
+                    continue;
+                }
+                var record = JsonSerializer.Deserialize<LauncherPackVersion>(File.ReadAllText(path), JsonOptions);
+                if (record?.Version is { } v && CompareVersion(v, localVersion) < 0)
+                {
+                    File.WriteAllText(path, JsonSerializer.Serialize(new LauncherPackVersion { PackName = pack, Version = localVersion }, JsonOptions));
+                    _logger.LogInformation("Healed per-pack version record {Pack}: {Old} -> {New}", pack, v, localVersion);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to heal per-pack version record {Path}", path);
+            }
+        }
+    }
+
     #endregion
 
 
@@ -495,7 +550,8 @@ public static class GameUpdateService
     public static async Task<GameUpdateState> GetStateAsync(GameBiz biz)
     {
 
-        if (GetGameDir(biz) is null)
+        string? gameDir = GetGameDir(biz);
+        if (gameDir is null)
         {
             return new GameUpdateState { Kind = UpdateKind.None, LocalVersion = null };
         }
@@ -503,6 +559,8 @@ public static class GameUpdateService
         string? local = GetLocalVersion(biz);
         if (local is not null)
         {
+
+            HealPerPackVersions(gameDir, local);
 
             _ = Task.Run(() => CleanOrphanStaging(biz, local));
         }
@@ -1394,6 +1452,8 @@ public static class GameUpdateService
         }
 
         WriteLocalVersion(gameDir, version);
+
+        WritePerPackVersions(gameDir, version, new[] { "common", "hd" });
         if (keepStaging)
         {
             CleanStagingRoots(gameDir, keepVersion: version);
@@ -1755,7 +1815,7 @@ public static class GameUpdateService
         };
     }
 
-    public sealed record GameTierOption(string Name, long SizeBytes);
+    public sealed record GameTierOption(string Name, long SizeBytes, long TierPackSizeBytes = 0);
 
     public static async Task<List<GameTierOption>?> GetTierOptionsAsync(GameBiz biz)
     {
@@ -1770,7 +1830,7 @@ public static class GameUpdateService
         return bundles.Keys
             .Where(packMap.ContainsKey)
             .OrderBy(k => packMap[k].Size)
-            .Select(k => new GameTierOption(k, common.Size + packMap[k].Size))
+            .Select(k => new GameTierOption(k, common.Size + packMap[k].Size, packMap[k].Size))
             .ToList();
     }
 
@@ -1817,6 +1877,88 @@ public static class GameUpdateService
         return new DownloadPlan(files, common.BaseUrl ?? "", total, null, null, version, null, null);
     }
 
+    public static async Task<long> SwitchTierAsync(
+        GameBiz biz, string tierName, IProgress<GameDownloadProgress>? progress, CancellationToken ct)
+    {
+        string? gameDir = GetGameDir(biz)
+            ?? throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_NoGameDir);
+        var index = await GetTierIndexAsync(biz, ct);
+        if (index?.ResourcePacks is not { } packs
+            || index.Bundles?.TryGetValue(tierName, out var bundle) != true
+            || bundle?.ResourcePacks is not { Count: > 0 })
+        {
+            throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_ErrNoManifest);
+        }
+        string packName = bundle.ResourcePacks.FirstOrDefault(p => !p.Equals("common", StringComparison.OrdinalIgnoreCase))
+            ?? throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_ErrNoManifest);
+        if (!packs.TryGetValue(packName, out var pack) || pack.IndexFile is not { } indexFile || pack.BaseUrl is not { } baseUrl)
+        {
+            throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_ErrNoManifest);
+        }
+        string? local = GetLocalVersion(biz);
+        if (pack.Version is { } pv && (local is null || CompareVersion(local, pv) != 0))
+        {
+            throw new InvalidOperationException(string.Format(Localization.Lang.Instance.GameUpdate_ErrTierVersionMismatch, pv, local ?? "?"));
+        }
+
+        var list = await FetchResourceListAsync(biz, indexFile)
+            ?? throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_ErrNoManifest);
+        List<GameResourceEntry> files = list.Resource
+            .Where(f => !string.IsNullOrWhiteSpace(f.Dest))
+
+            .Where(f => !VerifyFile(Path.Combine(gameDir, f.Dest), f, ct))
+            .ToList();
+
+        long downloaded = 0;
+        if (files.Count > 0)
+        {
+
+            if (GameProcessMonitor.IsRunning(biz))
+            {
+                throw new InvalidOperationException(Localization.Lang.Instance.GameUpdate_GameRunning);
+            }
+            long need = files.Sum(f => f.Size);
+            var drive = new DriveInfo(Path.GetPathRoot(Path.GetFullPath(gameDir))!);
+            if (drive.IsReady && drive.AvailableFreeSpace < need)
+            {
+                throw new InvalidOperationException(string.Format(
+                    Localization.Lang.Instance.GameUpdate_ErrNotEnoughSpaceForPatch, GameUpdateSession.FormatSize(need)));
+            }
+            foreach (var f in files)
+            {
+                f.FromFolder = baseUrl;
+            }
+            string probeRel = BuildProbeRel(files, null, baseUrl);
+            var channels = await EnsureDownloadChannelSetAsync(biz, probeRel, ct: ct);
+            var downloader = new GameUpdateDownloader(channels, baseUrl, gameDir, files,
+                rebuildChannels: token => EnsureDownloadChannelSetAsync(biz, probeRel, forceRefresh: true, token));
+            downloaded = await downloader.DownloadAsync(progress, ct);
+        }
+
+        var manifest = ReadLocalGameResources(gameDir);
+        if (manifest is null)
+        {
+            var common = packs.TryGetValue("common", out var c) ? await FetchResourceListAsync(biz, c?.IndexFile) : null;
+            if (common is not null)
+            {
+                manifest = common.Resource;
+            }
+        }
+        if (manifest is not null)
+        {
+            var dests = manifest.Select(m => m.Dest).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            manifest.AddRange(list.Resource.Where(f => !dests.Contains(f.Dest)));
+            WriteLocalGameResources(gameDir, new GameResourceList { Resource = manifest });
+        }
+
+        if (pack.Version is { } tierVersion)
+        {
+            WritePerPackVersions(gameDir, tierVersion, [packName]);
+        }
+        _logger.LogInformation("Tier switch {Biz} -> {Tier}: {Count} files, {Bytes} downloaded", biz, tierName, files.Count, downloaded);
+        return downloaded;
+    }
+
     public static string? GetInstallTier(GameBiz biz)
     {
         string v = AppConfig.GetConfig($"InstallTier_{biz}") ?? "";
@@ -1827,6 +1969,30 @@ public static class GameUpdateService
     {
         AppConfig.SetConfig($"InstallTier_{biz}", tier ?? "");
     }
+
+    public static string? GetLaunchTier(GameBiz biz)
+    {
+        string v = AppConfig.GetConfig($"LaunchTier_{biz}") ?? "";
+        return v.Length == 0 ? null : v;
+    }
+
+    public static void SetLaunchTier(GameBiz biz, string? tier)
+    {
+        AppConfig.SetConfig($"LaunchTier_{biz}", tier ?? "");
+    }
+
+    public static List<string> GetInstalledTiers(string gameDir) =>
+        new List<string> { "UHD", "HD", "SD" }
+            .Where(t => Directory.Exists(Path.Combine(gameDir, "Client", "Content", t)))
+            .ToList();
+
+    public static string TierDisplayName(string name) => name.ToUpperInvariant() switch
+    {
+        "UHD" => Localization.Lang.Instance.InstallGameDialog_TierUHD,
+        "HD" => Localization.Lang.Instance.InstallGameDialog_TierHD,
+        "SD" => Localization.Lang.Instance.InstallGameDialog_TierSD,
+        _ => name,
+    };
 
     public static async Task<long> InstallAsync(
         GameBiz biz, string installDir, GameVersionNode target, IProgress<GameDownloadProgress>? progress, CancellationToken ct,
@@ -1872,6 +2038,18 @@ public static class GameUpdateService
         GameAutoSearch.WriteOfficialLedger(biz, installDir, elevateForHklm: true);
 
         WriteLocalVersion(installDir, target.Version!);
+
+        IEnumerable<string> installedPacks = new[] { "common", "hd" };
+        if (tierName is not null)
+        {
+            var tierIndex = await GetTierIndexAsync(biz);
+            if (tierIndex?.Bundles?.TryGetValue(tierName, out var installedBundle) == true
+                && installedBundle?.ResourcePacks is { Count: > 0 } bundlePacks)
+            {
+                installedPacks = bundlePacks;
+            }
+        }
+        WritePerPackVersions(installDir, target.Version!, installedPacks);
         if (keepStaging)
         {
             CleanStagingRoots(installDir, keepVersion: target.Version!);

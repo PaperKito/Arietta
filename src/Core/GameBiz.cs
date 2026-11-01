@@ -374,6 +374,11 @@ public static class GameRegistry
         return AppConfig.GetConfig(GetEnableDynamicBgConfigKey(biz)) != "0";
     }
 
+    public static bool IsCustomBgEnabled(GameBiz biz)
+    {
+        return AppConfig.GetConfig(GetEnableCustomBgConfigKey(biz)) != "0";
+    }
+
     public static string? GetCustomBgPath(GameBiz biz)
     {
         string? path = AppConfig.GetConfig(GetCustomBgConfigKey(biz));
@@ -382,10 +387,6 @@ public static class GameRegistry
             return null;
         }
 
-        if (AppConfig.GetConfig(GetEnableCustomBgConfigKey(biz)) == "0")
-        {
-            return null;
-        }
-        return path;
+        return IsCustomBgEnabled(biz) ? path : null;
     }
 }

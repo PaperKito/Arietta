@@ -354,6 +354,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameUpdate_ErrPatchFailed => T();
     public string GameUpdate_ErrNotEnoughSpaceForPatch => T();
     public string GameUpdate_ErrPatchTool => T();
+    public string GameUpdate_ErrTierVersionMismatch => T();
+    public string GameUpdate_TierSwitchDone => T();
     public string GameUpdate_Predownloading => T();
     public string GameUpdate_Done => T();
     public string GameUpdate_InstallDone => T();
@@ -544,6 +546,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameLauncherSettingDialog_QualityMedium => T();
     public string GameLauncherSettingDialog_QualityLow => T();
     public string GameLauncherSettingDialog_PauseOnGameRun => T();
+    public string GameLauncherSettingDialog_ResourceTier => T();
+    public string GameLauncherSettingDialog_TierDownload => T();
     public string GameLauncherSettingDialog_RelocateGame => T();
     public string GameLauncherSettingDialog_Size => T();
     public string GameLauncherSettingDialog_StartRepairing => T();
@@ -597,6 +601,9 @@ public sealed class Lang : INotifyPropertyChanged
     public string SettingPage_WindowBehavior => T();
     public string SettingPage_CloseWindowOption => T();
     public string SettingPage_ExitApp => T();
+
+    public string CloseDialog_Title => T();
+    public string CloseDialog_Content => T();
     public string SettingPage_AfterLaunchOption => T();
     public string SettingPage_KeepWindow => T();
     public string SettingPage_AfterGameExitOption => T();
@@ -613,13 +620,34 @@ public sealed class Lang : INotifyPropertyChanged
     public string SettingPage_About_Copyright => T();
 
     public string SettingPage_CheckUpdate => T();
-    public string SettingPage_CheckingUpdate => T();
     public string SettingPage_UpToDate => T();
     public string SettingPage_UpdateAvailable => T();
     public string SettingPage_UpdateDownload => T();
     public string SettingPage_UpdateReady => T();
     public string SettingPage_UpdateFailed => T();
     public string SettingPage_UpdateDevLayout => T();
+
+    public string SettingPage_UpToDateDesc => T();
+    public string SettingPage_UpdateIgnored => T();
+    public string SettingPage_UpdateIgnoredDesc => T();
+    public string SettingPage_UpdateErrNetwork => T();
+    public string SettingPage_UpdateErrNetworkDesc => T();
+    public string SettingPage_UpdateErrTimeout => T();
+    public string SettingPage_UpdateErrTimeoutDesc => T();
+    public string SettingPage_UpdateErrRateLimited => T();
+    public string SettingPage_UpdateErrRateLimitedDesc => T();
+    public string SettingPage_UpdateErrNotFound => T();
+    public string SettingPage_UpdateErrNotFoundDesc => T();
+    public string SettingPage_UpdateErrBadResponse => T();
+    public string SettingPage_UpdateErrBadResponseDesc => T();
+    public string SettingPage_UpdateErrHttp => T();
+    public string SettingPage_UpdateErrHttpDesc => T();
+    public string SettingPage_UpdateErrChecksum => T();
+    public string SettingPage_UpdateErrChecksumDesc => T();
+    public string SettingPage_UpdateErrPackage => T();
+    public string SettingPage_UpdateErrPackageDesc => T();
+    public string SettingPage_UpdateErrDisk => T();
+    public string SettingPage_UpdateErrDiskDesc => T();
 
     public string UpdateDialog_IgnoreVersion => T();
 
@@ -645,6 +673,9 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameSelector_SelectServer => T();
     public string GameSelector_InstalledSize => T();
     public string GameSelector_Calculating => T();
+    public string GameSelector_TipSwitch => T();
+    public string GameSelector_Refresh => T();
+    public string GameSelector_PinBar => T();
 
     public string KuroBbs_AccountLevelLabel => T();
     public string KuroBbs_SwitchRole => T();

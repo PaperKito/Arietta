@@ -17,9 +17,15 @@ namespace Arietta.Features.GameLauncher;
 public sealed partial class GameBannerAndPost : UserControl
 {
 
+    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _bannerTimer;
+
     public GameBannerAndPost()
     {
         this.InitializeComponent();
+        _bannerTimer = DispatcherQueue.CreateTimer();
+        _bannerTimer.Interval = TimeSpan.FromSeconds(5);
+        _bannerTimer.IsRepeating = true;
+        _bannerTimer.Tick += BannerTimer_Tick;
         this.Loaded += GameBannerAndPost_Loaded;
         this.Unloaded += GameBannerAndPost_Unloaded;
     }
@@ -44,6 +50,7 @@ public sealed partial class GameBannerAndPost : UserControl
     private void GameBannerAndPost_Unloaded(object sender, RoutedEventArgs e)
     {
         GameLauncherSettingDialog.AnnouncementSettingChanged -= OnAnnouncementSettingChanged;
+        _bannerTimer.Stop();
     }
 
     private void OnAnnouncementSettingChanged(object? sender, EventArgs e)
@@ -64,12 +71,14 @@ public sealed partial class GameBannerAndPost : UserControl
         {
             if (!GameNoticeSettings.ShowBannerAndPost)
             {
+                _bannerTimer.Stop();
                 Show(false);
                 return;
             }
             var data = await GameNoticeService.GetAsync(CurrentGameBiz);
             if (data is null || (data.Value.Banners.Count == 0 && data.Value.Groups.Count == 0))
             {
+                _bannerTimer.Stop();
                 Show(false);
 
                 var kind = GameNoticeService.LastFailure;
@@ -83,11 +92,21 @@ public sealed partial class GameBannerAndPost : UserControl
             Banners = data.Value.Banners;
             PostGroups = data.Value.Groups;
             Show(true);
+
+            if (Banners.Count > 1)
+            {
+                _bannerTimer.Start();
+            }
+            else
+            {
+                _bannerTimer.Stop();
+            }
         }
         catch (Exception ex)
         {
 
             AppConfig.GetLogger<GameBannerAndPost>().LogError(ex, "Unexpected exception while loading announcements");
+            _bannerTimer.Stop();
             InAppToast.MainWindow?.Warning(Lang.Instance.Notice_LoadFailed);
             Show(false);
         }
@@ -112,6 +131,18 @@ public sealed partial class GameBannerAndPost : UserControl
     private void Grid_BannerContainer_PointerExited(object sender, PointerRoutedEventArgs e)
     {
         Border_PipsPager.Visibility = Visibility.Collapsed;
+    }
+
+    private void BannerTimer_Tick(Microsoft.UI.Dispatching.DispatcherQueueTimer sender, object args)
+    {
+        try
+        {
+            if (Banners is { Count: > 0 })
+            {
+                FlipView_Banner.SelectedIndex = (FlipView_Banner.SelectedIndex + 1) % Banners.Count;
+            }
+        }
+        catch { }
     }
 
 

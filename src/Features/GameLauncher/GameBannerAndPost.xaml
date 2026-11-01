@@ -35,6 +35,15 @@
                       CornerRadius="8"
                       ItemsSource="{x:Bind Banners}"
                       SelectionChanged="FlipView_Banner_SelectionChanged">
+                <FlipView.Resources>
+
+                    <Style TargetType="Button">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Setter Property="IsHitTestVisible" Value="False" />
+                        <Setter Property="MaxWidth" Value="0" />
+                        <Setter Property="MaxHeight" Value="0" />
+                    </Style>
+                </FlipView.Resources>
                 <FlipView.ItemTemplate>
                     <DataTemplate x:DataType="local:GameBannerItem">
                         <local:CachedImage HorizontalAlignment="Stretch"

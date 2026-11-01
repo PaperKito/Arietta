@@ -43,12 +43,12 @@
 
             <ScrollViewer x:Name="Scroll_Periods"
                           Grid.Column="0"
-                          Margin="0,0,16,16"
+                          Margin="10,0,16,16"
                           HorizontalAlignment="Left"
                           HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto"
                           Visibility="Collapsed">
-                <ListView x:Name="ListView_Periods"
+                <kuro:PeriodListView x:Name="ListView_Periods"
                           HorizontalAlignment="Left"
                           IsItemClickEnabled="False"
                           IsSwipeEnabled="False"
@@ -56,13 +56,19 @@
                           SelectionChanged="ListView_Periods_SelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="kuro:CombatPeriodItem">
-                            <StackPanel HorizontalAlignment="Left" Spacing="4">
-                                <TextBlock HorizontalAlignment="Left"
+
+                            <Border Margin="0,0,14,0"
+                                    Padding="12,6,12,6"
+                                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                                    CornerRadius="8">
+                                <StackPanel Spacing="4">
+
+                                <TextBlock HorizontalAlignment="Center"
                                            FontSize="14"
                                            FontWeight="SemiBold"
                                            Text="{x:Bind DateLabel}"
                                            TextTrimming="CharacterEllipsis" />
-                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Spacing="5">
+                                <StackPanel HorizontalAlignment="Center" MinHeight="18" Orientation="Horizontal" Spacing="5">
 
                                     <Image Width="16"
                                            Height="16"
@@ -79,74 +85,18 @@
                                                Text="{x:Bind ValueLabel}"
                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                 </StackPanel>
-                            </StackPanel>
+                                </StackPanel>
+                            </Border>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                     <ListView.ItemContainerStyle>
 
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Left" />
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                            <Setter Property="MinHeight" Value="0" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Margin" Value="0,0,0,8" />
-                            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListViewItem">
-                                        <Grid x:Name="RootGrid">
-                                            <Border x:Name="RootBorder"
-                                                    Padding="12,9,12,9"
-                                                    Background="{TemplateBinding Background}"
-                                                    CornerRadius="8">
-                                                <ContentPresenter x:Name="ContentPresenter"
-                                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                  Content="{TemplateBinding Content}"
-                                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                                  ContentTransitions="{TemplateBinding ContentTransitions}" />
-                                            </Border>
-                                            <VisualStateManager.VisualStateGroups>
-                                                <VisualStateGroup x:Name="CommonStates">
-                                                    <VisualState x:Name="Normal" />
-                                                    <VisualState x:Name="PointerOver">
-                                                        <VisualState.Setters>
-                                                            <Setter Target="RootBorder.Background" Value="{ThemeResource ListViewItemBackgroundPointerOver}" />
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                    <VisualState x:Name="Pressed">
-                                                        <VisualState.Setters>
-                                                            <Setter Target="RootBorder.Background" Value="{ThemeResource ListViewItemBackgroundPressed}" />
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                </VisualStateGroup>
-                                                <VisualStateGroup x:Name="SelectionStates">
-                                                    <VisualState x:Name="Unselected" />
-                                                    <VisualState x:Name="Selected">
-                                                        <VisualState.Setters>
-                                                            <Setter Target="RootBorder.Background" Value="{ThemeResource ListViewItemBackgroundSelected}" />
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                    <VisualState x:Name="PointerOverSelected">
-                                                        <VisualState.Setters>
-                                                            <Setter Target="RootBorder.Background" Value="{ThemeResource ListViewItemBackgroundSelectedPointerOver}" />
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                    <VisualState x:Name="PressedSelected">
-                                                        <VisualState.Setters>
-                                                            <Setter Target="RootBorder.Background" Value="{ThemeResource ListViewItemBackgroundSelectedPointerOver}" />
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                </VisualStateGroup>
-                                            </VisualStateManager.VisualStateGroups>
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
+                        <Style TargetType="ListViewItem" BasedOn="{StaticResource KuroBbsPeriodItemStyle}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Margin" Value="0,0,0,6" />
                         </Style>
                     </ListView.ItemContainerStyle>
-                </ListView>
+                </kuro:PeriodListView>
             </ScrollViewer>
 
             <InfoBar x:Name="InfoBar_NoAccount"

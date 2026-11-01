@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Arietta.Core;
+using Arietta.Features.Welcome;
 using Arietta.Helpers;
 using System;
 using System.Collections.Generic;
@@ -38,9 +39,9 @@ public sealed partial class GameSelector : UserControl
         this.Loaded += GameSelector_Loaded;
     }
 
+    public GameBiz? CurrentGameBiz { get; set => SetProperty(ref field, value); }
 
-
-    public GameBiz CurrentGameBiz { get; set => SetProperty(ref field, value); }
+    public bool HasSelection => CurrentGameBiz is not null;
 
 
     public GameBizIcon? CurrentGameBizIcon { get; set => SetProperty(ref field, value); }
@@ -71,14 +72,18 @@ public sealed partial class GameSelector : UserControl
         try
         {
 
+            if (AppConfig.GetConfig("WelcomeShown") == "1" && AppConfig.GetConfig("CurrentGameBiz") is null)
+            {
+                AppConfig.SetConfig("CurrentGameBiz", GameBiz.WutheringWavesGlobal.ToString());
+            }
+
             if (Enum.TryParse(AppConfig.GetConfig("CurrentGameBiz"), out GameBiz saved) && Enum.IsDefined(saved))
             {
                 CurrentGameBiz = saved;
             }
             else
             {
-
-                CurrentGameBiz = GameBiz.WutheringWavesGlobal;
+                CurrentGameBiz = null;
             }
 
             GameBizIcons.Clear();
@@ -171,8 +176,9 @@ public sealed partial class GameSelector : UserControl
             icon.MaskOpacity = selected ? 0 : 1;
         }
 
-        CurrentGameBizIcon = GameBizIcons.FirstOrDefault(x => x.Biz == CurrentGameBiz)
-                             ?? CreateIcon(CurrentGameBiz.ToString(), false);
+        CurrentGameBizIcon = CurrentGameBiz is { } current
+            ? GameBizIcons.FirstOrDefault(x => x.Biz == current) ?? CreateIcon(current.ToString(), false)
+            : null;
     }
 
 
@@ -185,12 +191,38 @@ public sealed partial class GameSelector : UserControl
 
             UpdateDragRectangles();
             await Task.Delay(600);
-            if (GameBizIcons.Count == 0 && AppConfig.GetConfig("GameSelectorTipDismissed") is not "1")
-            {
-                TeachTip_SelectGame.IsOpen = true;
-            }
+            ShowSelectGameTipWhenReady();
         }
         catch { }
+    }
+
+    private void ShowSelectGameTipWhenReady()
+    {
+        if (WelcomeOverlay.IsShowing)
+        {
+            WelcomeOverlay.Dismissed -= WelcomeOverlay_Dismissed;
+            WelcomeOverlay.Dismissed += WelcomeOverlay_Dismissed;
+            return;
+        }
+        TryShowSelectGameTip();
+    }
+
+
+    private async void WelcomeOverlay_Dismissed(object? sender, EventArgs e)
+    {
+        WelcomeOverlay.Dismissed -= WelcomeOverlay_Dismissed;
+
+        await Task.Delay(400);
+        TryShowSelectGameTip();
+    }
+
+
+    private void TryShowSelectGameTip()
+    {
+        if (GameBizIcons.Count == 0 && AppConfig.GetConfig("GameSelectorTipDismissed") is not "1")
+        {
+            TeachTip_SelectGame.IsOpen = true;
+        }
     }
 
 

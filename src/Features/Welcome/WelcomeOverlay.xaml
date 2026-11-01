@@ -8,10 +8,26 @@
              x:DefaultBindMode="OneWay"
              mc:Ignorable="d">
 
-    <Grid>
-        <Border Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" Opacity="0.78" />
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-        <StackPanel MaxWidth="640"
+        <Image HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Source="ms-appx:///Assets/Image/bg_default.jpg"
+               Stretch="UniformToFill" />
+
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#8A000000" Offset="0" />
+                    <GradientStop Color="#6B000000" Offset="0.32" />
+                    <GradientStop Color="#2E000000" Offset="0.66" />
+                    <GradientStop Color="#14000000" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <StackPanel x:Name="ContentPanel"
+                    MaxWidth="640"
                     Margin="52,64,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
@@ -50,8 +66,16 @@
                        Text="{x:Bind lang:Lang.Instance.Welcome_SuggestIntro}" />
 
             <StackPanel Orientation="Horizontal" Spacing="10">
-                <TextBlock FontSize="14" Foreground="{x:Bind TransparencyBrush}" Text="{x:Bind lang:Lang.Instance.Welcome_Transparency}" />
-                <TextBlock FontSize="14" Foreground="{x:Bind AnimationBrush}" Text="{x:Bind lang:Lang.Instance.Welcome_Animation}" />
+                <TextBlock FontSize="14">
+                    <Hyperlink Foreground="{x:Bind TransparencyBrush}" Click="OpenVisualEffectsSettings">
+                        <Run Text="{x:Bind lang:Lang.Instance.Welcome_Transparency}" />
+                    </Hyperlink>
+                </TextBlock>
+                <TextBlock FontSize="14">
+                    <Hyperlink Foreground="{x:Bind AnimationBrush}" Click="OpenVisualEffectsSettings">
+                        <Run Text="{x:Bind lang:Lang.Instance.Welcome_Animation}" />
+                    </Hyperlink>
+                </TextBlock>
             </StackPanel>
 
             <TextBlock Margin="0,12,0,0"
@@ -60,9 +84,14 @@
                        Text="{x:Bind lang:Lang.Instance.Welcome_Footer}" TextWrapping="Wrap" />
         </StackPanel>
 
-        <Button Margin="0,0,52,52"
+        <Button x:Name="StartButton"
+                Margin="0,0,52,52"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
+                Height="44"
+                MinWidth="180"
+                CornerRadius="22"
+                FontSize="15"
                 Command="{x:Bind StartCommand}"
                 Content="{x:Bind lang:Lang.Instance.Welcome_Start}"
                 Style="{ThemeResource AccentButtonStyle}" />

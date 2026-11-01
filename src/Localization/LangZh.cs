@@ -288,6 +288,8 @@ internal static class LangZh
         ["GameUpdate_ErrPatchFailed"] = "补丁应用失败：{0}（退出码 {1}）",
         ["GameUpdate_ErrNotEnoughSpaceForPatch"] = "磁盘空间不足：应用补丁还需要至少 {0} 的可用空间",
         ["GameUpdate_ErrPatchTool"] = "补丁工具缺失（Assets\\Hpatchz\\hpatchz.exe），请重新安装启动器",
+        ["GameUpdate_ErrTierVersionMismatch"] = "档位资源版本（{0}）与本地游戏版本（{1}）不一致，请先把游戏更新到最新再切换档位",
+        ["GameUpdate_TierSwitchDone"] = "{0} 资源下载完成",
         ["GameUpdate_Predownloading"] = "正在预下载 {0}…",
         ["GameUpdate_Done"] = "已更新到 {0}",
         ["GameUpdate_InstallDone"] = "{0} 安装完成",
@@ -478,6 +480,8 @@ internal static class LangZh
         ["GameLauncherSettingDialog_QualityMedium"] = "中",
         ["GameLauncherSettingDialog_QualityLow"] = "低",
         ["GameLauncherSettingDialog_PauseOnGameRun"] = "游戏运行时暂停背景",
+        ["GameLauncherSettingDialog_ResourceTier"] = "资源等级",
+        ["GameLauncherSettingDialog_TierDownload"] = "下载 {0} 资源（约 {1}）",
         ["GameLauncherSettingDialog_RelocateGame"] = "重新定位游戏",
         ["GameLauncherSettingDialog_Size"] = "大小",
         ["GameLauncherSettingDialog_StartRepairing"] = "开始修复",
@@ -527,6 +531,9 @@ internal static class LangZh
         ["SettingPage_WindowBehavior"] = "窗口行为",
         ["SettingPage_CloseWindowOption"] = "关闭窗口选项",
         ["SettingPage_ExitApp"] = "完全退出",
+
+        ["CloseDialog_Title"] = "关闭窗口",
+        ["CloseDialog_Content"] = "选择点击关闭按钮时的行为，之后可在「设置 → 窗口行为」中修改。",
         ["SettingPage_AfterLaunchOption"] = "启动游戏后",
         ["SettingPage_KeepWindow"] = "保持窗口",
         ["SettingPage_AfterGameExitOption"] = "关闭游戏后",
@@ -543,13 +550,34 @@ internal static class LangZh
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
 
         ["SettingPage_CheckUpdate"] = "检查更新",
-        ["SettingPage_CheckingUpdate"] = "正在检查更新…",
         ["SettingPage_UpToDate"] = "已是最新版本",
         ["SettingPage_UpdateAvailable"] = "发现新版本",
         ["SettingPage_UpdateDownload"] = "下载并安装",
         ["SettingPage_UpdateReady"] = "新版本已就绪，请重启应用完成安装",
         ["SettingPage_UpdateFailed"] = "更新失败",
         ["SettingPage_UpdateDevLayout"] = "当前是开发目录，不支持安装更新（仅绿色版布局支持）",
+
+        ["SettingPage_UpToDateDesc"] = "当前版本 v{0} 已是最新",
+        ["SettingPage_UpdateIgnored"] = "该版本已被忽略",
+        ["SettingPage_UpdateIgnoredDesc"] = "v{0} 的更新已跳过，可在发布页手动下载",
+        ["SettingPage_UpdateErrNetwork"] = "无法连接更新服务器",
+        ["SettingPage_UpdateErrNetworkDesc"] = "请检查网络连接或系统代理设置后重试",
+        ["SettingPage_UpdateErrTimeout"] = "连接更新服务器超时",
+        ["SettingPage_UpdateErrTimeoutDesc"] = "网络较慢或 GitHub 暂时不可达，请稍后重试",
+        ["SettingPage_UpdateErrRateLimited"] = "请求过于频繁",
+        ["SettingPage_UpdateErrRateLimitedDesc"] = "GitHub 接口限流（每小时 60 次），请过一会儿再试",
+        ["SettingPage_UpdateErrNotFound"] = "没有找到可用版本",
+        ["SettingPage_UpdateErrNotFoundDesc"] = "仓库还没有正式发布版本，请稍后再试",
+        ["SettingPage_UpdateErrBadResponse"] = "更新信息解析失败",
+        ["SettingPage_UpdateErrBadResponseDesc"] = "服务器返回的内容不是预期的格式，请稍后重试",
+        ["SettingPage_UpdateErrHttp"] = "更新服务器返回异常",
+        ["SettingPage_UpdateErrHttpDesc"] = "HTTP {0}，请稍后重试",
+        ["SettingPage_UpdateErrChecksum"] = "安装包校验失败",
+        ["SettingPage_UpdateErrChecksumDesc"] = "下载的安装包与服务器不一致，已丢弃，请重新下载",
+        ["SettingPage_UpdateErrPackage"] = "安装包内容异常",
+        ["SettingPage_UpdateErrPackageDesc"] = "解压后没有找到程序文件，安装包可能不完整，请重新下载",
+        ["SettingPage_UpdateErrDisk"] = "无法写入更新文件",
+        ["SettingPage_UpdateErrDiskDesc"] = "磁盘空间不足或安装目录没有写入权限",
 
         ["UpdateDialog_IgnoreVersion"] = "忽略此版本",
 
@@ -575,6 +603,9 @@ internal static class LangZh
         ["GameSelector_SelectServer"] = "选择服务器",
         ["GameSelector_InstalledSize"] = "已安装游戏实际占用空间 ",
         ["GameSelector_Calculating"] = "统计中",
+        ["GameSelector_TipSwitch"] = "点击此处选择或切换游戏",
+        ["GameSelector_Refresh"] = "刷新",
+        ["GameSelector_PinBar"] = "固定/取消固定图标栏",
 
         ["KuroBbs_AccountLevelLabel"] = "联觉等级 ",
         ["KuroBbs_SwitchRole"] = "切换角色",
@@ -699,7 +730,7 @@ internal static class LangZh
 
         ["Common_UnknownError"] = "未知错误",
 
-        ["Welcome_Title"] = "亲爱的玩家，欢迎来到 Arietta！",
+        ["Welcome_Title"] = "欢迎来到 Arietta",
         ["Welcome_Desc"] = "这是一个专为库洛旗下游戏打造的启动器，帮助您轻松管理游戏，享受更好的体验。",
         ["Welcome_DataFolderDesc"] = "您的所有个人数据将会被存放在以下文件夹中，它很重要。",
         ["Welcome_EnvCheckIntro"] = "开始之前还需要检查一些必要环境。",
@@ -709,7 +740,7 @@ internal static class LangZh
         ["Welcome_Transparency"] = "透明效果",
         ["Welcome_Animation"] = "动画效果",
         ["Welcome_Footer"] = "检查完毕后，点击右下角按钮即可开始使用。",
-        ["Welcome_Start"] = "Arietta，启动！",
+        ["Welcome_Start"] = "开始使用",
     };
 
 }

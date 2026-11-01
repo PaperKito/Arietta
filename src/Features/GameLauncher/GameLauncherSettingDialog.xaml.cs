@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Arietta.Core;
 using Arietta.Features.Background;
 using Arietta.Features.DynamicBackground;
@@ -11,8 +12,10 @@ using Arietta.Features.Screenshot;
 using Arietta.Helpers;
 using Arietta.Localization;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 
@@ -23,9 +26,10 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 {
     private readonly ILogger<GameLauncherSettingDialog> _logger = AppConfig.GetLogger<GameLauncherSettingDialog>();
 
-    public GameLauncherSettingDialog(GameBiz biz)
+    public GameLauncherSettingDialog(GameBiz biz, Action? onLaunchTierChanged = null)
     {
         CurrentGameBiz = biz;
+        _onLaunchTierChanged = onLaunchTierChanged;
         var entry = GameRegistry.GetEntry(biz);
         CurrentGameBizIcon = new GameSettingIcon
         {
@@ -35,9 +39,15 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             ServerCode = entry.ServerCode,
         };
         this.InitializeComponent();
-        WireFpsBubble();
         InitializeFromConfig();
+
+        this.AddHandler(UIElement.PointerPressedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler(Dialog_PointerPressed), false);
+
+        this.AddHandler(UIElement.KeyDownEvent, new Microsoft.UI.Xaml.Input.KeyEventHandler(Dialog_KeyDown), true);
+        _ = InitializeLaunchTierAsync();
     }
+
+    private readonly Action? _onLaunchTierChanged;
 
     public GameBiz CurrentGameBiz { get; private set; }
 
@@ -106,80 +116,68 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     public string VideoBgVolumeButtonIcon { get; set => SetProperty(ref field, "\uE767"); }
     public string? ChangeBgError { get; set => SetProperty(ref field, value); }
 
-    private bool _fpsCapEnabled;
-    public bool FpsCapEnabled
-    {
-        get => _fpsCapEnabled;
-        set
-        {
-            if (SetProperty(ref _fpsCapEnabled, value))
-            {
+    private int _fpsCapValue = 30;
 
-                WriteFpsCap(value ? (int)Math.Round(_fpsSliderValue) : 0);
-                OnPropertyChanged(nameof(FpsHeaderText));
+    private bool FpsBoxHasFocus
+    {
+        get
+        {
+            if (Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(XamlRoot) is not DependencyObject focused)
+            {
+                return false;
             }
-        }
-    }
-
-    private double _fpsSliderValue = 30;
-    public double FpsSliderValue
-    {
-        get => _fpsSliderValue;
-        set
-        {
-            if (SetProperty(ref _fpsSliderValue, value))
+            for (DependencyObject? d = focused; d is not null; d = VisualTreeHelper.GetParent(d))
             {
-                if (_fpsCapEnabled)
+                if (ReferenceEquals(d, Box_FpsCap))
                 {
-                    WriteFpsCap((int)Math.Round(value));
+                    return true;
                 }
-                OnPropertyChanged(nameof(FpsHeaderText));
+            }
+            return false;
+        }
+    }
+
+    private void LeaveFpsBox()
+    {
+
+        FocusSink.Focus(FocusState.Programmatic);
+    }
+
+    private void Dialog_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+
+        for (DependencyObject? d = e.OriginalSource as DependencyObject; d is not null; d = VisualTreeHelper.GetParent(d))
+        {
+            if (ReferenceEquals(d, Box_FpsCap))
+            {
+                return;
             }
         }
-    }
-
-    public string FpsHeaderText => $"{Lang.Instance.GameLauncherSettingDialog_BgFps} ({FpsCapText})";
-
-    public string FpsCapText => _fpsCapEnabled
-        ? $"{(int)Math.Round(_fpsSliderValue)} fps"
-        : Lang.Instance.GameLauncherSettingDialog_FpsUnlimited;
-
-    private bool _fpsDragging;
-
-    private void WireFpsBubble()
-    {
-        void Hide()
+        if (FpsBoxHasFocus)
         {
-            _fpsDragging = false;
-            FpsBubble.Visibility = Visibility.Collapsed;
-        }
-
-        Slider_FpsCap.AddHandler(UIElement.PointerPressedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => { _fpsDragging = true; UpdateFpsBubble(); }), true);
-        Slider_FpsCap.AddHandler(UIElement.PointerReleasedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
-        Slider_FpsCap.AddHandler(UIElement.PointerCanceledEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
-        Slider_FpsCap.AddHandler(UIElement.PointerCaptureLostEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => Hide()), true);
-    }
-
-    private void Slider_FpsCap_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
-    {
-        if (_fpsDragging)
-        {
-            UpdateFpsBubble();
+            LeaveFpsBox();
         }
     }
 
-    private void UpdateFpsBubble()
+    private void Dialog_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
     {
-        if (Slider_FpsCap.ActualWidth <= 0)
+
+        if (e.Key == Windows.System.VirtualKey.Enter && FpsBoxHasFocus)
         {
+            LeaveFpsBox();
+        }
+    }
+
+    private void Box_FpsCap_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+
+        if (double.IsNaN(sender.Value))
+        {
+            sender.Value = _fpsCapValue;
             return;
         }
-        double ratio = (Slider_FpsCap.Value - Slider_FpsCap.Minimum) / (Slider_FpsCap.Maximum - Slider_FpsCap.Minimum);
-        double center = ratio * Math.Max(0, Slider_FpsCap.ActualWidth - 20) + 10;
-        FpsBubbleText.Text = $"{(int)Math.Round(Slider_FpsCap.Value)} fps";
-
-        FpsBubble.Margin = new Thickness(Math.Max(0, center - 24), -30, 0, 0);
-        FpsBubble.Visibility = Visibility.Visible;
+        _fpsCapValue = (int)Math.Round(sender.Value);
+        WriteFpsCap(_fpsCapValue);
     }
 
     private void WriteFpsCap(int fps)
@@ -228,6 +226,56 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         set { if (SetProperty(ref field, value)) AppConfig.SetConfig(GameRegistry.GetStartGameArgumentConfigKey(CurrentGameBiz), string.IsNullOrWhiteSpace(value) ? null : value); }
     }
 
+    private async Task InitializeLaunchTierAsync()
+    {
+        try
+        {
+            string? dir = GameUpdateService.GetGameDir(CurrentGameBiz);
+            if (dir is null || GameUpdateService.GetInstalledTiers(dir).Count == 0)
+            {
+                return;
+            }
+            var options = await GameUpdateService.GetTierOptionsAsync(CurrentGameBiz);
+            List<string> names = options is { Count: > 0 }
+                ? options.Select(o => o.Name).ToList()
+                : new List<string> { "SD", "HD", "UHD" }
+                    .Where(n => Directory.Exists(Path.Combine(dir, "Client", "Content", n)))
+                    .ToList();
+            foreach (string name in names)
+            {
+                Segmented_LaunchTier.Items.Add(new CommunityToolkit.WinUI.Controls.SegmentedItem
+                {
+                    Content = GameUpdateService.TierDisplayName(name),
+                    Tag = name,
+                });
+            }
+            string? saved = GameUpdateService.GetLaunchTier(CurrentGameBiz);
+            int index = names.FindIndex(n => n.Equals(saved, StringComparison.OrdinalIgnoreCase));
+            if (index < 0)
+            {
+                index = names.FindLastIndex(n => Directory.Exists(Path.Combine(dir, "Client", "Content", n)));
+            }
+            Segmented_LaunchTier.SelectedIndex = index;
+
+            Segmented_LaunchTier.SelectionChanged += Segmented_LaunchTier_SelectionChanged;
+            Panel_LaunchTier.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Initialize launch tier {Biz}", CurrentGameBiz);
+        }
+    }
+
+    private void Segmented_LaunchTier_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (Segmented_LaunchTier.SelectedItem is CommunityToolkit.WinUI.Controls.SegmentedItem { Tag: string name })
+        {
+
+            GameUpdateService.SetLaunchTier(CurrentGameBiz, name);
+            _onLaunchTierChanged?.Invoke();
+        }
+    }
+
     private bool _enableThirdPartyTool;
     public bool EnableThirdPartyTool
     {
@@ -267,12 +315,9 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         OnPropertyChanged(nameof(VideoBgVolume));
 
         int fpsCap = int.TryParse(AppConfig.GetConfig(DynamicBackgroundStore.FpsCapConfigKey), out int v) ? v : 30;
-        _fpsCapEnabled = fpsCap > 0;
 
-        _fpsSliderValue = fpsCap is >= 10 and <= 60 ? fpsCap : 30;
-        OnPropertyChanged(nameof(FpsCapEnabled));
-        OnPropertyChanged(nameof(FpsSliderValue));
-        OnPropertyChanged(nameof(FpsHeaderText));
+        _fpsCapValue = fpsCap is >= 10 and <= 60 ? fpsCap : 30;
+        Box_FpsCap.Value = _fpsCapValue;
         var configuredQuality = AppConfig.GetConfig(DynamicBackgroundStore.QualityConfigKey);
         _bgQuality = configuredQuality is "high" or "medium" or "low" ? configuredQuality : "auto";
         OnPropertyChanged(nameof(BgQuality));
@@ -888,14 +933,59 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 
     private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
-        if (args.InvokedItemContainer is NavigationViewItem item && item.Tag is string tag)
+        if (args.InvokedItemContainer is NavigationViewItem item && item.Tag is string tag && int.TryParse(tag, out int target))
         {
-            FlipView_Settings.SelectedIndex = int.Parse(tag);
+
+            int steps = target - FlipView_Settings.SelectedIndex;
+            if (steps > 0)
+            {
+                for (int i = 0; i < steps; i++)
+                {
+                    FlipView_Settings.SelectedIndex++;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < -steps; i++)
+                {
+                    FlipView_Settings.SelectedIndex--;
+                }
+            }
+        }
+    }
+
+    private void FlipView_Settings_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (FlipView_Settings.SelectedIndex is int index && index >= 0
+            && Nav_Settings.MenuItems[index] is NavigationViewItem item)
+        {
+            item.IsSelected = true;
         }
     }
 
     private void FlipView_Settings_Loaded(object sender, RoutedEventArgs e)
     {
+
+        try
+        {
+            var grid = VisualTreeHelper.GetChild(FlipView_Settings, 0);
+            int count = VisualTreeHelper.GetChildrenCount(grid);
+            for (int i = 0; i < count; i++)
+            {
+                var child = VisualTreeHelper.GetChild(grid, i);
+                if (child is Button button)
+                {
+                    button.IsHitTestVisible = false;
+                    button.Opacity = 0;
+                }
+                else if (child is ScrollViewer scrollViewer)
+                {
+                    scrollViewer.PointerWheelChanged += (_, args) => args.Handled = true;
+                }
+            }
+        }
+        catch { }
+
         FlipView_Settings.SelectedIndex = 0;
     }
 

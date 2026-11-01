@@ -4,8 +4,10 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.Extensions.Logging;
+using Arietta.Core;
 using Arietta.Frameworks;
 using Arietta.Helpers;
+using Arietta.Features.GameLauncher.GameUpdate;
 using Arietta.Localization;
 using System;
 using System.Collections.Generic;
@@ -47,6 +49,8 @@ public sealed partial class CombatPage : PageBase
 
     private long _selectedPeriodEnd = -1;
 
+    private (int Major, int Minor) _matrixAnchorVersion = (3, 6);
+
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = false };
 
 
@@ -55,10 +59,6 @@ public sealed partial class CombatPage : PageBase
     private const int SlashKindForbidden = 0;
     private const int SlashKindRift = 1;
     private const int SlashKindTurbulence = 2;
-
-    private const double SlashRowHeight = 56;
-
-    private const double SlashRankColumnWidth = 38;
 
     private static readonly Dictionary<string, string> SlashRankIconFiles = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -69,11 +69,15 @@ public sealed partial class CombatPage : PageBase
         ["SSS"] = "SlashRankSSS.png",
     };
 
-    private const double SlashRolePhotoSize = 84;
+    private const double SlashRolePhotoSize = 80;
 
-    private const double SlashBranchIconSize = 20;
+    private const double SlashBranchIconSize = 24;
 
-    private const double SlashRoleRowSpacing = 6;
+    private const double SlashRoleRowSpacing = 4;
+
+    private const double SlashBuffBoxSize = 64;
+
+    private const double SlashDividerHeight = 62;
 
     private const string SlashBranchIconFile = "SlashBranchIcon.png";
 
@@ -89,6 +93,8 @@ public sealed partial class CombatPage : PageBase
     private KuroSlashData? _slashCache;
 
     private Dictionary<int, int>? _slashChainMap;
+
+    private Dictionary<int, int>? _slashStarMap;
 
     private Dictionary<int, int>? _matrixChainMap;
 
@@ -161,6 +167,11 @@ public sealed partial class CombatPage : PageBase
         InfoBar_NoAccount.IsOpen = false;
 
         int generation = _loadGeneration;
+
+        if (_mode == CombatRecordStore.ModeNewTower)
+        {
+            _matrixAnchorVersion = await FetchMatrixAnchorVersionAsync() ?? _matrixAnchorVersion;
+        }
 
         PopulatePeriodList(account, _selectedPeriodEnd);
         ProgressRing_Loading.IsActive = true;
@@ -303,14 +314,15 @@ public sealed partial class CombatPage : PageBase
 
         long periodEnd = await ResolveWidgetPeriodEndAsync(account, _mode, data.SeasonEndTime);
 
-        var (chainMap, _) = await BuildRoleAuxMapsAsync(account);
+        var (chainMap, starMap) = await BuildRoleAuxMapsAsync(account);
         if (generation != _loadGeneration)
         {
             return;
         }
 
         SaveRecord(account, _mode, periodEnd, 0, 0, ResolveSlashHeadlineScore(data),
-            JsonSerializer.Serialize(data, JsonOptions), JsonSerializer.Serialize(chainMap, JsonOptions));
+            JsonSerializer.Serialize(data, JsonOptions),
+            JsonSerializer.Serialize(new MatrixRoleAuxMaps { Chain = chainMap, Star = starMap }, JsonOptions));
 
         PopulatePeriodList(account, _selectedPeriodEnd);
     }
@@ -379,6 +391,9 @@ public sealed partial class CombatPage : PageBase
         }
 
         var starts = CombatRecordStore.ComputePeriodStarts(records, _mode);
+        var matrixVersions = _mode == CombatRecordStore.ModeNewTower
+            ? BuildMatrixVersionLabels(records, starts)
+            : null;
         var items = new List<CombatPeriodItem>();
         for (int i = 0; i < records.Count; i++)
         {
@@ -404,7 +419,7 @@ public sealed partial class CombatPage : PageBase
             {
                 Entry = record,
                 StartTs = starts[i],
-                DateLabel = FormatPeriodDate(record, starts[i]),
+                DateLabel = matrixVersions is not null ? matrixVersions[i] : FormatPeriodMonth(record, starts[i]),
                 ValueLabel = noScore ? "--" : _mode == CombatRecordStore.ModeTower ? record.Star.ToString() : valueScore.ToString("N0"),
                 StarIconVisibility = _mode == CombatRecordStore.ModeTower ? Visibility.Visible : Visibility.Collapsed,
                 RankSource = rankSource,
@@ -421,21 +436,70 @@ public sealed partial class CombatPage : PageBase
         ListView_Periods.ScrollIntoView(target);
     }
 
-
-    private static string FormatPeriodDate(CombatRecordEntry record, long startTs)
+    private static string FormatPeriodMonth(CombatRecordEntry record, long startTs)
     {
         try
         {
-
             long labelTs = startTs > 0 && record.PeriodEnd > startTs ? startTs
-                : record.PeriodEnd > 0 ? record.PeriodEnd
+                : record.PeriodEnd > 0 ? record.PeriodEnd - 86400
                 : DateTimeOffset.FromUnixTimeMilliseconds(record.UpdateTime).ToUnixTimeSeconds();
-            return DateTimeOffset.FromUnixTimeSeconds(labelTs).LocalDateTime.ToString("yyyy-MM-dd");
+            return DateTimeOffset.FromUnixTimeSeconds(labelTs).LocalDateTime.ToString("yyyy-MM");
         }
         catch
         {
             return "";
         }
+    }
+
+    private static async Task<(int Major, int Minor)?> FetchMatrixAnchorVersionAsync()
+    {
+        try
+        {
+            var index = await GameUpdateService.GetIndexAsync(GameBiz.WutheringWaves);
+            var parts = index?.Default?.Version?.Split('.');
+            if (parts is { Length: >= 2 }
+                && int.TryParse(parts[0], out int major) && int.TryParse(parts[1], out int minor))
+            {
+                return (major, minor);
+            }
+        }
+        catch
+        {
+
+        }
+        return null;
+    }
+
+    private string[] BuildMatrixVersionLabels(IReadOnlyList<CombatRecordEntry> records, long[] starts)
+    {
+        var labels = new string[records.Count];
+        if (records.Count == 0)
+        {
+            return labels;
+        }
+        var version = _matrixAnchorVersion;
+
+        if (records[0].PeriodEnd > 0 && records[0].PeriodEnd <= DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+        {
+            version = StepVersion(version, -1);
+        }
+        for (int i = 0; i < records.Count; i++)
+        {
+            labels[i] = $"{version.Major}.{version.Minor}";
+            if (i + 1 < records.Count)
+            {
+                double gapDays = (starts[i] - starts[i + 1]) / 86400.0;
+                int steps = Math.Max(1, (int)Math.Round(gapDays / 42.0, MidpointRounding.AwayFromZero));
+                version = StepVersion(version, -steps);
+            }
+        }
+        return labels;
+    }
+
+    private static (int Major, int Minor) StepVersion((int Major, int Minor) v, int steps)
+    {
+        int total = v.Major * 9 + v.Minor + steps;
+        return (total / 9, ((total % 9) + 9) % 9);
     }
 
     private static ImageSource? ResolveSlashPeriodRank(CombatRecordEntry record)
@@ -533,11 +597,30 @@ public sealed partial class CombatPage : PageBase
                     if (JsonSerializer.Deserialize<KuroSlashData>(entry.Detail, JsonOptions) is { } slash)
                     {
 
-                        var slashChain = entry.Chain is string slashChainJson
-                            ? JsonSerializer.Deserialize<Dictionary<int, int>>(slashChainJson, JsonOptions) ?? []
-                            : [];
+                        _slashChainMap = [];
+                        _slashStarMap = [];
+                        if (entry.Chain is string aux)
+                        {
+                            try
+                            {
+                                var maps = JsonSerializer.Deserialize<MatrixRoleAuxMaps>(aux, JsonOptions);
+                                if (maps?.Chain is not null)
+                                {
+                                    _slashChainMap = maps.Chain;
+                                    _slashStarMap = maps.Star ?? [];
+                                }
+                                else
+                                {
+                                    _slashChainMap = JsonSerializer.Deserialize<Dictionary<int, int>>(aux, JsonOptions) ?? [];
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+                        }
                         ShowPeriodRange(item);
-                        RenderSlash(slash, slashChain);
+                        RenderSlash(slash);
                     }
                     break;
                 default:
@@ -1379,10 +1462,9 @@ public sealed partial class CombatPage : PageBase
         return root;
     }
 
-    private void RenderSlash(KuroSlashData data, Dictionary<int, int>? chainMap = null)
+    private void RenderSlash(KuroSlashData data)
     {
         _slashCache = data;
-        _slashChainMap = chainMap;
         BuildSlashContent();
     }
 
@@ -1489,73 +1571,69 @@ public sealed partial class CombatPage : PageBase
         }
         StackPanel_Content.Children.Add(header);
 
-        var rows = new StackPanel { Spacing = 28 };
+        var rows = new StackPanel { Spacing = 12 };
         foreach (var difficulty in group)
         {
             foreach (var challenge in (difficulty.ChallengeList ?? []).OrderByDescending(c => c.ChallengeId))
             {
-                var block = new StackPanel { Spacing = 0 };
-                block.Children.Add(CreateSlashChallengeRow(challenge));
-
-                block.Children.Add(CreateSlashTeamList(challenge));
-                rows.Children.Add(block);
+                rows.Children.Add(CreateSlashFloorCard(challenge));
             }
         }
         StackPanel_Content.Children.Add(rows);
     }
 
-    private FrameworkElement CreateSlashChallengeRow(KuroSlashChallenge challenge)
+    private FrameworkElement CreateSlashFloorCard(KuroSlashChallenge challenge)
     {
-        var grid = new Grid { ColumnSpacing = 8 };
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(SlashRankColumnWidth) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        var header = new Grid { ColumnSpacing = 8 };
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-        var rank = CreateSlashRankIcon(challenge.Rank);
-        if (rank is not null)
-        {
-            rank.HorizontalAlignment = HorizontalAlignment.Left;
-            Grid.SetColumn(rank, 0);
-            grid.Children.Add(rank);
-        }
-
-        var score = new TextBlock
-        {
-            Text = string.Format(Lang.Instance.SlashPage_ScoreLabel, challenge.Score),
-            FontSize = 16,
-            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-            VerticalAlignment = VerticalAlignment.Center,
-            Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xBD, 0xA7, 0x57)),
-        };
-        Grid.SetColumn(score, 1);
-        grid.Children.Add(score);
-
-        var floor = new TextBlock
+        var title = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 9, VerticalAlignment = VerticalAlignment.Center };
+        title.Children.Add(new TextBlock
         {
             Text = string.Format(Lang.Instance.TowerPage_Floor, challenge.ChallengeId),
-            FontSize = 13,
+            FontSize = 15,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             VerticalAlignment = VerticalAlignment.Center,
-            Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
-        };
-        Grid.SetColumn(floor, 3);
-        grid.Children.Add(floor);
-
-        var name = new TextBlock
+        });
+        title.Children.Add(new TextBlock
         {
             Text = string.IsNullOrEmpty(challenge.ChallengeName)
                 ? string.Format(Lang.Instance.SlashPage_ChallengeFallback, challenge.ChallengeId)
                 : challenge.ChallengeName,
-            FontSize = 16,
-            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            FontSize = 13,
             TextTrimming = TextTrimming.CharacterEllipsis,
             VerticalAlignment = VerticalAlignment.Center,
-        };
-        Grid.SetColumn(name, 4);
-        grid.Children.Add(name);
+            Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+        });
+        Grid.SetColumn(title, 0);
+        header.Children.Add(title);
 
-        return KuroBbsUi.KuroCard(grid, padding: new Thickness(12, 0, 16, 0), height: SlashRowHeight);
+        var right = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Right };
+
+        if (CreateSlashRankIcon(challenge.Rank) is { } rank)
+        {
+            right.Children.Add(rank);
+        }
+        right.Children.Add(new TextBlock
+        {
+            Text = challenge.Score.ToString(),
+            FontSize = 16,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            VerticalAlignment = VerticalAlignment.Center,
+            Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xBD, 0xA7, 0x57)),
+        });
+        Grid.SetColumn(right, 2);
+        header.Children.Add(right);
+
+        var teams = CreateSlashTeamList(challenge);
+        teams.Margin = new Thickness(0, 12, 0, 0);
+
+        var content = new StackPanel();
+        content.Children.Add(header);
+        content.Children.Add(teams);
+        return KuroBbsUi.KuroCard(content, padding: new Thickness(14, 13, 16, 14));
     }
 
     private static ImageSource? SlashRankImageSource(string? rank)
@@ -1609,14 +1687,17 @@ public sealed partial class CombatPage : PageBase
             Grid.SetColumn(block, i);
             teams.Children.Add(block);
         }
-
-        return KuroBbsUi.KuroCard(teams, padding: new Thickness(12, 10, 12, 10), secondaryBackground: true);
+        return teams;
     }
 
     private FrameworkElement CreateSlashTeamBlock(KuroSlashHalf half, int index)
     {
 
         var head = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        if (index == 1)
+        {
+            head.HorizontalAlignment = HorizontalAlignment.Right;
+        }
         head.Children.Add(new TextBlock
         {
             Text = SlashTeamLabel(index),
@@ -1636,30 +1717,48 @@ public sealed partial class CombatPage : PageBase
             });
         }
 
-        var root = new StackPanel { Spacing = 4 };
+        var root = new StackPanel { Spacing = 8 };
         root.Children.Add(head);
 
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = SlashRoleRowSpacing, VerticalAlignment = VerticalAlignment.Center };
-        foreach (var role in half.RoleList ?? [])
+        var roles = (half.RoleList ?? []).ToList();
+        bool hasBuff = !string.IsNullOrEmpty(half.BuffName) || !string.IsNullOrEmpty(half.BuffIcon);
+
+        if (index == 1 && hasBuff)
         {
-            int chain = role.RoleId is int id && _slashChainMap is { } m && m.TryGetValue(id, out var c) ? c : 0;
-            row.Children.Add(CreateRolePhoto(role.IconUrl, chain, 0, role.SkillBranchIndex, SlashRolePhotoSize, SlashBranchIconSize, decodeToSize: false, showRarityBar: false, placeholderBackground: false));
+            row.Children.Add(CreateSlashBuffBox(half, SlashBuffBoxSize));
+            row.Children.Add(MakeSlashDivider());
         }
-        if (!string.IsNullOrEmpty(half.BuffName) || !string.IsNullOrEmpty(half.BuffIcon))
+        foreach (var role in roles)
         {
-            row.Children.Add(CreateSlashBuffBox(half));
+
+            int chain = 0, star = 0;
+            if (role.RoleId is int id)
+            {
+                chain = _slashChainMap is { } m && m.TryGetValue(id, out var c) ? c : 0;
+                star = _slashStarMap is { } sm && sm.TryGetValue(id, out var st) ? st : 0;
+            }
+            row.Children.Add(CreateRolePhoto(role.IconUrl, chain, star, role.SkillBranchIndex, SlashRolePhotoSize, SlashBranchIconSize, decodeToSize: true, showRarityBar: true, placeholderBackground: false));
+        }
+        if (index == 0 && hasBuff)
+        {
+            row.Children.Add(MakeSlashDivider());
+            row.Children.Add(CreateSlashBuffBox(half, SlashBuffBoxSize));
         }
         root.Children.Add(row);
         return root;
     }
 
-    private static FrameworkElement CreateSlashBuffBox(KuroSlashHalf half)
+    private static FrameworkElement MakeSlashDivider() =>
+        KuroBbsUi.MakeDivider(new SolidColorBrush(Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF)), SlashDividerHeight,
+            width: 1, verticalCenter: true);
+
+    private static FrameworkElement CreateSlashBuffBox(KuroSlashHalf half, double size)
     {
 
-        const double size = 44;
-
-        const double barHeight = size * 0.20;
-        const double iconSize = size - (2 * barHeight) - 4;
+        const double barHeightRatio = 0.20;
+        double barHeight = size * barHeightRatio;
+        double iconSize = size - (2 * barHeight) - 4;
 
         var root = new Grid { Width = size, Height = size };
 
@@ -1686,7 +1785,13 @@ public sealed partial class CombatPage : PageBase
             {
                 box.Child = new Image
                 {
-                    Source = new BitmapImage(new Uri(half.BuffIcon)),
+
+                    Source = new BitmapImage(new Uri(half.BuffIcon))
+                    {
+                        DecodePixelType = DecodePixelType.Logical,
+                        DecodePixelWidth = (int)size,
+                        DecodePixelHeight = (int)size,
+                    },
                     Stretch = Stretch.Uniform,
                     Width = iconSize,
                     Height = iconSize,

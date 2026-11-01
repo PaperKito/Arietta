@@ -106,7 +106,9 @@ public sealed partial class UpdateWindow : WindowEx
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "SelfUpdate: download/install from update window failed");
-            TextBlock_ProgressMessage.Text = $"{Localization.Lang.Instance.SettingPage_UpdateFailed}: {ex.Message}";
+
+            (string title, string message) = SelfUpdateService.DescribeFailure(ex);
+            TextBlock_ProgressMessage.Text = $"{title}：{message}";
             _isDownloading = false;
             Button_UpdateNow.IsEnabled = true;
         }
@@ -182,8 +184,8 @@ public sealed partial class UpdateWindow : WindowEx
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "SelfUpdate: failed to load release history");
-            NotesWeb.NavigateToString(BuildSimpleHtml(
-                $"{Localization.Lang.Instance.SettingPage_UpdateFailed}: {ex.Message}"));
+            (string title, string message) = SelfUpdateService.DescribeFailure(ex);
+            NotesWeb.NavigateToString(BuildSimpleHtml($"{title}：{message}"));
         }
         finally
         {

@@ -96,7 +96,8 @@ public sealed partial class PgrResourcePage : PageBase
                 HandleError(result.Code, result.Msg);
             }
         },
-        Lang.Instance.KuroBbs_PgrResource);
+        Lang.Instance.KuroBbs_PgrResource,
+        contentToHide: ScrollViewer_Content);
 
     private void MergeLocalMonths(string roleId)
     {
@@ -108,7 +109,7 @@ public sealed partial class PgrResourcePage : PageBase
             {
                 CurrentYear = r.Year,
                 CurrentMonth = r.Month,
-                Month = string.IsNullOrEmpty(r.Title) ? $"{r.Year}-{r.Month:00}" : r.Title,
+                Month = MonthLabel(r.Year, r.Month),
                 MonthBlackCard = r.BlackCard,
                 MonthDevelopResource = r.DevelopResource,
                 MonthTradeCredit = r.TradeCredit,
@@ -124,6 +125,9 @@ public sealed partial class PgrResourcePage : PageBase
         _peakDevelop = Math.Max(1, _allMonths.Max(m => (long)m.MonthDevelopResource));
         _peakTrade = Math.Max(1, _allMonths.Max(m => (long)m.MonthTradeCredit));
     }
+
+    private static string MonthLabel(int year, int month) =>
+        year > 0 && month is >= 1 and <= 12 ? $"{year}-{month:00}" : $"{year}-{month}";
 
     private void FillPeriodList()
     {
@@ -146,7 +150,7 @@ public sealed partial class PgrResourcePage : PageBase
             string subtitle = m.MonthBlackCard.ToString("N0");
             items.Add(new PgrResourcePeriodItem
             {
-                Title = string.IsNullOrEmpty(m.Month) ? $"{m.CurrentYear}-{m.CurrentMonth:00}" : m.Month!,
+                Title = MonthLabel(m.CurrentYear, m.CurrentMonth),
                 Subtitle = subtitle,
                 IsCumulative = false,
                 MonthIndex = i,
@@ -294,6 +298,9 @@ public sealed partial class PgrResourcePage : PageBase
         ];
         long[] peaks = [_peakBlack, _peakDevelop, _peakTrade];
 
+        const double fixedColumns = 96 + (3 * 100);
+        const double columnSpacing = 8 * 6;
+
         for (int r = 0; r < _allMonths.Count; r++)
         {
             var m = _allMonths[r];
@@ -307,16 +314,20 @@ public sealed partial class PgrResourcePage : PageBase
 
             var label = new TextBlock
             {
-                Text = string.IsNullOrEmpty(m.Month) ? $"{m.CurrentYear}-{m.CurrentMonth:00}" : m.Month!,
+                Text = MonthLabel(m.CurrentYear, m.CurrentMonth),
                 FontSize = 12,
                 VerticalAlignment = VerticalAlignment.Center,
             };
             Grid.SetColumn(label, 0);
             row.Children.Add(label);
 
+            var bars = new Border[cols.Length];
+            var values = new long[cols.Length];
             for (int c = 0; c < cols.Length; c++)
             {
                 long value = cols[c].Value(m);
+                values[c] = value;
+
                 var cell = new StackPanel
                 {
                     Orientation = Orientation.Horizontal,
@@ -344,10 +355,7 @@ public sealed partial class PgrResourcePage : PageBase
                 };
                 Grid.SetColumn(bar, 2 + c * 2);
                 row.Children.Add(bar);
-                if (value > 0)
-                {
-                    KuroBbsUi.AnimateWidth(bar, 180.0 * value / Math.Max(1, peaks[c]), 220 + r * 70 + c * 50);
-                }
+                bars[c] = bar;
             }
 
             bool highlighted = !item.IsCumulative && r == item.MonthIndex;
@@ -360,6 +368,23 @@ public sealed partial class PgrResourcePage : PageBase
                     : new SolidColorBrush(Colors.Transparent),
                 Child = row,
             };
+
+            int rowIndex = r;
+            KuroBbsUi.WhenMeasured(wrapper, w =>
+            {
+                double barMax = Math.Max(0, (w - 12 - fixedColumns - columnSpacing) / cols.Length);
+                for (int c = 0; c < cols.Length; c++)
+                {
+                    if (values[c] <= 0)
+                    {
+                        continue;
+                    }
+                    KuroBbsUi.AnimateWidth(
+                        bars[c],
+                        barMax * values[c] / Math.Max(1, peaks[c]),
+                        220 + rowIndex * 70 + c * 50);
+                }
+            });
 
             KuroBbsUi.AnimateDouble(wrapper, "Opacity", 1, 30 * r, 220);
             StackPanel_Items.Children.Add(wrapper);

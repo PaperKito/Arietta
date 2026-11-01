@@ -2,13 +2,15 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Arietta.Frameworks;
 using Arietta.Helpers;
 using Arietta.Localization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
@@ -73,24 +75,17 @@ public sealed partial class ResourceBriefPage : PageBase
         await LoadBriefingAsync();
     }
 
-
-    private async void Button_PeriodType_Click(object sender, RoutedEventArgs e)
+    private async void Menu_PeriodType_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: string type })
+        if (sender is FrameworkElement { Tag: string type } && _periodType != type)
         {
             _periodType = type;
-            HighlightPeriodTypeButton();
+            TextBlock_PeriodType.Text = type == "version"
+                ? Lang.Instance.ResourceBrief_Version
+                : Lang.Instance.ResourceBrief_Month;
             FillPeriodList();
             await LoadSelectedPeriodAsync();
         }
-    }
-
-
-    private void HighlightPeriodTypeButton()
-    {
-        Button_Month.Background = _periodType == "month" ? (Brush)Application.Current.Resources["SubtleFillColorSecondaryBrush"] : new SolidColorBrush(Colors.Transparent);
-        Button_Week.Background = _periodType == "week" ? (Brush)Application.Current.Resources["SubtleFillColorSecondaryBrush"] : new SolidColorBrush(Colors.Transparent);
-        Button_Version.Background = _periodType == "version" ? (Brush)Application.Current.Resources["SubtleFillColorSecondaryBrush"] : new SolidColorBrush(Colors.Transparent);
     }
 
 
@@ -105,9 +100,11 @@ public sealed partial class ResourceBriefPage : PageBase
         if (account is null || !account.IsValid)
         {
             InfoBar_NoAccount.IsOpen = true;
+            ScrollViewer_Content.Visibility = Visibility.Collapsed;
             return;
         }
         InfoBar_NoAccount.IsOpen = false;
+        ScrollViewer_Content.Visibility = Visibility.Visible;
         if (_briefing is not null)
         {
             FillPeriodList();
@@ -123,7 +120,6 @@ public sealed partial class ResourceBriefPage : PageBase
                 _briefing = briefing;
 
                 ResourceRecordStore.PruneBriefing(account.RoleId, "week", ResourceRecordStore.WeekWindowSize);
-                HighlightPeriodTypeButton();
                 FillPeriodList();
                 if (ListView_Periods.Items.Count > 0)
                 {
@@ -147,37 +143,49 @@ public sealed partial class ResourceBriefPage : PageBase
 
     private void FillPeriodList()
     {
-        var titles = _periodType switch
-        {
-            "week" => _briefing?.Weeks,
-            "version" => _briefing?.Versions,
-            _ => _briefing?.Months,
-        } ?? [];
-        var items = titles.Select(t => new PeriodItem(t)).ToList();
+        var titles = _periodType == "version" ? _briefing?.Versions : _briefing?.Months ?? [];
+        var items = titles.Select(t => new PeriodItem(t) { Title = PeriodLabel(_periodType, t.Index, t.Title) }).ToList();
         _serverPeriodIndexes = titles.Select(t => t.Index).ToHashSet();
 
         var account = KuroBbsAccountStore.Load();
         if (account is not null)
         {
-            foreach (var row in ResourceRecordStore.ListBriefing(account.RoleId, _periodType)
-                         .Where(r => !_serverPeriodIndexes.Contains(r.PeriodIndex)))
+            var local = ResourceRecordStore.ListBriefing(account.RoleId, _periodType);
+            foreach (var row in local.Where(r => !_serverPeriodIndexes.Contains(r.PeriodIndex)))
             {
-                items.Add(new PeriodItem(row.PeriodIndex, row.Title ?? row.PeriodIndex.ToString()));
+                items.Add(new PeriodItem(row.PeriodIndex, PeriodLabel(_periodType, row.PeriodIndex, row.Title)));
+            }
+
+            var stars = local.ToDictionary(r => r.PeriodIndex, r => r.Record.TotalStar);
+            foreach (var item in items)
+            {
+                if (stars.TryGetValue(item.Index, out var star))
+                {
+                    item.Star = star;
+                }
             }
         }
 
         var ordered = items.OrderByDescending(i => i.Index).ToList();
-
-        if (_periodType == "week" && ordered.Count > ResourceRecordStore.WeekWindowSize)
-        {
-            ordered = ordered.Take(ResourceRecordStore.WeekWindowSize).ToList();
-        }
         ListView_Periods.ItemsSource = ordered;
 
         if (items.Count > 0 && ListView_Periods.SelectedIndex < 0)
         {
             ListView_Periods.SelectedIndex = 0;
         }
+    }
+
+    private static string PeriodLabel(string periodType, int index, string? title)
+    {
+        if (periodType == "month" && index is >= 100000 and <= 999999)
+        {
+            return $"{index / 100:D4}-{index % 100:D2}";
+        }
+        if (periodType == "version" && index >= 10000)
+        {
+            return $"{index / 10000}.{index % 10000 / 100}";
+        }
+        return (title ?? "").Replace("版本", "");
     }
 
 
@@ -195,7 +203,8 @@ public sealed partial class ResourceBriefPage : PageBase
             var archived = ResourceRecordStore.GetBriefing(account.RoleId, _periodType, item.Index);
             if (archived is not null)
             {
-                FillDetail(item.Title, archived);
+                item.Star = archived.TotalStar;
+                await FillDetailAsync(item.Title, archived, item.Index);
             }
             return;
         }
@@ -209,7 +218,8 @@ public sealed partial class ResourceBriefPage : PageBase
             {
 
                 ResourceRecordStore.SaveBriefing(account.RoleId, _periodType, item.Index, item.Title, record);
-                FillDetail(item.Title, record);
+                item.Star = record.TotalStar;
+                await FillDetailAsync(item.Title, record, item.Index);
             }
             else if (result.IsTokenExpired)
             {
@@ -230,7 +240,7 @@ public sealed partial class ResourceBriefPage : PageBase
 
     #region 详情渲染与动画
 
-    private void FillDetail(string periodTitle, KuroBriefingRecord record)
+    private async Task FillDetailAsync(string periodTitle, KuroBriefingRecord record, int periodIndex)
     {
         TextBlock_PeriodTitle.Text = $"{Lang.Instance.ResourceBrief_HistoryData} {periodTitle}";
         TextBlock_TotalStar.Text = record.TotalStar.ToString("N0");
@@ -238,7 +248,195 @@ public sealed partial class ResourceBriefPage : PageBase
 
         FillCompositionBar(StackPanel_StarBar, StackPanel_StarLegend, record.StarList);
         FillCompositionBar(StackPanel_CoinBar, StackPanel_CoinLegend, record.CoinList);
-        FillItemList(record.StarList);
+
+        if (_periodType != "month")
+        {
+            TextBlock_DetailTitle.Text = Lang.Instance.ResourceBrief_Detail;
+            FillItemList(record.StarList);
+            return;
+        }
+
+        TextBlock_DetailTitle.Text = Lang.Instance.ResourceBrief_Week;
+        StackPanel_Items.Children.Clear();
+        var weeks = await GetMonthWeeksAsync(periodIndex);
+        RenderWeekRows(weeks);
+    }
+
+    private async Task<List<(string Label, KuroBriefingRecord? Record)>> GetMonthWeeksAsync(int monthIndex)
+    {
+        var monthStart = new DateTime(monthIndex / 100, monthIndex % 100, 1);
+        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+        var account = KuroBbsAccountStore.Load();
+        var local = account is null ? [] : ResourceRecordStore.ListBriefing(account.RoleId, "week");
+        var rows = new List<(int Index, string Label, KuroBriefingRecord? Record)>();
+        var seen = new HashSet<int>();
+        foreach (var row in local)
+        {
+            if (seen.Add(row.PeriodIndex) && ParseWeekSpan(row.PeriodIndex, row.Title) is { } span
+                && span.Start <= monthEnd && span.End >= monthStart)
+            {
+                rows.Add((row.PeriodIndex, row.Title ?? "", row.Record));
+            }
+        }
+        foreach (var week in _briefing?.Weeks ?? [])
+        {
+            if (!seen.Add(week.Index) || ParseWeekSpan(week.Index, week.Title) is not { } span
+                || span.Start > monthEnd || span.End < monthStart)
+            {
+                continue;
+            }
+            rows.Add((week.Index, week.Title ?? "", null));
+        }
+        rows.Sort((a, b) => a.Index.CompareTo(b.Index));
+
+        var serverWeeks = (_briefing?.Weeks ?? []).Select(w => w.Index).ToHashSet();
+        var result = new List<(string Label, KuroBriefingRecord? Record)>();
+        foreach (var (index, label, record) in rows)
+        {
+            var rec = record;
+            if (rec is null && account is not null && serverWeeks.Contains(index))
+            {
+                try
+                {
+                    var detail = await KuroBbsClient.Instance.GetBriefingDetailAsync(account, index, "week");
+                    if (detail is { IsSuccess: true, Data: { } data })
+                    {
+                        ResourceRecordStore.SaveBriefing(account.RoleId, "week", index, label, data);
+                        rec = data;
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+            result.Add((label, rec));
+        }
+        return result;
+    }
+
+    private static (DateTime Start, DateTime End)? ParseWeekSpan(int index, string? title)
+    {
+        if (title is null)
+        {
+            return null;
+        }
+        var m = Regex.Match(title, @"(\d{1,2})月(\d{1,2})日~(\d{1,2})月(\d{1,2})日");
+        if (!m.Success)
+        {
+            return null;
+        }
+        try
+        {
+            int year = index / 100;
+            int m1 = int.Parse(m.Groups[1].Value), d1 = int.Parse(m.Groups[2].Value);
+            int m2 = int.Parse(m.Groups[3].Value), d2 = int.Parse(m.Groups[4].Value);
+            return (new DateTime(m1 > m2 ? year - 1 : year, m1, d1), new DateTime(year, m2, d2));
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void RenderWeekRows(List<(string Label, KuroBriefingRecord? Record)> rows)
+    {
+        StackPanel_Items.Children.Clear();
+        if (rows.Count == 0)
+        {
+            StackPanel_Items.Children.Add(new TextBlock
+            {
+                Text = Lang.Instance.ResourceBrief_Empty,
+                FontSize = 13,
+                Opacity = 0.6,
+            });
+            return;
+        }
+        long maxStar = rows.Max(r => r.Record?.TotalStar ?? 0);
+        long maxCoin = rows.Max(r => r.Record?.TotalCoin ?? 0);
+        for (int i = 0; i < rows.Count; i++)
+        {
+            var (label, record) = rows[i];
+            var row = new Grid { ColumnSpacing = 12 };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(70) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var date = new TextBlock
+            {
+                Text = label,
+                FontSize = 13,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+            };
+            Grid.SetColumn(date, 0);
+            row.Children.Add(date);
+            row.Children.Add(WeekIconCell("star.png", 1));
+            row.Children.Add(WeekNumCell(record?.TotalStar ?? 0, 2));
+            var starBar = WeekBarCell(Windows.UI.Color.FromArgb(0xFF, 0x66, 0xBC, 0xF2), 3);
+            row.Children.Add(starBar);
+            row.Children.Add(WeekIconCell("coin.png", 4));
+            row.Children.Add(WeekNumCell(record?.TotalCoin ?? 0, 5));
+            var coinBar = WeekBarCell(Windows.UI.Color.FromArgb(0xFF, 0xF2, 0xDE, 0x77), 6);
+            row.Children.Add(coinBar);
+
+            StackPanel_Items.Children.Add(row);
+
+            double starRatio = maxStar > 0 ? (double)(record?.TotalStar ?? 0) / maxStar : 0;
+            double coinRatio = maxCoin > 0 ? (double)(record?.TotalCoin ?? 0) / maxCoin : 0;
+            KuroBbsUi.WhenMeasured(row, width =>
+            {
+                double available = Math.Max(0, width - 150 - 24 - 70 - 24 - 110 - 72) / 2;
+                KuroBbsUi.AnimateWidth(starBar, available * starRatio, 250 + i * 100);
+                KuroBbsUi.AnimateWidth(coinBar, available * coinRatio, 300 + i * 100);
+            });
+        }
+    }
+
+
+    private static Image WeekIconCell(string icon, int column)
+    {
+        var image = new Image
+        {
+            Width = 24,
+            Height = 24,
+            VerticalAlignment = VerticalAlignment.Center,
+            Source = new BitmapImage(new Uri($"ms-appx:///Assets/Image/Common/{icon}")),
+        };
+        Grid.SetColumn(image, column);
+        return image;
+    }
+
+
+    private static TextBlock WeekNumCell(long value, int column)
+    {
+        var text = new TextBlock
+        {
+            Text = value.ToString("N0"),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        Grid.SetColumn(text, column);
+        return text;
+    }
+
+    private static Border WeekBarCell(Windows.UI.Color color, int column)
+    {
+        var bar = new Border
+        {
+            Height = 12,
+            Width = 0,
+            CornerRadius = new CornerRadius(2, 6, 6, 2),
+            Background = new SolidColorBrush(color),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        Grid.SetColumn(bar, column);
+        return bar;
     }
 
     private void FillCompositionBar(StackPanel barHost, StackPanel legend, List<KuroBriefingItem>? items)
@@ -265,7 +463,7 @@ public sealed partial class ResourceBriefPage : PageBase
             StackPanel_Items.Children.Add(new TextBlock
             {
                 Text = Lang.Instance.ResourceBrief_Empty,
-                FontSize = 12,
+                FontSize = 13,
                 Opacity = 0.6,
             });
             return;
@@ -278,14 +476,14 @@ public sealed partial class ResourceBriefPage : PageBase
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(90) });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            var name = new TextBlock { Text = item.Type, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
+            var name = new TextBlock { Text = item.Type, FontSize = 13, VerticalAlignment = VerticalAlignment.Center };
             Grid.SetColumn(name, 0);
             row.Children.Add(name);
 
             var num = new TextBlock
             {
                 Text = item.Num.ToString("N0"),
-                FontSize = 12,
+                FontSize = 13,
                 VerticalAlignment = VerticalAlignment.Center,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             };
@@ -320,10 +518,28 @@ public sealed partial class ResourceBriefPage : PageBase
 
 }
 
-public sealed class PeriodItem
+public sealed class PeriodItem : INotifyPropertyChanged
 {
     public string Title { get; init; } = "";
     public int Index { get; init; }
+
+    private long? _star;
+
+    public long? Star
+    {
+        get => _star;
+        set
+        {
+            _star = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StarText)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasStar)));
+        }
+    }
+
+    public string StarText => Star?.ToString("N0") ?? "";
+    public Visibility HasStar => Star is null ? Visibility.Collapsed : Visibility.Visible;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public PeriodItem(KuroBriefingTitle title)
     {

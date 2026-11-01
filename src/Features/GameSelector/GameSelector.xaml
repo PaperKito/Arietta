@@ -33,7 +33,7 @@
                     Command="{x:Bind ShowFullBackgroundCommand}"
                     CornerRadius="8"
                     Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
-                    ToolTipService.ToolTip="点击此处选择或切换游戏">
+                    ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameSelector_TipSwitch}">
                 <Grid>
 
                     <FontIcon HorizontalAlignment="Center"
@@ -312,7 +312,7 @@
                                                 Padding="0"
                                                 Command="{x:Bind InitializeInstalledGamesCommand}"
                                                 Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
-                                                ToolTipService.ToolTip="刷新">
+                                                ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameSelector_Refresh}">
                                             <FontIcon FontSize="14"
                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                       Glyph="&#xE72C;" />
@@ -325,7 +325,7 @@
                                                 Padding="0"
                                                 Command="{x:Bind AutoSearchInstalledGamesCommand}"
                                                 Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
-                                                ToolTipService.ToolTip="自动查找本机游戏">
+                                                ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameSelector_AutoFind}">
                                             <FontIcon FontSize="14"
                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                       Glyph="&#xE721;" />
@@ -564,7 +564,7 @@
                         VerticalAlignment="Stretch"
                         Command="{x:Bind PinCommand}"
                         Style="{ThemeResource DateTimePickerFlyoutButtonStyle}"
-                        ToolTipService.ToolTip="固定/取消固定图标栏">
+                        ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameSelector_PinBar}">
                     <Grid>
                         <FontIcon HorizontalAlignment="Center"
                                   VerticalAlignment="Center"

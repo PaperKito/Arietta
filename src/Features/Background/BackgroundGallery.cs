@@ -99,16 +99,19 @@ public static class BackgroundGallery
             }
         }
 
-        foreach (string file in ListBackgroundFiles(biz))
+        if (GameRegistry.IsCustomBgEnabled(biz))
         {
-            items.Add(new BackgroundItem
+            foreach (string file in ListBackgroundFiles(biz))
             {
-                Id = Path.GetFileName(file),
-                Name = Path.GetFileNameWithoutExtension(file),
-                FilePath = file,
-                Kind = IsVideoPath(file) ? BackgroundKind.Video : BackgroundKind.Image,
-                Thumbnail = BuildThumbnail(file),
-            });
+                items.Add(new BackgroundItem
+                {
+                    Id = Path.GetFileName(file),
+                    Name = Path.GetFileNameWithoutExtension(file),
+                    FilePath = file,
+                    Kind = IsVideoPath(file) ? BackgroundKind.Video : BackgroundKind.Image,
+                    Thumbnail = BuildThumbnail(file),
+                });
+            }
         }
 
         return items;

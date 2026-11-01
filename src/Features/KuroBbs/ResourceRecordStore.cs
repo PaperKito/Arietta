@@ -15,7 +15,7 @@ internal static class ResourceRecordStore
     private const string PgrPeriodType = "month";
     private const string WeekPeriodType = "week";
 
-    internal const int WeekWindowSize = 3;
+    internal const int WeekWindowSize = 8;
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 

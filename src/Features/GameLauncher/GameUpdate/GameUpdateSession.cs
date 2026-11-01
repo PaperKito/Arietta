@@ -57,7 +57,12 @@ public sealed class GameUpdateSession
         {
             return false;
         }
-        return Begin(biz, state, installDir: null);
+        if (!Begin(biz, state.Kind, state.TargetVersion, state.TotalBytes))
+        {
+            return false;
+        }
+        _ = RunAsync(biz, state);
+        return true;
     }
 
     public bool StartInstall(GameBiz biz, GameUpdateService.GameUpdateState state, string installDir, string? tierName = null)
@@ -66,10 +71,34 @@ public sealed class GameUpdateSession
         {
             return false;
         }
-        return Begin(biz, state, installDir, tierName);
+        if (!Begin(biz, GameUpdateService.UpdateKind.Update, state.TargetVersion, state.TotalBytes, installDir, tierName))
+        {
+            return false;
+        }
+        _ = RunAsync(biz, state);
+        return true;
     }
 
-    private bool Begin(GameBiz biz, GameUpdateService.GameUpdateState state, string? installDir, string? tierName = null)
+    public bool StartTierSwitch(GameBiz biz, string tierName, long totalBytes)
+    {
+        if (string.IsNullOrWhiteSpace(tierName))
+        {
+            return false;
+        }
+        if (!Begin(biz, GameUpdateService.UpdateKind.Update, null, totalBytes))
+        {
+            return false;
+        }
+        _ = RunCoreAsync(biz, async (progress, ct) =>
+        {
+            await Task.Run(() => GameUpdateService.SwitchTierAsync(biz, tierName, progress, ct), ct);
+            InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_TierSwitchDone, GameUpdateService.TierDisplayName(tierName)));
+        }, errorTitle: Lang.Instance.GameLauncherSettingDialog_ResourceTier);
+        return true;
+    }
+
+    private bool Begin(GameBiz biz, GameUpdateService.UpdateKind kind, string? targetVersion, long totalBytes,
+        string? installDir = null, string? tierName = null)
     {
         lock (_gate)
         {
@@ -81,19 +110,18 @@ public sealed class GameUpdateSession
             _cts = new CancellationTokenSource();
         }
         Biz = biz;
-        Kind = installDir is null ? state.Kind : GameUpdateService.UpdateKind.Update;
+        Kind = kind;
         InstallDir = installDir;
         InstallTier = tierName;
-        TargetVersion = state.TargetVersion;
+        TargetVersion = targetVersion;
         IsApplying = false;
         IsPausing = false;
         ProgressValue = 0;
         ReceivedBytes = 0;
-        TotalBytes = state.TotalBytes;
+        TotalBytes = totalBytes;
         ProgressText = null;
         LastProgress = null;
         Changed?.Invoke(this, EventArgs.Empty);
-        _ = RunAsync(biz, state);
         return true;
     }
 
@@ -134,10 +162,7 @@ public sealed class GameUpdateSession
 
     private async Task RunAsync(GameBiz biz, GameUpdateService.GameUpdateState state)
     {
-
-        var progress = new Progress<GameDownloadProgress>(OnProgress);
-        var ct = _cts?.Token ?? CancellationToken.None;
-        try
+        await RunCoreAsync(biz, async (progress, ct) =>
         {
             if (InstallDir is { } installDir)
             {
@@ -156,6 +181,17 @@ public sealed class GameUpdateSession
                 await Task.Run(() => GameUpdateService.ApplyUpdateAsync(biz, state.Target!, progress, ct), ct);
                 InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_Done, state.TargetVersion));
             }
+        });
+    }
+
+    private async Task RunCoreAsync(GameBiz biz, Func<IProgress<GameDownloadProgress>, CancellationToken, Task> work, string? errorTitle = null)
+    {
+
+        var progress = new Progress<GameDownloadProgress>(OnProgress);
+        var ct = _cts?.Token ?? CancellationToken.None;
+        try
+        {
+            await work(progress, ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -165,12 +201,12 @@ public sealed class GameUpdateSession
         {
 
             AppConfig.GetLogger<GameUpdateSession>().LogWarning(ex, "Game update aborted by non-user cancellation {Biz}", biz);
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_UpdateGame);
+            InAppToast.MainWindow?.Error(ex, errorTitle ?? Lang.Instance.LauncherPage_UpdateGame);
         }
         catch (Exception ex)
         {
             AppConfig.GetLogger<GameUpdateSession>().LogError(ex, "Game update failed {Biz}", biz);
-            InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_UpdateGame);
+            InAppToast.MainWindow?.Error(ex, errorTitle ?? Lang.Instance.LauncherPage_UpdateGame);
         }
         finally
         {

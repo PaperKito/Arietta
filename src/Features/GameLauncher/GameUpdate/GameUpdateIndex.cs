@@ -220,4 +220,28 @@ public sealed class LauncherDownloadConfig
 
     [JsonPropertyName("appId")]
     public string? AppId { get; set; }
+
+    [JsonPropertyName("bundles")]
+    public Dictionary<string, LauncherBundleInfo>? Bundles { get; set; }
+}
+
+public sealed class LauncherBundleInfo
+{
+    [JsonPropertyName("version")]
+    public string? Version { get; set; }
+
+    [JsonPropertyName("state")]
+    public string? State { get; set; }
+
+    [JsonPropertyName("resourcePacks")]
+    public List<string>? ResourcePacks { get; set; }
+}
+
+public sealed class LauncherPackVersion
+{
+    [JsonPropertyName("packName")]
+    public string? PackName { get; set; }
+
+    [JsonPropertyName("version")]
+    public string? Version { get; set; }
 }

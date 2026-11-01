@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arietta.Features.GameLauncher;
@@ -234,7 +235,7 @@ public sealed partial class LauncherPage : PageBase
     [RelayCommand]
     private async Task OpenLauncherSettingDialogAsync()
     {
-        var dialog = new GameLauncherSettingDialog(CurrentGameBiz) { XamlRoot = this.XamlRoot };
+        var dialog = new GameLauncherSettingDialog(CurrentGameBiz, onLaunchTierChanged: UpdateGameState) { XamlRoot = this.XamlRoot };
         await dialog.ShowAsync();
         UpdateGameState();
     }
@@ -562,6 +563,8 @@ public sealed partial class LauncherPage : PageBase
         string name = await BackgroundGallery.AddFileAsync(sourcePath, CurrentGameBiz);
 
         BackgroundAccentService.Invalidate(Path.Combine(BackgroundGallery.GetFolder(CurrentGameBiz), name));
+
+        AppConfig.SetConfig(GameRegistry.GetEnableCustomBgConfigKey(CurrentGameBiz), "1");
         BackgroundGallery.SetSelectedId(CurrentGameBiz, name);
     }
 
@@ -720,6 +723,37 @@ public sealed partial class LauncherPage : PageBase
         ApplyUpdateStateToMainButton();
     }
 
+    private bool IsSelectedTierMissing()
+    {
+        if (CurrentGameBiz is not (GameBiz.WutheringWaves or GameBiz.WutheringWavesGlobal or GameBiz.WutheringWavesBilibili)
+            || GameRegistry.GetEnabledThirdPartyToolPath(CurrentGameBiz) is not null
+
+            || _updateState is { HasUpdate: true }
+            || GameUpdateService.GetLaunchTier(CurrentGameBiz) is not { } tier
+            || GameUpdateService.GetGameDir(CurrentGameBiz) is not { } dir)
+        {
+            return false;
+        }
+        return !GameUpdateService.GetInstalledTiers(dir).Any(t => t.Equals(tier, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [RelayCommand]
+    private async Task InstallTier()
+    {
+        if (GameUpdateService.GetLaunchTier(CurrentGameBiz) is not { } tier || GameUpdateSession.Current.IsBusy)
+        {
+            return;
+        }
+        var options = await GameUpdateService.GetTierOptionsAsync(CurrentGameBiz);
+        long size = options?.FirstOrDefault(o => o.Name.Equals(tier, StringComparison.OrdinalIgnoreCase))?.TierPackSizeBytes ?? 0;
+        var dialog = new TierInstallDialog(CurrentGameBiz, tier, size) { XamlRoot = this.XamlRoot };
+        await dialog.ShowAsync();
+        if (dialog.Confirmed)
+        {
+            GameUpdateSession.Current.StartTierSwitch(CurrentGameBiz, tier, size);
+        }
+    }
+
     private void ApplyUpdateStateToMainButton()
     {
         if (_updateBusy || GameState is GameState.GameIsRunning or GameState.InstallGame or GameState.Installing)
@@ -738,8 +772,17 @@ public sealed partial class LauncherPage : PageBase
             {
                 GameState = GameState.StartGame;
             }
+            if (IsSelectedTierMissing())
+            {
+                GameState = GameState.InstallGame;
+                Button_StartGame.IsResumeInstall = false;
+                Button_StartGame.GameCommand = InstallTierCommand;
+            }
+            else
+            {
 
-            Button_StartGame.GameCommand = GameState is GameState.InstallGame ? InstallGameCommand : StartGameCommand;
+                Button_StartGame.GameCommand = GameState is GameState.InstallGame ? InstallGameCommand : StartGameCommand;
+            }
         }
     }
 
@@ -1408,9 +1451,10 @@ public sealed partial class LauncherPage : PageBase
             && !args.Contains("krqlv", StringComparison.OrdinalIgnoreCase)
             && Path.GetDirectoryName(exePath) is { } gameDir)
         {
-            string lv = Directory.Exists(Path.Combine(gameDir, "Client", "Content", "UHD")) ? "uhd"
-                : Directory.Exists(Path.Combine(gameDir, "Client", "Content", "SD")) ? "sd"
-                : "hd";
+            var installed = GameUpdateService.GetInstalledTiers(gameDir);
+            string? pref = GameUpdateService.GetLaunchTier(biz);
+            string lv = (installed.FirstOrDefault(t => t.Equals(pref, StringComparison.OrdinalIgnoreCase))
+                         ?? installed.FirstOrDefault() ?? "HD").ToLowerInvariant();
             args = string.IsNullOrEmpty(args) ? $"-krqlv={lv}" : $"{args} -krqlv={lv}";
         }
         var startInfo = new ProcessStartInfo

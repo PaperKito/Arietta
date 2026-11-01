@@ -2,6 +2,7 @@
 <ContentDialog x:Class="Arietta.Features.GameLauncher.GameLauncherSettingDialog"
                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:cwc="using:CommunityToolkit.WinUI.Controls"
                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                xmlns:lang="using:Arietta.Localization"
                xmlns:local="using:Arietta.Features.GameLauncher"
@@ -20,9 +21,10 @@
 
     <Grid Width="800"
           Height="480"
-          Padding="24,24,24,0">
+          Padding="24,24,24,24">
 
-        <NavigationView IsBackButtonVisible="Collapsed"
+        <NavigationView x:Name="Nav_Settings"
+                        IsBackButtonVisible="Collapsed"
                         IsPaneToggleButtonVisible="False"
                         IsSettingsVisible="False"
                         ItemInvoked="NavigationView_ItemInvoked"
@@ -57,7 +59,8 @@
             <FlipView x:Name="FlipView_Settings"
                       Margin="24,24,0,0"
                       Background="Transparent"
-                      Loaded="FlipView_Settings_Loaded">
+                      Loaded="FlipView_Settings_Loaded"
+                      SelectionChanged="FlipView_Settings_SelectionChanged">
                 <FlipView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel Orientation="Vertical" />
@@ -294,6 +297,17 @@
                                    TextWrapping="Wrap"
                                    Visibility="Collapsed" />
 
+                        <StackPanel x:Name="Panel_LaunchTier"
+                                    Spacing="8"
+                                    Visibility="Collapsed">
+                            <TextBlock FontSize="12"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       IsTextScaleFactorEnabled="False"
+                                       Text="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_ResourceTier, Mode=OneWay}" />
+                            <cwc:Segmented x:Name="Segmented_LaunchTier"
+                                           HorizontalAlignment="Stretch" />
+                        </StackPanel>
+
                         <ToggleSwitch IsOn="{x:Bind EnableBannerAndPost, Mode=TwoWay}"
                                       OffContent="{x:Bind lang:Lang.Instance.LauncherPage_ShowGameAnnouncement, Mode=OneWay}"
                                       OnContent="{x:Bind lang:Lang.Instance.LauncherPage_ShowGameAnnouncement, Mode=OneWay}" />
@@ -494,52 +508,22 @@
                             </StackPanel>
                         </Grid>
 
-                        <StackPanel Spacing="0">
-                            <ToggleSwitch Margin="0,0,0,-4"
-                                          IsOn="{x:Bind FpsCapEnabled, Mode=TwoWay}"
-                                          OffContent="{x:Bind FpsHeaderText, Mode=OneWay}"
-                                          OnContent="{x:Bind FpsHeaderText, Mode=OneWay}" />
-                            <StackPanel>
-                                <Grid>
-                                    <Slider x:Name="Slider_FpsCap"
-                                            IsEnabled="{x:Bind FpsCapEnabled, Mode=OneWay}"
-                                            Maximum="60"
-                                            Minimum="10"
-                                            StepFrequency="1"
-                                            TickPlacement="BottomRight"
-                                            TickFrequency="10"
-                                            ValueChanged="Slider_FpsCap_ValueChanged"
-                                            Value="{x:Bind FpsSliderValue, Mode=TwoWay}" />
-
-                                    <Border x:Name="FpsBubble"
-                                            Background="{ThemeResource ToolTipBackgroundThemeBrush}"
-                                            CornerRadius="4"
-                                            HorizontalAlignment="Left"
-                                            IsHitTestVisible="False"
-                                            MinWidth="48"
-                                            Padding="6,3"
-                                            VerticalAlignment="Top"
-                                            Visibility="Collapsed">
-                                        <TextBlock x:Name="FpsBubbleText"
-                                                   FontSize="12"
-                                                   Foreground="{ThemeResource ToolTipForegroundThemeBrush}"
-                                                   IsTextScaleFactorEnabled="False"
-                                                   TextAlignment="Center" />
-                                    </Border>
-                                </Grid>
-
-                                <Grid>
-                                    <TextBlock FontSize="11"
-                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                               IsTextScaleFactorEnabled="False"
-                                               Text="10" />
-                                    <TextBlock FontSize="11"
-                                               HorizontalAlignment="Right"
-                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                               IsTextScaleFactorEnabled="False"
-                                               Text="60" />
-                                </Grid>
-                            </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    Spacing="12">
+                            <TextBlock VerticalAlignment="Center"
+                                       IsTextScaleFactorEnabled="False"
+                                       Text="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_BgFps, Mode=OneWay}" />
+                            <NumberBox x:Name="Box_FpsCap"
+                                       Width="68"
+                                       MinWidth="0"
+                                       Minimum="10"
+                                       Maximum="60"
+                                       SpinButtonPlacementMode="Hidden"
+                                       ValueChanged="Box_FpsCap_ValueChanged" />
+                            <TextBlock VerticalAlignment="Center"
+                                       FontWeight="SemiBold"
+                                       IsTextScaleFactorEnabled="False"
+                                       Text="FPS（≤60）" />
                         </StackPanel>
 
                         <ComboBox MinWidth="200"
@@ -579,6 +563,12 @@
                       Glyph="&#xE711;"
                       IsTextScaleFactorEnabled="False" />
         </Button>
+
+        <Border x:Name="FocusSink"
+                Width="0"
+                Height="0"
+                IsHitTestVisible="False"
+                IsTabStop="True" />
 
     </Grid>
 </ContentDialog>

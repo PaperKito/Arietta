@@ -63,8 +63,9 @@ public static class GameNoticeService
 
     private static readonly Dictionary<GameBiz, BizConfig> Configs = new()
     {
+
         [GameBiz.WutheringWaves] = new(CnBases,
-            "10003_Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5", "G152", null, NoticePathKind.Legacy, true,
+            "10003_oLNgHF1CESo51DGHN2odtp40e3oI1HfZ", "G152", "official", NoticePathKind.AppWithServer, true,
             OnlyZhHans),
 
         [GameBiz.WutheringWavesBilibili] = new(CnBases,

@@ -39,7 +39,7 @@
                  Title="{x:Bind lang:Lang.Instance.RolePage_NoAccount, Mode=OneWay}"
                  Message="{x:Bind lang:Lang.Instance.RolePage_NoAccountDesc, Mode=OneWay}" />
 
-        <ScrollViewer Grid.Row="1" Padding="0,0,16,16">
+        <ScrollViewer x:Name="ScrollViewer_Content" Grid.Row="1" Padding="0,0,16,16">
             <StackPanel Spacing="16" MaxWidth="1000" HorizontalAlignment="Left">
 
                 <Border Padding="16" CornerRadius="8"

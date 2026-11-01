@@ -1,6 +1,8 @@
 ﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Arietta.Frameworks;
+using Arietta.Localization;
 using System;
 using System.IO;
 using Windows.Graphics;
@@ -23,6 +25,7 @@ public sealed partial class MainWindow : WindowEx
         if (AppConfig.GetConfig("WelcomeShown") != "1")
         {
             WelcomeOverlayHost.Visibility = Visibility.Visible;
+            WelcomeOverlayHost.PlayEntrance();
         }
     }
 
@@ -53,13 +56,55 @@ public sealed partial class MainWindow : WindowEx
             if (AppConfig.GetConfig("CloseWindowAction") != "Exit")
             {
                 e.Cancel = true;
-                Hide();
+                if (string.IsNullOrEmpty(AppConfig.GetConfig("CloseWindowAction")))
+                {
+                    AskCloseActionOnce();
+                }
+                else
+                {
+                    Hide();
+                }
             }
             else
             {
                 App.Current.ExitApp();
             }
         };
+    }
+
+    private bool _closeAsking;
+
+    private async void AskCloseActionOnce()
+    {
+        if (_closeAsking) return;
+        _closeAsking = true;
+        try
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = Content.XamlRoot,
+                Title = Lang.Instance.CloseDialog_Title,
+                Content = Lang.Instance.CloseDialog_Content,
+                PrimaryButtonText = Lang.Instance.ExperienceSettingPage_MinimizeToSystemTray,
+                SecondaryButtonText = Lang.Instance.SettingPage_ExitApp,
+                DefaultButton = ContentDialogButton.Primary,
+            };
+            var result = await dialog.ShowAsync();
+            var toTray = result != ContentDialogResult.Secondary;
+            AppConfig.SetConfig("CloseWindowAction", toTray ? "Tray" : "Exit");
+            if (toTray)
+            {
+                Hide();
+            }
+            else
+            {
+                App.Current.ExitApp();
+            }
+        }
+        finally
+        {
+            _closeAsking = false;
+        }
     }
 
 

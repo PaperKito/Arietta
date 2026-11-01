@@ -1,5 +1,6 @@
 ﻿using System;
 using Arietta.Frameworks;
+using Arietta.Helpers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
@@ -20,9 +21,6 @@ public sealed partial class AboutSetting : PageBase
 
     [ObservableProperty]
     private bool _hasUpdate;
-
-    [ObservableProperty]
-    private string _statusText = "";
 
     [ObservableProperty]
     private string _newVersionText = "";
@@ -80,21 +78,31 @@ public sealed partial class AboutSetting : PageBase
         }
         IsChecking = true;
         HasUpdate = false;
-        StatusText = Localization.Lang.Instance.SettingPage_CheckingUpdate;
         try
         {
-            SelfUpdateInfo? info = await SelfUpdateService.CheckForUpdateAsync();
-            if (info is null)
+
+            SelfUpdateCheckResult result = await SelfUpdateService.CheckForUpdateAsync();
+            if (result is { Status: SelfUpdateCheckStatus.UpdateAvailable, Info: { } info })
             {
-                StatusText = Localization.Lang.Instance.SettingPage_UpToDate;
-            }
-            else
-            {
+
                 _info = info;
                 NewVersionText = $"{Localization.Lang.Instance.SettingPage_UpdateAvailable}: v{info.Version}";
                 ReleaseNotesText = info.Notes ?? "";
-                StatusText = "";
                 HasUpdate = true;
+            }
+            else if (result.Status == SelfUpdateCheckStatus.Ignored)
+            {
+                InAppToast.MainWindow?.Information(
+                    Localization.Lang.Instance.SettingPage_UpdateIgnored,
+                    string.Format(Localization.Lang.Instance.SettingPage_UpdateIgnoredDesc, result.IgnoredVersion),
+                    5000);
+            }
+            else
+            {
+                InAppToast.MainWindow?.Success(
+                    Localization.Lang.Instance.SettingPage_UpToDate,
+                    string.Format(Localization.Lang.Instance.SettingPage_UpToDateDesc, AppVersionText),
+                    4000);
             }
         }
         catch (OperationCanceledException)
@@ -104,7 +112,7 @@ public sealed partial class AboutSetting : PageBase
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "SelfUpdate: check for updates failed");
-            StatusText = $"{Localization.Lang.Instance.SettingPage_UpdateFailed}: {ex.Message}";
+            ShowUpdateErrorToast(ex);
         }
         finally
         {
@@ -121,12 +129,11 @@ public sealed partial class AboutSetting : PageBase
         }
         if (!SelfUpdateService.IsPortableLayout)
         {
-            StatusText = Localization.Lang.Instance.SettingPage_UpdateDevLayout;
+            InAppToast.MainWindow?.Warning(Localization.Lang.Instance.SettingPage_UpdateDevLayout);
             return;
         }
         IsDownloading = true;
         DownloadProgress = 0;
-        StatusText = "";
         try
         {
 
@@ -134,7 +141,7 @@ public sealed partial class AboutSetting : PageBase
                 _info, new Progress<double>(p => DownloadProgress = p));
             SelfUpdateService.InstallNow(newAppDir);
 
-            StatusText = Localization.Lang.Instance.SettingPage_UpdateReady;
+            InAppToast.MainWindow?.Information(Localization.Lang.Instance.SettingPage_UpdateReady, null, 8000);
         }
         catch (OperationCanceledException)
         {
@@ -143,12 +150,22 @@ public sealed partial class AboutSetting : PageBase
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "SelfUpdate: download/install failed");
-            StatusText = $"{Localization.Lang.Instance.SettingPage_UpdateFailed}: {ex.Message}";
+            ShowUpdateErrorToast(ex);
         }
         finally
         {
             IsDownloading = false;
         }
+    }
+
+    private static void ShowUpdateErrorToast(Exception ex)
+    {
+        if (InAppToast.MainWindow is not { } toast)
+        {
+            return;
+        }
+        (string title, string message) = SelfUpdateService.DescribeFailure(ex);
+        toast.Error(title, message);
     }
 
 }
