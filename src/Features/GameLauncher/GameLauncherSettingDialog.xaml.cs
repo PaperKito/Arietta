@@ -607,8 +607,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         ClearInstallPathUi();
     }
 
-    #region 校验 / 修复游戏
-
     private GameUpdateService.VerifyResult? _verifyResult;
     private System.Threading.CancellationTokenSource? _repairCts;
     private bool _repairBusy;
@@ -783,8 +781,6 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             _ => $"{bytes / 1024.0:F2}KB",
         };
     }
-
-    #endregion
 
     [RelayCommand]
     private async Task ChangeCustomBg()

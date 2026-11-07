@@ -237,9 +237,6 @@ public sealed partial class ResourceBriefPage : PageBase
         }
     }
 
-
-    #region 详情渲染与动画
-
     private async Task FillDetailAsync(string periodTitle, KuroBriefingRecord record, int periodIndex)
     {
         TextBlock_PeriodTitle.Text = $"{Lang.Instance.ResourceBrief_HistoryData} {periodTitle}";
@@ -513,8 +510,6 @@ public sealed partial class ResourceBriefPage : PageBase
             StackPanel_Items.Children.Add(row);
         }
     }
-
-    #endregion
 
 }
 

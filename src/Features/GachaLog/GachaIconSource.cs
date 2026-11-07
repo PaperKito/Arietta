@@ -33,9 +33,6 @@ public static class GachaIconSource
 
     private static Dictionary<string, string>? _index;
 
-
-    #region 索引：内存 → 磁盘 → 库街区
-
     private static async Task<Dictionary<string, string>?> GetIndexAsync(CancellationToken ct = default)
     {
         if (_index is not null)
@@ -197,11 +194,6 @@ public static class GachaIconSource
         index.TryAdd(name.Trim(), url.Trim());
     }
 
-    #endregion
-
-
-    #region 解析与下载
-
     public static async Task<string?> ResolveUrlAsync(string name, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -247,11 +239,6 @@ public static class GachaIconSource
         }
     }
 
-    #endregion
-
-
-    #region 索引落盘
-
     private static IndexFileModel? TryLoadDiskIndex()
     {
         try
@@ -284,9 +271,6 @@ public static class GachaIconSource
 
         }
     }
-
-    #endregion
-
 
     internal sealed class IndexFileModel
     {

@@ -60,13 +60,6 @@ public sealed partial class GameSelector : UserControl
 
     public string? InstalledGamesActualSize { get; set => SetProperty(ref field, value); }
 
-
-
-
-
-    #region 初始化
-
-
     private void InitializeGameSelector()
     {
         try
@@ -216,11 +209,22 @@ public sealed partial class GameSelector : UserControl
         TryShowSelectGameTip();
     }
 
+    private readonly bool _isFirstRunSession = AppConfig.GetConfig("WelcomeShown") is not "1";
+
+    public void DismissSelectGameTip()
+    {
+        TeachTip_SelectGame.IsOpen = false;
+        AppConfig.SetConfig("GameSelectorTipDismissed", "1");
+    }
+
 
     private void TryShowSelectGameTip()
     {
-        if (GameBizIcons.Count == 0 && AppConfig.GetConfig("GameSelectorTipDismissed") is not "1")
+
+        if (_isFirstRunSession && CurrentGameBiz is null && GameBizIcons.Count == 0 && AppConfig.GetConfig("GameSelectorTipDismissed") is not "1")
         {
+
+            AppConfig.SetConfig("GameSelectorTipDismissed", "1");
             TeachTip_SelectGame.IsOpen = true;
         }
     }
@@ -230,14 +234,6 @@ public sealed partial class GameSelector : UserControl
     {
         UpdateDragRectangles();
     }
-
-
-    #endregion
-
-
-
-
-    #region 拖动窗口区域
 
     public void UpdateDragRectangles()
     {
@@ -253,14 +249,6 @@ public sealed partial class GameSelector : UserControl
         }
         catch { }
     }
-
-
-    #endregion
-
-
-
-
-    #region 待选图标栏
 
     public bool GameIconsAreaVisible
     {
@@ -397,15 +385,6 @@ public sealed partial class GameSelector : UserControl
         CurrentGameChanged?.Invoke(this, biz);
     }
 
-
-    #endregion
-
-
-
-
-    #region 全屏选择层
-
-
     public bool FullBackgroundVisible => Border_FullBackground.Opacity > 0;
 
 
@@ -415,6 +394,8 @@ public sealed partial class GameSelector : UserControl
     [RelayCommand]
     private void ShowFullBackground()
     {
+
+        DismissSelectGameTip();
         _hideFullBackgroundTimer?.Stop();
         Border_FullBackground.Opacity = 1;
         Border_FullBackground.IsHitTestVisible = true;
@@ -465,15 +446,6 @@ public sealed partial class GameSelector : UserControl
     {
         e.Handled = true;
     }
-
-
-    #endregion
-
-
-
-
-    #region 服务器列表
-
 
     private bool _isGameBizDisplayPressed;
 
@@ -553,15 +525,6 @@ public sealed partial class GameSelector : UserControl
         }
 
     }
-
-
-    #endregion
-
-
-
-
-    #region 已安装游戏
-
 
     private CancellationTokenSource? _initializeInstalledGamesCancellationTokenSource;
 
@@ -674,9 +637,5 @@ public sealed partial class GameSelector : UserControl
         });
         await InitializeInstalledGamesAsync();
     }
-
-
-    #endregion
-
 
 }

@@ -80,25 +80,24 @@ public sealed partial class MainWindow : WindowEx
         _closeAsking = true;
         try
         {
-            var dialog = new ContentDialog
+
+            var dialog = new CloseWindowDialog
             {
                 XamlRoot = Content.XamlRoot,
-                Title = Lang.Instance.CloseDialog_Title,
-                Content = Lang.Instance.CloseDialog_Content,
-                PrimaryButtonText = Lang.Instance.ExperienceSettingPage_MinimizeToSystemTray,
-                SecondaryButtonText = Lang.Instance.SettingPage_ExitApp,
-                DefaultButton = ContentDialogButton.Primary,
             };
-            var result = await dialog.ShowAsync();
-            var toTray = result != ContentDialogResult.Secondary;
-            AppConfig.SetConfig("CloseWindowAction", toTray ? "Tray" : "Exit");
-            if (toTray)
+            await dialog.ShowAsync();
+
+            if (dialog.Confirmed)
             {
-                Hide();
-            }
-            else
-            {
-                App.Current.ExitApp();
+                AppConfig.SetConfig("CloseWindowAction", dialog.ExitOnConfirm ? "Exit" : "Tray");
+                if (dialog.ExitOnConfirm)
+                {
+                    App.Current.ExitApp();
+                }
+                else
+                {
+                    Hide();
+                }
             }
         }
         finally

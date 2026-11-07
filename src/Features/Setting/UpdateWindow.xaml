@@ -7,16 +7,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d">
 
-    <Grid x:Name="RootGrid">
+    <Grid x:Name="RootGrid" Loaded="RootGrid_Loaded">
         <Grid.ColumnDefinitions>
 
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="0"
+        <Grid x:Name="Panel_Left"
+              Grid.Row="0"
               Grid.Column="0"
-              Margin="24,8,20,20">
+              Margin="24">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -31,7 +32,7 @@
             <StackPanel Grid.Row="0"
                         Spacing="8">
                 <TextBlock x:Name="TextBlock_Title"
-                           FontSize="20" />
+                           FontSize="24" />
                 <StackPanel Margin="0,8,0,0"
                             Orientation="Horizontal"
                             Spacing="8">
@@ -49,11 +50,13 @@
                 </StackPanel>
             </StackPanel>
 
-            <Grid Grid.Row="1"
+            <Grid x:Name="Grid_Info"
+                  Grid.Row="1"
                   Margin="0,14,0,0"
                   ColumnSpacing="12"
                   RowSpacing="8">
                 <Grid.RowDefinitions>
+                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                 </Grid.RowDefinitions>
@@ -64,18 +67,24 @@
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           x:Name="TextBlock_SizeLabel" />
+                           x:Name="TextBlock_ArchLabel" />
                 <TextBlock Grid.Row="0"
                            Grid.Column="1"
-                           IsTextSelectionEnabled="True"
-                           x:Name="TextBlock_Size" />
+                           x:Name="TextBlock_Arch" />
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            x:Name="TextBlock_ChannelLabel" />
                 <TextBlock Grid.Row="1"
                            Grid.Column="1"
-                           Text="GitHub Releases" />
+                           x:Name="TextBlock_Channel" />
+                <TextBlock Grid.Row="2"
+                           Grid.Column="0"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           x:Name="TextBlock_BuildLabel" />
+                <TextBlock Grid.Row="2"
+                           Grid.Column="1"
+                           x:Name="TextBlock_Build" />
             </Grid>
 
             <StackPanel Grid.Row="2"
@@ -87,14 +96,21 @@
                                  Content=""
                                  Padding="0"
                                  x:Name="HyperlinkButton_Release" />
-                <HyperlinkButton Click="HyperlinkButton_History_Click"
-                                 Content=""
-                                 Padding="0"
-                                 x:Name="HyperlinkButton_History" />
             </StackPanel>
 
-            <MenuFlyoutSeparator Grid.Row="3"
-                                 Margin="0,12,0,0" />
+            <Border Grid.Row="3"
+                    Height="1"
+                    Margin="0,12,0,0"
+                    Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+            <StackPanel x:Name="Panel_Options"
+                        Grid.Row="4"
+                        Margin="0,10,0,0"
+                        Spacing="2"
+                        VerticalAlignment="Top">
+                <CheckBox x:Name="CheckBox_ShowNotes"
+                          Click="OnOptionChanged" />
+            </StackPanel>
 
             <StackPanel Grid.Row="5"
                         Spacing="4"
@@ -118,7 +134,8 @@
                            x:Name="TextBlock_ProgressMessage" />
             </StackPanel>
 
-            <StackPanel Grid.Row="6"
+            <StackPanel x:Name="Panel_Actions"
+                        Grid.Row="6"
                         Margin="0,12,0,0"
                         Orientation="Horizontal"
                         Spacing="24">
@@ -163,18 +180,43 @@
 
         </Grid>
 
-        <Grid Grid.Row="0"
+        <Grid x:Name="Panel_Notes"
+              Grid.Row="0"
               Grid.Column="1"
-              Margin="0,32,0,8">
+              Margin="0,32,0,0">
+
             <WebView2 x:Name="NotesWeb"
-                      DefaultBackgroundColor="Transparent"
-                      Loaded="NotesWeb_Loaded" />
-            <ScrollViewer Padding="24,4,24,12"
-                          Visibility="Collapsed"
-                          x:Name="Scroll_NotesFallback">
-                <TextBlock IsTextSelectionEnabled="True"
-                           TextWrapping="Wrap"
-                           x:Name="TextBlock_NotesFallback" />
+                      UseSystemFocusVisuals="False"
+                      DefaultBackgroundColor="Transparent">
+                <WebView2.Resources>
+                    <SolidColorBrush x:Key="BrushForThemeBackgroundColor" Color="Transparent" />
+                </WebView2.Resources>
+            </WebView2>
+
+            <StackPanel x:Name="Panel_Checking"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="14"
+                        Visibility="Collapsed">
+                <ProgressRing Width="36"
+                              Height="36"
+                              IsActive="True" />
+                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Text="{x:Bind CheckingText}" />
+            </StackPanel>
+
+            <ScrollViewer x:Name="Scroll_Notes"
+                          Padding="24,4,24,12"
+                          HorizontalScrollMode="Disabled"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto"
+                          Visibility="Collapsed">
+                <StackPanel>
+                    <ItemsControl x:Name="Images_Notes" />
+                    <RichTextBlock x:Name="Rich_Notes"
+                                   IsTextSelectionEnabled="True"
+                                   TextWrapping="Wrap" />
+                </StackPanel>
             </ScrollViewer>
         </Grid>
 

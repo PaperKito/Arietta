@@ -265,7 +265,7 @@ public sealed partial class PgrResourcePage : PageBase
         host.Children.Add(bar);
         host.Children.Add(legend);
 
-        KuroBbsUi.AddCompositionBar(bar, legend, host,
+        KuroBbsUi.AddCompositionBar(bar, legend, bar,
             rendered.Select((s, i) => (s.Label, s.Value,
                 (Brush)new SolidColorBrush(palette[i % palette.Length]),
                 new CornerRadius(

@@ -86,15 +86,40 @@
                                           MaxHeight="320"
                                           IsItemClickEnabled="True"
                                           ItemClick="GridView_Backgrounds_ItemClick"
-                                          ItemsSource="{x:Bind BackgroundImages}"
+                                          ItemsSource="{x:Bind BackgroundImages, Mode=OneWay}"
                                           SelectionMode="None">
                                     <GridView.ItemTemplate>
                                         <DataTemplate x:DataType="bg:BackgroundItem">
-                                            <StackPanel Width="116" Spacing="4">
-                                                <Image Width="116"
-                                                       Height="72"
-                                                       Source="{x:Bind Thumbnail}"
-                                                       Stretch="UniformToFill" />
+                                            <StackPanel Width="116"
+                                                        Spacing="4"
+                                                        ToolTipService.ToolTip="{x:Bind Description}">
+                                                <Grid Width="116" Height="72">
+                                                    <Image Width="116"
+                                                           Height="72"
+                                                           Source="{x:Bind Thumbnail}"
+                                                           Stretch="UniformToFill" />
+                                                    <Border Background="#33000000"
+                                                            Visibility="{x:Bind PlaceholderVisibility}">
+                                                        <FontIcon HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"
+                                                                  FontSize="22"
+                                                                  Foreground="#88FFFFFF"
+                                                                  Glyph="{x:Bind PlaceholderGlyph}"
+                                                                  IsTextScaleFactorEnabled="False" />
+                                                    </Border>
+                                                    <Border Margin="4"
+                                                            Padding="4,2"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Bottom"
+                                                            Background="#99000000"
+                                                            CornerRadius="4"
+                                                            Visibility="{x:Bind BadgeVisibility}">
+                                                        <FontIcon FontSize="12"
+                                                                  Foreground="White"
+                                                                  Glyph="{x:Bind BadgeGlyph}"
+                                                                  IsTextScaleFactorEnabled="False" />
+                                                    </Border>
+                                                </Grid>
                                                 <TextBlock FontSize="12"
                                                            MaxLines="1"
                                                            Text="{x:Bind Name}"

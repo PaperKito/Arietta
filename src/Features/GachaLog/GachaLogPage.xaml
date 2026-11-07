@@ -55,14 +55,16 @@
                            Foreground="{StaticResource GachaTextPrimary}"
                            Text="{x:Bind Name}"
                            TextTrimming="CharacterEllipsis" />
+
                 <TextBlock Grid.Column="2"
                            Margin="8,0,4,0"
                            VerticalAlignment="Center"
                            FontSize="12"
                            FontStyle="Italic"
                            Foreground="{StaticResource GachaStar5}"
+                           Opacity="{x:Bind UpTextOpacity}"
                            Text="up!"
-                           Visibility="{x:Bind UpVisibility}" />
+                           Visibility="{x:Bind UpColumnVisibility}" />
                 <TextBlock x:Name="PityText"
                            Grid.Column="3"
                            VerticalAlignment="Center"
@@ -124,7 +126,9 @@
 
                         <MenuFlyoutItem Click="ImportUrl_Click" Text="{x:Bind lang:Lang.Instance.GachaLogPage_InputUrl, Mode=OneWay}" />
 
-                        <MenuFlyoutItem Click="CloudGame_Click" Text="{x:Bind lang:Lang.Instance.GachaLogPage_ViaCloudGame, Mode=OneWay}" />
+                        <MenuFlyoutItem x:Name="MenuFlyoutItem_ViaCloudGame"
+                                        Click="CloudGame_Click"
+                                        Text="{x:Bind lang:Lang.Instance.GachaLogPage_ViaCloudGame, Mode=OneWay}" />
                     </MenuFlyout>
                 </SplitButton.Flyout>
             </SplitButton>

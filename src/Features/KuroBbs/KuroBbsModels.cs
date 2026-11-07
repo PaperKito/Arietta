@@ -3,8 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace Arietta.Features.KuroBbs;
 
-#region 通用返回包装（移植自 WutheringWavesTool wwt-kuro-api 的 ResponseBody）
-
 public sealed class KuroBbsResponse<T>
 {
     [JsonPropertyName("code")] public int Code { get; set; }
@@ -18,10 +16,6 @@ public sealed class KuroBbsResponse<T>
         || (Msg?.Contains("登录已过期") ?? false) || (Msg?.Contains("Token") ?? false);
 }
 
-#endregion
-
-#region 我的角色 · 角色列表（roleData 接口 data.roleList）
-
 public sealed class KuroRole
 {
     [JsonPropertyName("roleId")] public int RoleId { get; set; }
@@ -32,10 +26,6 @@ public sealed class KuroRole
     [JsonPropertyName("rolePicUrl")] public string? RolePicUrl { get; set; }
     [JsonPropertyName("starLevel")] public int StarLevel { get; set; }
 }
-
-#endregion
-
-#region 我的角色 · 角色详情（getRoleDetail 接口 data）
 
 public sealed class KuroRoleDetail
 {
@@ -125,10 +115,6 @@ public sealed class KuroRoleAttribute
     [JsonPropertyName("attributeValue")] public string? AttributeValue { get; set; }
 }
 
-#endregion
-
-#region 资源简报（aki/resource/period/list + month|week|version）
-
 public sealed class KuroBriefingTitle
 {
     [JsonPropertyName("title")] public string? Title { get; set; }
@@ -172,10 +158,6 @@ public sealed class KuroBriefingRecord
     [JsonPropertyName("coinList")] public List<KuroBriefingItem>? CoinList { get; set; }
     [JsonPropertyName("starList")] public List<KuroBriefingItem>? StarList { get; set; }
 }
-
-#endregion
-
-#region 养成计算器（aki/calculator/listRole | listWeapon）
 
 public sealed class KuroCalculatorRole
 {
@@ -223,10 +205,6 @@ public sealed class KuroCalculatorWeapon
     [JsonPropertyName("priority")] public int Priority { get; set; }
 }
 
-#endregion
-
-#region 登录（sdkLogin / getSmsCodeForH5）
-
 public sealed class KuroLoginResult
 {
     public string Token { get; init; } = "";
@@ -234,5 +212,3 @@ public sealed class KuroLoginResult
 
     public string HeadPhotoUrl { get; init; } = "";
 }
-
-#endregion

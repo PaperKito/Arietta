@@ -251,9 +251,6 @@ public sealed partial class DataTerminalWindow : Window
         }
     }
 
-
-    #region 登录态注入
-
     private static string BuildBootstrapScript(KuroBbsAccount account, string roleId, string serverId, string gameId, bool pgr)
     {
         var auth = new Dictionary<string, object?>
@@ -422,9 +419,6 @@ public sealed partial class DataTerminalWindow : Window
         }
         return storage;
     }
-
-    #endregion
-
 
     private void ShowPlaceholder(string message)
     {

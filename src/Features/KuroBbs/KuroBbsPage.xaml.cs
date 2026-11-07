@@ -136,9 +136,6 @@ public sealed partial class KuroBbsPage : PageBase
                   : "ms-appx:///Assets/Image/Common/CheckIn.png"));
     }
 
-
-    #region 顶部账号栏（照抄 Starward GameRecordPage 交互）
-
     private void UpdateAccountBar()
     {
         var accounts = KuroBbsAccountStore.Accounts;
@@ -503,9 +500,6 @@ public sealed partial class KuroBbsPage : PageBase
         }
         UpdateAccountBar();
     }
-
-    #endregion
-
 
     private void NavigationView_KuroBbs_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {

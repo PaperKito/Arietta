@@ -90,7 +90,6 @@ internal static class LangJa
         ["PgrResource_BlackCard"] = "ブラックカード",
         ["PgrResource_Develop"] = "開発リソース",
         ["PgrResource_Trade"] = "トレード証票",
-        ["PgrResource_SelectPeriod"] = "期間を選択",
         ["PgrResource_Composition"] = "収入内訳",
         ["PgrResource_MonthlyData"] = "月間データ",
         ["PgrChallenge_NotOpen"] = "現在は解放期間外です",
@@ -163,9 +162,6 @@ internal static class LangJa
         ["GameLauncherSettingDialog_BackupAndUninstall"] = "バックアップしてアンインストール",
         ["GameLauncherSettingDialog_Uninstalled"] = "ゲームをアンインストールしました",
 
-        ["CloseDialog_Title"] = "ウィンドウを閉じる",
-        ["CloseDialog_Content"] = "閉じるボタンを押したときの動作を選択します。あとから「設定 → ウィンドウ動作」で変更できます。",
-
         ["SettingPage_CurrentVersion"] = "バージョン:",
 
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
@@ -208,6 +204,7 @@ internal static class LangJa
         ["UpdateWindow_ReleasePage"] = "リリースページ",
         ["UpdateWindow_UpdateHistory"] = "更新履歴",
         ["UpdateWindow_LoadingHistory"] = "更新履歴を読み込み中…",
+        ["UpdateWindow_NotesUnavailable"] = "リリースノートを取得できません。",
         ["UpdateWindow_RemindLater"] = "後で通知",
 
         ["SettingPage_About_Links"] = "関連リンク",
@@ -380,6 +377,7 @@ internal static class LangJa
         ["ImageViewWindow2_SaveAs"] = "名前を付けて保存",
         ["GameLauncherPage_PlayPause"] = "再生/一時停止",
         ["GameLauncherSettingDialog_DragAndDropImageOrVideoFiles"] = "画像ファイルをドロップして背景を変更",
+        ["Background_OfficialShort"] = "公式",
         ["Background_Official"] = "公式動画背景",
         ["Background_OfficialStatic"] = "公式静止背景",
         ["Background_OpenFolder"] = "背景フォルダを開く",
@@ -449,7 +447,7 @@ internal static class LangJa
         ["Login_PhonePlaceholder"] = "電話番号",
         ["Login_CodePlaceholder"] = "SMS 認証コード",
         ["Login_CodeLabel"] = "認証コード",
-        ["Login_SmsTip"] = "「認証コードを送信」をタップした後、スマホで受信した SMS 認証コードを入力してください。ログインに成功するとアカウントは自動保存されます",
+        ["Login_SmsTip"] = "クロBBSは1台のデバイスでのみログインできます。ログイン後、モバイル側ではクロBBSを利用できなくなります",
         ["Login_SendCode"] = "認証コードを送信",
         ["Login_Confirm"] = "ログイン",
         ["Login_Cancel"] = "キャンセル",
@@ -463,6 +461,10 @@ internal static class LangJa
         ["Login_Failed"] = "ログインに失敗しました：{0}",
         ["Login_SeekRoleFailed"] = "紐付けキャラクターの検索に失敗しました：{0}",
         ["Login_Success"] = "クロBBSアカウント「{0}」でログインしました",
+        ["Login_CaptchaLoading"] = "セキュリティ認証を読み込み中です。スライダー認証を完了してください…",
+        ["Login_CaptchaCancel"] = "セキュリティ認証が完了しませんでした（キャンセル・読み込み失敗・タイムアウト）。再試行するか Token ログインをご利用ください",
+        ["Login_NeedCaptcha"] = "SMS が送信されませんでした：スライダー認証が必要、または認証コードの要求が頻繁すぎます",
+        ["Login_CaptchaTitle"] = "セキュリティ認証",
 
         ["ResourceBrief_Month"] = "月間",
         ["ResourceBrief_Week"] = "週間",
@@ -544,7 +546,7 @@ internal static class LangJa
         ["Common_Apply"] = "適用",
         ["GameSettingPage_Resolution"] = "解像度",
         ["GameSettingPage_FullScreen"] = "フルスクリーン",
-        ["GameSettingPage_PgrFullscreenBlockedTip"] = "現在のディスプレイの解像度がゲームの対応上限を超えているため、フルスクリーンは正常に使用できません",
+        ["GameSettingPage_PgrResolutionUnsupportedTip"] = "現在の解像度 {0} × {1} は全画面表示に対応していません",
         ["GameSettingPage_CustomResolution"] = "カスタム解像度",
         ["GameSettingPage_CustomResolutionTip"] = "カスタム解像度は「ウィンドウ」表示モードで有効になります",
         ["GameSettingPage_VoiceLanguage"] = "音声言語",
@@ -564,6 +566,9 @@ internal static class LangJa
         ["SettingPage_WindowBehavior"] = "ウィンドウの動作",
         ["SettingPage_CloseWindowOption"] = "ウィンドウを閉じた時の動作",
         ["SettingPage_ExitApp"] = "完全に終了",
+
+        ["CloseDialog_Title"] = "ウィンドウを閉じるオプション",
+        ["CloseDialog_Content"] = "このオプションは設定ページで再度変更できます。",
         ["SettingPage_AfterLaunchOption"] = "ゲーム起動後の動作",
         ["SettingPage_KeepWindow"] = "ウィンドウを維持",
         ["SettingPage_AfterGameExitOption"] = "ゲーム終了後",
@@ -577,7 +582,8 @@ internal static class LangJa
 
         ["Common_Exit"] = "終了",
 
-        ["GameSelector_Subtitle"] = "左上のアイコンをクリックすると、ゲームを選択または切り替えられます",
+        ["GameSelector_Title"] = "Arietta へようこそ",
+        ["GameSelector_Subtitle"] = "左上のアイコンをクリックすると、ゲームを選択または切り替えられます\nゲームを選ぶと Arietta を使い始められます",
         ["GameSelector_AutoFind"] = "端末内のゲームを自動検索",
         ["GameSelector_SelectServer"] = "サーバーを選択",
         ["GameSelector_InstalledSize"] = "インストール済みゲームの実際の使用容量 ",

@@ -16,52 +16,15 @@ public sealed partial class AboutSetting : PageBase
     [ObservableProperty]
     private bool _isChecking;
 
-    [ObservableProperty]
-    private bool _isDownloading;
-
-    [ObservableProperty]
-    private bool _hasUpdate;
-
-    [ObservableProperty]
-    private string _newVersionText = "";
-
-    [ObservableProperty]
-    private string _releaseNotesText = "";
-
-    [ObservableProperty]
-    private double _downloadProgress;
-
-    private SelfUpdateInfo? _info;
-
-    partial void OnIsCheckingChanged(bool value) => NotifyStateProjections();
-
-    partial void OnIsDownloadingChanged(bool value) => NotifyStateProjections();
-
-    partial void OnHasUpdateChanged(bool value) => NotifyStateProjections();
-
-    private void NotifyStateProjections()
+    partial void OnIsCheckingChanged(bool value)
     {
         OnPropertyChanged(nameof(CheckingVisibility));
-        OnPropertyChanged(nameof(DownloadingVisibility));
-        OnPropertyChanged(nameof(AvailableVisibility));
         OnPropertyChanged(nameof(CanCheckNow));
-        OnPropertyChanged(nameof(CanDownloadNow));
     }
 
-    public Visibility CheckingVisibility => ToVisibility(IsChecking);
+    public Visibility CheckingVisibility => IsChecking ? Visibility.Visible : Visibility.Collapsed;
 
-    public Visibility DownloadingVisibility => ToVisibility(IsDownloading);
-
-    public Visibility AvailableVisibility => ToVisibility(HasUpdate);
-
-    public bool CanCheckNow => !IsChecking && !IsDownloading;
-
-    public bool CanDownloadNow => HasUpdate && !IsDownloading && !IsChecking;
-
-    private static Visibility ToVisibility(bool value)
-    {
-        return value ? Visibility.Visible : Visibility.Collapsed;
-    }
+    public bool CanCheckNow => !IsChecking;
 
 
     public AboutSetting()
@@ -72,23 +35,19 @@ public sealed partial class AboutSetting : PageBase
 
     private async void OnCheckUpdateClick(object sender, RoutedEventArgs e)
     {
-        if (IsChecking || IsDownloading)
+        if (IsChecking)
         {
             return;
         }
         IsChecking = true;
-        HasUpdate = false;
         try
         {
 
-            SelfUpdateCheckResult result = await SelfUpdateService.CheckForUpdateAsync();
+            SelfUpdateCheckResult result = await SelfUpdateService.CheckForUpdateAsync(includeIgnored: true);
             if (result is { Status: SelfUpdateCheckStatus.UpdateAvailable, Info: { } info })
             {
 
-                _info = info;
-                NewVersionText = $"{Localization.Lang.Instance.SettingPage_UpdateAvailable}: v{info.Version}";
-                ReleaseNotesText = info.Notes ?? "";
-                HasUpdate = true;
+                (Application.Current as App)?.ShowUpdateDialog(info);
             }
             else if (result.Status == SelfUpdateCheckStatus.Ignored)
             {
@@ -120,44 +79,6 @@ public sealed partial class AboutSetting : PageBase
         }
     }
 
-
-    private async void OnDownloadClick(object sender, RoutedEventArgs e)
-    {
-        if (_info is null || IsDownloading)
-        {
-            return;
-        }
-        if (!SelfUpdateService.IsPortableLayout)
-        {
-            InAppToast.MainWindow?.Warning(Localization.Lang.Instance.SettingPage_UpdateDevLayout);
-            return;
-        }
-        IsDownloading = true;
-        DownloadProgress = 0;
-        try
-        {
-
-            string newAppDir = await SelfUpdateService.DownloadAndStageAsync(
-                _info, new Progress<double>(p => DownloadProgress = p));
-            SelfUpdateService.InstallNow(newAppDir);
-
-            InAppToast.MainWindow?.Information(Localization.Lang.Instance.SettingPage_UpdateReady, null, 8000);
-        }
-        catch (OperationCanceledException)
-        {
-
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "SelfUpdate: download/install failed");
-            ShowUpdateErrorToast(ex);
-        }
-        finally
-        {
-            IsDownloading = false;
-        }
-    }
-
     private static void ShowUpdateErrorToast(Exception ex)
     {
         if (InAppToast.MainWindow is not { } toast)
@@ -167,5 +88,4 @@ public sealed partial class AboutSetting : PageBase
         (string title, string message) = SelfUpdateService.DescribeFailure(ex);
         toast.Error(title, message);
     }
-
 }

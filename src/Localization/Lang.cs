@@ -139,7 +139,6 @@ public sealed class Lang : INotifyPropertyChanged
     public string PgrResource_BlackCard => T();
     public string PgrResource_Develop => T();
     public string PgrResource_Trade => T();
-    public string PgrResource_SelectPeriod => T();
     public string PgrResource_Composition => T();
     public string PgrResource_MonthlyData => T();
     public string PgrChallenge_NotOpen => T();
@@ -260,6 +259,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string GachaLogPage_ViaCloudGame => T();
 
     public string CloudGame_Title => T();
+
+    public string CloudGame_WindowTitle => T();
     public string CloudGame_Grab => T();
     public string CloudGame_StatusDefault => T();
     public string CloudGame_StatusSessionReady => T();
@@ -353,6 +354,12 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameUpdate_GameRunning => T();
     public string GameUpdate_ErrPatchFailed => T();
     public string GameUpdate_ErrNotEnoughSpaceForPatch => T();
+    public string SpaceCheck_Title => T();
+    public string SpaceCheck_Sub => T();
+    public string SpaceCheck_Retry => T();
+    public string SpaceCheck_Enough => T();
+    public string SpaceCheck_Short => T();
+    public string SpaceCheck_SimEnough => T();
     public string GameUpdate_ErrPatchTool => T();
     public string GameUpdate_ErrTierVersionMismatch => T();
     public string GameUpdate_TierSwitchDone => T();
@@ -378,6 +385,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameLauncherPage_PlayPause => T();
     public string GameLauncherSettingDialog_DragAndDropImageOrVideoFiles => T();
 
+    public string Background_OfficialShort => T();
     public string Background_Official => T();
     public string Background_OfficialStatic => T();
     public string Background_OpenFolder => T();
@@ -474,6 +482,10 @@ public sealed class Lang : INotifyPropertyChanged
     public string Login_Failed => T();
     public string Login_SeekRoleFailed => T();
     public string Login_Success => T();
+    public string Login_CaptchaLoading => T();
+    public string Login_CaptchaCancel => T();
+    public string Login_NeedCaptcha => T();
+    public string Login_CaptchaTitle => T();
 
     public string ResourceBrief_Month => T();
     public string ResourceBrief_Week => T();
@@ -581,7 +593,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string Common_Apply => T();
     public string GameSettingPage_Resolution => T();
     public string GameSettingPage_FullScreen => T();
-    public string GameSettingPage_PgrFullscreenBlockedTip => T();
+    public string GameSettingPage_PgrResolutionUnsupportedTip => T();
     public string GameSettingPage_CustomResolution => T();
     public string GameSettingPage_CustomResolutionTip => T();
     public string GameSettingPage_VoiceLanguage => T();
@@ -653,10 +665,19 @@ public sealed class Lang : INotifyPropertyChanged
 
     public string UpdateWindow_UpdateNow => T();
     public string UpdateWindow_PackageSize => T();
+    public string UpdateWindow_ChannelStable => T();
+    public string UpdateWindow_Arch => T();
+    public string UpdateWindow_BuildTime => T();
     public string UpdateWindow_Channel => T();
     public string UpdateWindow_ReleasePage => T();
     public string UpdateWindow_UpdateHistory => T();
     public string UpdateWindow_LoadingHistory => T();
+    public string UpdateWindow_FullPackage => T();
+    public string UpdateWindow_AutoRestart => T();
+    public string UpdateWindow_ShowNotes => T();
+    public string UpdateWindow_Checking => T();
+    public string UpdateWindow_WhatsNew => T();
+    public string UpdateWindow_NotesUnavailable => T();
     public string UpdateWindow_RemindLater => T();
 
     public string SettingPage_About_Links => T();
@@ -668,6 +689,7 @@ public sealed class Lang : INotifyPropertyChanged
 
     public string Common_Exit => T();
 
+    public string GameSelector_Title => T();
     public string GameSelector_Subtitle => T();
     public string GameSelector_AutoFind => T();
     public string GameSelector_SelectServer => T();

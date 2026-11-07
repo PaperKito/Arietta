@@ -89,9 +89,6 @@ public sealed partial class PgrChallengePage : PageBase
         },
         _moduleTitle);
 
-
-    #region 幻痛囚笼
-
     private async Task FillCageAsync(KuroBbsAccount account)
     {
         var result = await KuroBbsClient.Instance.GetPgrCageDataAsync(account);
@@ -439,11 +436,6 @@ public sealed partial class PgrChallengePage : PageBase
         return KuroBbsUi.KuroCard(grid, padding: new Thickness(14, 10, 14, 10), secondaryBackground: true);
     }
 
-    #endregion
-
-
-    #region 纷争战区
-
     private async Task FillWarAreaAsync(KuroBbsAccount account)
     {
         var result = await KuroBbsClient.Instance.GetPgrWarAreaDataAsync(account);
@@ -756,12 +748,6 @@ public sealed partial class PgrChallengePage : PageBase
         return root;
     }
 
-
-    #endregion
-
-
-    #region 历战映射
-
     private async Task FillTransfiniteAsync(KuroBbsAccount account)
     {
         var result = await KuroBbsClient.Instance.GetPgrTransfiniteDataAsync(account);
@@ -911,28 +897,17 @@ public sealed partial class PgrChallengePage : PageBase
         return root;
     }
 
-    #endregion
-
-
-
-
-    #region 通用渲染
-
     private void ClearBody()
     {
         StackPanel_Body.Children.Clear();
-    }
 
+        TextBlock_Hint.Visibility = Visibility.Collapsed;
+    }
 
     private void AddHint(string text)
     {
-        StackPanel_Body.Children.Add(new TextBlock
-        {
-            Text = text,
-            FontSize = 13,
-            Opacity = 0.6,
-            TextWrapping = TextWrapping.Wrap,
-        });
+        TextBlock_Hint.Text = text;
+        TextBlock_Hint.Visibility = Visibility.Visible;
     }
 
     private void AddSection(string title, JsonElement element)
@@ -1013,5 +988,4 @@ public sealed partial class PgrChallengePage : PageBase
         KuroBbsUi.HandleKuroError(code, msg, _moduleTitle, Lang.Instance.PgrCommon_LoadFailed);
     }
 
-    #endregion
 }

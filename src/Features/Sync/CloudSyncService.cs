@@ -50,9 +50,6 @@ internal sealed class CloudSyncService
 
     public event EventHandler<CloudSyncResult>? StatusChanged;
 
-
-    #region 配置
-
     public void ApplySettings(string serverUrl, string userName, string password,
         bool autoSync, SyncPreference preference)
     {
@@ -75,11 +72,6 @@ internal sealed class CloudSyncService
         _config.AutoSync = autoSync;
         _config.Save();
     }
-
-    #endregion
-
-
-    #region 对外的四个动作
 
     public async Task<CloudSyncResult> TestConnectionAsync(CancellationToken ct = default)
     {
@@ -226,11 +218,6 @@ internal sealed class CloudSyncService
             _gate.Release();
         }
     }
-
-    #endregion
-
-
-    #region 内部实现
 
     private string RemoteFilePath => $"{CloudSyncConfig.RemoteFolder}/{CloudSyncConfig.RemoteFileName}";
 
@@ -390,5 +377,4 @@ internal sealed class CloudSyncService
         catch { }
     }
 
-    #endregion
 }

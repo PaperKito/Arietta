@@ -53,9 +53,6 @@ public sealed partial class CombatPage : PageBase
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = false };
 
-
-    #region 海墟（冥歌海墟）资源与状态
-
     private const int SlashKindForbidden = 0;
     private const int SlashKindRift = 1;
     private const int SlashKindTurbulence = 2;
@@ -101,9 +98,6 @@ public sealed partial class CombatPage : PageBase
     private Dictionary<int, int>? _matrixStarMap;
 
     private int _loadGeneration;
-
-    #endregion
-
 
     public CombatPage()
     {
@@ -200,9 +194,6 @@ public sealed partial class CombatPage : PageBase
             ProgressRing_Loading.IsActive = false;
         }
     }
-
-
-    #region 当期拉取 + 落库（三个玩法）
 
     private async Task<T?> FetchCombatDataAsync<T>(Func<Task<KuroBbsResponse<T>>> fetch, Func<T, bool> unlocked, int generation) where T : class
     {
@@ -374,11 +365,6 @@ public sealed partial class CombatPage : PageBase
         }
         return ResolvePeriodEnd(primary, fallbackEndTime);
     }
-
-    #endregion
-
-
-    #region 期次列表 + 快照渲染
 
     private void PopulatePeriodList(KuroBbsAccount account, long selectPeriodEnd)
     {
@@ -1894,11 +1880,6 @@ public sealed partial class CombatPage : PageBase
         };
     }
 
-    #endregion
-
-
-    #region 逆境深塔（深境区）
-
     private const string TowerStarFile = "TowerStar.png";
 
     private const string TowerStarEmptyFile = "TowerStarEmpty.png";
@@ -2279,11 +2260,6 @@ public sealed partial class CombatPage : PageBase
         };
     }
 
-    #endregion
-
-
-    #region 构建卡片的辅助方法
-
     private void HandleError(int code, string? msg)
     {
         KuroBbsUi.HandleKuroError(code, msg, TextBlock_Title.Text, Lang.Instance.RolePage_LoadFailed);
@@ -2320,9 +2296,6 @@ public sealed partial class CombatPage : PageBase
             TextWrapping = TextWrapping.Wrap,
         });
     }
-
-
-    #endregion
 
 }
 

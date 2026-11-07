@@ -231,20 +231,16 @@ public partial class GachaLogViewModel : ObservableObject
             if (result.Code != 0)
             {
 
-                InAppToast.MainWindow?.ShowWithButton(InfoBarSeverity.Error,
-                                                      Lang.Instance.GachaLogPage_LinkExpired,
-                                                      string.Format(Lang.Instance.GachaLogPage_LinkExpiredDesc, result.Code, result.Message),
-                                                      Lang.Instance.GachaLogPage_RefetchFromCloudGame,
-                                                      () => CloudGameFetchRequested?.Invoke());
+                ShowFetchFailureToast(InfoBarSeverity.Error,
+                                      Lang.Instance.GachaLogPage_LinkExpired,
+                                      string.Format(Lang.Instance.GachaLogPage_LinkExpiredDesc, result.Code, result.Message));
             }
             else
             {
 
-                InAppToast.MainWindow?.ShowWithButton(InfoBarSeverity.Warning,
-                                                      Lang.Instance.GachaLogPage_FetchEmpty,
-                                                      Lang.Instance.GachaLogPage_FetchEmptyDesc,
-                                                      Lang.Instance.GachaLogPage_RefetchFromCloudGame,
-                                                      () => CloudGameFetchRequested?.Invoke());
+                ShowFetchFailureToast(InfoBarSeverity.Warning,
+                                      Lang.Instance.GachaLogPage_FetchEmpty,
+                                      Lang.Instance.GachaLogPage_FetchEmptyDesc);
             }
             return null;
         }
@@ -267,6 +263,19 @@ public partial class GachaLogViewModel : ObservableObject
         }
 
         return renamedCount;
+    }
+
+    private void ShowFetchFailureToast(InfoBarSeverity severity, string title, string message)
+    {
+        if (CloudGameFetchRequested is { } refetch)
+        {
+            InAppToast.MainWindow?.ShowWithButton(severity, title, message,
+                                                  Lang.Instance.GachaLogPage_RefetchFromCloudGame, refetch);
+        }
+        else
+        {
+            InAppToast.MainWindow?.ShowSingle(severity, title, message);
+        }
     }
 
 
@@ -528,13 +537,15 @@ public partial class PoolViewModel : ObservableObject
         Count3Text = $"{stat.Count3} [{Percent(stat.Count3, stat.Total)}%]";
         Is5Selected = true;
 
+        bool showUpColumn = GachaPools.IsEventPool(stat.PoolId);
+
         if (stat.CurrentPity5 > 0)
         {
-            Items5.Add(BarItemViewModel.Current(stat.CurrentPity5, isRarity5: true, stat.EndTime));
+            Items5.Add(BarItemViewModel.Current(stat.CurrentPity5, isRarity5: true, stat.EndTime, showUpColumn));
         }
         foreach (var item in stat.Items5)
         {
-            Items5.Add(BarItemViewModel.History(item, isRarity5: true));
+            Items5.Add(BarItemViewModel.History(item, isRarity5: true, showUpColumn));
         }
         if (stat.CurrentPity4 > 0)
         {
@@ -602,10 +613,13 @@ public sealed class BarItemViewModel : GachaIconItem
     public string Time { get; }
     public int Pity { get; }
     public Brush BarBrush { get; }
-    public Visibility UpVisibility { get; }
+
+    public Visibility UpColumnVisibility { get; }
+
+    public double UpTextOpacity { get; }
 
 
-    private BarItemViewModel(string name, int resourceId, int pity, bool isRarity5, bool isUp, string time)
+    private BarItemViewModel(string name, int resourceId, int pity, bool isRarity5, bool isUp, string time, bool showUpColumn)
     {
 
         Name = GachaNameTable.Translate(resourceId, name, GachaLanguageSettings.Effective) ?? name;
@@ -614,7 +628,8 @@ public sealed class BarItemViewModel : GachaIconItem
         BarBrush = CreateBarBrush(pity,
             isRarity5 ? Pity5Point : Pity4Point,
             isRarity5 ? Pity5Guarantee : Pity4Guarantee);
-        UpVisibility = isUp ? Visibility.Visible : Visibility.Collapsed;
+        UpColumnVisibility = showUpColumn ? Visibility.Visible : Visibility.Collapsed;
+        UpTextOpacity = isUp ? 1 : 0;
 
         Icon = GachaIcon.Load(resourceId);
         IconVisibility = Icon is null ? Visibility.Collapsed : Visibility.Visible;
@@ -624,10 +639,9 @@ public sealed class BarItemViewModel : GachaIconItem
         }
     }
 
+    public static BarItemViewModel Current(int pity, bool isRarity5, string time, bool showUpColumn = false) => new(Lang.Instance.GachaLog_PityBuilt, 0, pity, isRarity5, false, time, showUpColumn);
 
-    public static BarItemViewModel Current(int pity, bool isRarity5, string time) => new(Lang.Instance.GachaLog_PityBuilt, 0, pity, isRarity5, false, time);
-
-    public static BarItemViewModel History(PoolItem item, bool isRarity5) => new(item.Name, item.ResourceId, item.Pity, isRarity5, item.IsUp, item.Time);
+    public static BarItemViewModel History(PoolItem item, bool isRarity5, bool showUpColumn = false) => new(item.Name, item.ResourceId, item.Pity, isRarity5, item.IsUp, item.Time, showUpColumn);
 
 
     private static Brush CreateBarBrush(int pity, int point, int guarantee)

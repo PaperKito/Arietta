@@ -7,8 +7,6 @@ using Arietta.Localization;
 
 namespace Arietta.Features.KuroBbs;
 
-#region 账号概览（haru/roleBox/accountData）
-
 public sealed class KuroPgrAccountData
 {
     [JsonPropertyName("roleId")] public string? RoleId { get; set; }
@@ -17,10 +15,6 @@ public sealed class KuroPgrAccountData
     [JsonPropertyName("level")] public int Level { get; set; }
     [JsonPropertyName("headIconUrl")] public string? HeadIconUrl { get; set; }
 }
-
-#endregion
-
-#region 角色（haru/roleBox/roleIndex）
 
 public sealed class KuroPgrRoleIndex
 {
@@ -59,10 +53,6 @@ public sealed class KuroPgrCharacter
     };
 }
 
-#endregion
-
-#region 资源月报（haru/resource/halfOfYear）
-
 public sealed class KuroPgrResourceReport
 {
     [JsonPropertyName("totalBlackCard")] public int TotalBlackCard { get; set; }
@@ -79,10 +69,6 @@ public sealed class KuroPgrResourceMonth
     [JsonPropertyName("monthDevelopResource")] public int MonthDevelopResource { get; set; }
     [JsonPropertyName("monthTradeCredit")] public int MonthTradeCredit { get; set; }
 }
-
-#endregion
-
-#region 幻痛囚笼（haru/roleBox/prisonerCage）
 
 public sealed class KuroPgrCageData
 {
@@ -135,10 +121,6 @@ public sealed class KuroPgrCageStage
 
     [JsonPropertyName("bodyList")] public List<KuroPgrWarAreaBodyEntry>? BodyList { get; set; }
 }
-
-#endregion
-
-#region 纷争战区（haru/roleBox/area）
 
 public sealed class KuroPgrWarAreaData
 {
@@ -197,10 +179,6 @@ public sealed class KuroPgrSupportBuff
     [JsonPropertyName("name")] public string? Name { get; set; }
 }
 
-#endregion
-
-#region 历战映射（haru/roleBox/transfinite）
-
 public sealed class KuroPgrTransfiniteData
 {
     [JsonPropertyName("isOpen")] public bool IsOpen { get; set; }
@@ -215,11 +193,6 @@ public sealed class KuroPgrTransfiniteData
     [JsonPropertyName("fightTime")] public long FightTime { get; set; }
     [JsonPropertyName("characterList")] public List<KuroPgrCharacter>? CharacterList { get; set; }
 }
-
-#endregion
-
-
-#region 角色深层详情（haru/roleBox/roleDetail）
 
 public sealed class KuroPgrRoleDetailData
 {
@@ -363,5 +336,3 @@ public sealed class KuroPgrChipResonance
 
     [JsonPropertyName("subDescription")] public string? SubDescription { get; set; }
 }
-
-#endregion

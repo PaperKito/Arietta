@@ -35,9 +35,6 @@ public sealed partial class AdbToolPage : PageBase
         base.OnUnloaded();
     }
 
-
-    #region 导航
-
     private void Button_Back_Click(object sender, RoutedEventArgs e)
     {
         try
@@ -49,11 +46,6 @@ public sealed partial class AdbToolPage : PageBase
         }
         catch { }
     }
-
-    #endregion
-
-
-    #region USB 抓取
 
     private void AppendLog(string message)
     {
@@ -290,11 +282,6 @@ public sealed partial class AdbToolPage : PageBase
         }
     }
 
-    #endregion
-
-
-    #region 手动填写 / 保存
-
     private void Button_Save_Click(object sender, RoutedEventArgs e)
     {
         var account = ReadAccountFromInputs();
@@ -335,7 +322,5 @@ public sealed partial class AdbToolPage : PageBase
         account.Did = TextBox_Did.Text.Trim();
         return account;
     }
-
-    #endregion
 
 }

@@ -90,7 +90,6 @@ internal static class LangKo
         ["PgrResource_BlackCard"] = "블랙 카드",
         ["PgrResource_Develop"] = "개발 자원",
         ["PgrResource_Trade"] = "교역 증표",
-        ["PgrResource_SelectPeriod"] = "기간 선택",
         ["PgrResource_Composition"] = "수입 구성",
         ["PgrResource_MonthlyData"] = "월별 데이터",
         ["PgrChallenge_NotOpen"] = "현재는 개방 기간이 아닙니다",
@@ -180,9 +179,6 @@ internal static class LangKo
         ["GameLauncherSettingDialog_BackupAndUninstall"] = "백업 후 제거",
         ["GameLauncherSettingDialog_Uninstalled"] = "게임을 제거했습니다",
 
-        ["CloseDialog_Title"] = "창 닫기",
-        ["CloseDialog_Content"] = "닫기 버튼을 눌렀을 때의 동작을 선택하세요. 나중에 \"설정 → 창 동작\"에서 변경할 수 있습니다.",
-
         ["SettingPage_CurrentVersion"] = "버전:",
 
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
@@ -225,6 +221,7 @@ internal static class LangKo
         ["UpdateWindow_ReleasePage"] = "릴리스 페이지",
         ["UpdateWindow_UpdateHistory"] = "업데이트 기록",
         ["UpdateWindow_LoadingHistory"] = "업데이트 기록을 불러오는 중…",
+        ["UpdateWindow_NotesUnavailable"] = "업데이트 노트를 가져올 수 없습니다.",
         ["UpdateWindow_RemindLater"] = "나중에 알림",
 
         ["SettingPage_About_Links"] = "관련 링크",
@@ -397,6 +394,7 @@ internal static class LangKo
         ["ImageViewWindow2_SaveAs"] = "다른 이름으로 저장",
         ["GameLauncherPage_PlayPause"] = "재생/일시정지",
         ["GameLauncherSettingDialog_DragAndDropImageOrVideoFiles"] = "이미지 파일을 끌어다 놓아 배경 변경",
+        ["Background_OfficialShort"] = "공식",
         ["Background_Official"] = "공식 애니메이션 배경",
         ["Background_OfficialStatic"] = "공식 정적 배경",
         ["Background_OpenFolder"] = "배경 폴더 열기",
@@ -467,7 +465,7 @@ internal static class LangKo
         ["Login_PhonePlaceholder"] = "휴대폰 번호",
         ["Login_CodePlaceholder"] = "SMS 인증번호",
         ["Login_CodeLabel"] = "인증번호",
-        ["Login_SmsTip"] = "'인증번호 보내기'를 누른 뒤 휴대폰으로 받은 SMS 인증번호를 입력하세요. 로그인에 성공하면 계정이 자동 저장됩니다.",
+        ["Login_SmsTip"] = "쿠로 BBS는 단일 기기 로그인만 지원합니다. 로그인 후에는 모바일에서 쿠로 BBS를 사용할 수 없습니다",
         ["Login_SendCode"] = "인증번호 보내기",
         ["Login_Confirm"] = "로그인",
         ["Login_Cancel"] = "취소",
@@ -481,6 +479,10 @@ internal static class LangKo
         ["Login_Failed"] = "로그인 실패: {0}",
         ["Login_SeekRoleFailed"] = "연동 캐릭터 조회 실패: {0}",
         ["Login_Success"] = "쿠로 BBS 계정 '{0}' 로그인 성공",
+        ["Login_CaptchaLoading"] = "보안 인증을 불러오는 중입니다. 슬라이더 인증을 완료하세요…",
+        ["Login_CaptchaCancel"] = "보안 인증이 완료되지 않았습니다(취소·불러오기 실패·시간 초과). 다시 시도하거나 토큰 로그인을 이용하세요",
+        ["Login_NeedCaptcha"] = "SMS가 전송되지 않았습니다: 슬라이더 인증이 필요하거나 인증번호 요청이 너무 잦습니다",
+        ["Login_CaptchaTitle"] = "보안 인증",
 
         ["ResourceBrief_Month"] = "월간",
         ["ResourceBrief_Week"] = "주간",
@@ -546,7 +548,7 @@ internal static class LangKo
 
         ["GameSettingPage_Resolution"] = "해상도",
         ["GameSettingPage_FullScreen"] = "전체 화면",
-        ["GameSettingPage_PgrFullscreenBlockedTip"] = "현재 디스플레이 해상도가 게임 지원 상한을 초과하여 전체 화면을 정상적으로 사용할 수 없습니다",
+        ["GameSettingPage_PgrResolutionUnsupportedTip"] = "현재 해상도 {0} × {1}은(는) 전체 화면 모드를 지원하지 않습니다",
         ["GameSettingPage_CustomResolution"] = "사용자 지정 해상도",
         ["GameSettingPage_CustomResolutionTip"] = "사용자 지정 해상도는 '창 모드'에서 적용됩니다",
         ["GameSettingPage_VoiceLanguage"] = "음성 언어",
@@ -566,6 +568,9 @@ internal static class LangKo
         ["SettingPage_WindowBehavior"] = "창 동작",
         ["SettingPage_CloseWindowOption"] = "창 닫기 옵션",
         ["SettingPage_ExitApp"] = "완전 종료",
+
+        ["CloseDialog_Title"] = "창 닫기 옵션",
+        ["CloseDialog_Content"] = "이 옵션은 설정 페이지에서 다시 변경할 수 있습니다.",
         ["SettingPage_AfterLaunchOption"] = "게임 실행 후",
         ["SettingPage_KeepWindow"] = "창 유지",
         ["SettingPage_AfterGameExitOption"] = "게임 종료 후",
@@ -577,7 +582,8 @@ internal static class LangKo
         ["SettingPage_TransparencyEffects"] = "투명 효과",
         ["SettingPage_AnimationEffects"] = "애니메이션 효과",
 
-        ["GameSelector_Subtitle"] = "왼쪽 위 아이콘을 눌러 게임을 선택하거나 전환하세요",
+        ["GameSelector_Title"] = "Arietta에 오신 것을 환영합니다",
+        ["GameSelector_Subtitle"] = "왼쪽 위 아이콘을 눌러 게임을 선택하거나 전환하세요\n게임을 선택하면 Arietta를 시작할 수 있습니다",
         ["GameSelector_AutoFind"] = "설치된 게임 자동 찾기",
         ["GameSelector_SelectServer"] = "서버 선택",
         ["GameSelector_InstalledSize"] = "설치된 게임의 실제 디스크 사용량 ",

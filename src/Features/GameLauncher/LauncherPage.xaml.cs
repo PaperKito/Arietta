@@ -68,17 +68,11 @@ public sealed partial class LauncherPage : PageBase
 
     public GameBiz CurrentGameBiz { get; private set => SetProperty(ref field, value); } = ViewHost.MainView.CurrentGameBiz;
 
-
-    #region 更新 / 预下载（借鉴 Starward 更新模块，数据来自库洛官方启动器接口）
-
     private GameUpdateService.GameUpdateState? _updateState;
 
     private bool _updateBusy => GameUpdateSession.Current.IsActiveFor(CurrentGameBiz);
 
     private bool _updateSessionWasActive;
-
-    #endregion
-
 
     public LauncherPage()
     {
@@ -315,14 +309,12 @@ public sealed partial class LauncherPage : PageBase
         DynamicBackgroundStore.Updated -= OnDynamicBackgroundUpdated;
     }
 
-
-    #region 背景切换条（照搬 Starward GameLauncherPage 的底部切换条）
-
-    private void InitializeBackgroundSwitcher()
+    private async void InitializeBackgroundSwitcher()
     {
         try
         {
-            BackgroundImages = BackgroundGallery.GetItems(CurrentGameBiz);
+            List<BackgroundItem> items = BackgroundGallery.GetItems(CurrentGameBiz);
+            BackgroundImages = items;
             var current = BackgroundGallery.Resolve(CurrentGameBiz);
             int index = BackgroundImages.FindIndex(x => x.Id == current?.Id);
             if (index < 0)
@@ -339,6 +331,11 @@ public sealed partial class LauncherPage : PageBase
             Border_SwitchBackgroundImage.Visibility = BackgroundImages.Count > 1
                 ? Visibility.Visible
                 : Visibility.Collapsed;
+
+            if (await BackgroundGallery.EnsureVideoThumbnailsAsync(items))
+            {
+                BackgroundImages = new List<BackgroundItem>(items);
+            }
         }
         catch (Exception ex)
         {
@@ -515,13 +512,6 @@ public sealed partial class LauncherPage : PageBase
         }
     }
 
-
-    #endregion
-
-
-    #region 拖放换背景（照搬 Starward：整页都是放置区，放进去即添加并选中）
-
-
     private void RootGrid_DragOver(object sender, DragEventArgs e)
     {
         if (e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
@@ -567,12 +557,6 @@ public sealed partial class LauncherPage : PageBase
         AppConfig.SetConfig(GameRegistry.GetEnableCustomBgConfigKey(CurrentGameBiz), "1");
         BackgroundGallery.SetSelectedId(CurrentGameBiz, name);
     }
-
-
-    #endregion
-
-
-    #region 更新 / 预下载（借鉴 Starward 更新模块，数据来自库洛官方启动器接口）
 
     private async Task RefreshUpdateStateAsync()
     {
@@ -979,12 +963,6 @@ public sealed partial class LauncherPage : PageBase
         Button_StartGame.GameCommand = PauseGameUpdateCommand;
     }
 
-
-    #endregion
-
-
-    #region 定位游戏（对齐 Starward 的「已安装？ 定位游戏」）
-
     private async void Hyperlink_LocateGame_Click(object sender, RoutedEventArgs e)
     {
         var biz = CurrentGameBiz;
@@ -1053,9 +1031,6 @@ public sealed partial class LauncherPage : PageBase
         return null;
     }
 
-    #endregion
-
-
     private void UpdateGameState()
     {
 
@@ -1086,9 +1061,6 @@ public sealed partial class LauncherPage : PageBase
         }
         ApplyUpdateStateToMainButton();
     }
-
-
-    #region 游戏运行中：本次实时时长（对齐 Starward 的 GameProcess + RunningGameTime）
 
     private Process? _runningProcess;
 
@@ -1195,6 +1167,24 @@ public sealed partial class LauncherPage : PageBase
         }
         if (!PlayTimeRecordService.HasOwnStartRecord(biz, running.Id))
         {
+
+            bool restarted = false;
+            try
+            {
+                restarted = PlayTimeRecordService.IsOwnRestartedSession(biz, running.Id, running.StartTime);
+            }
+            catch
+            {
+
+            }
+            if (restarted)
+            {
+                AppConfig.GetLogger<LauncherPage>().LogInformation(
+                    "Game process of {biz} (pid {pid}) is a restarted session, retake running state and re-attach logger", biz, running.Id);
+                EnterRunningState(biz);
+                _ = _recordService.StartProcessToLogAsync(new GameId(biz, biz.ToString()), running.Id);
+                return;
+            }
 
             AppConfig.GetLogger<LauncherPage>().LogInformation("Game process of {biz} (pid {pid}) has no Start record yet, will retry takeover", biz, running.Id);
             _ = RetryEnterRunningStateAsync(biz, running.Id);
@@ -1315,6 +1305,9 @@ public sealed partial class LauncherPage : PageBase
     {
         string? info = null;
         string? timeText = null;
+        int adoptedPid = 0;
+        DateTime adoptedStart = default;
+        bool wasAdopted;
         lock (_runningGate)
         {
             if (_runningBiz != biz)
@@ -1323,6 +1316,8 @@ public sealed partial class LauncherPage : PageBase
                 client.Dispose();
                 return;
             }
+
+            wasAdopted = _runningAdopted;
             _runningProcess?.Dispose();
             _runningProcess = client;
             _runningAdopted = true;
@@ -1335,6 +1330,8 @@ public sealed partial class LauncherPage : PageBase
                 {
                     timeText = TimeSpanToString(DateTime.Now - s);
                 }
+                adoptedPid = client.Id;
+                adoptedStart = start;
                 info = $"{client.ProcessName}.exe ({client.Id})";
                 AppConfig.GetLogger<LauncherPage>().LogInformation("Adopted game process: {biz}, {name} ({pid}), started at {start}", biz, client.ProcessName, client.Id, start);
             }
@@ -1342,6 +1339,13 @@ public sealed partial class LauncherPage : PageBase
             {
 
             }
+        }
+
+        if (wasAdopted && adoptedPid > 0 && PlayTimeRecordService.IsOwnRestartedSession(biz, adoptedPid, adoptedStart))
+        {
+            AppConfig.GetLogger<LauncherPage>().LogInformation(
+                "Game process of {biz} restarted as pid {pid}, re-attach playtime logger", biz, adoptedPid);
+            _ = _recordService.StartProcessToLogAsync(new GameId(biz, biz.ToString()), adoptedPid);
         }
         DispatcherQueue.TryEnqueue(() =>
         {
@@ -1377,9 +1381,6 @@ public sealed partial class LauncherPage : PageBase
     {
         return $"{value.Days * 24 + value.Hours:D2}:{value.Minutes:D2}:{value.Seconds:D2}";
     }
-
-
-    #endregion
 
     private void StartPlayTimeRecording(Process? launchedProcess)
     {

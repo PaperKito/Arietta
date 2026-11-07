@@ -90,7 +90,6 @@ internal static class LangFr
         ["PgrResource_BlackCard"] = "Cartes noires",
         ["PgrResource_Develop"] = "Ressources de R&D",
         ["PgrResource_Trade"] = "Bons d'échange",
-        ["PgrResource_SelectPeriod"] = "Choisir la période",
         ["PgrResource_Composition"] = "Répartition des revenus",
         ["PgrResource_MonthlyData"] = "Données mensuelles",
         ["PgrChallenge_NotOpen"] = "Hors période d'ouverture",
@@ -180,9 +179,6 @@ internal static class LangFr
         ["GameLauncherSettingDialog_BackupAndUninstall"] = "Sauvegarder et désinstaller",
         ["GameLauncherSettingDialog_Uninstalled"] = "Jeu désinstallé",
 
-        ["CloseDialog_Title"] = "Fermer la fenêtre",
-        ["CloseDialog_Content"] = "Choisissez le comportement du bouton de fermeture. Vous pourrez le modifier dans « Paramètres → Comportement de la fenêtre ».",
-
         ["SettingPage_CurrentVersion"] = "Version :",
 
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
@@ -225,6 +221,7 @@ internal static class LangFr
         ["UpdateWindow_ReleasePage"] = "Page de publication",
         ["UpdateWindow_UpdateHistory"] = "Historique des mises à jour",
         ["UpdateWindow_LoadingHistory"] = "Chargement de l'historique…",
+        ["UpdateWindow_NotesUnavailable"] = "Notes de version indisponibles pour le moment.",
         ["UpdateWindow_RemindLater"] = "Me rappeler plus tard",
 
         ["SettingPage_About_Links"] = "Liens utiles",
@@ -397,6 +394,7 @@ internal static class LangFr
         ["ImageViewWindow2_SaveAs"] = "Enregistrer sous",
         ["GameLauncherPage_PlayPause"] = "Lecture/Pause",
         ["GameLauncherSettingDialog_DragAndDropImageOrVideoFiles"] = "Déposez des fichiers image pour changer le fond",
+        ["Background_OfficialShort"] = "Officiel",
         ["Background_Official"] = "Fond animé officiel",
         ["Background_OfficialStatic"] = "Fond statique officiel",
         ["Background_OpenFolder"] = "Ouvrir le dossier des fonds",
@@ -467,7 +465,7 @@ internal static class LangFr
         ["Login_PhonePlaceholder"] = "Numéro de téléphone",
         ["Login_CodePlaceholder"] = "Code SMS",
         ["Login_CodeLabel"] = "Code SMS",
-        ["Login_SmsTip"] = "Appuyez sur « Envoyer le code », puis saisissez le code reçu par SMS. Le compte est enregistré automatiquement après une connexion réussie.",
+        ["Login_SmsTip"] = "Kuro BBS n'autorise qu'un seul appareil connecté. Après la connexion, l'application mobile ne pourra plus utiliser Kuro BBS.",
         ["Login_SendCode"] = "Envoyer le code",
         ["Login_Confirm"] = "Se connecter",
         ["Login_Cancel"] = "Annuler",
@@ -481,6 +479,10 @@ internal static class LangFr
         ["Login_Failed"] = "Échec de la connexion : {0}",
         ["Login_SeekRoleFailed"] = "Échec de la recherche du personnage lié : {0}",
         ["Login_Success"] = "Compte Kuro BBS « {0} » connecté",
+        ["Login_CaptchaLoading"] = "Chargement de la vérification de sécurité — effectuez le glissement…",
+        ["Login_CaptchaCancel"] = "Vérification non terminée (annulée, échec de chargement ou délai dépassé). Réessayez ou connectez-vous avec un Token.",
+        ["Login_NeedCaptcha"] = "Aucun SMS envoyé : vérification par glissement requise, ou trop de demandes de code.",
+        ["Login_CaptchaTitle"] = "Vérification de sécurité",
 
         ["ResourceBrief_Month"] = "Mensuel",
         ["ResourceBrief_Week"] = "Hebdomadaire",
@@ -546,7 +548,7 @@ internal static class LangFr
 
         ["GameSettingPage_Resolution"] = "Résolution",
         ["GameSettingPage_FullScreen"] = "Plein écran",
-        ["GameSettingPage_PgrFullscreenBlockedTip"] = "La résolution de votre écran dépasse le maximum pris en charge par le jeu, le plein écran n'est donc pas disponible",
+        ["GameSettingPage_PgrResolutionUnsupportedTip"] = "La résolution actuelle {0} × {1} ne prend pas en charge le mode plein écran",
         ["GameSettingPage_CustomResolution"] = "Résolution personnalisée",
         ["GameSettingPage_CustomResolutionTip"] = "La résolution personnalisée s'applique en mode « Fenêtré »",
         ["GameSettingPage_VoiceLanguage"] = "Langue vocale",
@@ -566,6 +568,9 @@ internal static class LangFr
         ["SettingPage_WindowBehavior"] = "Comportement de la fenêtre",
         ["SettingPage_CloseWindowOption"] = "À la fermeture de la fenêtre",
         ["SettingPage_ExitApp"] = "Quitter l'application",
+
+        ["CloseDialog_Title"] = "Options de fermeture de la fenêtre",
+        ["CloseDialog_Content"] = "Vous pouvez modifier cette option à nouveau dans la page Paramètres.",
         ["SettingPage_AfterLaunchOption"] = "Après le lancement du jeu",
         ["SettingPage_KeepWindow"] = "Garder la fenêtre",
         ["SettingPage_AfterGameExitOption"] = "Après la fermeture du jeu",
@@ -577,7 +582,8 @@ internal static class LangFr
         ["SettingPage_TransparencyEffects"] = "Effets de transparence",
         ["SettingPage_AnimationEffects"] = "Effets d'animation",
 
-        ["GameSelector_Subtitle"] = "Appuyez sur l'icône en haut à gauche pour choisir ou changer de jeu",
+        ["GameSelector_Title"] = "Bienvenue dans Arietta",
+        ["GameSelector_Subtitle"] = "Appuyez sur l'icône en haut à gauche pour choisir ou changer de jeu\nChoisissez un jeu pour commencer à utiliser Arietta",
         ["GameSelector_AutoFind"] = "Détecter les jeux installés",
         ["GameSelector_SelectServer"] = "Sélectionner le serveur",
         ["GameSelector_InstalledSize"] = "Espace disque réellement occupé par les jeux installés ",

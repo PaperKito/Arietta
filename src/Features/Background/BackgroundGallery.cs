@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Media;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Arietta.Core;
 using Arietta.Localization;
@@ -6,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Arietta.Features.Background;
@@ -22,6 +25,16 @@ public sealed class BackgroundItem
     public string Id { get; set; } = "";
 
     public string Name { get; set; } = "";
+
+    public string Description { get; set; } = "";
+
+    public string BadgeGlyph { get; set; } = "";
+
+    public Visibility BadgeVisibility { get; set; } = Visibility.Collapsed;
+
+    public Visibility PlaceholderVisibility => Thumbnail is null ? Visibility.Visible : Visibility.Collapsed;
+
+    public string PlaceholderGlyph => IsVideo ? "\uE768" : "\uE91B";
 
     public string? FilePath { get; set; }
 
@@ -78,7 +91,10 @@ public static class BackgroundGallery
             items.Add(new BackgroundItem
             {
                 Id = OfficialId,
-                Name = Lang.Instance.Background_Official,
+                Name = Lang.Instance.Background_OfficialShort,
+                Description = Lang.Instance.Background_Official,
+                BadgeGlyph = "\uE768",
+                BadgeVisibility = Visibility.Visible,
                 FilePath = local.VideoPath,
                 Kind = IsVideoPath(local.VideoPath) ? BackgroundKind.Video : BackgroundKind.Image,
                 IsOfficial = true,
@@ -90,7 +106,10 @@ public static class BackgroundGallery
                 items.Add(new BackgroundItem
                 {
                     Id = OfficialStaticId,
-                    Name = Lang.Instance.Background_OfficialStatic,
+                    Name = Lang.Instance.Background_OfficialShort,
+                    Description = Lang.Instance.Background_OfficialStatic,
+                    BadgeGlyph = "\uE91B",
+                    BadgeVisibility = Visibility.Visible,
                     FilePath = local.PosterPath,
                     Kind = BackgroundKind.Image,
                     IsOfficial = true,
@@ -103,10 +122,12 @@ public static class BackgroundGallery
         {
             foreach (string file in ListBackgroundFiles(biz))
             {
+                string name = Path.GetFileNameWithoutExtension(file);
                 items.Add(new BackgroundItem
                 {
                     Id = Path.GetFileName(file),
-                    Name = Path.GetFileNameWithoutExtension(file),
+                    Name = name,
+                    Description = name,
                     FilePath = file,
                     Kind = IsVideoPath(file) ? BackgroundKind.Video : BackgroundKind.Image,
                     Thumbnail = BuildThumbnail(file),
@@ -230,10 +251,18 @@ public static class BackgroundGallery
         try
         {
             const int decodeWidth = 232;
-
-            if (string.IsNullOrWhiteSpace(path) || IsVideoPath(path) || !File.Exists(path))
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
             {
                 return null;
+            }
+            if (IsVideoPath(path))
+            {
+                string cache = VideoThumbnailCachePath(path);
+                if (!File.Exists(cache))
+                {
+                    return null;
+                }
+                path = cache;
             }
 
             return new BitmapImage(new Uri(path))
@@ -245,6 +274,58 @@ public static class BackgroundGallery
         catch
         {
             return null;
+        }
+    }
+
+    private static string VideoThumbnailCachePath(string videoPath)
+    {
+        FileInfo info = new(videoPath);
+        string key = $"{info.Name}|{info.Length}|{info.LastWriteTimeUtc.Ticks}";
+        return Path.Combine(Folder, ".thumbs", Convert.ToHexString(MD5.HashData(Encoding.UTF8.GetBytes(key))) + ".png");
+    }
+
+    public static async Task<bool> EnsureVideoThumbnailsAsync(IReadOnlyList<BackgroundItem> items)
+    {
+        bool changed = false;
+        foreach (BackgroundItem item in items)
+        {
+            if (item.Thumbnail is not null || item.FilePath is not { Length: > 0 } path
+                || !IsVideoPath(path) || !File.Exists(path))
+            {
+                continue;
+            }
+            string cache = VideoThumbnailCachePath(path);
+            if (!File.Exists(cache) && !await ExtractFirstFrameAsync(path, cache))
+            {
+                continue;
+            }
+            item.Thumbnail = BuildThumbnail(cache);
+            changed |= item.Thumbnail is not null;
+        }
+        return changed;
+    }
+
+    private static async Task<bool> ExtractFirstFrameAsync(string videoPath, string cachePath)
+    {
+        try
+        {
+            return await Task.Run(async () =>
+            {
+                var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(videoPath);
+                var clip = await Windows.Media.Editing.MediaClip.CreateFromFileAsync(file);
+                var composition = new Windows.Media.Editing.MediaComposition();
+                composition.Clips.Add(clip);
+                using var frame = await composition.GetThumbnailAsync(TimeSpan.Zero, 232, 130,
+                    Windows.Media.Editing.VideoFramePrecision.NearestFrame);
+                Directory.CreateDirectory(Path.GetDirectoryName(cachePath)!);
+                using var output = File.Create(cachePath);
+                await frame.AsStreamForRead().CopyToAsync(output);
+                return new FileInfo(cachePath).Length > 0;
+            });
+        }
+        catch
+        {
+            return false;
         }
     }
 

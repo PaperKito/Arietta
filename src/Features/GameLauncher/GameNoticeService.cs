@@ -279,9 +279,6 @@ public static class GameNoticeService
     private static string Lang_GameNotice => Arietta.Localization.Lang.Instance.Notice_NoticeTab;
     private static string Lang_GameNews => Arietta.Localization.Lang.Instance.Notice_News;
 
-
-    #region 接口 JSON 结构（camelCase 原样）
-
     public sealed class LauncherInformation
     {
         [JsonPropertyName("guidance")]
@@ -333,5 +330,4 @@ public static class GameNoticeService
         public string? JumpUrl { get; set; }
     }
 
-    #endregion
 }

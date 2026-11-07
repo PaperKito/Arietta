@@ -68,6 +68,8 @@ public partial class App : Application
 
         _ = Features.Setting.SelfUpdateService.CleanupLeftoversAsync();
 
+        ShowWhatsNewIfJustUpdated();
+
         _ = Features.Setting.SelfUpdateService.AutoCheckAsync();
 
         if (AppConfig.CommandLineArgs.Contains("--fake-update"))
@@ -81,6 +83,38 @@ public partial class App : Application
                 "- 点「立即更新」在开发树只会提示开发布局，不会真下载",
                 "https://example.invalid/Arietta-portable.zip", 0, null));
             fakeTimer.Start();
+        }
+
+        if (AppConfig.CommandLineArgs.Contains("--fake-space-check")
+            || Features.GameLauncher.SpaceCheckDialog.HasSimConfig())
+        {
+            var spaceTimer = new System.Timers.Timer(1500) { AutoReset = false };
+            spaceTimer.Elapsed += (_, _) => _uiDispatcherQueue.TryEnqueue(ShowSpaceCheckSim);
+            spaceTimer.Start();
+        }
+
+        if (AppConfig.CommandLineArgs.Contains("--fake-whatsnew"))
+        {
+            var whatsNewTimer = new System.Timers.Timer(3000) { AutoReset = false };
+            whatsNewTimer.Elapsed += (_, _) => _uiDispatcherQueue.TryEnqueue(() =>
+            {
+                try
+                {
+                    m_whatsNewWindow = new Features.Setting.UpdateWindow(
+                        new Features.Setting.SelfUpdateInfo(
+                            "1.0.1", "https://github.com/PaperKito/Arietta/releases/tag/v1.0.1",
+                            null, string.Empty, 0, null),
+                        whatsNew: true, fromVersion: "1.0.0");
+                    m_whatsNewWindow.Closed += (_, _) => m_whatsNewWindow = null;
+                    m_whatsNewWindow.Show();
+                    m_whatsNewWindow.BringToFront();
+                }
+                catch (Exception ex)
+                {
+                    AppConfig.GetLogger<App>().LogWarning(ex, "Failed to show fake whats-new window");
+                }
+            });
+            whatsNewTimer.Start();
         }
 
         _ = Features.KuroBbs.KuroBbsAutoSignService.RunDailyOnceAsync();
@@ -149,24 +183,207 @@ public partial class App : Application
 
     private Features.Setting.UpdateWindow? m_updateWindow;
 
+    private Features.Setting.UpdateWindow? m_whatsNewWindow;
+
+    private Features.Setting.SelfUpdateInfo? m_pendingUpdateInfo;
+
+    public void ShowUpdateDialogWaiting()
+    {
+        _uiDispatcherQueue.TryEnqueue(() =>
+        {
+            try
+            {
+
+                if (m_updateWindow is not null || m_whatsNewWindow is not null)
+                {
+                    return;
+                }
+                m_updateWindow = new Features.Setting.UpdateWindow();
+                m_updateWindow.Closed += (_, _) => m_updateWindow = null;
+                m_updateWindow.Show();
+
+                m_updateWindow.EnsureForeground();
+                RaiseLater(m_updateWindow, 900);
+                RaiseLater(m_updateWindow, 2000);
+            }
+            catch (Exception ex)
+            {
+                AppConfig.GetLogger<App>().LogWarning(ex, "Failed to show waiting update window");
+            }
+        });
+    }
+
+    public void ApplyUpdateInfo(Features.Setting.SelfUpdateInfo info)
+    {
+        _uiDispatcherQueue.TryEnqueue(() =>
+        {
+
+            if (m_whatsNewWindow is not null)
+            {
+                m_pendingUpdateInfo = info;
+                return;
+            }
+            if (m_updateWindow is null)
+            {
+                ShowUpdateDialog(info);
+                return;
+            }
+            m_updateWindow.ApplyInfo(info);
+            m_updateWindow.EnsureForeground();
+        });
+    }
+
+    public void CloseUpdateDialog()
+    {
+
+        _uiDispatcherQueue.TryEnqueue(() =>
+        {
+            if (m_updateWindow is { IsWaiting: true })
+            {
+                m_updateWindow.Close();
+            }
+        });
+    }
+
+    private static void RaiseLater(Features.Setting.UpdateWindow window, int delayMs)
+    {
+        Microsoft.UI.Dispatching.DispatcherQueueTimer timer = window.DispatcherQueue.CreateTimer();
+        timer.Interval = TimeSpan.FromMilliseconds(delayMs);
+        timer.IsRepeating = false;
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            try
+            {
+                window.EnsureForeground();
+            }
+            catch
+            {
+
+            }
+        };
+        timer.Start();
+    }
+
+
     public void ShowUpdateDialog(Features.Setting.SelfUpdateInfo info)
     {
         _uiDispatcherQueue.TryEnqueue(() =>
         {
             try
             {
+                if (m_whatsNewWindow is not null)
+                {
+
+                    m_pendingUpdateInfo = info;
+                    return;
+                }
                 if (m_updateWindow is null)
                 {
                     m_updateWindow = new Features.Setting.UpdateWindow(info);
                     m_updateWindow.Closed += (_, _) => m_updateWindow = null;
                 }
+                else
+                {
+
+                    m_updateWindow.ApplyInfo(info);
+                }
                 m_updateWindow.Show();
+
+                m_updateWindow.EnsureForeground();
+                RaiseLater(m_updateWindow, 700);
+                RaiseLater(m_updateWindow, 2000);
             }
             catch (Exception ex)
             {
                 AppConfig.GetLogger<App>().LogWarning(ex, "Failed to show update window");
             }
         });
+    }
+
+    private void ShowWhatsNewIfJustUpdated()
+    {
+        string current = AppConfig.AppVersion;
+        string? last = AppConfig.GetConfig("LastAppVersion");
+        if (string.Equals(last, current, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+        AppConfig.SetConfig("LastAppVersion", current);
+        if (last is null)
+        {
+            return;
+        }
+        if (string.Equals(AppConfig.GetConfig("ShowUpdateContentAfterUpdateRestart"), "off", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+        _uiDispatcherQueue.TryEnqueue(() =>
+        {
+            try
+            {
+                if (m_whatsNewWindow is not null)
+                {
+                    return;
+                }
+                if (m_updateWindow is not null)
+                {
+
+                    AppConfig.GetLogger<App>().LogInformation(
+                        "Whats-new skipped: update prompt window is already open");
+                    return;
+                }
+
+                m_whatsNewWindow = new Features.Setting.UpdateWindow(
+                    Features.Setting.SelfUpdateService.CurrentVersionInfo(), whatsNew: true, fromVersion: last);
+                m_whatsNewWindow.Closed += (_, _) =>
+                {
+                    m_whatsNewWindow = null;
+
+                    if (m_pendingUpdateInfo is { } pending)
+                    {
+                        m_pendingUpdateInfo = null;
+                        ShowUpdateDialog(pending);
+                    }
+                };
+                m_whatsNewWindow.Show();
+                m_whatsNewWindow.EnsureForeground();
+
+                RaiseLater(m_whatsNewWindow, 700);
+                RaiseLater(m_whatsNewWindow, 2000);
+            }
+            catch (Exception ex)
+            {
+                AppConfig.GetLogger<App>().LogWarning(ex, "Failed to show whats-new window");
+            }
+        });
+    }
+
+    private void ShowSpaceCheckSim()
+    {
+        try
+        {
+            var cfg = Features.GameLauncher.SpaceCheckDialog.LoadConfig();
+            if (cfg.Enough && !cfg.ForceShow)
+            {
+                AppConfig.GetLogger<App>().LogInformation(
+                    "Space check sim: enough ({Available}GB >= {Required}GB), no dialog",
+                    cfg.AvailableGB, cfg.RequiredGB);
+                Arietta.Helpers.InAppToast.MainWindow?.Information(
+                    Arietta.Localization.Lang.Instance.SpaceCheck_SimEnough);
+                return;
+            }
+            var dialog = new Features.GameLauncher.SpaceCheckDialog
+            {
+                XamlRoot = ((FrameworkElement)m_MainWindow.Content).XamlRoot,
+            };
+            _ = dialog.ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            AppConfig.GetLogger<App>().LogWarning(ex, "Failed to show space check sim dialog");
+            Arietta.Helpers.InAppToast.MainWindow?.Error(ex, "Space check sim");
+        }
     }
 
 
@@ -176,11 +393,35 @@ public partial class App : Application
         m_MainWindow.Activate();
         m_MainWindow.Show();
 
+        m_MainWindow.RestoreAndBringToFront();
+        RaiseMainWindowLater(900);
+
         _ = Features.KuroBbs.KuroBbsAutoSignService.RunDailyOnceAsync();
+    }
+
+    private void RaiseMainWindowLater(int delayMs)
+    {
+        MainWindow? window = m_MainWindow;
+        if (window is null)
+        {
+            return;
+        }
+        Microsoft.UI.Dispatching.DispatcherQueueTimer raise = window.DispatcherQueue.CreateTimer();
+        raise.Interval = TimeSpan.FromMilliseconds(delayMs);
+        raise.IsRepeating = false;
+        raise.Tick += (_, _) =>
+        {
+            raise.Stop();
+            try { window.EnsureForeground(); }
+            catch { }
+        };
+        raise.Start();
     }
 
     private void AppInstance_Activated(object? sender, AppActivationArguments e)
     {
+
+        AppConfig.GetLogger<App>().LogInformation("Second instance activation forwarded, restoring main window");
         _uiDispatcherQueue.TryEnqueue(EnsureMainWindow);
     }
 

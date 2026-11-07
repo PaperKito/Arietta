@@ -90,7 +90,6 @@ internal static class LangTh
         ["PgrResource_BlackCard"] = "การ์ดดำ",
         ["PgrResource_Develop"] = "ทรัพยากรวิจัยพัฒนา",
         ["PgrResource_Trade"] = "ตั๋วแลกเปลี่ยนการค้า",
-        ["PgrResource_SelectPeriod"] = "เลือกช่วงเวลา",
         ["PgrResource_Composition"] = "องค์ประกอบรายได้",
         ["PgrResource_MonthlyData"] = "ข้อมูลรายเดือน",
         ["PgrChallenge_NotOpen"] = "ไม่ได้อยู่ในช่วงเปิดใช้งาน",
@@ -180,9 +179,6 @@ internal static class LangTh
         ["GameLauncherSettingDialog_BackupAndUninstall"] = "สำรองและถอนการติดตั้ง",
         ["GameLauncherSettingDialog_Uninstalled"] = "ถอนการติดตั้งเกมแล้ว",
 
-        ["CloseDialog_Title"] = "ปิดหน้าต่าง",
-        ["CloseDialog_Content"] = "เลือกพฤติกรรมเมื่อกดปุ่มปิด สามารถเปลี่ยนได้ภายหลังที่ «ตั้งค่า → พฤติกรรมหน้าต่าง»",
-
         ["SettingPage_CurrentVersion"] = "เวอร์ชัน:",
 
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
@@ -225,6 +221,7 @@ internal static class LangTh
         ["UpdateWindow_ReleasePage"] = "หน้าเผยแพร่",
         ["UpdateWindow_UpdateHistory"] = "ประวัติการอัปเดต",
         ["UpdateWindow_LoadingHistory"] = "กำลังโหลดประวัติการอัปเดต…",
+        ["UpdateWindow_NotesUnavailable"] = "ไม่สามารถดึงบันทึกปรับปรุงได้ในขณะนี้",
         ["UpdateWindow_RemindLater"] = "เตือนภายหลัง",
 
         ["SettingPage_About_Links"] = "ลิงก์ที่เกี่ยวข้อง",
@@ -397,6 +394,7 @@ internal static class LangTh
         ["ImageViewWindow2_SaveAs"] = "บันทึกเป็น",
         ["GameLauncherPage_PlayPause"] = "เล่น/พัก",
         ["GameLauncherSettingDialog_DragAndDropImageOrVideoFiles"] = "ลากไฟล์รูปภาพมาวางเพื่อเปลี่ยนพื้นหลัง",
+        ["Background_OfficialShort"] = "ทางการ",
         ["Background_Official"] = "พื้นหลังแอนิเมชันอย่างเป็นทางการ",
         ["Background_OfficialStatic"] = "พื้นหลังนิ่งอย่างเป็นทางการ",
         ["Background_OpenFolder"] = "เปิดโฟลเดอร์พื้นหลัง",
@@ -467,7 +465,7 @@ internal static class LangTh
         ["Login_PhonePlaceholder"] = "หมายเลขโทรศัพท์",
         ["Login_CodePlaceholder"] = "รหัส SMS",
         ["Login_CodeLabel"] = "รหัส SMS",
-        ["Login_SmsTip"] = "กด \"ส่งรหัส\" แล้วกรอกรหัส SMS ที่ได้รับ หากเข้าสู่ระบบสำเร็จจะบันทึกบัญชีให้อัตโนมัติ",
+        ["Login_SmsTip"] = "Kuro BBS รองรับการเข้าสู่ระบบได้เพียงอุปกรณ์เดียว หลังจากเข้าสู่ระบบแล้วจะไม่สามารถใช้ Kuro BBS บนมือถือได้",
         ["Login_SendCode"] = "ส่งรหัส",
         ["Login_Confirm"] = "เข้าสู่ระบบ",
         ["Login_Cancel"] = "ยกเลิก",
@@ -481,6 +479,10 @@ internal static class LangTh
         ["Login_Failed"] = "เข้าสู่ระบบไม่สำเร็จ: {0}",
         ["Login_SeekRoleFailed"] = "ค้นหาตัวละครที่ผูกไว้ไม่สำเร็จ: {0}",
         ["Login_Success"] = "เข้าสู่ระบบบัญชี Kuro BBS \"{0}\" สำเร็จ",
+        ["Login_CaptchaLoading"] = "กำลังโหลดการยืนยันความปลอดภัย กรุณาเลื่อนเพื่อยืนยัน…",
+        ["Login_CaptchaCancel"] = "การยืนยันไม่เสร็จสมบูรณ์ (ยกเลิก โหลดไม่สำเร็จ หรือหมดเวลา) ลองใหม่หรือเข้าสู่ระบบด้วย Token",
+        ["Login_NeedCaptcha"] = "ไม่ได้ส่ง SMS: ต้องยืนยันด้วยการเลื่อนก่อน หรือขอรหัสบ่อยเกินไป",
+        ["Login_CaptchaTitle"] = "การยืนยันความปลอดภัย",
 
         ["ResourceBrief_Month"] = "รายเดือน",
         ["ResourceBrief_Week"] = "รายสัปดาห์",
@@ -546,7 +548,7 @@ internal static class LangTh
 
         ["GameSettingPage_Resolution"] = "ความละเอียด",
         ["GameSettingPage_FullScreen"] = "เต็มหน้าจอ",
-        ["GameSettingPage_PgrFullscreenBlockedTip"] = "ความละเอียดของจอเกินขีดจำกัดที่เกมรองรับ โหมดเต็มหน้าจอจึงใช้งานไม่ได้ตามปกติ",
+        ["GameSettingPage_PgrResolutionUnsupportedTip"] = "ความละเอียดปัจจุบัน {0} × {1} ไม่รองรับโหมดเต็มหน้าจอ",
         ["GameSettingPage_CustomResolution"] = "ความละเอียดแบบกำหนดเอง",
         ["GameSettingPage_CustomResolutionTip"] = "ความละเอียดแบบกำหนดเองมีผลในโหมดแสดงผล \"หน้าต่าง\"",
         ["GameSettingPage_VoiceLanguage"] = "ภาษาเสียงพากย์",
@@ -566,6 +568,9 @@ internal static class LangTh
         ["SettingPage_WindowBehavior"] = "พฤติกรรมหน้าต่าง",
         ["SettingPage_CloseWindowOption"] = "ตัวเลือกการปิดหน้าต่าง",
         ["SettingPage_ExitApp"] = "ออกจากแอปโดยสมบูรณ์",
+
+        ["CloseDialog_Title"] = "ตัวเลือกการปิดหน้าต่าง",
+        ["CloseDialog_Content"] = "คุณสามารถเปลี่ยนตัวเลือกนี้ได้อีกครั้งในหน้าตั้งค่า",
         ["SettingPage_AfterLaunchOption"] = "หลังเปิดเกม",
         ["SettingPage_KeepWindow"] = "คงหน้าต่างไว้",
         ["SettingPage_AfterGameExitOption"] = "หลังปิดเกม",
@@ -577,7 +582,8 @@ internal static class LangTh
         ["SettingPage_TransparencyEffects"] = "เอฟเฟกต์ความโปร่งใส",
         ["SettingPage_AnimationEffects"] = "เอฟเฟกต์แอนิเมชัน",
 
-        ["GameSelector_Subtitle"] = "แตะไอคอนมุมซ้ายบนเพื่อเลือกหรือสลับเกม",
+        ["GameSelector_Title"] = "ยินดีต้อนรับสู่ Arietta",
+        ["GameSelector_Subtitle"] = "แตะไอคอนมุมซ้ายบนเพื่อเลือกหรือสลับเกม\nเลือกเกมเพื่อเริ่มใช้ Arietta",
         ["GameSelector_AutoFind"] = "ค้นหาเกมในเครื่องอัตโนมัติ",
         ["GameSelector_SelectServer"] = "เลือกเซิร์ฟเวอร์",
         ["GameSelector_InstalledSize"] = "พื้นที่จริงที่เกมที่ติดตั้งใช้งาน ",

@@ -1,17 +1,22 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
+using Arietta.Frameworks;
 using Arietta.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Graphics;
 
 namespace Arietta.Features.GachaLog;
 
-public sealed partial class CloudGameWindow : Window
+public sealed partial class CloudGameWindow : WindowEx
 {
+
+    private const int TitleBarHeight = 48;
 
     private readonly Func<GachaParams, Task> _onGrabbed;
 
@@ -21,16 +26,86 @@ public sealed partial class CloudGameWindow : Window
 
     private bool _grabbing;
 
+    private bool _closed;
+
 
     public CloudGameWindow(Func<GachaParams, Task> onGrabbed)
     {
         _onGrabbed = onGrabbed;
         this.InitializeComponent();
-        Title = Lang.Instance.CloudGame_Title;
-        this.AppWindow.Resize(new Windows.Graphics.SizeInt32(1180, 780));
+
+        Title = Lang.Instance.CloudGame_WindowTitle;
+
+        SystemBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
+
+        AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
+
+        AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
+        AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+        AdaptTitleBarButtonColorToActuallTheme();
+        CenterInScreen(1180, 780);
+        RootGrid.Loaded += (_, _) =>
+        {
+            AdaptTitleBarButtonColorToActuallTheme();
+            UpdateDragRectangles();
+        };
+
+        AppTitleBar.SizeChanged += (_, _) => UpdateDragRectangles();
+        Button_Grab.SizeChanged += (_, _) => UpdateDragRectangles();
+        AppWindow.Changed += (_, _) =>
+        {
+            if (!_closed)
+            {
+                UpdateDragRectangles();
+            }
+        };
+        RootGrid.ActualThemeChanged += (_, _) => AdaptTitleBarButtonColorToActuallTheme();
         Web.Loaded += async (_, _) => await EnsureWebviewAsync();
 
-        this.Closed += (_, _) => Web.Close();
+        this.Closed += (_, _) =>
+        {
+            _closed = true;
+            Web.Close();
+        };
+    }
+
+    private void UpdateDragRectangles()
+    {
+        if (_closed)
+        {
+            return;
+        }
+        if (!AppWindowTitleBar.IsCustomizationSupported() || AppWindow.TitleBar.ExtendsContentIntoTitleBar != true)
+        {
+            return;
+        }
+        int height = (int)(TitleBarHeight * UIScale);
+        if (height <= 0)
+        {
+            return;
+        }
+        var rects = new List<RectInt32>();
+        double buttonLeft = double.NaN;
+        if (Button_Grab.ActualWidth > 0 && AppTitleBar.ActualWidth > 0)
+        {
+            try
+            {
+                buttonLeft = Button_Grab.TransformToVisual(null)
+                    .TransformPoint(new Windows.Foundation.Point(0, 0)).X;
+            }
+            catch
+            {
+
+            }
+        }
+        int split = double.IsNaN(buttonLeft)
+            ? (int)(AppTitleBar.ActualWidth * UIScale)
+            : (int)(buttonLeft * UIScale) - (int)(8 * UIScale);
+        if (split > 0)
+        {
+            rects.Add(new RectInt32(0, 0, split, height));
+        }
+        SetDragRectangles(rects.ToArray());
     }
 
 
@@ -45,8 +120,6 @@ public sealed partial class CloudGameWindow : Window
             Web.CoreWebView2.WebResourceResponseReceived -= CaptureCloudApiHeaders;
             Web.CoreWebView2.WebResourceResponseReceived += CaptureCloudApiHeaders;
             Web.CoreWebView2.Navigate(CloudGameClient.CloudHomePage);
-            Web.CoreWebView2.DocumentTitleChanged += (_, _) =>
-                Title = $"{Lang.Instance.CloudGame_Title} - {Web.CoreWebView2.DocumentTitle}";
         }
         catch (Exception e)
         {

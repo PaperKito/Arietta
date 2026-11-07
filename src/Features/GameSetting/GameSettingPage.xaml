@@ -27,11 +27,12 @@
                                FontWeight="Bold"
                                Text="{x:Bind lang:Lang.Instance.GameSettingPage_Resolution, Mode=OneWay}" />
                     <CheckBox Content="{x:Bind lang:Lang.Instance.GameSettingPage_FullScreen, Mode=OneWay}"
+                              IsEnabled="{x:Bind IsPgrResolutionUnsupported, Mode=OneWay, Converter={StaticResource BoolReversedConverter}}"
                               IsChecked="{x:Bind EnableFullScreen, Mode=TwoWay}" />
                     <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               Text="{x:Bind lang:Lang.Instance.GameSettingPage_PgrFullscreenBlockedTip, Mode=OneWay}"
+                               Text="{x:Bind PgrResolutionUnsupportedTip, Mode=OneWay}"
                                TextWrapping="Wrap"
-                               Visibility="{x:Bind IsPgrFullscreenBlocked, Converter={StaticResource BoolToVisibilityConverter}}" />
+                               Visibility="{x:Bind IsPgrResolutionUnsupported, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <CheckBox Content="{x:Bind lang:Lang.Instance.GameSettingPage_CustomResolution, Mode=OneWay}"
                               IsChecked="{x:Bind EnableCustomResolution, Mode=TwoWay}" />
                     <ComboBox Name="ComboBox_Resolution"

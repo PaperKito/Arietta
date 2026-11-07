@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
 
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
 
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -65,5 +65,66 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
+
+	<ItemGroup>
+		<UnusedWinAppSdkPayload Include="RestartAgent.exe" />
+		<UnusedWinAppSdkPayload Include="Microsoft.UI.Designer.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.AppNotifications.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.AppNotifications.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.AppNotifications.Builder.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.AppNotifications.Builder.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.BadgeNotifications.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.BadgeNotifications.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.PushNotifications.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.PushNotifications.winmd" />
+		<UnusedWinAppSdkPayload Include="PushNotificationsLongRunningTask.ProxyStub.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Storage.Pickers.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Storage.Pickers.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Storage.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Storage.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Media.Capture.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Media.Capture.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Security.Authentication.OAuth.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Security.Authentication.OAuth.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Management.Deployment.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Management.Deployment.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.System.Power.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.System.Power.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.System.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.System.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Foundation.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Foundation.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Security.AccessControl.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Security.AccessControl.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.Background.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.Background.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.Background.UniversalBGTask.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.WindowsAppRuntime.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.WindowsAppRuntime.winmd" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.Globalization.winmd" />
+
+		<UnusedWinAppSdkPayload Include="Microsoft.WindowsAppRuntime.Bootstrap.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.WindowsAppRuntime.Bootstrap.Net.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.DynamicDependency.Projection.dll" />
+		<UnusedWinAppSdkPayload Include="Microsoft.Windows.ApplicationModel.DynamicDependency.winmd" />
+	</ItemGroup>
+
+	<Target Name="TrimUnusedWinAppSdkPayload" AfterTargets="Build">
+		<Delete Files="@(UnusedWinAppSdkPayload->'$(OutDir)%(Identity)')" />
+
+		<ItemGroup>
+			<_WinmdToDelete Include="$(OutDir)*.winmd" />
+		</ItemGroup>
+		<Delete Files="@(_WinmdToDelete)" />
+	</Target>
+
+	<Target Name="TrimUnusedWinAppSdkPayloadOnPublish" AfterTargets="Publish">
+		<Delete Files="@(UnusedWinAppSdkPayload->'$(PublishDir)%(Identity)')" />
+		<ItemGroup>
+			<_WinmdToDeleteOnPublish Include="$(PublishDir)*.winmd" />
+		</ItemGroup>
+		<Delete Files="@(_WinmdToDeleteOnPublish)" />
+	</Target>
 
 </Project>

@@ -173,9 +173,6 @@ internal static class GamepadController
         }
     }
 
-
-    #region Game Bar 注册表
-
     private const string GameBarKeyPath = @"HKEY_CURRENT_USER\Software\Microsoft\GameBar";
 
     private static bool _gameBarDisabledByUs;
@@ -201,13 +198,6 @@ internal static class GamepadController
             _logger.LogWarning(ex, "Failed to update Game Bar registry");
         }
     }
-
-
-    #endregion
-
-
-    #region SendInput 组合键
-
 
     private static void SendKeyCombo(VirtualKey[] modifiers, VirtualKey[] keys)
     {
@@ -264,13 +254,6 @@ internal static class GamepadController
             or VirtualKey.Insert or VirtualKey.Delete or VirtualKey.Home or VirtualKey.End
             or VirtualKey.PageUp or VirtualKey.PageDown or VirtualKey.Print;
     }
-
-
-    #endregion
-
-
-    #region 键名解析（键名表来自 Starward.GamepadController，裁剪）
-
 
     private static bool TryParseKeys(string? value, out VirtualKey[] modifiers, out VirtualKey[] keys, out string keysTextOrErrorKey)
     {
@@ -537,8 +520,5 @@ internal static class GamepadController
         [VirtualKey.Pause] = "Pause",
         [VirtualKey.Print] = "PrintScreen",
     };
-
-
-    #endregion
 
 }

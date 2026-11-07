@@ -117,13 +117,36 @@ internal static class KuroBbsUi
             legend.Children.Add(legendItem);
         }
 
-        WhenMeasured(measureHost, totalWidth =>
+        void Expand(double totalWidth)
         {
+            if (totalWidth <= 0)
+            {
+                return;
+            }
             for (int k = 0; k < plan.Count; k++)
             {
                 AnimateWidth(plan[k].Segment, Math.Max(minWidth, totalWidth * plan[k].Share), baseDelayMs + k * stepDelayMs);
             }
-        });
+        }
+
+        var queue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        if (queue is null)
+        {
+            WhenMeasured(measureHost, Expand);
+            return;
+        }
+        var uiQueue = queue;
+        async Task SettleAsync()
+        {
+            try
+            {
+                await Task.Delay(120);
+
+                uiQueue.TryEnqueue(() => WhenMeasured(measureHost, Expand));
+            }
+            catch { }
+        }
+        _ = SettleAsync();
     }
 
     public static Border KuroCard(

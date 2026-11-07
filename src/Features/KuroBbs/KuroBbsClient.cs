@@ -84,9 +84,6 @@ public sealed class KuroBbsClient
 
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-
-    #region 角色列表 / 详情 / 玩家总览
-
     public async Task<KuroBbsResponse<List<KuroRole>>> GetRoleListAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         using var body = new MultipartFormDataContent();
@@ -128,11 +125,6 @@ public sealed class KuroBbsClient
         using var request = await BuildRequestAsync(BaseDataUrl, body, account, ct);
         return await ParseRawDataAsync(request, ct);
     }
-
-    #endregion
-
-
-    #region token 换取与角色查找
 
     public async Task<KuroBbsResponse<List<KuroBbsAccount>>> SeekGameRoleAsync(string token, int gameId = 3, CancellationToken ct = default)
     {
@@ -265,12 +257,7 @@ public sealed class KuroBbsClient
         }
     }
 
-    #endregion
-
-
-    #region 登录 / 短信验证码（移植自 wwt-kuro-api KujiequAuthApi）
-
-    public async Task<string?> SendSmsCodeAsync(string phone, CancellationToken ct = default)
+    public async Task<string?> SendSmsCodeAsync(string phone, string geeTestData, CancellationToken ct = default)
     {
         try
         {
@@ -284,19 +271,26 @@ public sealed class KuroBbsClient
             request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 ["mobile"] = phone,
-                ["geeTestData"] = "",
+                ["geeTestData"] = geeTestData ?? "",
             });
             using var response = await Http.SendAsync(request, ct);
             var json = await response.Content.ReadAsStringAsync(ct);
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
+            int code = root.TryGetProperty("code", out var c) ? c.GetInt32() : 0;
             bool success = root.TryGetProperty("success", out var s) && s.ValueKind == JsonValueKind.True
-                || (root.TryGetProperty("code", out var c) && c.GetInt32() is 0 or 200);
-            if (success)
+                || code is 0 or 200;
+            string msg = root.TryGetProperty("msg", out var m) ? m.GetString() ?? "" : "";
+            if (!success)
             {
-                return null;
+                return msg.Length > 0 ? msg : Localization.Lang.Instance.KuroBbs_ErrSendCode;
             }
-            return root.TryGetProperty("msg", out var m) ? m.GetString() : Localization.Lang.Instance.KuroBbs_ErrSendCode;
+
+            bool sent = root.TryGetProperty("data", out var data)
+                && data.ValueKind == JsonValueKind.Object
+                && data.TryGetProperty("geeTest", out var geeTest)
+                && geeTest.ValueKind == JsonValueKind.False;
+            return sent ? null : Localization.Lang.Instance.Login_NeedCaptcha;
         }
         catch (Exception e)
         {
@@ -358,11 +352,6 @@ public sealed class KuroBbsClient
         return new string(Random.Shared.GetItems<char>(chars, 32));
     }
 
-    #endregion
-
-
-    #region 资源简报（移植自 wwt-kuro-api KujiequSignApi 的 Briefing 任务）
-
     public async Task<KuroBbsResponse<KuroBriefing>> GetBriefingListAsync(string token, CancellationToken ct = default)
     {
         try
@@ -411,11 +400,6 @@ public sealed class KuroBbsClient
             return new KuroBbsResponse<KuroBriefingRecord> { Code = 1, Msg = e.Message };
         }
     }
-
-    #endregion
-
-
-    #region 签到 / 深塔 / 终焉矩阵 / 冥歌海墟（移植自 wwt-kuro-api KujiequSignApi、KujiequTowerApi 与 wwt-app SignService）
 
     private async Task<HttpRequestMessage> BuildSourceRequestAsync(string url, KuroBbsAccount account, CancellationToken ct)
     {
@@ -593,11 +577,6 @@ public sealed class KuroBbsClient
         return await ParseDataStringAsync<KuroSlashData>(request, ct);
     }
 
-    #endregion
-
-
-    #region 养成计算器（移植自 wwt-kuro-api KujiequCalculatorApi）
-
     public async Task<KuroBbsResponse<bool>> RefreshCalculatorDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -675,11 +654,6 @@ public sealed class KuroBbsClient
             return new KuroBbsResponse<KuroCalculatorResult> { Code = 1, Msg = e.Message };
         }
     }
-
-    #endregion
-
-
-    #region 战双 · 作战数据（web-static.kurobbs.com/pns-box，接口前缀 /haru）
 
     private const string PgrRefreshUrl = "https://api.kurobbs.com/haru/roleBox/refreshData";
     private const string PgrAccountDataUrl = "https://api.kurobbs.com/haru/roleBox/accountData";
@@ -759,11 +733,6 @@ public sealed class KuroBbsClient
     public Task<KuroBbsResponse<KuroPgrTransfiniteData>> GetPgrTransfiniteDataAsync(KuroBbsAccount account, CancellationToken ct = default)
         => PostPgrAsync<KuroPgrTransfiniteData>(PgrTransfiniteUrl, PgrForm(account), account, ct);
 
-    #endregion
-
-
-    #region 鸣潮（gamer/widget/game3）
-
     public async Task<KuroBbsResponse<KuroWuwaWidgetData>> GetWuwaWidgetDataAsync(KuroBbsAccount account, CancellationToken ct = default)
     {
         try
@@ -778,11 +747,6 @@ public sealed class KuroBbsClient
             return new KuroBbsResponse<KuroWuwaWidgetData> { Code = 1, Msg = e.Message };
         }
     }
-
-    #endregion
-
-
-    #region 请求构造
 
     private async Task<HttpRequestMessage> BuildRequestAsync(string url, HttpContent? body, KuroBbsAccount account, CancellationToken ct, bool withToken = true)
     {
@@ -873,11 +837,6 @@ public sealed class KuroBbsClient
         catch { }
         return null;
     }
-
-    #endregion
-
-
-    #region 响应解析
 
     private async Task<KuroBbsResponse<T>> ParseDirectAsync<T>(HttpRequestMessage request, CancellationToken ct)
     {
@@ -976,8 +935,6 @@ public sealed class KuroBbsClient
             return new KuroBbsResponse<JsonElement> { Code = 1, Msg = e.Message, Success = false };
         }
     }
-
-    #endregion
 
     private static string GetStringSafe(JsonElement obj, string name)
     {

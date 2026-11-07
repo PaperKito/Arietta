@@ -97,8 +97,6 @@ internal static class DatabaseService
         }
     }
 
-    #region 快照与替换
-
     public static void VacuumInto(string targetFile, bool stripHostSpecificData = false)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(targetFile)!);
@@ -180,10 +178,6 @@ internal static class DatabaseService
         catch { }
     }
 
-    #endregion
-
-    #region 数据指纹
-
     public static string GetContentVersion()
     {
         try
@@ -214,10 +208,6 @@ internal static class DatabaseService
             return Guid.NewGuid().ToString("N");
         }
     }
-
-    #endregion
-
-    #region Setting 读写
 
     public static T? GetValue<T>(string key, out bool found)
     {
@@ -322,5 +312,4 @@ internal static class DatabaseService
         }
     }
 
-    #endregion
 }

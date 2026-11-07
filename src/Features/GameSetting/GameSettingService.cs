@@ -41,10 +41,6 @@ public static class GameSettingService
 
     public record GameResolutionSetting(bool IsFullScreen, bool UseBorderless, int Width, int Height, int ResolutionIndex);
 
-
-
-    #region 路径
-
     public static string? GetGameDir(GameBiz biz)
     {
         string? exe = GameRegistry.GetConfiguredExePath(biz);
@@ -66,13 +62,6 @@ public static class GameSettingService
                 _ => File.Exists(Path.Combine(dir, "Client", "Saved", "LocalStorage", "LocalStorage.db")),
             };
     }
-
-
-    #endregion
-
-
-
-    #region 分辨率 / 显示模式
 
     public static GameResolutionSetting? GetGameResolutionSetting(GameBiz biz)
     {
@@ -215,13 +204,6 @@ public static class GameSettingService
         public uint dmPanningHeight;
     }
 
-
-    #endregion
-
-
-
-    #region 语音语言
-
     public static int? GetVoiceLanguage(GameBiz biz)
     {
         return GetLocalStorageInt(biz, VoiceLanguage);
@@ -232,13 +214,6 @@ public static class GameSettingService
     {
         SetLocalStorageValues(biz, new Dictionary<string, string> { [VoiceLanguage] = lang.ToString() });
     }
-
-
-    #endregion
-
-
-
-    #region 战双（Unity / 注册表）
 
     private const string PgrRegistryPath = @"Software\kurogame\战双帕弥什";
 
@@ -295,10 +270,25 @@ public static class GameSettingService
         return new List<(int Width, int Height)>(PgrResolutions);
     }
 
-    public static bool IsPgrFullscreenBlocked()
+    public static (int Width, int Height)? GetPgrUnsupportedFullscreenResolution()
     {
         var (w, h) = GetMonitorResolution();
-        return w > 0 && (w > 2560 || h > 2048);
+        if (w <= 0 || h <= 0)
+        {
+            return null;
+        }
+        if (w == 3840 && h == 2160)
+        {
+            return null;
+        }
+        foreach (var (width, height) in PgrResolutions)
+        {
+            if (width == w && height == h)
+            {
+                return null;
+            }
+        }
+        return (w, h);
     }
 
 
@@ -308,18 +298,30 @@ public static class GameSettingService
         int width = GetPgrInt(PgrKeyResolutionWidth) ?? 0;
         int height = GetPgrInt(PgrKeyResolutionHeight) ?? 0;
 
-        return new GameResolutionSetting(mode == 0, mode == 1, width, height, -1);
+        bool isFullScreen = mode is 0 or 1;
+        return new GameResolutionSetting(isFullScreen, false, width, height, -1);
     }
 
     public static void SetPgrResolutionSetting(GameBiz biz, bool isFullScreen, bool useBorderless, int width, int height)
     {
+        int windowWidth = width;
+        int windowHeight = height;
+        if (isFullScreen || useBorderless)
+        {
+            var (desktopWidth, desktopHeight) = GetMonitorResolution();
+            if (desktopWidth > 0 && desktopHeight > 0)
+            {
+                width = desktopWidth;
+                height = desktopHeight;
+            }
+        }
         int mode = isFullScreen ? 0 : useBorderless ? 1 : 3;
         using var key = Registry.CurrentUser.CreateSubKey(PgrRegistryPath, writable: true);
         key.SetValue(PgrKeyFullscreenMode, mode, RegistryValueKind.DWord);
         key.SetValue(PgrKeyResolutionWidth, width, RegistryValueKind.DWord);
         key.SetValue(PgrKeyResolutionHeight, height, RegistryValueKind.DWord);
-        key.SetValue(PgrKeyResolutionWindowWidth, width, RegistryValueKind.DWord);
-        key.SetValue(PgrKeyResolutionWindowHeight, height, RegistryValueKind.DWord);
+        key.SetValue(PgrKeyResolutionWindowWidth, windowWidth, RegistryValueKind.DWord);
+        key.SetValue(PgrKeyResolutionWindowHeight, windowHeight, RegistryValueKind.DWord);
         key.SetValue(PgrKeyResolutionUseNative, 0, RegistryValueKind.DWord);
         key.SetValue(PgrKeyLastFullScreen, isFullScreen || useBorderless ? 1 : 0, RegistryValueKind.DWord);
         key.SetValue(PgrKeyLastFullScreenMode, useBorderless ? 1 : 0, RegistryValueKind.DWord);
@@ -348,13 +350,6 @@ public static class GameSettingService
         return key?.GetValue(name) as int?;
     }
 
-
-    #endregion
-
-
-
-    #region HDR（GameUserSettings.ini）
-
     public static bool GetHdrEnabled(GameBiz biz)
     {
         return GetIniValue(GetGameUserSettingsPath(biz), IniSectionGameUserSettings, "bUseHDRDisplayOutput") is "True" or "true" or "1";
@@ -368,13 +363,6 @@ public static class GameSettingService
             ["bUseHDRDisplayOutput"] = enable ? "True" : "False",
         });
     }
-
-
-    #endregion
-
-
-
-    #region LocalStorage.db
 
     private static string? GetLocalStoragePath(GameBiz biz)
     {
@@ -427,13 +415,6 @@ public static class GameSettingService
         }
         transaction.Commit();
     }
-
-
-    #endregion
-
-
-
-    #region GameUserSettings.ini
 
     private static string? GetGameUserSettingsPath(GameBiz biz)
     {
@@ -517,11 +498,6 @@ public static class GameSettingService
         }
         File.WriteAllLines(path, lines, new UTF8Encoding(false));
     }
-
-
-    #endregion
-
-
 
     private static int? ParseInt(string? value)
     {

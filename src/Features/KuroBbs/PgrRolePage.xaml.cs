@@ -125,9 +125,6 @@ public sealed partial class PgrRolePage : PageBase
         KuroBbsUi.HandleKuroError(code, msg, null, Lang.Instance.PgrCommon_LoadFailed, InfoBar_Error);
     }
 
-
-    #region 角色详情（点列表项钻取：概览先用 roleIndex 字段即时渲染，深层分区再走 roleDetail）
-
     private CancellationTokenSource? _detailCts;
 
     private void GridView_Roles_ItemClick(object sender, ItemClickEventArgs e)
@@ -299,9 +296,6 @@ public sealed partial class PgrRolePage : PageBase
         }
     }
 
-
-    #region 装备一览（只有图标：武器 / 辅助机 / 意识×6）与共鸣角标
-
     private enum ChevronKind
     {
 
@@ -465,11 +459,6 @@ public sealed partial class PgrRolePage : PageBase
         }
         return grid;
     }
-
-    #endregion
-
-
-    #region 深层分区构建（专属武器 / 辅助机 / 意识套装 / 意识共鸣）
 
     private void FillDeepSections(KuroPgrCharacterDetail d)
     {
@@ -1005,8 +994,6 @@ public sealed partial class PgrRolePage : PageBase
         return head;
     }
 
-    #endregion
-
     private static Brush PgrGradeBrush(string? grade, int quality)
     {
         var g = grade?.Trim();
@@ -1033,6 +1020,4 @@ public sealed partial class PgrRolePage : PageBase
         _ => Color.FromArgb(0xFF, 0x80, 0x80, 0x80),
     };
 
-
-    #endregion
 }

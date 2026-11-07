@@ -5,6 +5,7 @@ using Arietta.Helpers;
 using Arietta.Localization;
 using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Arietta.Features.KuroBbs;
@@ -32,6 +33,8 @@ public sealed class KuroBbsLoginDialog
     private readonly RadioButton _radioSms = new() { Content = Lang.Instance.Login_BySms };
     private readonly StackPanel _panelToken;
     private readonly StackPanel _panelSms;
+
+    private CancellationTokenSource? _captchaCts;
     private int _busy;
 
     public int ResultIndex { get; private set; } = -1;
@@ -107,6 +110,8 @@ public sealed class KuroBbsLoginDialog
         _radioToken.Checked += (_, _) => UpdatePanels();
         _radioSms.Checked += (_, _) => UpdatePanels();
         _buttonSendCode.Click += async (_, _) => await SendCodeAsync();
+
+        _dialog.Closed += (_, _) => CancelCaptcha();
         _dialog.PrimaryButtonClick += async (_, args) =>
         {
             args.Cancel = true;
@@ -141,6 +146,20 @@ public sealed class KuroBbsLoginDialog
     {
         ((Border)((StackPanel)_dialog.Content).Children[1]).Child = ByToken ? _panelToken : _panelSms;
         _textHint.Text = "";
+        if (ByToken)
+        {
+            CancelCaptcha();
+        }
+    }
+
+
+    private void CancelCaptcha()
+    {
+        try
+        {
+            _captchaCts?.Cancel();
+        }
+        catch (ObjectDisposedException) { }
     }
 
 
@@ -173,9 +192,23 @@ public sealed class KuroBbsLoginDialog
                 _textHint.Text = Lang.Instance.Login_PhoneInvalid;
                 return;
             }
+
             _buttonSendCode.IsEnabled = false;
+            _textHint.Text = Lang.Instance.Login_CaptchaLoading;
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(180));
+            _captchaCts = cts;
+
+            string? geeTestData = await KuroBbsGeetestWindow.ShowAsync(cts.Token);
+            _captchaCts = null;
+            if (geeTestData is null)
+            {
+                _textHint.Text = Lang.Instance.Login_CaptchaCancel;
+                _buttonSendCode.IsEnabled = true;
+                return;
+            }
+
             _textHint.Text = Lang.Instance.Login_Sending;
-            string? error = await KuroBbsClient.Instance.SendSmsCodeAsync(phone);
+            string? error = await KuroBbsClient.Instance.SendSmsCodeAsync(phone, geeTestData);
             if (error is null)
             {
                 _textHint.Text = Lang.Instance.Login_CodeSent;

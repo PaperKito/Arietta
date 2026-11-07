@@ -307,6 +307,36 @@ internal class PlayTimeRecordService
         }
     }
 
+    public static bool IsOwnRestartedSession(GameBiz biz, int pid, DateTime processStartTime)
+    {
+        try
+        {
+
+            if (HasOwnStartRecord(biz, pid))
+            {
+                return false;
+            }
+            using var dapper = DatabaseService.CreateConnection();
+            long lastEndMs = dapper.ExecuteScalar<long>(
+                "SELECT COALESCE(MAX(EndTime), 0) FROM PlayTimeStats WHERE GameBiz = @biz;", new { biz });
+            if (lastEndMs <= 0)
+            {
+                return false;
+            }
+            long startMs = new DateTimeOffset(processStartTime).ToUnixTimeMilliseconds();
+            if (startMs < lastEndMs - 5_000 || startMs > lastEndMs + 30_000)
+            {
+                return false;
+            }
+
+            return !HasStartRecordForOtherBiz(biz, pid);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public static bool HasStatsRecord(GameBiz biz, long minEndTimeMs)
     {
         try

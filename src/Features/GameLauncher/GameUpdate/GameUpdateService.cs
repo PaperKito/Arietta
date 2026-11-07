@@ -232,9 +232,6 @@ public static class GameUpdateService
 
     private static readonly Dictionary<GameBiz, (GameUpdateIndex Index, DateTimeOffset Time)> _cache = new();
 
-
-    #region 索引获取
-
     public static async Task<GameUpdateIndex?> GetIndexAsync(GameBiz biz, CancellationToken ct = default)
     {
         if (_cache.TryGetValue(biz, out var cached) && DateTimeOffset.Now - cached.Time < CacheLifetime)
@@ -335,11 +332,6 @@ public static class GameUpdateService
         _logger.LogInformation("Branch index {Biz}: no branch content at any probe point, treating as no branches", biz);
         return null;
     }
-
-    #endregion
-
-
-    #region 本地版本
 
     public static string? GetGameDir(GameBiz biz)
     {
@@ -470,11 +462,6 @@ public static class GameUpdateService
             }
         }
     }
-
-    #endregion
-
-
-    #region 更新状态
 
     public enum UpdateKind
     {
@@ -789,11 +776,6 @@ public static class GameUpdateService
         }
         return null;
     }
-
-    #endregion
-
-
-    #region 预下载暂存与应用更新
 
     private delegate void ReportFileProgress(int done, int total, long doneBytes = -1, bool force = false);
 
@@ -1783,9 +1765,6 @@ public static class GameUpdateService
         }
     }
 
-
-    #region 全新安装（本地没有任何版本记录时，把最新版全量下载并落位）
-
     public static async Task<GameUpdateState?> GetInstallStateAsync(GameBiz biz)
     {
         if (GetLocalVersion(biz) is not null)
@@ -2085,13 +2064,6 @@ public static class GameUpdateService
         }
     }
 
-    #endregion
-
-    #endregion
-
-
-    #region 校验 / 修复游戏
-
     public sealed class VerifyResult
     {
 
@@ -2261,5 +2233,4 @@ public static class GameUpdateService
         return GameUpdateDownloader.VerifyMd5(path, entry.Md5, ct);
     }
 
-    #endregion
 }

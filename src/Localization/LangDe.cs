@@ -90,7 +90,6 @@ internal static class LangDe
         ["PgrResource_BlackCard"] = "Schwarzkarten",
         ["PgrResource_Develop"] = "F&E-Ressourcen",
         ["PgrResource_Trade"] = "Handelsbelege",
-        ["PgrResource_SelectPeriod"] = "Zeitraum wählen",
         ["PgrResource_Composition"] = "Zusammensetzung der Einnahmen",
         ["PgrResource_MonthlyData"] = "Monatliche Daten",
         ["PgrChallenge_NotOpen"] = "Derzeit keine offene Phase",
@@ -180,9 +179,6 @@ internal static class LangDe
         ["GameLauncherSettingDialog_BackupAndUninstall"] = "Sichern und deinstallieren",
         ["GameLauncherSettingDialog_Uninstalled"] = "Spiel deinstalliert",
 
-        ["CloseDialog_Title"] = "Fenster schließen",
-        ["CloseDialog_Content"] = "Wähle das Verhalten beim Klick auf die Schließen-Schaltfläche. Später änderbar unter „Einstellungen → Fensterverhalten“.",
-
         ["SettingPage_CurrentVersion"] = "Version:",
 
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
@@ -225,6 +221,7 @@ internal static class LangDe
         ["UpdateWindow_ReleasePage"] = "Release-Seite",
         ["UpdateWindow_UpdateHistory"] = "Update-Verlauf",
         ["UpdateWindow_LoadingHistory"] = "Update-Verlauf wird geladen…",
+        ["UpdateWindow_NotesUnavailable"] = "Versionshinweise sind derzeit nicht verfügbar.",
         ["UpdateWindow_RemindLater"] = "Später erinnern",
 
         ["SettingPage_About_Links"] = "Links",
@@ -397,6 +394,7 @@ internal static class LangDe
         ["ImageViewWindow2_SaveAs"] = "Speichern unter",
         ["GameLauncherPage_PlayPause"] = "Wiedergabe/Pause",
         ["GameLauncherSettingDialog_DragAndDropImageOrVideoFiles"] = "Bilddateien ablegen, um den Hintergrund zu wechseln",
+        ["Background_OfficialShort"] = "Offiziell",
         ["Background_Official"] = "Offizieller animierter Hintergrund",
         ["Background_OfficialStatic"] = "Offizieller statischer Hintergrund",
         ["Background_OpenFolder"] = "Hintergrundordner öffnen",
@@ -467,7 +465,7 @@ internal static class LangDe
         ["Login_PhonePlaceholder"] = "Telefonnummer",
         ["Login_CodePlaceholder"] = "SMS-Code",
         ["Login_CodeLabel"] = "SMS-Code",
-        ["Login_SmsTip"] = "Tippe auf „Code senden“ und gib dann den per SMS erhaltenen Code ein. Nach erfolgreicher Anmeldung wird das Konto automatisch gespeichert.",
+        ["Login_SmsTip"] = "Kuro BBS erlaubt nur ein angemeldetes Gerät. Nach der Anmeldung kann die mobile App Kuro BBS nicht mehr nutzen.",
         ["Login_SendCode"] = "Code senden",
         ["Login_Confirm"] = "Anmelden",
         ["Login_Cancel"] = "Abbrechen",
@@ -481,6 +479,10 @@ internal static class LangDe
         ["Login_Failed"] = "Anmeldung fehlgeschlagen: {0}",
         ["Login_SeekRoleFailed"] = "Verknüpfter Charakter konnte nicht gesucht werden: {0}",
         ["Login_Success"] = "Kuro-BBS-Konto „{0}“ angemeldet",
+        ["Login_CaptchaLoading"] = "Sicherheitsprüfung wird geladen — bitte den Schieberegler lösen…",
+        ["Login_CaptchaCancel"] = "Sicherheitsprüfung nicht abgeschlossen (abgebrochen, Ladefehler oder Zeitüberschreitung). Erneut versuchen oder mit Token anmelden.",
+        ["Login_NeedCaptcha"] = "Keine SMS gesendet: Schieberegler-Prüfung erforderlich oder zu viele Code-Anfragen.",
+        ["Login_CaptchaTitle"] = "Sicherheitsprüfung",
 
         ["ResourceBrief_Month"] = "Monatlich",
         ["ResourceBrief_Week"] = "Wöchentlich",
@@ -546,7 +548,7 @@ internal static class LangDe
 
         ["GameSettingPage_Resolution"] = "Auflösung",
         ["GameSettingPage_FullScreen"] = "Vollbild",
-        ["GameSettingPage_PgrFullscreenBlockedTip"] = "Die Auflösung Ihres Bildschirms überschreitet das vom Spiel unterstützte Maximum, der Vollbildmodus ist daher nicht verfügbar",
+        ["GameSettingPage_PgrResolutionUnsupportedTip"] = "Die aktuelle Auflösung {0} × {1} unterstützt den Vollbildmodus nicht",
         ["GameSettingPage_CustomResolution"] = "Eigene Auflösung",
         ["GameSettingPage_CustomResolutionTip"] = "Die eigene Auflösung gilt im Anzeigemodus „Fenster“",
         ["GameSettingPage_VoiceLanguage"] = "Sprachausgabe",
@@ -566,6 +568,9 @@ internal static class LangDe
         ["SettingPage_WindowBehavior"] = "Fensterverhalten",
         ["SettingPage_CloseWindowOption"] = "Beim Schließen des Fensters",
         ["SettingPage_ExitApp"] = "App beenden",
+
+        ["CloseDialog_Title"] = "Optionen beim Schließen des Fensters",
+        ["CloseDialog_Content"] = "Sie können diese Option später auf der Seite Einstellungen erneut ändern.",
         ["SettingPage_AfterLaunchOption"] = "Nach dem Spielstart",
         ["SettingPage_KeepWindow"] = "Fenster beibehalten",
         ["SettingPage_AfterGameExitOption"] = "Nach Spielende",
@@ -577,7 +582,8 @@ internal static class LangDe
         ["SettingPage_TransparencyEffects"] = "Transparenzeffekte",
         ["SettingPage_AnimationEffects"] = "Animationseffekte",
 
-        ["GameSelector_Subtitle"] = "Tippe oben links auf das Symbol, um ein Spiel zu wählen oder zu wechseln",
+        ["GameSelector_Title"] = "Willkommen bei Arietta",
+        ["GameSelector_Subtitle"] = "Tippe oben links auf das Symbol, um ein Spiel zu wählen oder zu wechseln\nWähle ein Spiel, um Arietta zu nutzen",
         ["GameSelector_AutoFind"] = "Installierte Spiele automatisch finden",
         ["GameSelector_SelectServer"] = "Server auswählen",
         ["GameSelector_InstalledSize"] = "Tatsächlich belegter Speicherplatz der installierten Spiele ",

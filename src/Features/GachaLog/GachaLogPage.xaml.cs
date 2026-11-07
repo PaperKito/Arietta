@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Arietta.Core;
 using Arietta.Features.GameLauncher;
+using Arietta.Features.ViewHost;
 using Arietta.Frameworks;
 using Arietta.Helpers;
 using Arietta.Localization;
@@ -27,7 +29,14 @@ public sealed partial class GachaLogPage : PageBase
         _restoringGachaLanguage = false;
         InitializeGachaPools();
 
-        ViewModel.CloudGameFetchRequested = OpenCloudGameWindow;
+        bool cloudGameSupported = IsCloudGameSupported();
+        MenuFlyoutItem_ViaCloudGame.Visibility = cloudGameSupported ? Visibility.Visible : Visibility.Collapsed;
+        ViewModel.CloudGameFetchRequested = cloudGameSupported ? OpenCloudGameWindow : null;
+    }
+
+    private static bool IsCloudGameSupported()
+    {
+        return MainView.CurrentGameBiz is GameBiz.WutheringWaves;
     }
 
     private bool _restoringGachaPools;

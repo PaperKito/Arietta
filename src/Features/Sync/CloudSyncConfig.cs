@@ -22,8 +22,6 @@ internal sealed class CloudSyncConfig
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
-    #region 用户配置
-
     public string ServerUrl { get; set; } = "";
 
     public string UserName { get; set; } = "";
@@ -36,17 +34,11 @@ internal sealed class CloudSyncConfig
 
     public string ProtectedPassword { get; set; } = "";
 
-    #endregion
-
-    #region 同步锚点
-
     public string LastLocalVersion { get; set; } = "";
 
     public string LastRemoteETag { get; set; } = "";
 
     public DateTimeOffset? LastSyncTime { get; set; }
-
-    #endregion
 
     [JsonIgnore]
     public string Password

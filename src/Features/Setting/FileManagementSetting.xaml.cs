@@ -27,9 +27,6 @@ public sealed partial class FileManagementSetting : PageBase
         RefreshCacheSize();
     }
 
-
-    #region 数据文件夹
-
     private void RefreshDataFolder()
     {
         TextBlock_DataPath.Text = DatabaseService.DatabaseFolder;
@@ -98,21 +95,11 @@ public sealed partial class FileManagementSetting : PageBase
         }
     }
 
-    #endregion
-
-
-    #region 日志
-
     private void Button_OpenLogFolder_Click(object sender, RoutedEventArgs e)
     {
         Directory.CreateDirectory(AppConfig.LogFolder);
         OpenInExplorer(AppConfig.LogFolder);
     }
-
-    #endregion
-
-
-    #region 缓存
 
     private static string GachaIconFolder => Path.Combine(AppConfig.LocalFolder, "GachaIcons");
 
@@ -178,11 +165,6 @@ public sealed partial class FileManagementSetting : PageBase
         catch { }
     }
 
-    #endregion
-
-
-    #region 通用
-
     private static void OpenInExplorer(string path)
     {
         try
@@ -233,7 +215,5 @@ public sealed partial class FileManagementSetting : PageBase
             _ => $"{bytes} B",
         };
     }
-
-    #endregion
 
 }

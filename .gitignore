@@ -1,5 +1,6 @@
 bin/
 obj/
+_build/
 .vs/
 __pycache__/
 *.log

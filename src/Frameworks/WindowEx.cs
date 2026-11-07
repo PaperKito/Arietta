@@ -30,13 +30,6 @@ public abstract partial class WindowEx : Window
         ComCtl32.SetWindowSubclass(WindowHandle, windowSubclassProc, 1001, IntPtr.Zero);
     }
 
-
-
-
-    #region Message Loop
-
-
-
     private readonly ComCtl32.SUBCLASSPROC windowSubclassProc;
 
 
@@ -46,24 +39,11 @@ public abstract partial class WindowEx : Window
         return ComCtl32.DefSubclassProc(hWnd, uMsg, wParam, lParam);
     }
 
-
-
-
-    #endregion
-
-
-
-
-    #region Window Method
-
-
-
     public virtual void Show()
     {
-        AppWindow.Show(true);
+
+        Activate();
         AppWindow.MoveInZOrderAtTop();
-        User32.ShowWindow(WindowHandle, ShowWindowCommand.SW_SHOWNORMAL);
-        User32.SetForegroundWindow(WindowHandle);
     }
 
 
@@ -72,6 +52,98 @@ public abstract partial class WindowEx : Window
     {
         AppWindow.Hide();
     }
+
+    public void BringToFront()
+    {
+        const uint SWP_NOSIZE = 0x0001, SWP_NOMOVE = 0x0002, SWP_SHOWWINDOW = 0x0040;
+        var topMost = new IntPtr(-1);
+        var noTopMost = new IntPtr(-2);
+        _ = SetWindowPos(WindowHandle, topMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        _ = SetWindowPos(WindowHandle, noTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        _ = User32.SetForegroundWindow(WindowHandle);
+    }
+
+    public void RestoreAndBringToFront()
+    {
+
+        bool needsRestore = !IsWindowVisible(WindowHandle) || IsIconic(WindowHandle);
+        if (needsRestore)
+        {
+            _ = ShowWindow(WindowHandle, SW_RESTORE);
+        }
+
+        EnsureForeground();
+        if (User32.GetForegroundWindow() != WindowHandle)
+        {
+            FlashTaskbarButton();
+        }
+    }
+
+    public void FlashTaskbarButton()
+    {
+        FLASHWINFO info = new()
+        {
+            cbSize = (uint)Marshal.SizeOf<FLASHWINFO>(),
+            hwnd = WindowHandle,
+            dwFlags = FLASHW_TRAY | FLASHW_TIMER,
+            uCount = 6,
+            dwTimeout = 0,
+        };
+        _ = FlashWindowEx(ref info);
+    }
+
+
+    private const int SW_RESTORE = 9;
+    private const uint FLASHW_TRAY = 0x00000002;
+    private const uint FLASHW_TIMER = 0x00000004;
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct FLASHWINFO
+    {
+        public uint cbSize;
+        public IntPtr hwnd;
+        public uint dwFlags;
+        public uint uCount;
+        public uint dwTimeout;
+    }
+
+    public void EnsureForeground()
+    {
+        if (User32.GetForegroundWindow() == WindowHandle)
+        {
+            return;
+        }
+        _ = User32.SetForegroundWindow(WindowHandle);
+        if (User32.GetForegroundWindow() == WindowHandle)
+        {
+            return;
+        }
+        BringToFront();
+    }
+
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsWindowVisible(IntPtr hWnd);
+
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsIconic(IntPtr hWnd);
+
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FlashWindowEx(ref FLASHWINFO pwfi);
 
 
 
@@ -87,17 +159,6 @@ public abstract partial class WindowEx : Window
         int y = display.WorkArea.Y + (display.WorkArea.Height - h) / 2;
         AppWindow.MoveAndResize(new RectInt32(x, y, w, h));
     }
-
-
-
-    #endregion
-
-
-
-
-    #region Theme
-
-
 
     public void SetDragRectangles(params RectInt32[] value)
     {
@@ -169,16 +230,13 @@ public abstract partial class WindowEx : Window
         {
             return;
         }
-        if (element.ActualTheme is ElementTheme.Dark)
+        element.RequestedTheme = element.ActualTheme switch
         {
-            element.RequestedTheme = ElementTheme.Light;
-            element.RequestedTheme = ElementTheme.Dark;
-        }
-        else if (element.ActualTheme is ElementTheme.Light)
-        {
-            element.RequestedTheme = ElementTheme.Dark;
-            element.RequestedTheme = ElementTheme.Light;
-        }
+            ElementTheme.Light => ElementTheme.Dark,
+            ElementTheme.Dark => ElementTheme.Light,
+            _ => ElementTheme.Default,
+        };
+        element.RequestedTheme = ElementTheme.Default;
     }
 
 
@@ -191,11 +249,6 @@ public abstract partial class WindowEx : Window
     [return: MarshalAs(UnmanagedType.Bool)]
     [LibraryImport("uxtheme.dll", EntryPoint = "#138", SetLastError = true)]
     protected static partial bool ShouldSystemUseDarkMode();
-
-
-
-    #endregion
-
 
 }
 

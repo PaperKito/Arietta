@@ -62,6 +62,11 @@ public sealed partial class GameSettingPage : PageBase
             if (SetProperty(ref field, value))
             {
 
+                if (value)
+                {
+                    EnableCustomResolution = false;
+                }
+
                 IsApplyButtonEnable = true;
                 UpdateResolutionInputState();
             }
@@ -69,7 +74,10 @@ public sealed partial class GameSettingPage : PageBase
     }
 
 
-    public bool IsPgrFullscreenBlocked { get; private set => SetProperty(ref field, value); }
+
+    public bool IsPgrResolutionUnsupported { get; private set => SetProperty(ref field, value); }
+
+    public string PgrResolutionUnsupportedTip { get; private set => SetProperty(ref field, value); } = "";
 
     public bool IsResolutionListEnabled { get; private set => SetProperty(ref field, value); }
 
@@ -81,6 +89,11 @@ public sealed partial class GameSettingPage : PageBase
         get;
         set
         {
+
+            if (value && EnableFullScreen)
+            {
+                EnableFullScreen = false;
+            }
             if (SetProperty(ref field, value))
             {
                 UpdateResolutionInputState();
@@ -180,18 +193,25 @@ public sealed partial class GameSettingPage : PageBase
             IsBaseSettingEnable = true;
             IsLanguageSettingEnable = !isPgr;
             IsHdrSettingEnable = true;
-            IsPgrFullscreenBlocked = isPgr && GameSettingService.IsPgrFullscreenBlocked();
+            var unsupported = isPgr ? GameSettingService.GetPgrUnsupportedFullscreenResolution() : null;
+            IsPgrResolutionUnsupported = unsupported is not null;
+            PgrResolutionUnsupportedTip = unsupported is { } res
+                ? string.Format(Lang.Instance.GameSettingPage_PgrResolutionUnsupportedTip, res.Width, res.Height)
+                : "";
             UpdateResolutionInputState();
 
             var resolution = isPgr ? GameSettingService.GetPgrResolutionSetting(biz) : GameSettingService.GetGameResolutionSetting(biz);
             if (resolution is not null)
             {
-                EnableFullScreen = resolution.IsFullScreen;
+
+                EnableFullScreen = resolution.IsFullScreen && !IsPgrResolutionUnsupported;
                 if (resolution.Width * resolution.Height > 0)
                 {
                     ResolutionWidth = resolution.Width;
                     ResolutionHeight = resolution.Height;
-                    EnableCustomResolution = !UpdateResolutionComboBoxSelection(ResolutionWidth, ResolutionHeight);
+
+                    bool matched = UpdateResolutionComboBoxSelection(ResolutionWidth, ResolutionHeight);
+                    EnableCustomResolution = !EnableFullScreen && !matched;
                 }
                 else
                 {

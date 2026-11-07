@@ -150,9 +150,6 @@ public sealed partial class StartGameButton : UserControl
         }
     }
 
-
-    #region 更新下载状态（对齐 Starward 的 GameInstallState 展示）
-
     public DownloadPhase InstallPhase { get; private set => SetProperty(ref field, value); }
 
     public int ProgressRingValue { get; private set => SetProperty(ref field, value); }
@@ -311,10 +308,6 @@ public sealed partial class StartGameButton : UserControl
         const double MB = 1 << 20;
         return bytes >= MB ? $"{bytes / MB:F2} MB/s" : $"{bytes / KB:F2} KB/s";
     }
-
-
-    #endregion
-
 
     private void StartGameButton_ActualThemeChanged(FrameworkElement sender, object args)
     {

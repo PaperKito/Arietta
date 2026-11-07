@@ -14,6 +14,31 @@ public static partial class AppConfig
     public static string AppVersion =>
         System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1.0";
 
+    public static string AppArchitecture =>
+        System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture switch
+        {
+            System.Runtime.InteropServices.Architecture.X64 => "x64",
+            System.Runtime.InteropServices.Architecture.Arm64 => "arm64",
+            System.Runtime.InteropServices.Architecture.X86 => "x86",
+            var other => other.ToString().ToLowerInvariant(),
+        };
+
+    public static string BuildTime
+    {
+        get
+        {
+            try
+            {
+                string? path = Environment.ProcessPath;
+                return path is null ? "—" : System.IO.File.GetLastWriteTime(path).ToString("yyyy/MM/dd HH:mm");
+            }
+            catch
+            {
+                return "—";
+            }
+        }
+    }
+
 
     public static string LocalFolder { get; } = ResolveLocalFolder();
 

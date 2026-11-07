@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog x:Class="Arietta.Features.GameLauncher.SpaceCheckDialog"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+               xmlns:lang="using:Arietta.Localization"
+               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+               x:DefaultBindMode="OneWay"
+               Background="{ThemeResource CustomDialogAcrylicBrush}"
+               BorderThickness="0"
+               CornerRadius="8"
+               Style="{ThemeResource DefaultContentDialogStyle}"
+               mc:Ignorable="d">
+    <ContentDialog.Resources>
+        <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
+        <Thickness x:Key="ContentDialogPadding">0</Thickness>
+        <StaticResource x:Key="ContentDialogSmokeFill" ResourceKey="ControlFillColorTransparentBrush" />
+    </ContentDialog.Resources>
+
+    <Grid Width="400" Padding="24">
+
+        <StackPanel>
+
+            <TextBlock FontSize="18"
+                       FontWeight="Bold"
+                       IsTextScaleFactorEnabled="False"
+                       Text="{x:Bind lang:Lang.Instance.SpaceCheck_Title, Mode=OneWay}" />
+
+            <TextBlock Margin="0,12,0,0"
+                       FontSize="12"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       IsTextScaleFactorEnabled="False"
+                       Text="{x:Bind lang:Lang.Instance.SpaceCheck_Sub, Mode=OneWay}"
+                       TextWrapping="Wrap" />
+
+            <Border Margin="0,20,0,0"
+                    Padding="12,8"
+                    Background="{ThemeResource DateTimePickerFlyoutButtonBackgroundPointerOver}"
+                    CornerRadius="8">
+                <StackPanel Spacing="8">
+                    <TextBlock FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               IsTextScaleFactorEnabled="False">
+                        <Run Text="{x:Bind lang:Lang.Instance.GameUpdate_SpaceRequired, Mode=OneWay}" />
+                        <Run x:Name="Run_Required" />
+                    </TextBlock>
+                    <TextBlock FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               IsTextScaleFactorEnabled="False">
+                        <Run Text="{x:Bind lang:Lang.Instance.InstallGameDialog_SpaceAvailable, Mode=OneWay}" />
+                        <Run x:Name="Run_Available"
+                             Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="Text_Error"
+                       Margin="1,8,1,0"
+                       FontSize="12"
+                       Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                       IsTextScaleFactorEnabled="False"
+                       TextWrapping="Wrap" />
+
+            <Button Margin="0,20,0,0"
+                    HorizontalAlignment="Right"
+                    Click="Retry_Click"
+                    Content="{x:Bind lang:Lang.Instance.SpaceCheck_Retry, Mode=OneWay}"
+                    FontSize="14"
+                    IsTextScaleFactorEnabled="False"
+                    Style="{ThemeResource AccentButtonStyle}" />
+
+        </StackPanel>
+
+        <Button Width="32"
+                Height="32"
+                Margin="-20"
+                Padding="0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                BorderThickness="0"
+                Click="Close_Click"
+                CornerRadius="8"
+                Style="{ThemeResource DateTimePickerFlyoutButtonStyle}">
+            <FontIcon FontSize="16"
+                      Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                      Glyph="&#xE711;"
+                      IsTextScaleFactorEnabled="False" />
+        </Button>
+
+    </Grid>
+</ContentDialog>

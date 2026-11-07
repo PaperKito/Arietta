@@ -19,9 +19,6 @@ internal static class ResourceRecordStore
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-
-    #region 鸣潮 · 资源简报（/aki/resource/period：月 / 周 / 版本）
-
     public static void SaveBriefing(string roleId, string periodType, int periodIndex, string? title, KuroBriefingRecord record)
     {
         UpsertResourceRecord(WuwaBiz, roleId, periodType, periodIndex, title,
@@ -108,11 +105,6 @@ internal static class ResourceRecordStore
         }
     }
 
-    #endregion
-
-
-    #region 战双 · 资源月报（/haru/resource/halfOfYear：近半年逐月）
-
     public static void SavePgrReport(string roleId, KuroPgrResourceReport report)
     {
         foreach (var m in report.PerMonthList ?? [])
@@ -198,9 +190,6 @@ internal static class ResourceRecordStore
             return null;
         }
     }
-
-    #endregion
-
 
     private sealed class RecordRow
     {

@@ -127,17 +127,46 @@ internal static class AccentColorHelper
         }
         try
         {
+            Color light2 = ColorMix(value, Colors.White, 0.6);
+            Color light3 = ColorMix(value, Colors.White, 0.4);
+            Color dark1 = ColorMix(value, Colors.Black, 0.8);
+            Color dark2 = ColorMix(value, Colors.Black, 0.6);
+            Color dark3 = ColorMix(value, Colors.Black, 0.4);
+
             app.Resources["SystemAccentColor"] = value;
             app.Resources["SystemAccentColorLight1"] = ColorMix(value, Colors.White, 0.8);
-            app.Resources["SystemAccentColorLight2"] = ColorMix(value, Colors.White, 0.6);
-            app.Resources["SystemAccentColorLight3"] = ColorMix(value, Colors.White, 0.4);
-            app.Resources["SystemAccentColorDark1"] = ColorMix(value, Colors.Black, 0.8);
-            app.Resources["SystemAccentColorDark2"] = ColorMix(value, Colors.Black, 0.6);
-            app.Resources["SystemAccentColorDark3"] = ColorMix(value, Colors.Black, 0.4);
+            app.Resources["SystemAccentColorLight2"] = light2;
+            app.Resources["SystemAccentColorLight3"] = light3;
+            app.Resources["SystemAccentColorDark1"] = dark1;
+            app.Resources["SystemAccentColorDark2"] = dark2;
+            app.Resources["SystemAccentColorDark3"] = dark3;
+
+            bool dark = app.RequestedTheme == ApplicationTheme.Dark;
+            SetAccentTextBrush(app, "AccentTextFillColorPrimaryBrush", dark ? light3 : dark2);
+            SetAccentTextBrush(app, "AccentTextFillColorSecondaryBrush", dark ? light3 : dark3);
+            SetAccentTextBrush(app, "AccentTextFillColorTertiaryBrush", dark ? light2 : dark1);
         }
         catch
         {
 
+        }
+    }
+
+    private static void SetAccentTextBrush(Application app, string key, Color color)
+    {
+        if (app.Resources[key] is SolidColorBrush brush)
+        {
+            brush.Color = color;
+        }
+        foreach (string themeKey in new[] { "Light", "Dark" })
+        {
+            if (app.Resources.ThemeDictionaries.TryGetValue(themeKey, out object? entry)
+                && entry is ResourceDictionary dict
+                && dict.TryGetValue(key, out object? themed)
+                && themed is SolidColorBrush themedBrush)
+            {
+                themedBrush.Color = color;
+            }
         }
     }
 
@@ -149,17 +178,23 @@ internal static class AccentColorHelper
             {
                 return "无 Application";
             }
-            if (app.Resources["AccentFillColorDefaultBrush"] is SolidColorBrush brush)
-            {
-                return $"AccentFillColorDefaultBrush=#{brush.Color.A:X2}{brush.Color.R:X2}{brush.Color.G:X2}{brush.Color.B:X2}";
-            }
-            return "AccentFillColorDefaultBrush 不是 SolidColorBrush";
+            string fill = app.Resources["AccentFillColorDefaultBrush"] is SolidColorBrush brush
+                ? ToHex(brush.Color)
+                : "不是 SolidColorBrush";
+
+            string text = app.Resources["AccentTextFillColorPrimaryBrush"] is SolidColorBrush textBrush
+                ? ToHex(textBrush.Color)
+                : "不是 SolidColorBrush";
+            return $"AccentFillColorDefaultBrush={fill}; AccentTextFillColorPrimaryBrush={text}";
         }
         catch (Exception ex)
         {
-            return $"读取 AccentFillColorDefaultBrush 失败: {ex.GetType().Name}";
+            return $"读取强调色笔刷失败: {ex.GetType().Name}";
         }
     }
+
+
+    private static string ToHex(Color color) => $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
 
 
     private static Color ColorMix(Color input, Color blend, double percent)

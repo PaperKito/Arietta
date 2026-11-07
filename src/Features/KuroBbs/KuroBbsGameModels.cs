@@ -3,8 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace Arietta.Features.KuroBbs;
 
-#region 签到（initSignInV2 / signIn/v2）
-
 public sealed class KuroSignGood
 {
     [JsonPropertyName("goodsName")] public string? GoodsName { get; set; }
@@ -21,10 +19,6 @@ public sealed class KuroSignInitData
     [JsonPropertyName("sigInNum")] public int SignInNum { get; set; }
     [JsonPropertyName("signInGoodsConfigs")] public List<KuroSignGood>? SignInGoodsConfigs { get; set; }
 }
-
-#endregion
-
-#region 逆境深塔（towerDataDetail）
 
 public sealed class KuroTowerSimpleRole
 {
@@ -63,10 +57,6 @@ public sealed class KuroTowerData
     [JsonPropertyName("isUnlock")] public bool IsUnlock { get; set; }
     [JsonPropertyName("seasonEndTime")] public long SeasonEndTime { get; set; }
 }
-
-#endregion
-
-#region 终焉矩阵（newTowerDetail）
 
 public sealed class KuroNewTowerBuff
 {
@@ -113,10 +103,6 @@ public sealed class KuroNewTowerData
     [JsonPropertyName("modeDetails")] public List<KuroNewTowerModeDetail>? ModeDetails { get; set; }
 }
 
-#endregion
-
-#region 冥歌海墟（slashDetail）
-
 public sealed class KuroSlashHalf
 {
     [JsonPropertyName("buffDescription")] public string? BuffDescription { get; set; }
@@ -151,5 +137,3 @@ public sealed class KuroSlashData
     [JsonPropertyName("isUnlock")] public bool IsUnlock { get; set; }
     [JsonPropertyName("seasonEndTime")] public long SeasonEndTime { get; set; }
 }
-
-#endregion

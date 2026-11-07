@@ -25,24 +25,36 @@
             </Button>
         </StackPanel>
 
-        <ScrollViewer Grid.Row="1">
-            <StackPanel x:Name="StackPanel_Content" Spacing="12">
-                <ProgressRing x:Name="ProgressRing_Loading"
-                              IsActive="False"
-                              Visibility="Collapsed" />
-                <InfoBar x:Name="InfoBar_Error"
-                         IsOpen="False"
-                         Visibility="Collapsed"
-                         Severity="Error" />
-                <InfoBar x:Name="InfoBar_NoAccount"
-                         IsOpen="False"
-                         Visibility="Collapsed"
-                         Severity="Warning"
-                         Message="{x:Bind lang:Lang.Instance.PgrData_NoRole, Mode=OneWay}" />
+        <Grid Grid.Row="1">
+            <ScrollViewer Padding="0,4,16,16">
+                <StackPanel x:Name="StackPanel_Content" Spacing="12">
+                    <ProgressRing x:Name="ProgressRing_Loading"
+                                  IsActive="False"
+                                  Visibility="Collapsed" />
+                    <InfoBar x:Name="InfoBar_Error"
+                             IsOpen="False"
+                             Visibility="Collapsed"
+                             Severity="Error" />
+                    <InfoBar x:Name="InfoBar_NoAccount"
+                             IsOpen="False"
+                             Visibility="Collapsed"
+                             Severity="Warning"
+                             Message="{x:Bind lang:Lang.Instance.PgrData_NoRole, Mode=OneWay}" />
 
-                <StackPanel x:Name="StackPanel_Body" Spacing="12" />
-            </StackPanel>
-        </ScrollViewer>
+                    <StackPanel x:Name="StackPanel_Body" Spacing="12" />
+                </StackPanel>
+            </ScrollViewer>
+
+            <TextBlock x:Name="TextBlock_Hint"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsHitTestVisible="False"
+                       FontSize="13"
+                       Opacity="0.6"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Visibility="Collapsed" />
+        </Grid>
     </Grid>
 
 </mf:PageBase>

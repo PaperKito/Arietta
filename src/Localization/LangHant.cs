@@ -90,7 +90,6 @@ internal static class LangHant
         ["PgrResource_BlackCard"] = "黑卡",
         ["PgrResource_Develop"] = "研發資源",
         ["PgrResource_Trade"] = "貿易憑證",
-        ["PgrResource_SelectPeriod"] = "選擇週期",
         ["PgrResource_Composition"] = "收入組成",
         ["PgrResource_MonthlyData"] = "每月資料",
         ["PgrChallenge_NotOpen"] = "當前不在開放期",
@@ -162,9 +161,6 @@ internal static class LangHant
         ["GameLauncherSettingDialog_BackupAndUninstall"] = "備份並解除安裝",
         ["GameLauncherSettingDialog_Uninstalled"] = "遊戲已解除安裝",
 
-        ["CloseDialog_Title"] = "關閉視窗",
-        ["CloseDialog_Content"] = "選擇點擊關閉按鈕時的行為，之後可在「設定 → 視窗行為」中修改。",
-
         ["SettingPage_CurrentVersion"] = "版本:",
 
         ["SettingPage_About_Copyright"] = "Developed by PaperKito. All rights reserved.",
@@ -207,6 +203,7 @@ internal static class LangHant
         ["UpdateWindow_ReleasePage"] = "發佈頁",
         ["UpdateWindow_UpdateHistory"] = "更新紀錄",
         ["UpdateWindow_LoadingHistory"] = "正在載入更新紀錄…",
+        ["UpdateWindow_NotesUnavailable"] = "暫時無法取得更新說明。",
         ["UpdateWindow_RemindLater"] = "稍後提醒",
 
         ["SettingPage_About_Links"] = "相關連結",
@@ -301,7 +298,7 @@ internal static class LangHant
         ["GachaLogPage_ViaCloudGame"] = "透過雲端遊戲取得",
         ["CloudGame_Title"] = "雲鳴潮 - 登入後一鍵取得喚取連結",
         ["CloudGame_Grab"] = "取得喚取連結",
-        ["CloudGame_StatusDefault"] = "在此登入庫洛帳號、點「進入遊戲」並開啟一次「喚取記錄」介面，然後點擊「取得喚取連結」",
+        ["CloudGame_StatusDefault"] = "開啟喚取記錄後點擊取得連結",
         ["CloudGame_StatusSessionReady"] = "已偵測到雲端遊戲登入狀態，點擊「取得喚取連結」完成同步",
         ["CloudGame_StatusGrabbing"] = "正在讀取登入資訊…",
         ["CloudGame_StatusOk"] = "取得成功（玩家 {0}），正在同步調頻記錄…",
@@ -379,6 +376,7 @@ internal static class LangHant
         ["ImageViewWindow2_SaveAs"] = "另存新檔",
         ["GameLauncherPage_PlayPause"] = "播放/暫停",
         ["GameLauncherSettingDialog_DragAndDropImageOrVideoFiles"] = "拖放圖片檔案以更換背景",
+        ["Background_OfficialShort"] = "官方",
         ["Background_Official"] = "官方動態背景",
         ["Background_OfficialStatic"] = "官方靜態背景",
         ["Background_OpenFolder"] = "開啟背景資料夾",
@@ -452,7 +450,7 @@ internal static class LangHant
         ["Login_PhonePlaceholder"] = "手機號碼",
         ["Login_CodePlaceholder"] = "簡訊驗證碼",
         ["Login_CodeLabel"] = "驗證碼",
-        ["Login_SmsTip"] = "點擊「傳送驗證碼」後填寫手機收到的簡訊驗證碼，登入成功會自動儲存帳號",
+        ["Login_SmsTip"] = "庫街區僅支援單設備登入，登入後行動端將無法使用庫街區",
         ["Login_SendCode"] = "傳送驗證碼",
         ["Login_Confirm"] = "登入",
         ["Login_Cancel"] = "取消",
@@ -466,6 +464,10 @@ internal static class LangHant
         ["Login_Failed"] = "登入失敗：{0}",
         ["Login_SeekRoleFailed"] = "查詢綁定角色失敗：{0}",
         ["Login_Success"] = "庫街區帳號「{0}」登入成功",
+        ["Login_CaptchaLoading"] = "正在載入安全驗證，請完成滑塊驗證…",
+        ["Login_CaptchaCancel"] = "安全驗證未完成（取消、載入失敗或逾時），可重試；也可改用 Token 登入",
+        ["Login_NeedCaptcha"] = "伺服器未發送簡訊：需先完成滑塊驗證，或驗證碼發送過於頻繁",
+        ["Login_CaptchaTitle"] = "安全驗證",
 
         ["ResourceBrief_Month"] = "月度",
         ["ResourceBrief_Week"] = "週度",
@@ -542,7 +544,7 @@ internal static class LangHant
 
         ["GameSettingPage_Resolution"] = "解析度",
         ["GameSettingPage_FullScreen"] = "全螢幕",
-        ["GameSettingPage_PgrFullscreenBlockedTip"] = "目前顯示器解析度超過遊戲支援上限，全螢幕無法正常使用",
+        ["GameSettingPage_PgrResolutionUnsupportedTip"] = "目前解析度 {0} × {1} 不支援全螢幕模式",
         ["GameSettingPage_CustomResolution"] = "自訂解析度",
         ["GameSettingPage_CustomResolutionTip"] = "自訂解析度在「視窗」顯示模式下生效",
         ["GameSettingPage_VoiceLanguage"] = "語音語言",
@@ -562,6 +564,9 @@ internal static class LangHant
         ["SettingPage_WindowBehavior"] = "視窗行為",
         ["SettingPage_CloseWindowOption"] = "關閉視窗選項",
         ["SettingPage_ExitApp"] = "完全結束",
+
+        ["CloseDialog_Title"] = "關閉視窗選項",
+        ["CloseDialog_Content"] = "您可以在設定頁面再次變更此選項。",
         ["SettingPage_AfterLaunchOption"] = "啟動遊戲後",
         ["SettingPage_KeepWindow"] = "保持視窗",
         ["SettingPage_AfterGameExitOption"] = "關閉遊戲後",
@@ -573,7 +578,8 @@ internal static class LangHant
         ["SettingPage_TransparencyEffects"] = "透明效果",
         ["SettingPage_AnimationEffects"] = "動畫效果",
 
-        ["GameSelector_Subtitle"] = "點擊左上角的圖示即可選擇或切換遊戲",
+        ["GameSelector_Title"] = "歡迎來到 Arietta",
+        ["GameSelector_Subtitle"] = "點擊左上角的圖示即可選擇或切換遊戲\n選擇後即可開始使用 Arietta",
         ["GameSelector_AutoFind"] = "自動搜尋本機遊戲",
         ["GameSelector_SelectServer"] = "選擇伺服器",
         ["GameSelector_InstalledSize"] = "已安裝遊戲實際佔用空間 ",

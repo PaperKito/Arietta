@@ -36,6 +36,10 @@ internal static class SharedHttp
         Create(decompression: false, timeout: Timeout.InfiniteTimeSpan, userAgent: ChromeUserAgent,
             pooledConnectionLifetime: TimeSpan.FromMinutes(10), bypassProxy: false);
 
+    public static HttpClient SelfUpdateWeb { get; } =
+        Create(decompression: true, timeout: Timeout.InfiniteTimeSpan, userAgent: ChromeUserAgent,
+            pooledConnectionLifetime: TimeSpan.FromMinutes(10), bypassProxy: false, allowAutoRedirect: false);
+
     public static bool IsSystemProxyActive()
     {
         try
@@ -68,7 +72,8 @@ internal static class SharedHttp
         TimeSpan timeout,
         string? userAgent = null,
         TimeSpan? pooledConnectionLifetime = null,
-        bool bypassProxy = false)
+        bool bypassProxy = false,
+        bool allowAutoRedirect = true)
     {
         var client = new HttpClient(new SocketsHttpHandler
         {
@@ -76,6 +81,8 @@ internal static class SharedHttp
             PooledConnectionLifetime = pooledConnectionLifetime ?? TimeSpan.FromMinutes(2),
 
             UseProxy = !bypassProxy,
+
+            AllowAutoRedirect = allowAutoRedirect,
         })
         { Timeout = timeout };
 
