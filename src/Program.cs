@@ -10,6 +10,13 @@ public static class Program
     [global::System.STAThreadAttribute]
     static void Main(string[] args)
     {
+
+        if (args.Length > 0 && string.Equals(args[0], Features.GamePacks.GamePackLauncher.Verb, StringComparison.OrdinalIgnoreCase))
+        {
+            Environment.Exit(Features.GamePacks.GamePackLauncher.RunVerb(args));
+            return;
+        }
+
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         global::WinRT.ComWrappersSupport.InitializeComWrappers();
         global::Microsoft.UI.Xaml.Application.Start((p) =>

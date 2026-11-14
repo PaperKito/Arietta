@@ -14,6 +14,8 @@ public sealed partial class GameBizIcon
 
     public GameBiz Biz { get; set; }
 
+    public string Key { get; set; } = "";
+
     public string GameName { get; set; } = "";
 
     public string ServerName { get; set; } = "";
@@ -55,6 +57,11 @@ public sealed partial class GameBizIcon
     {
         try
         {
+
+            if (Path.IsPathRooted(iconPath) && File.Exists(iconPath))
+            {
+                return new BitmapImage(new Uri(iconPath));
+            }
             string file = Path.Combine(AppContext.BaseDirectory, "Assets", "Image", "Game", Path.GetFileName(iconPath));
             return new BitmapImage(new Uri(file));
         }

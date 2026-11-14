@@ -176,20 +176,20 @@ internal static class AccentColorHelper
         {
             if (Application.Current is not { } app)
             {
-                return "无 Application";
+                return "no Application";
             }
             string fill = app.Resources["AccentFillColorDefaultBrush"] is SolidColorBrush brush
                 ? ToHex(brush.Color)
-                : "不是 SolidColorBrush";
+                : "not a SolidColorBrush";
 
             string text = app.Resources["AccentTextFillColorPrimaryBrush"] is SolidColorBrush textBrush
                 ? ToHex(textBrush.Color)
-                : "不是 SolidColorBrush";
+                : "not a SolidColorBrush";
             return $"AccentFillColorDefaultBrush={fill}; AccentTextFillColorPrimaryBrush={text}";
         }
         catch (Exception ex)
         {
-            return $"读取强调色笔刷失败: {ex.GetType().Name}";
+            return $"Failed to read accent brushes: {ex.GetType().Name}";
         }
     }
 

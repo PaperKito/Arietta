@@ -111,6 +111,19 @@ public sealed partial class GachaLogPage : PageBase
     protected override void OnLoaded()
     {
         base.OnLoaded();
+
+        if (ViewHost.MainView.CurrentGameEntry?.IsExternal == true)
+        {
+
+            if (ViewHost.MainView.CurrentGameEntry?.Pack?.Strings is { } strings
+                && strings.TryGetValue("gacha.title", out string? title)
+                && !string.IsNullOrWhiteSpace(title))
+            {
+                Text_GachaTitle.Text = title;
+            }
+            ViewModel.ClearForPackGame();
+            return;
+        }
         try
         {
             ViewModel.Initialize();

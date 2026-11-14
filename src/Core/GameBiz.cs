@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Arietta.Core;
 
@@ -13,6 +15,8 @@ public enum GameBiz
     PunishingGrayRavenKorea,
     PunishingGrayRavenJapan,
     PunishingGrayRavenTaiwan,
+
+    External = 100,
 }
 
 public static class GameBizExtensions
@@ -57,7 +61,15 @@ public static class GameRegistry
         bool HasGachaPage)
     {
 
-        public string ShortName => Biz switch
+        public string? PackId { get; init; }
+
+        public GamePack? Pack { get; init; }
+
+        public string Key => PackId is null ? Biz.ToString() : $"{nameof(GameBiz.External)}:{PackId}";
+
+        public bool IsExternal => PackId is not null;
+
+        public string ShortName => Pack?.DisplayName ?? Biz switch
         {
             GameBiz.WutheringWaves => Localization.Lang.Instance.GameBiz_ShortCn,
             GameBiz.WutheringWavesGlobal => Localization.Lang.Instance.GameBiz_ShortGlobal,
@@ -70,7 +82,7 @@ public static class GameRegistry
             _ => Name,
         };
 
-        public string GameIconPath => Biz switch
+        public string GameIconPath => Pack?.IconPath is { Length: > 0 } packIcon ? packIcon : Biz switch
         {
             GameBiz.PunishingGrayRaven or GameBiz.PunishingGrayRavenGlobal or GameBiz.PunishingGrayRavenKorea
                 or GameBiz.PunishingGrayRavenJapan or GameBiz.PunishingGrayRavenTaiwan
@@ -79,13 +91,13 @@ public static class GameRegistry
             _ => "ms-appx:///Assets/Image/Game/gameicon_wuwa.png",
         };
 
-        public string? ServerIconPath => Biz switch
+        public string? ServerIconPath => IsExternal ? null : Biz switch
         {
             GameBiz.WutheringWavesBilibili => "ms-appx:///Assets/Image/Game/gameicon_bilibili.png",
             _ => null,
         };
 
-        public string ServerCode => Biz switch
+        public string ServerCode => Pack?.ServerCode ?? Biz switch
         {
             GameBiz.WutheringWaves => "CN",
             GameBiz.WutheringWavesGlobal => "GL",
@@ -97,7 +109,7 @@ public static class GameRegistry
             _ => "",
         };
 
-        public string[] ExeNames => Biz switch
+        public string[] ExeNames => Pack is { ExeNames.Length: > 0 } p ? p.ExeNames : Biz switch
         {
             GameBiz.PunishingGrayRaven or GameBiz.PunishingGrayRavenGlobal or GameBiz.PunishingGrayRavenKorea
                 or GameBiz.PunishingGrayRavenJapan or GameBiz.PunishingGrayRavenTaiwan
@@ -105,7 +117,7 @@ public static class GameRegistry
             _ => new[] { "Client-Win64-Shipping.exe", "Wuthering Waves.exe" },
         };
 
-        public string[] MarkerDirs => Biz switch
+        public string[] MarkerDirs => Pack is { MarkerDirs.Length: > 0 } p ? p.MarkerDirs : Biz switch
         {
             GameBiz.PunishingGrayRaven => new[] { "Punishing Gray Raven" },
 
@@ -115,7 +127,7 @@ public static class GameRegistry
             _ => new[] { "Wuthering Waves" },
         };
 
-        public string DefaultInstallDirName => Biz switch
+        public string DefaultInstallDirName => Pack?.Id ?? Biz switch
         {
             GameBiz.WutheringWavesGlobal => "Wuthering Waves Global",
             GameBiz.WutheringWavesBilibili => "Wuthering Waves bilibili",
@@ -125,7 +137,7 @@ public static class GameRegistry
             _ => "Wuthering Waves",
         };
 
-        public string[] RegistryKeys => Biz switch
+        public string[] RegistryKeys => Pack is { RegistryKeys.Length: > 0 } p ? p.RegistryKeys : Biz switch
         {
             GameBiz.WutheringWaves => new[]
             {
@@ -157,7 +169,7 @@ public static class GameRegistry
             _ => Array.Empty<string>(),
         };
 
-        public string? DirHint => Biz switch
+        public string? DirHint => IsExternal ? null : Biz switch
         {
             GameBiz.WutheringWavesGlobal => "global",
             GameBiz.WutheringWavesBilibili => "bilibili",
@@ -169,10 +181,19 @@ public static class GameRegistry
 
     private static GameEntry[]? _games;
 
+    public static Func<IEnumerable<GameEntry>>? ExternalEntriesProvider { get; set; }
+
+    public static void Invalidate()
+    {
+        _games = null;
+        _groups = null;
+    }
+
+
     private static GameEntry[] BuildGames()
     {
-        return
-        [
+        var list = new List<GameEntry>
+        {
             new(GameBiz.WutheringWaves, Localization.Lang.Instance.GameBiz_WuwaCn, true),
             new(GameBiz.WutheringWavesGlobal, Localization.Lang.Instance.GameBiz_WuwaGlobal, true),
             new(GameBiz.WutheringWavesBilibili, Localization.Lang.Instance.GameBiz_WuwaBilibili, true),
@@ -181,7 +202,19 @@ public static class GameRegistry
             new(GameBiz.PunishingGrayRavenKorea, Localization.Lang.Instance.GameBiz_PgrKorea, false),
             new(GameBiz.PunishingGrayRavenJapan, Localization.Lang.Instance.GameBiz_PgrJapan, false),
             new(GameBiz.PunishingGrayRavenTaiwan, Localization.Lang.Instance.GameBiz_PgrTaiwan, false),
-        ];
+        };
+        if (ExternalEntriesProvider is { } provider)
+        {
+            try
+            {
+                list.AddRange(provider());
+            }
+            catch
+            {
+
+            }
+        }
+        return list.ToArray();
     }
 
     public static GameEntry GetEntry(GameBiz biz)
@@ -194,6 +227,22 @@ public static class GameRegistry
             }
         }
         return Games[0];
+    }
+
+    public static GameEntry? FindEntry(string? key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return null;
+        }
+        foreach (var g in Games)
+        {
+            if (string.Equals(g.Key, key, StringComparison.OrdinalIgnoreCase))
+            {
+                return g;
+            }
+        }
+        return null;
     }
 
     public record GameGroup(string Game, string IconPath, GameEntry[] Servers);
@@ -221,8 +270,8 @@ public static class GameRegistry
 
     private static GameGroup[] BuildGroups()
     {
-        return
-        [
+        var groups = new List<GameGroup>
+        {
 
             new(Localization.Lang.Instance.GameBiz_Wuwa, WuwaLogoPath, new[]
             {
@@ -238,7 +287,13 @@ public static class GameRegistry
                 Games[6],
                 Games[7],
             }),
-        ];
+        };
+
+        foreach (GameEntry entry in Games.Where(g => g.IsExternal))
+        {
+            groups.Add(new GameGroup(entry.Name, entry.GameIconPath, new[] { entry }));
+        }
+        return groups.ToArray();
     }
 
     static GameRegistry()
@@ -372,6 +427,19 @@ public static class GameRegistry
     public static bool IsDynamicBgEnabled(GameBiz biz)
     {
         return AppConfig.GetConfig(GetEnableDynamicBgConfigKey(biz)) != "0";
+    }
+
+    public static string GetShowDynBgSloganConfigKey(GameBiz biz) =>
+        $"ShowDynBgSlogan_{biz.GetBaseBiz()}";
+
+    public static bool IsDynBgSloganShown(GameBiz biz)
+    {
+        return AppConfig.GetConfig(GetShowDynBgSloganConfigKey(biz)) != "0";
+    }
+
+    public static void SetDynBgSloganShown(GameBiz biz, bool shown)
+    {
+        AppConfig.SetConfig(GetShowDynBgSloganConfigKey(biz), shown ? null : "0");
     }
 
     public static bool IsCustomBgEnabled(GameBiz biz)

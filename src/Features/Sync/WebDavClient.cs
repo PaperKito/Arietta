@@ -108,28 +108,33 @@ internal sealed class WebDavClient : IDisposable
         return response!;
     }
 
-    public async Task<(bool Success, string Message)> TestAsync(CancellationToken ct = default)
+    public async Task<(bool Success, string Message, string? Key, object[]? Args)> TestAsync(CancellationToken ct = default)
     {
         try
         {
             using var response = await SendAsync(() => new HttpRequestMessage(HttpMethod.Options, _baseUri), ct);
             if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
             {
-                return (false, "认证失败：请检查账号与第三方应用密码（坚果云需要单独生成应用密码）");
+                return (false,
+                    "Authentication failed: check the account and app password (Nutstore requires a separately generated app password)",
+                    "Sync_Msg_TestAuthFailed", null);
             }
             if (!response.IsSuccessStatusCode)
             {
-                return (false, $"服务器返回 {(int)response.StatusCode} {response.ReasonPhrase}");
+                int code = (int)response.StatusCode;
+                return (false, $"Server returned {code} {response.ReasonPhrase}",
+                    "Sync_Msg_TestServerStatus", [code, response.ReasonPhrase ?? ""]);
             }
             bool supportsDav = response.Headers.TryGetValues("DAV", out IEnumerable<string>? values)
                                && values.Any();
             return supportsDav
-                ? (true, "连接成功")
-                : (true, "已连通，但服务端未声明 DAV 支持，可能不是标准 WebDAV 目录");
+                ? (true, "Connected", "Sync_Msg_TestOk", null)
+                : (true, "Connected, but the server does not advertise DAV support; it may not be a standard WebDAV folder",
+                    "Sync_Msg_TestNoDav", null);
         }
         catch (Exception ex)
         {
-            return (false, $"连接失败：{ex.Message}");
+            return (false, $"Connection failed: {ex.Message}", "Sync_Msg_TestFailed", [ex.Message]);
         }
     }
 
@@ -149,7 +154,7 @@ internal sealed class WebDavClient : IDisposable
         }
         if (status is not (HttpStatusCode.OK or HttpStatusCode.MultiStatus))
         {
-            throw new WebDavException($"PROPFIND {relativePath} 失败：{(int)status} {reason}");
+            throw new WebDavException($"PROPFIND {relativePath} failed: {(int)status} {reason}");
         }
         return xml is null ? null : ParseResource(xml, relativePath);
     }
@@ -235,7 +240,7 @@ internal sealed class WebDavClient : IDisposable
             {
                 return;
             }
-            throw new WebDavException($"创建目录 {relativePath} 失败：{(int)retry.StatusCode} {retry.ReasonPhrase}");
+            throw new WebDavException($"Create directory {relativePath} failed: {(int)retry.StatusCode} {retry.ReasonPhrase}");
         }
     }
 
@@ -248,7 +253,7 @@ internal sealed class WebDavClient : IDisposable
         }
         if (!response.IsSuccessStatusCode)
         {
-            throw new WebDavException($"下载 {relativePath} 失败：{(int)response.StatusCode} {response.ReasonPhrase}");
+            throw new WebDavException($"Download {relativePath} failed: {(int)response.StatusCode} {response.ReasonPhrase}");
         }
         byte[] content = await response.Content.ReadAsByteArrayAsync(ct);
         return (content, NormalizeETag(response.Headers.ETag?.Tag));

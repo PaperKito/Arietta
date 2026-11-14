@@ -108,7 +108,12 @@ public sealed partial class DynamicBackgroundHost : UserControl
                 return;
             }
 
-            Stop();
+            var resumingSuspended = _player is null &&
+                string.Equals(_currentPath, videoPath, StringComparison.OrdinalIgnoreCase);
+            if (!resumingSuspended)
+            {
+                Stop();
+            }
 
             var player = new MediaPlayer
             {
@@ -183,9 +188,15 @@ public sealed partial class DynamicBackgroundHost : UserControl
         {
             _player.Play();
         }
+        else if (!_windowVisible || _gameRunning)
+        {
+
+            SuspendPlayback();
+        }
         else
         {
-            SuspendPlayback();
+
+            _player.Pause();
         }
     }
 
@@ -211,10 +222,7 @@ public sealed partial class DynamicBackgroundHost : UserControl
 
     public void TogglePause()
     {
-        if (_player is null)
-        {
-            return;
-        }
+
         _pausedByUser = !_pausedByUser;
         UpdatePlayback();
     }

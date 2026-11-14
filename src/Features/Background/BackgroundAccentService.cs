@@ -63,7 +63,7 @@ internal static class BackgroundAccentService
 
                     _logger.LogInformation("Background accent color {Color} (from {Source}); {Resolved}",
                                            ToHex(effective),
-                                           accentSourcePath ?? "无（还原默认）",
+                                           accentSourcePath ?? "none (default restored)",
                                            AccentColorHelper.DescribeResolvedAccent());
                 }
                 catch (Exception ex)

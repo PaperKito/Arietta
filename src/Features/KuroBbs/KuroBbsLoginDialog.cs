@@ -172,7 +172,7 @@ public sealed class KuroBbsLoginDialog
         catch (Exception ex)
         {
 
-            throw new InvalidOperationException($"登录窗口打开失败：{ex.Message} (0x{ex.HResult:X8})", ex);
+            throw new InvalidOperationException($"Login window failed to open: {ex.Message} (0x{ex.HResult:X8})", ex);
         }
         return ResultIndex;
     }

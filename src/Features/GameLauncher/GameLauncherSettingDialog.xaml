@@ -12,6 +12,7 @@
                BorderThickness="0"
                CornerRadius="8"
                Style="{ThemeResource DefaultContentDialogStyle}"
+               Closing="GameLauncherSettingDialog_Closing"
                mc:Ignorable="d">
     <ContentDialog.Resources>
         <x:Double x:Key="ContentDialogMaxWidth">1200</x:Double>
@@ -268,28 +269,81 @@
                                     Visibility="Collapsed" />
                         </StackPanel>
 
-                        <Grid x:Name="Panel_RepairProgress"
-                              ColumnSpacing="12"
-                              Visibility="Collapsed">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Spacing="6">
+                        <Border x:Name="Panel_RepairProgress"
+                                Padding="16,12,16,12"
+                                Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Visibility="Collapsed">
+                            <StackPanel Spacing="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="Text_RepairStatus"
+                                               VerticalAlignment="Center"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               TextWrapping="Wrap" />
+                                    <TextBlock x:Name="Text_RepairPercent"
+                                               Grid.Column="1"
+                                               Margin="12,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="12"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    <Button Grid.Column="2"
+                                            Margin="12,0,0,0"
+                                            Padding="12,4,12,4"
+                                            VerticalAlignment="Center"
+                                            Click="Button_RepairCancel_Click"
+                                            Content="{x:Bind lang:Lang.Instance.Common_Cancel, Mode=OneWay}"
+                                            CornerRadius="8"
+                                            Style="{ThemeResource DateTimePickerFlyoutButtonStyle}" />
+                                </Grid>
                                 <ProgressBar x:Name="ProgressBar_Repair"
                                              IsIndeterminate="True" />
-                                <TextBlock x:Name="Text_RepairStatus"
-                                           FontSize="12"
-                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           TextWrapping="Wrap" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon FontSize="14"
+                                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                  Glyph="&#xF012;" />
+                                        <TextBlock x:Name="Text_RepairBytes"
+                                                   FontSize="12"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel x:Name="Row_RepairSpeed"
+                                                Grid.Column="1"
+                                                Orientation="Horizontal"
+                                                Spacing="8"
+                                                Visibility="Collapsed">
+                                        <FontIcon FontSize="14"
+                                                  Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                  Glyph="&#xEC4A;" />
+                                        <TextBlock x:Name="Text_RepairSpeed"
+                                                   FontSize="12"
+                                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel x:Name="Row_RepairRemain"
+                                            Orientation="Horizontal"
+                                            Spacing="8"
+                                            Visibility="Collapsed">
+                                    <FontIcon FontSize="14"
+                                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                              Glyph="&#xE917;" />
+                                    <TextBlock x:Name="Text_RepairRemain"
+                                               FontSize="12"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
                             </StackPanel>
-                            <Button Grid.Column="1"
-                                    VerticalAlignment="Center"
-                                    Click="Button_RepairCancel_Click"
-                                    Content="{x:Bind lang:Lang.Instance.Common_Cancel, Mode=OneWay}"
-                                    CornerRadius="8"
-                                    Style="{ThemeResource DateTimePickerFlyoutButtonStyle}" />
-                        </Grid>
+                        </Border>
 
                         <TextBlock x:Name="TextBlock_RepairError"
                                    FontSize="12"
@@ -308,9 +362,23 @@
                                            HorizontalAlignment="Stretch" />
                         </StackPanel>
 
-                        <ToggleSwitch IsOn="{x:Bind EnableBannerAndPost, Mode=TwoWay}"
-                                      OffContent="{x:Bind lang:Lang.Instance.LauncherPage_ShowGameAnnouncement, Mode=OneWay}"
-                                      OnContent="{x:Bind lang:Lang.Instance.LauncherPage_ShowGameAnnouncement, Mode=OneWay}" />
+                        <StackPanel Orientation="Horizontal" Spacing="24">
+                            <ToggleSwitch IsOn="{x:Bind EnableBannerAndPost, Mode=TwoWay}"
+                                          OffContent="{x:Bind lang:Lang.Instance.LauncherPage_ShowGameAnnouncement, Mode=OneWay}"
+                                          OnContent="{x:Bind lang:Lang.Instance.LauncherPage_ShowGameAnnouncement, Mode=OneWay}" />
+
+                            <ComboBox MinWidth="132"
+                                      VerticalAlignment="Center"
+                                      SelectedIndex="{x:Bind BannerScaleUpMode, Mode=TwoWay}"
+                                      Visibility="{x:Bind BannerScaleUpVisibility, Mode=OneWay}">
+                                <ComboBoxItem Content="{x:Bind lang:Lang.Instance.LauncherPage_AnnouncementScaleOnHover, Mode=OneWay}" />
+                                <ComboBoxItem Content="{x:Bind lang:Lang.Instance.LauncherPage_AnnouncementFixedSize, Mode=OneWay}" />
+                            </ComboBox>
+                        </StackPanel>
+
+                        <ToggleSwitch IsOn="{x:Bind EnableShowVersionPoster, Mode=TwoWay}"
+                                      OffContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_ShowVersionPoster, Mode=OneWay}"
+                                      OnContent="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_ShowVersionPoster, Mode=OneWay}" />
 
                     </StackPanel>
                 </FlipViewItem>
@@ -390,10 +458,11 @@
                                   VerticalScrollMode="Auto">
 
                     <StackPanel Spacing="12" Margin="0,0,16,0">
+
                         <ToggleSwitch Margin="0,0,0,-8"
                                       IsOn="{x:Bind EnableCustomBg, Mode=TwoWay}"
-                                      OffContent="{x:Bind lang:Lang.Instance.SettingPage_CustomBackgroundSupportVideo, Mode=OneWay}"
-                                      OnContent="{x:Bind lang:Lang.Instance.SettingPage_CustomBackgroundSupportVideo, Mode=OneWay}" />
+                                      OffContent="{x:Bind lang:Lang.Instance.SettingPage_EnableCustomBackground, Mode=OneWay}"
+                                      OnContent="{x:Bind lang:Lang.Instance.SettingPage_EnableCustomBackground, Mode=OneWay}" />
                         <TextBlock FontSize="12"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    Text="{x:Bind lang:Lang.Instance.SettingPage_BgSizeTip, Mode=OneWay}"
@@ -569,6 +638,49 @@
                 Height="0"
                 IsHitTestVisible="False"
                 IsTabStop="True" />
+
+        <Grid x:Name="Grid_RepairExitConfirm"
+              Margin="-24"
+              Background="#99000000"
+              PointerPressed="Grid_RepairExitConfirm_PointerPressed"
+              Visibility="Collapsed">
+            <Border Width="440"
+                    MinWidth="340"
+                    MaxWidth="440"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{ThemeResource CustomDialogAcrylicBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                <StackPanel Spacing="8">
+                    <TextBlock FontSize="20"
+                               FontWeight="SemiBold"
+                               Text="{x:Bind lang:Lang.Instance.RepairExitDialog_Title, Mode=OneWay}"
+                               TextWrapping="Wrap" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Text="{x:Bind lang:Lang.Instance.RepairExitDialog_Content, Mode=OneWay}"
+                               TextWrapping="Wrap" />
+                    <Grid Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="Button_RepairExitConfirm"
+                                HorizontalAlignment="Stretch"
+                                Click="Button_RepairExitConfirm_Click"
+                                Content="{x:Bind lang:Lang.Instance.RepairExitDialog_Confirm, Mode=OneWay}"
+                                Style="{ThemeResource AccentButtonStyle}" />
+                        <Button Grid.Column="2"
+                                HorizontalAlignment="Stretch"
+                                Click="Button_RepairExitCancel_Click"
+                                Content="{x:Bind lang:Lang.Instance.Common_Cancel, Mode=OneWay}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
 
     </Grid>
 </ContentDialog>

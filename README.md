@@ -4,7 +4,9 @@ English | [简体中文](./README.zh.md)
 
 > The name comes from Italian *arietta* — the diminutive of *aria* ("a little aria"); the word also means "a light breeze".
 
-Arietta aims to make up for what the official launcher is missing. It supports all Kuro Games PC titles (Wuthering Waves, Punishing: Gray Raven).
+Arietta aims to make up for what the official launcher is missing. It natively supports all Kuro Games PC titles (Wuthering Waves, Punishing: Gray Raven).
+
+**Other games can be added by installing a game package**
 
 Besides the launcher basics, I added extra features driven by my own needs, for example:
 

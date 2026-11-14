@@ -21,6 +21,8 @@ public sealed partial class PreDownloadDialog : ContentDialog
         _stagedBytes = state.PredownloadedBytes;
         TitleText = string.Format(Lang.Instance.GameUpdate_PredownloadTitle, state.TargetVersion);
 
+        TierNameText = state.TierName is null ? "" : GameUpdateService.TierDisplayName(state.TierName);
+
         SizeLabel = _requiredBytes > 0 ? Lang.Instance.GameUpdate_SpaceRequired : Lang.Instance.GameUpdate_PackageSize;
         PackageSizeText = GameUpdateSession.FormatSize(_requiredBytes > 0 ? _requiredBytes : _totalBytes);
         PredownloadedSizeText = GameUpdateSession.FormatSize(_stagedBytes);
@@ -43,6 +45,8 @@ public sealed partial class PreDownloadDialog : ContentDialog
     public string PackageSizeText { get; }
     public string PredownloadedSizeText { get; }
     public string StartButtonText { get; }
+    public string TierNameText { get; }
+    public Visibility TierVisible => TierNameText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility StagedVisible => _stagedBytes > 0 ? Visibility.Visible : Visibility.Collapsed;
     public string AvailableSpaceText { get; private set => SetProperty(ref field, value); } = "--";
     public string? ErrorMessage { get; private set => SetProperty(ref field, value); }

@@ -5,6 +5,7 @@ using Arietta.Frameworks;
 using Arietta.Localization;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Windows.Graphics;
 
 namespace Arietta.Features.ViewHost;

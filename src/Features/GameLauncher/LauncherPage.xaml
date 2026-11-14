@@ -20,6 +20,51 @@
           DragOver="RootGrid_DragOver"
           Drop="RootGrid_Drop">
 
+        <Grid.Resources>
+
+            <Style x:Key="WallpaperOverlayButtonStyle"
+                   TargetType="Button">
+                <Setter Property="Foreground" Value="{ThemeResource ButtonForeground}" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid x:Name="RootGrid"
+                                  Background="{TemplateBinding Background}"
+                                  CornerRadius="{TemplateBinding CornerRadius}">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="PointerOver">
+                                            <VisualState.Setters>
+                                                <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonBackgroundPointerOver}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Target="RootGrid.Background" Value="{ThemeResource ButtonBackgroundPressed}" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+
+                                        <VisualState x:Name="Disabled" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <ContentPresenter Padding="{TemplateBinding Padding}"
+                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                  AutomationProperties.AccessibilityView="Raw"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                  CornerRadius="{TemplateBinding CornerRadius}"
+                                                  Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+
         <Border x:Name="Border_BackgroundDragIn"
                 Margin="0,40,0,0"
                 Padding="24"
@@ -232,6 +277,7 @@
                         CornerRadius="16"
                         PointerEntered="Button_PreDownload_PointerEntered"
                         PointerExited="Button_PreDownload_PointerExited"
+                        Style="{StaticResource WallpaperOverlayButtonStyle}"
                         ToolTipService.ToolTip="{x:Bind lang:Lang.Instance.GameUpdate_PredownloadButton}"
                         Visibility="Collapsed">
                     <Grid>
@@ -319,7 +365,6 @@
                                    VerticalAlignment="Bottom" />
 
                 <local:StartGameButton x:Name="Button_StartGame"
-                                       GameCommand="{x:Bind StartGameCommand}"
                                        GameState="{x:Bind GameState}"
                                        RunningGameInfo="{x:Bind RunningGameInfo}"
                                        RunningGameTime="{x:Bind RunningGameTime}"

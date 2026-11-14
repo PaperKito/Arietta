@@ -63,6 +63,8 @@ public sealed partial class StartGameButton : UserControl
         GameState.GameIsRunning => RunningGameTime ?? "",
         GameState.InstallGame => IsResumeInstall ? Lang.Instance.LauncherPage_ResumeInstall : Lang.Instance.LauncherPage_InstallGame,
         GameState.UpdateGame => Lang.Instance.LauncherPage_UpdateGame,
+
+        GameState.CheckingUpdate => Lang.Instance.UpdateWindow_Checking,
         GameState.Installing => "",
         _ => "",
     };
@@ -87,7 +89,8 @@ public sealed partial class StartGameButton : UserControl
 
     private void UpdateActionButtonState()
     {
-        Button_GameAction.IsEnabled = GameState is not GameState.GameIsRunning;
+
+        Button_GameAction.IsEnabled = GameState is not (GameState.GameIsRunning or GameState.CheckingUpdate);
         OnPropertyChanged(nameof(IsAccentColorBackgroundVisible));
         OnPropertyChanged(nameof(IsGameActionCommandRunning));
         OnPropertyChanged(nameof(StartGameButtonText));
@@ -179,7 +182,8 @@ public sealed partial class StartGameButton : UserControl
     {
         DownloadPhase.Downloading => Lang.Instance.DownloadGamePage_Downloading,
         DownloadPhase.Verifying => Lang.Instance.DownloadGamePage_Verifying,
-        DownloadPhase.Applying => Lang.Instance.GameUpdate_Applying,
+
+        DownloadPhase.Applying or DownloadPhase.Patching => Lang.Instance.GameUpdate_Applying,
         _ => "",
     };
 
@@ -187,17 +191,17 @@ public sealed partial class StartGameButton : UserControl
         ? Lang.Instance.DownloadGamePage_Pause
         : Lang.Instance.Common_Cancel;
 
-    public double DownloadingRemainTimeOpacity => !ActionButtonPointerOver && InstallPhase is DownloadPhase.Downloading ? 1 : 0;
+    public double RemainTimeRowOpacity => !ActionButtonPointerOver && RemainTimeText != "--:--:--" ? 1 : 0;
 
-    public double InstallStateCenterOpacity => !ActionButtonPointerOver && InstallPhase is not DownloadPhase.Downloading ? 1 : 0;
+    public double InstallStateCenterOpacity => !ActionButtonPointerOver && RemainTimeText == "--:--:--" ? 1 : 0;
 
     public double PauseHintOpacity => ActionButtonPointerOver ? 1 : 0;
 
-    public Visibility RemainTimeVisibility => InstallPhase is DownloadPhase.Downloading && RemainTimeText != "--:--:--"
+    public Visibility RemainTimeVisibility => RemainTimeText != "--:--:--"
         ? Visibility.Visible
         : Visibility.Collapsed;
 
-    public Visibility DownloadBytesVisibility => InstallPhase is DownloadPhase.Downloading or DownloadPhase.Applying or DownloadPhase.Patching
+    public Visibility DownloadBytesVisibility => InstallPhase is DownloadPhase.Downloading
         ? Visibility.Visible
         : Visibility.Collapsed;
 
@@ -206,6 +210,11 @@ public sealed partial class StartGameButton : UserControl
     public void UpdateGameInstallProgress(GameDownloadProgress p)
     {
         InstallPhase = p.Phase;
+
+        static string Remain(long remaining, long rate)
+            => rate > 0 && remaining > 0
+                ? TimeSpan.FromSeconds(remaining / (double)rate).ToString(@"hh\:mm\:ss")
+                : "--:--:--";
         if (p.Phase is DownloadPhase.Downloading)
         {
             double progress = p.TotalBytes > 0 ? (double)p.ReceivedBytes / p.TotalBytes : 0;
@@ -213,9 +222,7 @@ public sealed partial class StartGameButton : UserControl
             ProgressPercentText = $"{progress:P1}";
             DownloadBytesText = ToBytesText(p.ReceivedBytes, p.TotalBytes) ?? "";
             DownloadSpeedText = ToSpeedText(p.SpeedBytesPerSec);
-            RemainTimeText = p.SpeedBytesPerSec > 0 && p.TotalBytes > p.ReceivedBytes
-                ? TimeSpan.FromSeconds((p.TotalBytes - p.ReceivedBytes) / (double)p.SpeedBytesPerSec).ToString(@"hh\:mm\:ss")
-                : "--:--:--";
+            RemainTimeText = Remain(p.TotalBytes - p.ReceivedBytes, p.SpeedBytesPerSec);
         }
         else if (p.Phase is DownloadPhase.Verifying && p.TotalFiles > 0)
         {
@@ -225,25 +232,25 @@ public sealed partial class StartGameButton : UserControl
             ProgressPercentText = $"{verifyProgress:P1}";
             DownloadBytesText = "";
             DownloadSpeedText = "";
-            RemainTimeText = "--:--:--";
+            RemainTimeText = Remain(p.TotalFiles - p.CompletedFiles, p.SpeedFilesPerSec);
         }
-        else if (p.Phase is DownloadPhase.Applying && p.TotalFiles > 0)
+        else if ((p.Phase is DownloadPhase.Applying or DownloadPhase.Patching) && p.TotalFiles > 0)
         {
 
             ApplyingHasCounts = true;
-            double applyProgress = (double)p.CompletedFiles / p.TotalFiles;
-            ProgressRingValue = (int)(applyProgress * 100);
+            double applyProgress = Math.Clamp(p.OverallProgress ?? (double)p.CompletedFiles / p.TotalFiles, 0, 1);
+            ProgressRingValue = (int)Math.Round(applyProgress * 100);
             ProgressPercentText = $"{applyProgress:P1}";
-            DownloadBytesText = ToBytesText(p.ReceivedBytes, p.TotalBytes) ?? "";
-            DownloadSpeedText = ToSpeedText(p.SpeedBytesPerSec);
+            DownloadBytesText = "";
+            DownloadSpeedText = "";
             RemainTimeText = "--:--:--";
         }
         else
         {
 
             ApplyingHasCounts = false;
-            ProgressRingValue = 100;
-            ProgressPercentText = "100%";
+            ProgressRingValue = 0;
+            ProgressPercentText = "";
             DownloadBytesText = "";
             DownloadSpeedText = "";
             RemainTimeText = "--:--:--";
@@ -265,8 +272,8 @@ public sealed partial class StartGameButton : UserControl
 
     public void ShowPausing()
     {
-        DownloadSpeedText = Lang.Instance.GameUpdate_Pausing;
-        RemainTimeText = "--:--:--";
+        RemainTimeText = Lang.Instance.GameUpdate_Pausing;
+        RefreshInstallStateBindings();
     }
 
     private void RefreshInstallStateBindings()
@@ -279,7 +286,7 @@ public sealed partial class StartGameButton : UserControl
         OnPropertyChanged(nameof(ApplyingHasCounts));
         OnPropertyChanged(nameof(InstallStateText));
         OnPropertyChanged(nameof(PauseHintText));
-        OnPropertyChanged(nameof(DownloadingRemainTimeOpacity));
+        OnPropertyChanged(nameof(RemainTimeRowOpacity));
         OnPropertyChanged(nameof(InstallStateCenterOpacity));
         OnPropertyChanged(nameof(PauseHintOpacity));
         OnPropertyChanged(nameof(RemainTimeVisibility));

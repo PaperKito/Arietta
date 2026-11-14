@@ -9,4 +9,6 @@ public enum GameState
     UpdateGame,
 
     Installing,
+
+    CheckingUpdate,
 }

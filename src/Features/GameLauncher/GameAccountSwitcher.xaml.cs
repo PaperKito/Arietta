@@ -84,6 +84,13 @@ public sealed partial class GameAccountSwitcher : UserControl
     public bool CanSwitchAccount { get; set => SetProperty(ref field, value); }
 
 
+    private static bool ShouldHideForPack()
+    {
+        Core.GamePack? pack = Features.ViewHost.MainView.CurrentGameEntry?.Pack;
+        return pack is not null && !pack.Capabilities.Accounts;
+    }
+
+
     public void UpdateAccounts()
     {
 
@@ -93,6 +100,12 @@ public sealed partial class GameAccountSwitcher : UserControl
 
     private async Task UpdateAccountsAsync()
     {
+
+        if (ShouldHideForPack())
+        {
+            Visibility = Visibility.Collapsed;
+            return;
+        }
         if (_refreshing)
         {
             return;

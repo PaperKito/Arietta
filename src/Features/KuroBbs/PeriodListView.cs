@@ -162,13 +162,12 @@ public sealed class PeriodListView : ListView
             return;
         }
 
-        var outgoingEnd = (float)(nextPos - prevPos);
-        var incomingStart = (float)(prevPos - nextPos);
+        var isNextBelow = nextPos > prevPos;
 
         var compositor = ElementCompositionPreview.GetElementVisual(nextIndicator).Compositor;
         var batch = compositor.CreateScopedBatch(CompositionBatchTypes.Animation);
-        PlayIndicatorAnimations(prevIndicator, 0, outgoingEnd, isOutgoing: true);
-        PlayIndicatorAnimations(nextIndicator, incomingStart, 0, isOutgoing: false);
+        PlayIndicatorAnimations(prevIndicator, isOutgoing: true, fromTop: !isNextBelow);
+        PlayIndicatorAnimations(nextIndicator, isOutgoing: false, fromTop: isNextBelow);
         batch.End();
 
         _prevIndicator = prevIndicator;
@@ -239,46 +238,34 @@ public sealed class PeriodListView : ListView
         LayoutUpdated -= OnLayoutUpdatedForSync;
     }
 
-    private static void PlayIndicatorAnimations(UIElement indicator, float from, float to, bool isOutgoing)
+    private static void PlayIndicatorAnimations(UIElement indicator, bool isOutgoing, bool fromTop)
     {
         var visual = ElementCompositionPreview.GetElementVisual(indicator);
         var comp = visual.Compositor;
-        const float dimension = IndicatorHeight;
-
-        var step = comp.CreateStepEasingFunction();
-        step.IsFinalStepSingleFrame = true;
-        var easeOut = comp.CreateCubicBezierEasingFunction(EaseOutP1, EaseOutP2);
         var easeIn = comp.CreateCubicBezierEasingFunction(EaseInP1, EaseInP2);
+        var easeOut = comp.CreateCubicBezierEasingFunction(EaseOutP1, EaseOutP2);
 
+        var scaleAnim = comp.CreateScalarKeyFrameAnimation();
         if (isOutgoing)
         {
 
-            var opacityAnim = comp.CreateScalarKeyFrameAnimation();
-            opacityAnim.InsertKeyFrame(0.0f, 1.0f);
-            opacityAnim.InsertKeyFrame(0.333f, 1.0f, step);
-            opacityAnim.InsertKeyFrame(1.0f, 0.0f, easeOut);
-            opacityAnim.Duration = TimeSpan.FromMilliseconds(600);
-            visual.StartAnimation("Opacity", opacityAnim);
+            scaleAnim.InsertKeyFrame(0.0f, 1.0f);
+            scaleAnim.InsertKeyFrame(1.0f, 0.0f, easeIn);
+            scaleAnim.Duration = TimeSpan.FromMilliseconds(200);
         }
+        else
+        {
 
-        var posAnim = comp.CreateScalarKeyFrameAnimation();
-        posAnim.InsertKeyFrame(0.0f, from);
-        posAnim.InsertKeyFrame(0.333f, to, step);
-        posAnim.Duration = TimeSpan.FromMilliseconds(600);
-        visual.StartAnimation("Offset.Y", posAnim);
-
-        var scaleAnim = comp.CreateScalarKeyFrameAnimation();
-        scaleAnim.InsertKeyFrame(0.0f, 1.0f);
-        scaleAnim.InsertKeyFrame(0.333f, Math.Abs(to - from) / dimension + 1.0f, easeIn);
-        scaleAnim.InsertKeyFrame(1.0f, 1.0f, easeOut);
-        scaleAnim.Duration = TimeSpan.FromMilliseconds(600);
+            scaleAnim.InsertKeyFrame(0.0f, 0.0f);
+            scaleAnim.InsertKeyFrame(0.333f, 0.0f);
+            scaleAnim.InsertKeyFrame(1.0f, 1.0f, easeOut);
+            scaleAnim.Duration = TimeSpan.FromMilliseconds(600);
+        }
         visual.StartAnimation("Scale.Y", scaleAnim);
 
-        var centerAnim = comp.CreateScalarKeyFrameAnimation();
-        centerAnim.InsertKeyFrame(0.0f, from < to ? 0.0f : dimension);
-        centerAnim.InsertKeyFrame(1.0f, from < to ? dimension : 0.0f, step);
-        centerAnim.Duration = TimeSpan.FromMilliseconds(200);
-        visual.StartAnimation("CenterPoint.Y", centerAnim);
+        var centerPoint = visual.CenterPoint;
+        centerPoint.Y = fromTop ? 0.0f : IndicatorHeight;
+        visual.CenterPoint = centerPoint;
     }
 
     private void OnAnimationComplete()

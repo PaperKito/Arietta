@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using GameEntry = Arietta.Core.GameRegistry.GameEntry;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -41,6 +42,8 @@ public sealed partial class GameSelector : UserControl
 
     public GameBiz? CurrentGameBiz { get; set => SetProperty(ref field, value); }
 
+    public GameEntry? CurrentGameEntry { get; set => SetProperty(ref field, value); }
+
     public bool HasSelection => CurrentGameBiz is not null;
 
 
@@ -70,13 +73,20 @@ public sealed partial class GameSelector : UserControl
                 AppConfig.SetConfig("CurrentGameBiz", GameBiz.WutheringWavesGlobal.ToString());
             }
 
-            if (Enum.TryParse(AppConfig.GetConfig("CurrentGameBiz"), out GameBiz saved) && Enum.IsDefined(saved))
+            CurrentGameEntry = GameRegistry.FindEntry(AppConfig.GetConfig("CurrentGameBiz"));
+            if (CurrentGameEntry is not null)
+            {
+                CurrentGameBiz = CurrentGameEntry.Biz;
+            }
+            else if (Enum.TryParse(AppConfig.GetConfig("CurrentGameBiz"), out GameBiz saved) && Enum.IsDefined(saved))
             {
                 CurrentGameBiz = saved;
+                CurrentGameEntry = GameRegistry.GetEntry(saved);
             }
             else
             {
                 CurrentGameBiz = null;
+                CurrentGameEntry = null;
             }
 
             GameBizIcons.Clear();
@@ -114,6 +124,27 @@ public sealed partial class GameSelector : UserControl
         catch { }
     }
 
+    public void ReloadGames()
+    {
+        GameRegistry.Invalidate();
+        GameBizIcons.CollectionChanged -= GameBizIcons_CollectionChanged;
+        try
+        {
+            if (CurrentGameEntry is { } cur && GameRegistry.FindEntry(cur.Key) is null)
+            {
+                CurrentGameBiz = null;
+                CurrentGameEntry = null;
+                AppConfig.SetConfig("CurrentGameBiz", null);
+            }
+            InitializeGameSelector();
+        }
+        finally
+        {
+            GameBizIcons.CollectionChanged += GameBizIcons_CollectionChanged;
+        }
+        SyncSelection();
+    }
+
     private void OnUiLanguageChanged()
     {
 
@@ -133,17 +164,27 @@ public sealed partial class GameSelector : UserControl
     }
 
 
-    private static GameBizIcon? CreateIcon(string bizName, bool isPinned)
+    private static GameBizIcon? CreateIcon(string key, bool isPinned)
     {
         try
         {
-            var biz = Enum.Parse<GameBiz>(bizName, true);
-            var entry = GameRegistry.GetEntry(biz);
+            GameEntry? entry = GameRegistry.FindEntry(key);
+            GameBiz biz;
+            if (entry is null)
+            {
+                biz = Enum.Parse<GameBiz>(key, true);
+                entry = GameRegistry.GetEntry(biz);
+            }
+            else
+            {
+                biz = entry.Biz;
+            }
             var group = GameRegistry.Groups.FirstOrDefault(g => g.Servers.Contains(entry));
 
             return new GameBizIcon
             {
                 Biz = biz,
+                Key = entry.Key,
                 GameName = group?.Game ?? entry.ShortName,
                 ServerName = entry.ShortName,
                 GameIconPath = entry.GameIconPath,
@@ -164,14 +205,15 @@ public sealed partial class GameSelector : UserControl
     {
         foreach (var icon in GameBizIcons)
         {
-            bool selected = icon.Biz == CurrentGameBiz;
+            bool selected = CurrentGameEntry is { } cur ? icon.Key == cur.Key : icon.Biz == CurrentGameBiz;
             icon.IsSelected = selected;
             icon.MaskOpacity = selected ? 0 : 1;
         }
 
-        CurrentGameBizIcon = CurrentGameBiz is { } current
-            ? GameBizIcons.FirstOrDefault(x => x.Biz == current) ?? CreateIcon(current.ToString(), false)
-            : null;
+        string? currentKey = CurrentGameEntry?.Key ?? CurrentGameBiz?.ToString();
+        CurrentGameBizIcon = currentKey is null
+            ? null
+            : GameBizIcons.FirstOrDefault(x => x.Key == currentKey) ?? CreateIcon(currentKey, false);
     }
 
 
@@ -361,7 +403,7 @@ public sealed partial class GameSelector : UserControl
     {
         try
         {
-            AppConfig.SetConfig("PinnedGames", string.Join(",", GameBizIcons.Select(i => i.Biz)));
+            AppConfig.SetConfig("PinnedGames", string.Join(",", GameBizIcons.Select(i => i.Key)));
             SyncSelection();
         }
         catch { }
@@ -370,19 +412,20 @@ public sealed partial class GameSelector : UserControl
 
     private void SelectIcon(GameBizIcon icon)
     {
-        SelectCore(icon.Biz);
+        SelectCore(GameRegistry.FindEntry(icon.Key) ?? GameRegistry.GetEntry(icon.Biz));
     }
 
-    private void SelectCore(GameBiz biz)
+    private void SelectCore(GameEntry entry)
     {
-        if (biz == CurrentGameBiz)
+        if (CurrentGameEntry is { } cur && cur.Key == entry.Key)
         {
             return;
         }
-        CurrentGameBiz = biz;
-        AppConfig.SetConfig("CurrentGameBiz", biz.ToString());
+        CurrentGameBiz = entry.Biz;
+        CurrentGameEntry = entry;
+        AppConfig.SetConfig("CurrentGameBiz", entry.Key);
         SyncSelection();
-        CurrentGameChanged?.Invoke(this, biz);
+        CurrentGameChanged?.Invoke(this, entry.Biz);
     }
 
     public bool FullBackgroundVisible => Border_FullBackground.Opacity > 0;
@@ -488,7 +531,7 @@ public sealed partial class GameSelector : UserControl
         {
             if (sender is FrameworkElement fe && fe.DataContext is GameBizIcon server)
             {
-                SelectCore(server.Biz);
+                SelectCore(GameRegistry.FindEntry(server.Key) ?? GameRegistry.GetEntry(server.Biz));
 
                 if (VisualTreeHelper.GetOpenPopupsForXamlRoot(this.XamlRoot).FirstOrDefault() is Popup popup)
                 {
@@ -512,8 +555,8 @@ public sealed partial class GameSelector : UserControl
 
     private void TogglePin(GameBizIcon server)
     {
-        var biz = server.Biz;
-        if (GameBizIcons.FirstOrDefault(x => x.Biz == biz) is GameBizIcon icon)
+        string key = server.Key;
+        if (GameBizIcons.FirstOrDefault(x => x.Key == key) is GameBizIcon icon)
         {
             GameBizIcons.Remove(icon);
             server.IsPinned = false;

@@ -211,11 +211,11 @@ public static class KrSdkAccountService
             or GameBiz.PunishingGrayRavenJapan or GameBiz.PunishingGrayRavenTaiwan
                 => ("KR_G148", "A1393", "https://pc-launcher-sdk-haru-api.kurogames.com"),
 
-        _ => throw new ArgumentOutOfRangeException(nameof(biz), biz, "未知的游戏服区，没有对应的 SDK 缓存配置"),
+        _ => throw new ArgumentOutOfRangeException(nameof(biz), biz, "Unknown game server, no SDK cache config for it"),
     };
 
-    private static bool HasSdkCache(GameBiz biz) => !biz.IsPunishingGrayRaven()
-        || biz == GameBiz.PunishingGrayRaven;
+    private static bool HasSdkCache(GameBiz biz) => biz != GameBiz.External
+        && (!biz.IsPunishingGrayRaven() || biz == GameBiz.PunishingGrayRaven);
 
     public static string GetApiBase(GameBiz biz) => GetSdkProfile(biz).ApiBase;
 
@@ -470,7 +470,7 @@ public static class KrSdkAccountService
         {
 
             AppConfig.GetLogger<RefreshTag>().LogInformation(
-                "判定角色信息跳过：{Biz} 下没有任何账号能取到 oauthCode（官方启动器缓存缺失）", biz);
+                "Character probe skipped: no account under {Biz} can get an oauthCode (official launcher cache missing)", biz);
         }
         return changed;
     }

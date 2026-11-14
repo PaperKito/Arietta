@@ -47,11 +47,23 @@
                  Severity="Error"
                  Title="{x:Bind lang:Lang.Instance.RolePage_LoadFailed, Mode=OneWay}" />
 
-        <ScrollView Grid.Row="1" x:Name="ScrollView_Roles" VerticalScrollMode="Disabled" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Hidden">
+        <ScrollViewer Grid.Row="1" x:Name="ScrollViewer_Roles"
+                      Padding="0,0,16,16"
+                      VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled">
             <GridView x:Name="GridView_Roles"
                       SelectionMode="Single"
                       IsItemClickEnabled="True"
-                      ItemClick="GridView_Roles_ItemClick">
+                      ItemClick="GridView_Roles_ItemClick"
+                      ScrollViewer.VerticalScrollMode="Disabled"
+                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                      ScrollViewer.HorizontalScrollMode="Disabled"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
                 <GridView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Width="92" Spacing="3">
@@ -80,7 +92,7 @@
                     </DataTemplate>
                 </GridView.ItemTemplate>
             </GridView>
-        </ScrollView>
+        </ScrollViewer>
 
         <Grid Grid.Row="1" x:Name="Grid_Detail" Visibility="Collapsed" Background="{ThemeResource CustomOverlayAcrylicBrush}">
             <Grid.RowDefinitions>
@@ -98,7 +110,7 @@
                 </StackPanel>
             </Button>
 
-            <ScrollViewer Grid.Row="1" Padding="16,0,24,24">
+            <ScrollViewer Grid.Row="1" Padding="16,0,24,24" Background="Transparent">
                 <StackPanel Spacing="16" MaxWidth="1200" HorizontalAlignment="Left">
 
                     <Border Padding="16"

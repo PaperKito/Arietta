@@ -56,6 +56,12 @@ public sealed class Lang : INotifyPropertyChanged
         return LangZh.Map.TryGetValue(key, out string? cn) ? cn : key;
     }
 
+    public static string Get(string key, params object?[] args)
+    {
+        string text = TFor(UiLanguage.Current, key);
+        return args.Length == 0 ? text : string.Format(text, args);
+    }
+
     public string MainPage_Launcer => T();
     public string LauncherPage_GameSetting => T();
     public string MainPage_GameScreenshot => T();
@@ -350,6 +356,8 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameUpdate_Pausing => T();
 
     public string GameUpdate_ApplyingProgress => T();
+
+    public string GameUpdate_AppliedBytes => T();
     public string GameUpdate_Patching => T();
     public string GameUpdate_GameRunning => T();
     public string GameUpdate_ErrPatchFailed => T();
@@ -357,12 +365,16 @@ public sealed class Lang : INotifyPropertyChanged
     public string SpaceCheck_Title => T();
     public string SpaceCheck_Sub => T();
     public string SpaceCheck_Retry => T();
+    public string SpaceCheck_ActualRequired => T();
+    public string SpaceCheck_ActualAvailable => T();
     public string SpaceCheck_Enough => T();
     public string SpaceCheck_Short => T();
     public string SpaceCheck_SimEnough => T();
     public string GameUpdate_ErrPatchTool => T();
     public string GameUpdate_ErrTierVersionMismatch => T();
     public string GameUpdate_TierSwitchDone => T();
+    public string GameUpdate_SessionBusy => T();
+    public string GameUpdate_NothingInstalled => T();
     public string GameUpdate_Predownloading => T();
     public string GameUpdate_Done => T();
     public string GameUpdate_InstallDone => T();
@@ -425,6 +437,24 @@ public sealed class Lang : INotifyPropertyChanged
     public string SettingPage_General => T();
     public string SettingPage_FileManagement => T();
 
+    public string SettingPage_GamePack => T();
+    public string GamePackPage_Title => T();
+    public string GamePackPage_Desc => T();
+    public string GamePackPage_Rescan => T();
+    public string GamePackPage_OpenFolder => T();
+    public string GamePackPage_Launch => T();
+    public string GamePackPage_Empty => T();
+    public string GamePackPage_NoExe => T();
+    public string GamePackPage_Pick => T();
+    public string GamePackPage_Searching => T();
+    public string GamePackPage_CapLaunch => T();
+    public string GamePackPage_CapGacha => T();
+    public string GamePackPage_CapSettings => T();
+    public string GamePackPage_CapUpdate => T();
+    public string GamePackPage_AuthorVerified => T();
+    public string GamePackPage_AuthorUnsigned => T();
+    public string GamePackPage_SettingsEmpty => T();
+
     public string FilePage_DataFolder => T();
     public string FilePage_DataFolderDesc => T();
     public string FilePage_ReselectDataFolder => T();
@@ -443,6 +473,8 @@ public sealed class Lang : INotifyPropertyChanged
 
     public string FilePage_HardLink => T();
     public string FilePage_HardLinkDesc => T();
+    public string FilePage_SystemUnzip => T();
+    public string FilePage_SystemUnzipDesc => T();
     public string FilePage_Enabled => T();
     public string FilePage_Disabled => T();
 
@@ -573,6 +605,8 @@ public sealed class Lang : INotifyPropertyChanged
 
     public string LauncherPage_RepairGame => T();
     public string LauncherPage_ShowGameAnnouncement => T();
+    public string LauncherPage_AnnouncementScaleOnHover => T();
+    public string LauncherPage_AnnouncementFixedSize => T();
     public string LauncherPage_UninstallGame => T();
     public string LauncherPage_CustomStartExecutable => T();
 
@@ -588,7 +622,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string PlayTimeStatsDialog_StatsTip => T();
 
     public string SettingPage_BgSizeTip => T();
-    public string SettingPage_CustomBackgroundSupportVideo => T();
+    public string SettingPage_EnableCustomBackground => T();
 
     public string Common_Apply => T();
     public string GameSettingPage_Resolution => T();
@@ -600,6 +634,7 @@ public sealed class Lang : INotifyPropertyChanged
     public string GameSettingPage_VoiceLanguageDescription => T();
     public string GameSettingPage_HDR => T();
     public string GameSettingPage_EnableHDR => T();
+    public string GameLauncherSettingDialog_ShowVersionPoster => T();
     public string GameSettingPage_HDRNotSupported => T();
     public string GameSettingPage_HDRNotEnabled => T();
     public string GameSettingPage_GameNotInstalled => T();
@@ -616,6 +651,15 @@ public sealed class Lang : INotifyPropertyChanged
 
     public string CloseDialog_Title => T();
     public string CloseDialog_Content => T();
+
+    public string RepairExitDialog_Title => T();
+    public string RepairExitDialog_Content => T();
+    public string RepairExitDialog_Confirm => T();
+
+    public string RepairConfirmDialog_Title => T();
+    public string RepairConfirmDialog_Content => T();
+    public string RepairConfirmDialog_Confirm => T();
+    public string RepairConfirmDialog_Busy => T();
     public string SettingPage_AfterLaunchOption => T();
     public string SettingPage_KeepWindow => T();
     public string SettingPage_AfterGameExitOption => T();
@@ -760,6 +804,22 @@ public sealed class Lang : INotifyPropertyChanged
     public string Sync_NeverSynced => T();
     public string Sync_LastSync => T();
     public string Sync_Working => T();
+
+    public string Sync_Msg_NeedCredentials => T();
+    public string Sync_Msg_NotConfigured => T();
+    public string Sync_Msg_NoChanges => T();
+    public string Sync_Msg_Uploaded => T();
+    public string Sync_Msg_UploadFailed => T();
+    public string Sync_Msg_MergeConflict => T();
+    public string Sync_Msg_NoCloudBackup => T();
+    public string Sync_Msg_CloudCorrupted => T();
+    public string Sync_Msg_MergeUpToDate => T();
+    public string Sync_Msg_Merged => T();
+    public string Sync_Msg_TestOk => T();
+    public string Sync_Msg_TestNoDav => T();
+    public string Sync_Msg_TestAuthFailed => T();
+    public string Sync_Msg_TestServerStatus => T();
+    public string Sync_Msg_TestFailed => T();
 
     public string CloudGame_ErrNoLogin => T();
     public string CloudGame_ErrHttp => T();

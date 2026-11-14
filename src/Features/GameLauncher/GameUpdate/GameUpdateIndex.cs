@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Arietta.Features.GameLauncher.GameUpdate;
@@ -11,8 +12,11 @@ public sealed class GameUpdateIndex
     [JsonPropertyName("predownloadSwitch")]
     public int PredownloadSwitch { get; set; }
 
+    [JsonPropertyName("config")]
+    public GameIndexConfig? Config { get; set; }
+
     [JsonPropertyName("predownload")]
-    public GameVersionNode? PredownloadNode { get; set; }
+    public JsonElement? PredownloadRaw { get; set; }
 
     [JsonPropertyName("resourcePacks")]
     public Dictionary<string, GameResourcePack>? ResourcePacks { get; set; }
@@ -20,11 +24,62 @@ public sealed class GameUpdateIndex
     [JsonPropertyName("bundles")]
     public Dictionary<string, GameBundle>? Bundles { get; set; }
 
+    [JsonPropertyName("cdnList")]
+    public List<GameCdnItem>? CdnList { get; set; }
+
     [JsonExtensionData]
-    public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
+    public Dictionary<string, JsonElement>? ExtensionData { get; set; }
 
     [JsonIgnore]
-    public GameVersionNode? Predownload => PredownloadNode ?? FindPredownloadInExtension();
+    public bool PredownloadEnabled => PredownloadSwitch == 1 || Config?.PredownloadSwitch == 1;
+
+    [JsonIgnore]
+    public GameVersionNode? Predownload => ParseLegacyPredownload() ?? FindPredownloadInExtension();
+
+    [JsonIgnore]
+    public GamePredownloadBranch? PredownloadBranch => ParsePredownloadBranch();
+
+    private GameVersionNode? ParseLegacyPredownload()
+    {
+        if (PredownloadRaw is not { ValueKind: JsonValueKind.Object } raw)
+        {
+            return null;
+        }
+        if (!raw.TryGetProperty("version", out _) && !raw.TryGetProperty("config", out _))
+        {
+            return null;
+        }
+        try
+        {
+            var node = JsonSerializer.Deserialize<GameVersionNode>(raw.GetRawText());
+            return node is { Version: not null, Config: not null } ? node : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private GamePredownloadBranch? ParsePredownloadBranch()
+    {
+        if (PredownloadRaw is not { ValueKind: JsonValueKind.Object } raw)
+        {
+            return null;
+        }
+        if (!raw.TryGetProperty("bundles", out _) || !raw.TryGetProperty("resourcePacks", out _))
+        {
+            return null;
+        }
+        try
+        {
+            var branch = JsonSerializer.Deserialize<GamePredownloadBranch>(raw.GetRawText());
+            return branch is { Bundles.Count: > 0, ResourcePacks.Count: > 0 } ? branch : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 
     private GameVersionNode? FindPredownloadInExtension()
     {
@@ -34,13 +89,13 @@ public sealed class GameUpdateIndex
         }
         foreach (var (_, value) in ExtensionData)
         {
-            if (value.ValueKind != System.Text.Json.JsonValueKind.Object)
+            if (value.ValueKind != JsonValueKind.Object)
             {
                 continue;
             }
             try
             {
-                var node = System.Text.Json.JsonSerializer.Deserialize<GameVersionNode>(value.GetRawText());
+                var node = JsonSerializer.Deserialize<GameVersionNode>(value.GetRawText());
                 if (node is { Version: not null, Config: not null })
                 {
                     return node;
@@ -53,6 +108,21 @@ public sealed class GameUpdateIndex
         }
         return null;
     }
+}
+
+public sealed class GameIndexConfig
+{
+    [JsonPropertyName("predownloadSwitch")]
+    public int PredownloadSwitch { get; set; }
+}
+
+public sealed class GamePredownloadBranch
+{
+    [JsonPropertyName("bundles")]
+    public Dictionary<string, GameBundle>? Bundles { get; set; }
+
+    [JsonPropertyName("resourcePacks")]
+    public Dictionary<string, GameResourcePack>? ResourcePacks { get; set; }
 }
 
 public sealed class GameVersionNode
@@ -101,6 +171,9 @@ public sealed class GamePatchConfig
     [JsonPropertyName("size")]
     public long Size { get; set; }
 
+    [JsonPropertyName("unCompressSize")]
+    public long UnCompressSize { get; set; }
+
     [JsonPropertyName("ext")]
     public GamePatchConfigExt? Ext { get; set; }
 }
@@ -124,6 +197,15 @@ public sealed class GameResourcePack
 
     [JsonPropertyName("size")]
     public long Size { get; set; }
+
+    [JsonPropertyName("unCompressSize")]
+    public long UnCompressSize { get; set; }
+
+    [JsonPropertyName("patchType")]
+    public string? PatchType { get; set; }
+
+    [JsonPropertyName("patchConfig")]
+    public List<GamePatchConfig>? PatchConfig { get; set; }
 }
 
 public sealed class GameBundle
@@ -202,6 +284,9 @@ public sealed class GameResourceZipInfo
 
     [JsonPropertyName("entries")]
     public List<GameResourceEntry>? Entries { get; set; }
+
+    [JsonIgnore]
+    public string? FromFolder { get; set; }
 }
 
 public sealed class LauncherDownloadConfig

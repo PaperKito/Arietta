@@ -43,7 +43,6 @@ internal static partial class ReleaseNotesHtml
         sb.Append("""
             <script>
             (function () {
-              // 正文里的配图也做成可点击：点开用系统浏览器看原图（和 Starward 一致）
               document.querySelectorAll('img').forEach(function (img) {
                 if (img.closest('a')) { return; }
                 var src = img.getAttribute('src');
@@ -56,8 +55,6 @@ internal static partial class ReleaseNotesHtml
                 a.appendChild(img);
               });
               document.querySelectorAll('.hero img').forEach(function (img) {
-                // 加载失败只隐藏、不删除：主程序自己可能正在后台把图抓下来，
-                // 抓完会用 JS 把 src 换成本地文件再显示出来。
                 function hide() { img.style.display = 'none'; }
                 if (img.complete && img.naturalWidth === 0) { hide(); }
                 else { img.addEventListener('error', hide); }
@@ -209,13 +206,11 @@ internal static partial class ReleaseNotesHtml
             margin: 6px 24px 16px; color: #ffffff;
         }
         h1 .date { font-size: 12px; font-weight: 400; color: #9aa4b2; margin-left: 12px; }
-        /* 首图：通栏，顶到内容区左右边缘，无圆角、无最大高度（Starward 同款观感） */
         .hero { margin: 0 0 16px; }
         .hero img {
             display: block; width: 100%; height: auto;
             max-width: none; max-height: none; border-radius: 0; margin: 0;
         }
-        /* 正文：24px 内边距只作用在文字上，主视觉通栏 */
         .body { padding: 0 24px; }
         .body > :first-child { margin-top: 0; }
         .body img {
@@ -243,7 +238,6 @@ internal static partial class ReleaseNotesHtml
         hr { border: none; border-top: 1px solid rgba(255, 255, 255, .1); margin: 20px 0; }
         table { border-collapse: collapse; }
         td, th { border: 1px solid rgba(255, 255, 255, .12); padding: 6px 10px; }
-        /* 细滚动条：默认那条 17px 的灰条压在通栏图上很扎眼（Starward 同款 6px） */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); border-radius: 1000px; }

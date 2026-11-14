@@ -181,7 +181,7 @@ public sealed partial class DataTerminalWindow : Window
             if (!args.IsSuccess)
             {
                 AppConfig.GetLogger<DataTerminalWindow>().LogWarning(
-                    "数据终端页面加载失败：{Status}", args.WebErrorStatus);
+                    "Data terminal page failed to load: {Status}", args.WebErrorStatus);
             }
         };
 

@@ -1,5 +1,8 @@
-﻿using Microsoft.UI.Xaml;
+﻿using GameEntry = Arietta.Core.GameRegistry.GameEntry;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Arietta.Core;
 using Arietta.Features.Background;
@@ -13,6 +16,7 @@ using Arietta.Features.Screenshot;
 using Arietta.Features.Setting;
 using System;
 using System.IO;
+using System.Numerics;
 
 namespace Arietta.Features.ViewHost;
 
@@ -20,6 +24,8 @@ public sealed partial class MainView : UserControl
 {
 
     public static GameBiz CurrentGameBiz { get; private set; } = GameBiz.WutheringWavesGlobal;
+
+    public static GameEntry? CurrentGameEntry { get; private set; }
 
     public static event EventHandler<GameBiz>? GameChanged;
 
@@ -32,13 +38,20 @@ public sealed partial class MainView : UserControl
         this.InitializeComponent();
 
         CurrentGameBiz = GameSelectorControl.CurrentGameBiz ?? GameBiz.WutheringWavesGlobal;
+        CurrentGameEntry = GameSelectorControl.CurrentGameEntry ?? GameRegistry.GetEntry(CurrentGameBiz);
 
         UpdateNavVisibility();
         LoadCustomBackground(null, null);
         GameLauncherSettingDialog.CustomBackgroundChanged += LoadCustomBackground;
 
+        Features.GamePacks.GamePackService.Changed += OnPackEnableChanged;
+
         BackgroundGallery.SelectionChanged += OnBackgroundChanged;
         DynamicBackgroundStore.Updated += OnBackgroundChanged;
+
+        Localization.UiLanguage.Changed += OnUiLanguageChanged;
+
+        GameLauncherSettingDialog.ShowVersionPosterChanged += OnShowBgSloganChanged;
 
         if (GameSelectorControl.HasSelection)
         {
@@ -62,11 +75,14 @@ public sealed partial class MainView : UserControl
                     : null;
                 DynamicBgHost.Play(video);
 
+                UpdateSloganLayer(item.IsOfficial);
+
                 BackgroundAccentService.Apply(poster, DispatcherQueue);
                 return;
             }
 
             DynamicBgHost.Stop();
+            UpdateSloganLayer(false);
             if (item?.FilePath is { Length: > 0 } image && File.Exists(image))
             {
 
@@ -88,6 +104,46 @@ public sealed partial class MainView : UserControl
         catch
         {
             DynamicBgHost.Stop();
+            UpdateSloganLayer(false);
+        }
+    }
+
+    private void UpdateSloganLayer(bool visible)
+    {
+        string? path = visible && GameRegistry.IsDynBgSloganShown(CurrentGameBiz)
+            ? DynamicBackgroundStore.GetSloganPath(CurrentGameBiz)
+            : null;
+        if (path is null)
+        {
+            Image_Slogan.Source = null;
+            Image_Slogan.Visibility = Visibility.Collapsed;
+            return;
+        }
+        Image_Slogan.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(path));
+        Image_Slogan.Visibility = Visibility.Visible;
+    }
+
+    private void OnUiLanguageChanged()
+    {
+        if (DispatcherQueue.HasThreadAccess)
+        {
+            LoadCustomBackground(null, null);
+        }
+        else
+        {
+            DispatcherQueue.TryEnqueue(() => LoadCustomBackground(null, null));
+        }
+    }
+
+    private void OnShowBgSloganChanged(object? sender, EventArgs e)
+    {
+        if (DispatcherQueue.HasThreadAccess)
+        {
+            LoadCustomBackground(null, null);
+        }
+        else
+        {
+            DispatcherQueue.TryEnqueue(() => LoadCustomBackground(null, null));
         }
     }
 
@@ -107,13 +163,41 @@ public sealed partial class MainView : UserControl
         }
     }
 
+    private void OnPackEnableChanged()
+    {
+        try
+        {
+            GameSelectorControl.ReloadGames();
+            bool has = GameSelectorControl.HasSelection;
+            CurrentGameBiz = GameSelectorControl.CurrentGameBiz ?? GameBiz.WutheringWavesGlobal;
+            CurrentGameEntry = GameSelectorControl.CurrentGameEntry;
+            UpdateNavVisibility();
+            if (has)
+            {
+                LoadCustomBackground(null, null);
+                NavigateTo(typeof(LauncherPage));
+                GameChanged?.Invoke(this, CurrentGameBiz);
+            }
+            else
+            {
+
+                MainView_Frame.Content = null;
+            }
+        }
+        catch { }
+    }
+
     private void GameSelector_CurrentGameChanged(object? sender, GameBiz biz)
     {
         CurrentGameBiz = biz;
+        CurrentGameEntry = GameSelectorControl.CurrentGameEntry ?? GameRegistry.GetEntry(biz);
 
         LoadCustomBackground(null, null);
 
-        _ = DynamicBackgroundStore.SyncAllAsync(biz);
+        if (CurrentGameEntry?.IsExternal != true)
+        {
+            _ = DynamicBackgroundStore.SyncAllAsync(biz);
+        }
 
         UpdateNavVisibility();
         GameChanged?.Invoke(this, biz);
@@ -124,14 +208,19 @@ public sealed partial class MainView : UserControl
     {
 
         bool has = GameSelectorControl.HasSelection;
+
+        bool external = CurrentGameEntry?.IsExternal == true;
+        GameEntry entry = CurrentGameEntry ?? GameRegistry.GetEntry(CurrentGameBiz);
         NavigationViewItem_Launcher.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
-        NavigationViewItem_GameSetting.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
-        NavigationViewItem_Screenshot.Visibility = has ? Visibility.Visible : Visibility.Collapsed;
-        NavigationViewItem_GachaLog.Visibility = has && GameRegistry.GetEntry(CurrentGameBiz).HasGachaPage
+        NavigationViewItem_GameSetting.Visibility = has && (!external || entry.Pack?.Settings is not null)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        NavigationViewItem_Screenshot.Visibility = has && !external ? Visibility.Visible : Visibility.Collapsed;
+        NavigationViewItem_GachaLog.Visibility = has && entry.HasGachaPage
             ? Visibility.Visible
             : Visibility.Collapsed;
 
-        NavigationViewItem_KuroBbs.Visibility = has && !CurrentGameBiz.IsOverseas()
+        NavigationViewItem_KuroBbs.Visibility = has && !external && !CurrentGameBiz.IsOverseas()
             ? Visibility.Visible
             : Visibility.Collapsed;
     }
@@ -171,6 +260,11 @@ public sealed partial class MainView : UserControl
     private void NavigateTo(Type? page, object? param = null, NavigationTransitionInfo? infoOverride = null)
     {
         page ??= typeof(LauncherPage);
+
+        if (page == typeof(GameSettingPage) && CurrentGameEntry?.IsExternal == true)
+        {
+            page = typeof(Features.GamePacks.PackSettingsPage);
+        }
         MainView_Frame.Navigate(page, param, infoOverride);
         if (page.Name is nameof(LauncherPage))
         {
@@ -181,6 +275,58 @@ public sealed partial class MainView : UserControl
         {
             Border_OverlayMask.Opacity = 1;
         }
+    }
+
+    private void NavigationView_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (FindDescendant(MainView_NavigationView, "PaneContentGrid") is Grid paneGrid)
+        {
+            paneGrid.PointerEntered += NavPane_PointerEntered;
+            paneGrid.PointerExited += NavPane_PointerExited;
+        }
+        if (FindDescendant(MainView_NavigationView, "PaneToggleButtonGrid") is Grid toggleGrid)
+        {
+            toggleGrid.PointerEntered += NavPane_PointerEntered;
+            toggleGrid.PointerExited += NavPane_PointerExited;
+        }
+    }
+
+
+    private void NavPane_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        Border_NavPaneBackground.Opacity = 1;
+        Border_NavPaneBackground.Translation = new Vector3(0, 0, 32);
+    }
+
+
+    private void NavPane_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+
+        float x = (float)e.GetCurrentPoint(Border_NavPaneBackground).Position.X;
+        if (x <= 4 || x > Border_NavPaneBackground.Width - 8)
+        {
+            Border_NavPaneBackground.Opacity = 0;
+            Border_NavPaneBackground.Translation = new Vector3(-56, 0, 0);
+        }
+    }
+
+
+    private static DependencyObject? FindDescendant(DependencyObject parent, string name)
+    {
+        int count = VisualTreeHelper.GetChildrenCount(parent);
+        for (int i = 0; i < count; i++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+            if (child is FrameworkElement { Name: string n } && n == name)
+            {
+                return child;
+            }
+            if (FindDescendant(child, name) is { } found)
+            {
+                return found;
+            }
+        }
+        return null;
     }
 
 

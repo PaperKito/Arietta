@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 namespace Arietta.Features.Sync;
 
+internal sealed record MergeOutcome(string Message, string? LangKey = null, object[]? LangArgs = null);
+
 internal static class DatabaseMergeService
 {
     private static readonly string[] PlayTimeItemColumns =
@@ -17,7 +19,7 @@ internal static class DatabaseMergeService
     private static readonly string[] GachaLogItemColumns =
         ["PlayerId", "CardPoolType", "ResourceId", "QualityLevel", "ResourceType", "Name", "Count", "Time", "SubSeq"];
 
-    public static string MergeFromFile(string remoteDatabaseFile, SyncPreference preference = SyncPreference.LocalFirst)
+    public static MergeOutcome MergeFromFile(string remoteDatabaseFile, SyncPreference preference = SyncPreference.LocalFirst)
     {
         using var connection = DatabaseService.CreateConnection();
         connection.Execute("ATTACH DATABASE @path AS remote;", new { path = remoteDatabaseFile });
@@ -48,10 +50,9 @@ internal static class DatabaseMergeService
                 added += pair.Value - before.GetValueOrDefault(pair.Key);
             }
 
-            string message = added == 0
-                ? "本地已是最新，无需合并"
-                : $"合并完成：新增 {added} 条记录";
-            return message;
+            return added == 0
+                ? new MergeOutcome("Local already up to date, nothing to merge", "Sync_Msg_MergeUpToDate")
+                : new MergeOutcome($"Merge completed: {added} records added", "Sync_Msg_Merged", [added]);
         }
         finally
         {

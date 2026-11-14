@@ -63,6 +63,7 @@ public partial class App : Application
             return;
         }
 
+        Features.GamePacks.GamePackService.Reload();
         m_MainWindow = new MainWindow();
         m_MainWindow.Activate();
 

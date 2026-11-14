@@ -30,7 +30,7 @@ public sealed class AdbClient : IDisposable
     {
         if (string.IsNullOrWhiteSpace(exePath))
         {
-            throw new ArgumentException("ADB 路径不能为空", nameof(exePath));
+            throw new ArgumentException("ADB path must not be empty", nameof(exePath));
         }
         RemoveTrackedForwardsAsync().GetAwaiter().GetResult();
         AdbPath = exePath;
@@ -295,7 +295,7 @@ public sealed class AdbClient : IDisposable
             catch (NotSupportedException) { }
             catch (JsonException) { }
         }
-        throw new InvalidOperationException("无法从 WebView 端点获取 DevTools 页面列表");
+        throw new InvalidOperationException("Failed to get DevTools page list from the WebView endpoint");
     }
 
     private static string NormalizeForwardedWebSocketDebuggerUrl(string webSocketDebuggerUrl, int localPort)
@@ -395,7 +395,7 @@ public sealed class AdbClient : IDisposable
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"无法启动 adb（{AdbPath}），请确认路径正确", ex);
+            throw new InvalidOperationException($"Failed to start adb ({AdbPath}), check the path", ex);
         }
         Task<string> readOutput = process.StandardOutput.ReadToEndAsync(ct);
         Task<string> readError = process.StandardError.ReadToEndAsync(ct);
@@ -412,7 +412,7 @@ public sealed class AdbClient : IDisposable
             return;
         }
         string detail = string.IsNullOrWhiteSpace(result.StandardError) ? result.StandardOutput : result.StandardError;
-        throw new InvalidOperationException($"{message}（adb 退出码 {result.ExitCode}）：{detail.Trim()}");
+        throw new InvalidOperationException($"{message} (adb exit code {result.ExitCode}): {detail.Trim()}");
     }
 
     private sealed record CommandResult(int ExitCode, string StandardOutput, string StandardError);

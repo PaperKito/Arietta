@@ -10,9 +10,6 @@
               Background="{ThemeResource CustomDialogAcrylicBrush}"
               BorderThickness="0"
               CornerRadius="8"
-              Title="{x:Bind lang:Lang.Instance.CloseDialog_Title}"
-              PrimaryButtonText="{x:Bind lang:Lang.Instance.Common_Confirm}"
-              CloseButtonText="{x:Bind lang:Lang.Instance.Common_Cancel}"
               DefaultButton="Primary"
               mc:Ignorable="d">
 
@@ -22,8 +19,8 @@
     </ContentDialog.Resources>
 
     <StackPanel Spacing="4">
-        <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                   Text="{x:Bind lang:Lang.Instance.CloseDialog_Content}"
+        <TextBlock x:Name="Text_Content"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                    TextWrapping="Wrap" />
         <RadioButtons x:Name="RadioGroup"
                       SelectedIndex="0">

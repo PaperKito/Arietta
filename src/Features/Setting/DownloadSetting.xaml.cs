@@ -22,6 +22,7 @@ public sealed partial class DownloadSetting : PageBase
     {
         base.OnLoaded();
         RefreshHardLink();
+        RefreshSystemUnzip();
         RefreshSpeedLimit();
         RefreshThreads();
     }
@@ -31,6 +32,14 @@ public sealed partial class DownloadSetting : PageBase
     {
         _restoringDownload = true;
         Toggle_HardLink.IsOn = AppConfig.GetConfig(GameLauncher.GameUpdate.GameUpdateService.UseHardLinkConfigKey) == "1";
+        _restoringDownload = false;
+    }
+
+
+    private void RefreshSystemUnzip()
+    {
+        _restoringDownload = true;
+        Toggle_SystemUnzip.IsOn = AppConfig.GetConfig(GameLauncher.GameUpdate.GameUpdateService.UseSystemUnzipConfigKey) == "1";
         _restoringDownload = false;
     }
 
@@ -70,6 +79,17 @@ public sealed partial class DownloadSetting : PageBase
         }
         AppConfig.SetConfig(GameLauncher.GameUpdate.GameUpdateService.UseHardLinkConfigKey,
             Toggle_HardLink.IsOn ? "1" : "0");
+    }
+
+
+    private void Toggle_SystemUnzip_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_restoringDownload)
+        {
+            return;
+        }
+        AppConfig.SetConfig(GameLauncher.GameUpdate.GameUpdateService.UseSystemUnzipConfigKey,
+            Toggle_SystemUnzip.IsOn ? "1" : "0");
     }
 
 

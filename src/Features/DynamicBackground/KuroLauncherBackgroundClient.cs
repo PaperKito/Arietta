@@ -2,7 +2,9 @@
 using Arietta.Core;
 using Arietta.Helpers;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,15 +13,21 @@ using System.Threading.Tasks;
 
 namespace Arietta.Features.DynamicBackground;
 
-public sealed record KuroLauncherApp(string GameId, string AppId, string AppKey)
+public sealed record KuroLauncherApp(string GameId, string AppId, string AppKey, string ServerCode = "")
 {
 
     public string DirName => $"{AppId}_{AppKey}";
 
-    public string LauncherConfigPath(string host) => $"{host}/launcher/launcher/{DirName}/{GameId}/index.json";
+    public bool IsNewApi => ServerCode.Length > 0;
+
+    public string LauncherConfigPath(string host) => IsNewApi
+        ? $"{host}/launcher/game/{DirName}/{GameId}/{ServerCode}/index.json"
+        : $"{host}/launcher/launcher/{DirName}/{GameId}/index.json";
 
     public string BackgroundConfigPath(string host, string backgroundId, string lang)
-        => $"{host}/launcher/{DirName}/{GameId}/background/{backgroundId}/{lang}.json";
+        => IsNewApi
+            ? $"{host}/launcher/game/{DirName}/{GameId}/{ServerCode}/background/{backgroundId}/{lang}.json"
+            : $"{host}/launcher/{DirName}/{GameId}/background/{backgroundId}/{lang}.json";
 }
 
 public sealed class KuroBackgroundInfo
@@ -63,8 +71,10 @@ public static class KuroLauncherBackgroundClient
     {
         return biz switch
         {
-            GameBiz.WutheringWaves => new KuroLauncherApp("G152", "10003", "Y8xXrXk65DqFHEDgApn3cpK5lfczpFx5"),
-            GameBiz.PunishingGrayRaven => new KuroLauncherApp("G148", "10012", "RnIUKs3r59Csliu3N0rl5uRWWBOFDaJL"),
+            GameBiz.WutheringWaves => new KuroLauncherApp(
+                "G152", "10003", "oLNgHF1CESo51DGHN2odtp40e3oI1HfZ", "official"),
+            GameBiz.PunishingGrayRaven => new KuroLauncherApp(
+                "G148", "10012", "RnIUKs3r59Csliu3N0rl5uRWWBOFDaJL"),
             _ => null,
         };
     }
@@ -92,6 +102,117 @@ public static class KuroLauncherBackgroundClient
 
     public static bool CanFetch(GameBiz biz) => GetSourceApp(biz) is not null;
 
+    public sealed record KuroSloganSet(string PosterUrl, IReadOnlyDictionary<string, string> Slogans);
+
+    private sealed record SloganChain(GameBiz BaseBiz, KuroLauncherApp App, string[] Hosts, string[] Languages);
+
+    private static readonly string[] SloganHostsOverseas =
+    {
+        "https://prod-alicdn-gamestarter.kurogame.com",
+        "https://prod-volcdn-gamestarter.kurogame.net",
+    };
+
+    private static readonly string[] SloganLanguagesWutheringWaves =
+        { "zh-Hant", "en", "ja", "ko", "fr", "de", "es", "th", "pt-BR" };
+
+    private static readonly SloganChain[] SloganChains =
+    {
+        new(GameBiz.WutheringWaves,
+            new KuroLauncherApp("G153", "50004", "P7xcUZnEr1AXIGON25E6KjpOgTlVrg6e", "official"),
+            SloganHostsOverseas, SloganLanguagesWutheringWaves),
+        new(GameBiz.PunishingGrayRaven,
+            new KuroLauncherApp("G143", "50015", "LWdk9D2Ep9mpJmqBZZkcPBU2YNraEWBQ"),
+            SloganHostsOverseas, new[] { "en" }),
+        new(GameBiz.PunishingGrayRaven,
+            new KuroLauncherApp("G279", "50016", "i2n5NLmdCAmOGP3J1tJOlWKNSMQuyWL7"),
+            SloganHostsOverseas, new[] { "zh-Hant" }),
+        new(GameBiz.PunishingGrayRaven,
+            new KuroLauncherApp("G282", "50007", "NxWGZ0d254oWqZKuuL6szOK7WRLPt668"),
+            SloganHostsOverseas, new[] { "ja" }),
+        new(GameBiz.PunishingGrayRaven,
+            new KuroLauncherApp("G286", "50011", "XefwDdpgPxxLABoTOD0yuqTFBC3koJZ0"),
+            SloganHostsOverseas, new[] { "ko" }),
+    };
+
+    public static string[] SloganLanguagesFor(GameBiz biz)
+    {
+        GameBiz baseBiz = biz.GetBaseBiz();
+        return SloganChains.Where(c => c.BaseBiz == baseBiz)
+            .SelectMany(c => c.Languages)
+            .Distinct()
+            .ToArray();
+    }
+
+    public static async Task<IReadOnlyList<KuroSloganSet>> GetSloganSetsAsync(GameBiz biz, CancellationToken ct = default)
+    {
+        GameBiz baseBiz = biz.GetBaseBiz();
+        var sets = new List<KuroSloganSet>();
+        foreach (var chain in SloganChains.Where(c => c.BaseBiz == baseBiz))
+        {
+            foreach (string host in chain.Hosts)
+            {
+                try
+                {
+                    using var index = JsonDocument.Parse(await Http.GetByteArrayAsync(chain.App.LauncherConfigPath(host), ct));
+                    string? backgroundId = FindBackgroundId(index.RootElement);
+                    if (string.IsNullOrWhiteSpace(backgroundId))
+                    {
+                        continue;
+                    }
+
+                    var slogans = new Dictionary<string, string>();
+                    string? posterUrl = null;
+                    foreach (string lang in chain.Languages)
+                    {
+                        string payload = await Http.GetStringAsync(chain.App.BackgroundConfigPath(host, backgroundId, lang), ct);
+                        var info = JsonSerializer.Deserialize<KuroBackgroundInfo>(payload);
+                        if (info?.Slogan is { Length: > 0 })
+                        {
+                            slogans[lang] = Absolute(host, info.Slogan);
+                        }
+                        posterUrl ??= info?.FirstFrameImage is { Length: > 0 } f ? Absolute(host, f) : null;
+                    }
+                    if (slogans.Count > 0 && posterUrl is not null)
+                    {
+                        Log.LogInformation("Kuro slogan set {Langs}: id={Id}", string.Join(',', slogans.Keys), backgroundId);
+                        sets.Add(new KuroSloganSet(posterUrl, slogans));
+                    }
+                    break;
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Log.LogWarning(ex, "Kuro slogan request failed on {Host}", host);
+                }
+            }
+        }
+        return sets;
+    }
+
+    public static async Task<byte[]?> TryGetBytesAsync(string? url, CancellationToken ct)
+    {
+        if (url is not { Length: > 0 })
+        {
+            return null;
+        }
+        try
+        {
+            return await Http.GetByteArrayAsync(url, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Log.LogWarning(ex, "Fetch {Url} failed", url);
+            return null;
+        }
+    }
+
     public static async Task<KuroBackgroundInfo?> GetBackgroundAsync(GameBiz biz, CancellationToken ct = default)
     {
         var app = GetSourceApp(biz);
@@ -106,12 +227,7 @@ public static class KuroLauncherBackgroundClient
             {
                 string indexUrl = app.LauncherConfigPath(host);
                 using var index = JsonDocument.Parse(await Http.GetByteArrayAsync(indexUrl, ct));
-                if (!index.RootElement.TryGetProperty("functionCode", out var functionCode) ||
-                    !functionCode.TryGetProperty("background", out var backgroundProperty))
-                {
-                    continue;
-                }
-                string? backgroundId = backgroundProperty.GetString();
+                string? backgroundId = FindBackgroundId(index.RootElement);
                 if (string.IsNullOrWhiteSpace(backgroundId))
                 {
                     continue;
@@ -142,6 +258,32 @@ public static class KuroLauncherBackgroundClient
             }
         }
         return null;
+    }
+
+    private static string? FindBackgroundId(JsonElement root)
+    {
+        if (TryRead(root, out string? id))
+        {
+            return id;
+        }
+        if (root.TryGetProperty("config", out var config) && TryRead(config, out id))
+        {
+            return id;
+        }
+        return null;
+
+        static bool TryRead(JsonElement node, out string? id)
+        {
+            id = null;
+            if (node.ValueKind != JsonValueKind.Object ||
+                !node.TryGetProperty("functionCode", out var functionCode) ||
+                !functionCode.TryGetProperty("background", out var background))
+            {
+                return false;
+            }
+            id = background.GetString();
+            return !string.IsNullOrWhiteSpace(id);
+        }
     }
 
     public static async Task<long> DownloadAsync(string url, string destPath, IProgress<double>? progress, CancellationToken ct)

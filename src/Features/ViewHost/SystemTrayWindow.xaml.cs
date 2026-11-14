@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using Arietta.Frameworks;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Vanara.PInvoke;
 using Windows.Foundation;
 

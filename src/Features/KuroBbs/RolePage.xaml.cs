@@ -56,7 +56,7 @@ public sealed partial class RolePage : PageBase
         if (account is null || !account.IsValid)
         {
             InfoBar_NoAccount.IsOpen = true;
-            ScrollView_Roles.Visibility = Visibility.Collapsed;
+            ScrollViewer_Roles.Visibility = Visibility.Collapsed;
             return;
         }
         InfoBar_NoAccount.IsOpen = false;
@@ -68,7 +68,7 @@ public sealed partial class RolePage : PageBase
             if (result is { IsSuccess: true, Data: { } roles })
             {
                 GridView_Roles.ItemsSource = roles.Select(KuroRoleItem.From).ToList();
-                ScrollView_Roles.Visibility = Visibility.Visible;
+                ScrollViewer_Roles.Visibility = Visibility.Visible;
             }
             else if (result.IsTokenExpired)
             {
@@ -114,7 +114,7 @@ public sealed partial class RolePage : PageBase
             {
                 await FillDetailAsync(detail);
 
-                ScrollView_Roles.Visibility = Visibility.Collapsed;
+                ScrollViewer_Roles.Visibility = Visibility.Collapsed;
                 InfoBar_NoAccount.IsOpen = false;
                 Grid_Detail.Visibility = Visibility.Visible;
 
@@ -698,7 +698,7 @@ public sealed partial class RolePage : PageBase
 
         if (KuroBbsAccountStore.Load() is { IsValid: true })
         {
-            ScrollView_Roles.Visibility = Visibility.Visible;
+            ScrollViewer_Roles.Visibility = Visibility.Visible;
         }
     }
 

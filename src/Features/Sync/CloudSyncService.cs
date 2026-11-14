@@ -17,14 +17,31 @@ internal enum CloudSyncAction
     Skipped,
 }
 
-internal sealed record CloudSyncResult(bool Success, CloudSyncAction Action, string Message, Exception? Exception = null)
+internal sealed record CloudSyncResult(
+    bool Success,
+    CloudSyncAction Action,
+    string Message,
+    Exception? Exception = null,
+    string? MessageKey = null,
+    object[]? MessageArgs = null)
 {
-    public static CloudSyncResult Ok(CloudSyncAction action, string message) => new(true, action, message);
+    public static CloudSyncResult Ok(CloudSyncAction action, string message, string? key = null, object[]? args = null)
+        => new(true, action, message, null, key, args);
 
-    public static CloudSyncResult Fail(CloudSyncAction action, string message, Exception? exception = null)
-        => new(false, action, message, exception);
+    public static CloudSyncResult Fail(CloudSyncAction action, string message, Exception? exception = null,
+        string? key = null, object[]? args = null)
+        => new(false, action, message, exception, key, args);
 
-    public static CloudSyncResult Skip(string message) => new(true, CloudSyncAction.Skipped, message);
+    public static CloudSyncResult Skip(string message, string? key = null, object[]? args = null)
+        => new(true, CloudSyncAction.Skipped, message, null, key, args);
+
+    public string Display => MessageKey is null
+        ? Message
+        : Localization.Lang.Get(MessageKey, ResolveArgs());
+
+    private object?[] ResolveArgs() => MessageArgs is null
+        ? []
+        : MessageArgs.Select(arg => arg is CloudSyncResult nested ? nested.Display : arg).ToArray();
 }
 
 internal sealed class CloudSyncService
@@ -77,15 +94,16 @@ internal sealed class CloudSyncService
     {
         if (!IsConfigured)
         {
-            return CloudSyncResult.Fail(CloudSyncAction.TestConnection, "请先填写服务器地址、账号与密码");
+            return CloudSyncResult.Fail(CloudSyncAction.TestConnection,
+                "Fill in the server address, account and password first", null, "Sync_Msg_NeedCredentials");
         }
         try
         {
             using var client = CreateClient();
-            var (success, message) = await client.TestAsync(ct);
+            var (success, message, key, args) = await client.TestAsync(ct);
             return success
-                ? CloudSyncResult.Ok(CloudSyncAction.TestConnection, message)
-                : CloudSyncResult.Fail(CloudSyncAction.TestConnection, message);
+                ? CloudSyncResult.Ok(CloudSyncAction.TestConnection, message, key, args)
+                : CloudSyncResult.Fail(CloudSyncAction.TestConnection, message, null, key, args);
         }
         catch (Exception ex)
         {
@@ -98,7 +116,7 @@ internal sealed class CloudSyncService
     {
         if (!IsConfigured)
         {
-            return CloudSyncResult.Skip(NotConfiguredMessage);
+            return CloudSyncResult.Skip(NotConfiguredMessage, "Sync_Msg_NotConfigured");
         }
         await _gate.WaitAsync(ct);
         try
@@ -146,7 +164,7 @@ internal sealed class CloudSyncService
             }
             else
             {
-                result = CloudSyncResult.Skip("本地与云端都没有变化");
+                result = CloudSyncResult.Skip("No changes locally or in the cloud", "Sync_Msg_NoChanges");
             }
 
             Raise(result);
@@ -169,7 +187,7 @@ internal sealed class CloudSyncService
     {
         if (!IsConfigured)
         {
-            return CloudSyncResult.Fail(CloudSyncAction.Push, NotConfiguredMessage);
+            return CloudSyncResult.Fail(CloudSyncAction.Push, NotConfiguredMessage, null, "Sync_Msg_NotConfigured");
         }
         await _gate.WaitAsync(ct);
         try
@@ -196,7 +214,7 @@ internal sealed class CloudSyncService
     {
         if (!IsConfigured)
         {
-            return CloudSyncResult.Fail(CloudSyncAction.Pull, NotConfiguredMessage);
+            return CloudSyncResult.Fail(CloudSyncAction.Pull, NotConfiguredMessage, null, "Sync_Msg_NotConfigured");
         }
         await _gate.WaitAsync(ct);
         try
@@ -221,7 +239,7 @@ internal sealed class CloudSyncService
 
     private string RemoteFilePath => $"{CloudSyncConfig.RemoteFolder}/{CloudSyncConfig.RemoteFileName}";
 
-    private string NotConfiguredMessage => "尚未配置 WebDAV";
+    private string NotConfiguredMessage => "WebDAV not configured";
 
     private string RemoteHistoryFolder => $"{CloudSyncConfig.RemoteFolder}/history";
 
@@ -254,14 +272,17 @@ internal sealed class CloudSyncService
             var pull = await PullInternalAsync(client, ct);
             if (!pull.Success)
             {
-                return CloudSyncResult.Fail(CloudSyncAction.Push, $"云端已被其他设备更新，且合并失败：{pull.Message}");
+                return CloudSyncResult.Fail(CloudSyncAction.Push,
+                    $"Cloud updated by another device and merge failed: {pull.Message}", null,
+                    "Sync_Msg_MergeConflict", [pull]);
             }
             return await PushInternalAsync(client, allowMergeRetry: false, ct);
         }
 
         if (!upload.Success)
         {
-            return CloudSyncResult.Fail(CloudSyncAction.Push, $"上传失败：HTTP {upload.StatusCode}");
+            return CloudSyncResult.Fail(CloudSyncAction.Push,
+                $"Upload failed: HTTP {upload.StatusCode}", null, "Sync_Msg_UploadFailed", [upload.StatusCode]);
         }
 
         SaveLocalBackup();
@@ -273,7 +294,8 @@ internal sealed class CloudSyncService
 
         await PruneRemoteHistoryAsync(client, ct);
         _logger.LogInformation("Pushed snapshot {Size} bytes, plain hash {Hash}", payload.Length, plainHash);
-        return CloudSyncResult.Ok(CloudSyncAction.Push, $"已上传（{payload.Length / 1024.0:F0} KB）");
+        string sizeKb = (payload.Length / 1024.0).ToString("F0");
+        return CloudSyncResult.Ok(CloudSyncAction.Push, $"Uploaded ({sizeKb} KB)", "Sync_Msg_Uploaded", [sizeKb]);
     }
 
 
@@ -282,7 +304,7 @@ internal sealed class CloudSyncService
         var (content, etag) = await client.DownloadAsync(RemoteFilePath, ct);
         if (content is null)
         {
-            return CloudSyncResult.Skip("云端还没有备份");
+            return CloudSyncResult.Skip("No cloud backup yet", "Sync_Msg_NoCloudBackup");
         }
 
         string tempDatabase = Path.Combine(Path.GetTempPath(), "Arietta", $"merge_{Guid.NewGuid():N}.db");
@@ -293,10 +315,11 @@ internal sealed class CloudSyncService
             await File.WriteAllBytesAsync(tempDatabase, database, ct);
             if (!DatabaseService.IntegrityCheck(tempDatabase, out string message))
             {
-                return CloudSyncResult.Fail(CloudSyncAction.Pull, $"云端备份已损坏：{message}");
+                return CloudSyncResult.Fail(CloudSyncAction.Pull,
+                    $"Cloud backup corrupted: {message}", null, "Sync_Msg_CloudCorrupted", [message]);
             }
 
-            string mergeMessage = DatabaseMergeService.MergeFromFile(tempDatabase, _config.Preference);
+            MergeOutcome merge = DatabaseMergeService.MergeFromFile(tempDatabase, _config.Preference);
             SaveLocalBackup();
 
             _config.LastRemoteETag = etag ?? "";
@@ -304,7 +327,7 @@ internal sealed class CloudSyncService
             _config.LastSyncTime = DateTimeOffset.Now;
             _config.Save();
 
-            return CloudSyncResult.Ok(CloudSyncAction.Pull, mergeMessage);
+            return CloudSyncResult.Ok(CloudSyncAction.Pull, merge.Message, merge.LangKey, merge.LangArgs);
         }
         catch (InvalidDataException ex)
         {

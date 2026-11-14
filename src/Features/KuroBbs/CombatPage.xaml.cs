@@ -91,11 +91,7 @@ public sealed partial class CombatPage : PageBase
 
     private Dictionary<int, int>? _slashChainMap;
 
-    private Dictionary<int, int>? _slashStarMap;
-
     private Dictionary<int, int>? _matrixChainMap;
-
-    private Dictionary<int, int>? _matrixStarMap;
 
     private int _loadGeneration;
 
@@ -426,8 +422,9 @@ public sealed partial class CombatPage : PageBase
     {
         try
         {
-            long labelTs = startTs > 0 && record.PeriodEnd > startTs ? startTs
-                : record.PeriodEnd > 0 ? record.PeriodEnd - 86400
+            long labelTs = record.PeriodEnd > 0
+                ? startTs > 0 && record.PeriodEnd > startTs ? startTs + (record.PeriodEnd - startTs) / 2 : record.PeriodEnd - 86400
+                : startTs > 0 ? startTs
                 : DateTimeOffset.FromUnixTimeMilliseconds(record.UpdateTime).ToUnixTimeSeconds();
             return DateTimeOffset.FromUnixTimeSeconds(labelTs).LocalDateTime.ToString("yyyy-MM");
         }
@@ -554,7 +551,6 @@ public sealed partial class CombatPage : PageBase
                     {
 
                         _matrixChainMap = [];
-                        _matrixStarMap = [];
                         if (entry.Chain is string aux)
                         {
                             try
@@ -563,7 +559,6 @@ public sealed partial class CombatPage : PageBase
                                 if (maps?.Chain is not null)
                                 {
                                     _matrixChainMap = maps.Chain;
-                                    _matrixStarMap = maps.Star ?? [];
                                 }
                                 else
                                 {
@@ -584,7 +579,6 @@ public sealed partial class CombatPage : PageBase
                     {
 
                         _slashChainMap = [];
-                        _slashStarMap = [];
                         if (entry.Chain is string aux)
                         {
                             try
@@ -593,7 +587,6 @@ public sealed partial class CombatPage : PageBase
                                 if (maps?.Chain is not null)
                                 {
                                     _slashChainMap = maps.Chain;
-                                    _slashStarMap = maps.Star ?? [];
                                 }
                                 else
                                 {
@@ -846,9 +839,6 @@ public sealed partial class CombatPage : PageBase
 
     private const double MatrixBuffSize = 64;
 
-    private const double MatrixOverviewAvatarSize = 40;
-    private const double MatrixOverviewBuffSize = 28;
-
     private const double MatrixShareImageWidth = 686;
 
     private static readonly SolidColorBrush MatrixGoldBrush = new(Color.FromArgb(0xFF, 0xFF, 0xF3, 0xB9));
@@ -942,7 +932,7 @@ public sealed partial class CombatPage : PageBase
         {
             foreach (var icon in team.RoleIcons ?? [])
             {
-                left.Children.Add(CreateRolePhoto(icon, 0, 0, null, MatrixRolePhotoSize, 24, decodeToSize: true, showRarityBar: true, placeholderBackground: true));
+                left.Children.Add(CreateRolePhoto(icon, 0, null, MatrixRolePhotoSize, 24, decodeToSize: true, placeholderBackground: true));
             }
         }
         else
@@ -950,8 +940,7 @@ public sealed partial class CombatPage : PageBase
             foreach (var role in roles)
             {
                 int chain = _matrixChainMap is { } m && m.TryGetValue(role.RoleId, out var c) ? c : 0;
-                int star = _matrixStarMap is { } sm && sm.TryGetValue(role.RoleId, out var st) ? st : 0;
-                left.Children.Add(CreateRolePhoto(role.IconUrl, chain, star, role.SkillBranchIndex, MatrixRolePhotoSize, 24, decodeToSize: true, showRarityBar: true, placeholderBackground: true));
+                left.Children.Add(CreateRolePhoto(role.IconUrl, chain, role.SkillBranchIndex, MatrixRolePhotoSize, 24, decodeToSize: true, placeholderBackground: true));
             }
         }
 
@@ -1076,7 +1065,8 @@ public sealed partial class CombatPage : PageBase
                 await Task.Delay(400);
 
                 rtb = new RenderTargetBitmap();
-                await rtb.RenderAsync(image);
+
+                await rtb.RenderAsync(image, (int)Math.Ceiling(image.ActualWidth * 2), (int)Math.Ceiling(image.ActualHeight * 2));
 
                 png = new InMemoryRandomAccessStream();
                 var pixels = await rtb.GetPixelsAsync();
@@ -1140,7 +1130,7 @@ public sealed partial class CombatPage : PageBase
         {
             for (int i = 0; i < teams.Count; i++)
             {
-                rows.Children.Add(CreateMatrixShareRow(teams[i], i + 1, MeasureRoundColumnWidth(teams, 12)));
+                rows.Children.Add(CreateMatrixShareRow(teams[i], i + 1, MeasureRoundColumnWidth(teams, 13)));
             }
         }
         body.Children.Add(rows);
@@ -1163,13 +1153,13 @@ public sealed partial class CombatPage : PageBase
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(roundColumnWidth) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(48) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(58) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(64) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(68) });
 
         row.Children.Add(new TextBlock
         {
             Text = index.ToString("D2"),
-            FontSize = 18,
+            FontSize = 22,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             VerticalAlignment = VerticalAlignment.Center,
             Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
@@ -1181,7 +1171,7 @@ public sealed partial class CombatPage : PageBase
         {
             foreach (var icon in team.RoleIcons ?? [])
             {
-                left.Children.Add(CreateRolePhoto(icon, 0, 0, null, MatrixOverviewAvatarSize, 14, decodeToSize: true, showRarityBar: false, placeholderBackground: true, badgeFontSize: 9));
+                left.Children.Add(CreateRolePhoto(icon, 0, null, MatrixRolePhotoSize, 24, decodeToSize: false, placeholderBackground: true));
             }
         }
         else
@@ -1189,13 +1179,18 @@ public sealed partial class CombatPage : PageBase
             foreach (var role in roles)
             {
                 int chain = _matrixChainMap is { } m && m.TryGetValue(role.RoleId, out var c) ? c : 0;
-                int star = _matrixStarMap is { } sm && sm.TryGetValue(role.RoleId, out var st) ? st : 0;
-                left.Children.Add(CreateRolePhoto(role.IconUrl, chain, star, role.SkillBranchIndex, MatrixOverviewAvatarSize, 14, decodeToSize: true, showRarityBar: false, placeholderBackground: true, badgeFontSize: 9));
+                left.Children.Add(CreateRolePhoto(role.IconUrl, chain, role.SkillBranchIndex, MatrixRolePhotoSize, 24, decodeToSize: false, placeholderBackground: true));
             }
         }
-        foreach (var buff in (team.Buffs ?? []).Where(b => !string.IsNullOrEmpty(b.BuffIcon) || !string.IsNullOrEmpty(b.BuffName)))
+
+        var buffs = (team.Buffs ?? []).Where(b => !string.IsNullOrEmpty(b.BuffIcon) || !string.IsNullOrEmpty(b.BuffName)).ToList();
+        if (buffs.Count > 0)
         {
-            left.Children.Add(CreateMatrixBuffBox(buff, MatrixOverviewBuffSize));
+            left.Children.Add(KuroBbsUi.MakeDivider(new SolidColorBrush(Color.FromArgb(0x1A, 0xFF, 0xFF, 0xFF)), 62, new Thickness(6, 0, 8, 0), width: 1, verticalCenter: true));
+            foreach (var buff in buffs)
+            {
+                left.Children.Add(CreateMatrixBuffBox(buff, decodeToSize: false));
+            }
         }
         Grid.SetColumn(left, 1);
         row.Children.Add(left);
@@ -1205,7 +1200,7 @@ public sealed partial class CombatPage : PageBase
             var round = new TextBlock
             {
                 Text = string.Format(Lang.Instance.MatrixPage_Round, team.Round),
-                FontSize = 12,
+                FontSize = 13,
                 VerticalAlignment = VerticalAlignment.Center,
                 Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
             };
@@ -1218,8 +1213,8 @@ public sealed partial class CombatPage : PageBase
             progress.Children.Add(new Image
             {
                 Source = boss,
-                Width = 16,
-                Height = 16,
+                Width = 20,
+                Height = 20,
                 Stretch = Stretch.Uniform,
                 VerticalAlignment = VerticalAlignment.Center,
             });
@@ -1227,7 +1222,7 @@ public sealed partial class CombatPage : PageBase
         progress.Children.Add(new TextBlock
         {
             Text = string.Format(Lang.Instance.MatrixPage_BossFormat, team.PassBoss, team.BossCount),
-            FontSize = 12,
+            FontSize = 14,
             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
             VerticalAlignment = VerticalAlignment.Center,
             Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xB3, 0xB3, 0xB3)),
@@ -1238,7 +1233,7 @@ public sealed partial class CombatPage : PageBase
         var score = new TextBlock
         {
             Text = "+" + team.Score.ToString(),
-            FontSize = 14,
+            FontSize = 18,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -1249,11 +1244,11 @@ public sealed partial class CombatPage : PageBase
 
         return new Border
         {
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(10),
             Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x24, 0x33, 0x43)),
             BorderBrush = new SolidColorBrush(Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF)),
             BorderThickness = new Thickness(1),
-            Padding = new Thickness(12, 8, 14, 8),
+            Padding = new Thickness(14, 10, 16, 10),
             Child = row,
         };
     }
@@ -1318,8 +1313,8 @@ public sealed partial class CombatPage : PageBase
         InAppToast.MainWindow?.Success(Lang.Instance.Common_Save);
     }
 
-    private FrameworkElement CreateRolePhoto(string? url, int chain, int star, int? branchIndex,
-        double size, double starIconSize, bool decodeToSize, bool showRarityBar, bool placeholderBackground,
+    private FrameworkElement CreateRolePhoto(string? url, int chain, int? branchIndex,
+        double size, double starIconSize, bool decodeToSize, bool placeholderBackground,
         double badgeFontSize = 11)
     {
         var root = new Grid { Width = size, Height = size };
@@ -1357,19 +1352,6 @@ public sealed partial class CombatPage : PageBase
         }
         root.Children.Add(photo);
 
-        if (showRarityBar && star > 0)
-        {
-            root.Children.Add(new Border
-            {
-                Height = 3,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                CornerRadius = new CornerRadius(0, 0, 8, 8),
-                Background = star >= 5
-                    ? new SolidColorBrush(Microsoft.UI.Colors.Gold)
-                    : new SolidColorBrush(Microsoft.UI.Colors.MediumPurple),
-            });
-        }
-
         if (chain > 0)
         {
             root.Children.Add(KuroBbsUi.MakeCornerBadge(chain.ToString(), badgeFontSize, new Thickness(4, 0, 4, 1)));
@@ -1396,7 +1378,7 @@ public sealed partial class CombatPage : PageBase
         return root;
     }
 
-    private static FrameworkElement CreateMatrixBuffBox(KuroNewTowerBuff buff, double? size = null)
+    private static FrameworkElement CreateMatrixBuffBox(KuroNewTowerBuff buff, double? size = null, bool decodeToSize = true)
     {
         var s = size ?? MatrixBuffSize;
         var box = new Border
@@ -1410,17 +1392,15 @@ public sealed partial class CombatPage : PageBase
         {
             try
             {
-                box.Child = new Image
+                var source = new BitmapImage(new Uri(buff.BuffIcon));
+                if (decodeToSize)
                 {
 
-                    Source = new BitmapImage(new Uri(buff.BuffIcon))
-                    {
-                        DecodePixelType = DecodePixelType.Logical,
-                        DecodePixelWidth = (int)s,
-                        DecodePixelHeight = (int)s,
-                    },
-                    Stretch = Stretch.UniformToFill,
-                };
+                    source.DecodePixelType = DecodePixelType.Logical;
+                    source.DecodePixelWidth = (int)s;
+                    source.DecodePixelHeight = (int)s;
+                }
+                box.Child = new Image { Source = source, Stretch = Stretch.UniformToFill };
             }
             catch
             {
@@ -1718,13 +1698,12 @@ public sealed partial class CombatPage : PageBase
         foreach (var role in roles)
         {
 
-            int chain = 0, star = 0;
+            int chain = 0;
             if (role.RoleId is int id)
             {
                 chain = _slashChainMap is { } m && m.TryGetValue(id, out var c) ? c : 0;
-                star = _slashStarMap is { } sm && sm.TryGetValue(id, out var st) ? st : 0;
             }
-            row.Children.Add(CreateRolePhoto(role.IconUrl, chain, star, role.SkillBranchIndex, SlashRolePhotoSize, SlashBranchIconSize, decodeToSize: true, showRarityBar: true, placeholderBackground: false));
+            row.Children.Add(CreateRolePhoto(role.IconUrl, chain, role.SkillBranchIndex, SlashRolePhotoSize, SlashBranchIconSize, decodeToSize: true, placeholderBackground: false));
         }
         if (index == 0 && hasBuff)
         {

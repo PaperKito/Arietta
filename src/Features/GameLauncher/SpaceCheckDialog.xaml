@@ -38,19 +38,60 @@
                     Background="{ThemeResource DateTimePickerFlyoutButtonBackgroundPointerOver}"
                     CornerRadius="8">
                 <StackPanel Spacing="8">
-                    <TextBlock FontSize="12"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               IsTextScaleFactorEnabled="False">
-                        <Run Text="{x:Bind lang:Lang.Instance.GameUpdate_SpaceRequired, Mode=OneWay}" />
-                        <Run x:Name="Run_Required" />
-                    </TextBlock>
-                    <TextBlock FontSize="12"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               IsTextScaleFactorEnabled="False">
-                        <Run Text="{x:Bind lang:Lang.Instance.InstallGameDialog_SpaceAvailable, Mode=OneWay}" />
-                        <Run x:Name="Run_Available"
-                             Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
-                    </TextBlock>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind lang:Lang.Instance.InstallGameDialog_SpaceRequiredToDownload, Mode=OneWay}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock x:Name="Text_Download"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Right"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False" />
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind lang:Lang.Instance.SpaceCheck_ActualRequired, Mode=OneWay}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock x:Name="Text_Required"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Right"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False" />
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   IsTextScaleFactorEnabled="False"
+                                   Text="{x:Bind lang:Lang.Instance.SpaceCheck_ActualAvailable, Mode=OneWay}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock x:Name="Text_Available"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Right"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                   IsTextScaleFactorEnabled="False" />
+                    </Grid>
                 </StackPanel>
             </Border>
 

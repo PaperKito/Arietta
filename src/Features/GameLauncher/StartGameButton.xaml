@@ -141,7 +141,7 @@
                     <Grid Grid.Column="1"
                           VerticalAlignment="Center"
                           ColumnSpacing="4"
-                          Opacity="{x:Bind DownloadingRemainTimeOpacity}">
+                          Opacity="{x:Bind RemainTimeRowOpacity}">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -242,7 +242,6 @@
                            Visibility="{x:Bind NonInstallingVisibility}" />
 
                 <StackPanel Visibility="{x:Bind InstallingVisibility}">
-
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontSize="14"
                                    FontWeight="Bold"
@@ -272,8 +271,6 @@
                                    Visibility="{x:Bind RemainTimeVisibility}" />
                     </StackPanel>
 
-                    <MenuFlyoutSeparator Margin="0,8,0,0" />
-
                     <StackPanel Margin="0,8,0,0"
                                 Orientation="Horizontal"
                                 Spacing="4"
@@ -286,7 +283,7 @@
                         <TextBlock FontSize="12"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                    IsTextScaleFactorEnabled="False"
-                                   Text="{x:Bind lang:Lang.Instance.SettingPage_Download}" />
+                                   Text="{x:Bind lang:Lang.Instance.SettingPage_Download, Mode=OneWay}" />
                     </StackPanel>
                     <Grid Width="200"
                           Margin="0,2,0,0"

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media.Animation;
 using Arietta.Core;
 using Arietta.Helpers;
 using Arietta.Localization;
@@ -43,6 +44,7 @@ public sealed partial class GameBannerAndPost : UserControl
     {
 
         GameLauncherSettingDialog.AnnouncementSettingChanged += OnAnnouncementSettingChanged;
+        ApplyScale();
         _ = ReloadAsync();
     }
 
@@ -57,11 +59,16 @@ public sealed partial class GameBannerAndPost : UserControl
     {
         if (DispatcherQueue.HasThreadAccess)
         {
+            ApplyScale();
             _ = ReloadAsync();
         }
         else
         {
-            DispatcherQueue.TryEnqueue(() => _ = ReloadAsync());
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                ApplyScale();
+                _ = ReloadAsync();
+            });
         }
     }
 
@@ -176,5 +183,71 @@ public sealed partial class GameBannerAndPost : UserControl
         catch { }
     }
 
+    private const double RestingScale = 0.8;
+
+    private bool _isPointerInside;
+    private bool _isScaledOut;
+    private Storyboard? _scaleStoryboard;
+
+    private void ApplyScale()
+    {
+        _scaleStoryboard?.Stop();
+        _isPointerInside = false;
+        _isScaledOut = false;
+        double scale = GameNoticeSettings.ScaleUpOnHover ? RestingScale : 1.0;
+        Transform_Card.ScaleX = scale;
+        Transform_Card.ScaleY = scale;
+    }
+
+
+    private async void Grid_Card_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        _isPointerInside = true;
+        if (!GameNoticeSettings.ScaleUpOnHover || _isScaledOut)
+        {
+            return;
+        }
+
+        await Task.Delay(150);
+        if (!_isPointerInside || _isScaledOut || !GameNoticeSettings.ScaleUpOnHover)
+        {
+            return;
+        }
+        AnimateScale(1.0, 200);
+        _isScaledOut = true;
+    }
+
+
+    private void Grid_Card_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        _isPointerInside = false;
+        if (!GameNoticeSettings.ScaleUpOnHover || !_isScaledOut)
+        {
+            return;
+        }
+        AnimateScale(RestingScale, 250);
+        _isScaledOut = false;
+    }
+
+    private void AnimateScale(double to, int durationMs)
+    {
+        double from = Transform_Card.ScaleX;
+        Storyboard storyboard = new();
+        foreach (string property in new[] { "ScaleX", "ScaleY" })
+        {
+            DoubleAnimation anim = new()
+            {
+                From           = from,
+                To             = to,
+                Duration       = new Duration(TimeSpan.FromMilliseconds(durationMs)),
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            };
+            Storyboard.SetTarget(anim, Transform_Card);
+            Storyboard.SetTargetProperty(anim, property);
+            storyboard.Children.Add(anim);
+        }
+        _scaleStoryboard = storyboard;
+        storyboard.Begin();
+    }
 
 }

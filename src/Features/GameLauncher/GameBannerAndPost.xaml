@@ -20,7 +20,18 @@
           CornerRadius="8"
           RowSpacing="4"
           Shadow="{StaticResource ThemeShadow}"
-          Translation="0,0,16">
+          Translation="0,0,16"
+          PointerEntered="Grid_Card_PointerEntered"
+          PointerExited="Grid_Card_PointerExited">
+
+        <Grid.RenderTransform>
+
+            <CompositeTransform x:Name="Transform_Card"
+                                ScaleX="0.8"
+                                ScaleY="0.8"
+                                CenterX="0"
+                                CenterY="304" />
+        </Grid.RenderTransform>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="176" />

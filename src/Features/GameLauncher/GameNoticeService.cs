@@ -69,7 +69,7 @@ public static class GameNoticeService
             OnlyZhHans),
 
         [GameBiz.WutheringWavesBilibili] = new(CnBases,
-            "10004_j5GWFuUFlb8N31Wi2uS3ZAVHcb7ZGN7y", "G152", null, NoticePathKind.Legacy, false,
+            "10004_IY6xmlAusbImBjWrpPj1OwNuirXEO44x", "G152", "bilibili", NoticePathKind.AppWithServer, false,
             OnlyZhHans),
 
         [GameBiz.WutheringWavesGlobal] = new(GlobalBases,
@@ -121,7 +121,11 @@ public static class GameNoticeService
         if (!Configs.TryGetValue(biz, out var cfg) && !Configs.TryGetValue(biz.GetBaseBiz(), out cfg))
         {
             LastFailure = NoticeFailureKind.Error;
-            _logger.LogWarning("Notification API not configured: {Biz}", biz);
+
+            if (biz != GameBiz.External)
+            {
+                _logger.LogWarning("Notification API not configured: {Biz}", biz);
+            }
             return null;
         }
 
@@ -203,7 +207,7 @@ public static class GameNoticeService
                 var data = await JsonSerializer.DeserializeAsync<LauncherInformation>(stream, JsonOptions);
                 if (data is null)
                 {
-                    failures.Add($"{tag}:解析为空");
+                    failures.Add($"{tag}: empty parse");
                     continue;
                 }
 
@@ -220,7 +224,7 @@ public static class GameNoticeService
 
                 if (banners.Count == 0 && groups.Count == 0)
                 {
-                    failures.Add($"{tag}:内容为空");
+                    failures.Add($"{tag}: empty content");
                     continue;
                 }
 

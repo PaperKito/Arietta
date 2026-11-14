@@ -97,7 +97,7 @@ public sealed partial class CloudSyncSection : UserControl
 
     private void CloudSync_StatusChanged(object? sender, CloudSyncResult e)
     {
-        DispatcherQueue.TryEnqueue(() => SetStatus(e.Message, e.Success));
+        DispatcherQueue.TryEnqueue(() => SetStatus(e.Display, e.Success));
     }
 
 
@@ -144,7 +144,7 @@ public sealed partial class CloudSyncSection : UserControl
         }
 
         SetBusy(false);
-        SetStatus(result.Message, result.Success);
+        SetStatus(result.Display, result.Success);
     }
 
 

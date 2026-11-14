@@ -40,15 +40,15 @@ internal static class DatabaseSnapshot
         if (payload.Length <= HeaderSize || payload[0] != Magic[0] || payload[1] != Magic[1]
             || payload[2] != Magic[2] || payload[3] != Magic[3])
         {
-            throw new InvalidDataException("不是有效的备份文件（缺少 MWL1 标识）");
+            throw new InvalidDataException("Not a valid backup file (missing MWL1 header)");
         }
         if (payload[4] != Version)
         {
-            throw new InvalidDataException($"备份文件版本 {payload[4]} 不受支持，请升级启动器");
+            throw new InvalidDataException($"Backup file version {payload[4]} not supported, please upgrade the launcher");
         }
         if ((payload[5] & FlagEncrypted) != 0)
         {
-            throw new InvalidDataException("备份文件已加密，请使用包含加密备份功能的旧版本启动器恢复");
+            throw new InvalidDataException("Backup file is encrypted, restore it with an older launcher version that supports encrypted backups");
         }
         return payload[HeaderSize..];
     }

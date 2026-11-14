@@ -53,7 +53,7 @@ public sealed class CdpTokenSniffer : IAsyncDisposable
         var ws = _ws;
         if (ws?.State != WebSocketState.Open)
         {
-            throw new InvalidOperationException("CDP 未连接");
+            throw new InvalidOperationException("CDP not connected");
         }
         int id = Interlocked.Increment(ref _nextCommandId);
         using var stream = new MemoryStream();
@@ -88,7 +88,7 @@ public sealed class CdpTokenSniffer : IAsyncDisposable
                     result = await _ws.ReceiveAsync(new ArraySegment<byte>(buffer), _cts.Token);
                     if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        throw new WebSocketException("对端关闭连接");
+                        throw new WebSocketException("Peer closed the connection");
                     }
                     message.Write(buffer, 0, result.Count);
                 }

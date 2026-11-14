@@ -111,7 +111,7 @@ public sealed partial class CloudSyncServerPage : PageBase
             CloudSyncResult result = await _cloudSync.TestConnectionAsync();
             SetStatus(result.Success
                 ? Lang.Instance.Sync_ConnectOk
-                : $"{Lang.Instance.Sync_ConnectFail}（{result.Message}）", result.Success);
+                : $"{Lang.Instance.Sync_ConnectFail}（{result.Display}）", result.Success);
         }
         catch (Exception ex)
         {

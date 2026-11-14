@@ -41,6 +41,14 @@
                     <TextBlock FontSize="12"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                IsTextScaleFactorEnabled="False"
+                               Visibility="{x:Bind TierVisible}">
+                        <Run Text="{x:Bind lang:Lang.Instance.GameLauncherSettingDialog_ResourceTier, Mode=OneWay}" />
+                        <Run Text="{x:Bind TierNameText}" />
+                    </TextBlock>
+
+                    <TextBlock FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               IsTextScaleFactorEnabled="False"
                                Visibility="{x:Bind StagedVisible}">
                         <Run Text="{x:Bind lang:Lang.Instance.GameUpdate_PredownloadedSize, Mode=OneWay}" />
                         <Run Text="{x:Bind PredownloadedSizeText}" />

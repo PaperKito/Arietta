@@ -22,8 +22,12 @@ public sealed class GameUpdateSession
 
     private long _cancelRequestedTimestamp;
 
+    private long _lastApplyLogMs;
+
 
     public bool IsBusy { get; private set; }
+
+    public bool IsRepair { get; private set; }
 
     public GameBiz Biz { get; private set; }
 
@@ -53,11 +57,12 @@ public sealed class GameUpdateSession
 
     public bool Start(GameBiz biz, GameUpdateService.GameUpdateState state)
     {
-        if (state.Target is null || state.TargetVersion is null)
+
+        if (state.TargetVersion is null || (state.Target is null && state.TierName is null))
         {
             return false;
         }
-        if (!Begin(biz, state.Kind, state.TargetVersion, state.TotalBytes))
+        if (!Begin(biz, state.Kind, state.TargetVersion, state.TotalBytes, initialBytes: state.PredownloadedBytes))
         {
             return false;
         }
@@ -71,7 +76,7 @@ public sealed class GameUpdateSession
         {
             return false;
         }
-        if (!Begin(biz, GameUpdateService.UpdateKind.Update, state.TargetVersion, state.TotalBytes, installDir, tierName))
+        if (!Begin(biz, GameUpdateService.UpdateKind.Update, state.TargetVersion, state.TotalBytes, installDir, tierName, state.PredownloadedBytes))
         {
             return false;
         }
@@ -79,26 +84,41 @@ public sealed class GameUpdateSession
         return true;
     }
 
-    public bool StartTierSwitch(GameBiz biz, string tierName, long totalBytes)
+    public bool StartTierSwitch(GameBiz biz, string tierName, long totalBytes, string? installDir = null)
     {
         if (string.IsNullOrWhiteSpace(tierName))
         {
             return false;
         }
-        if (!Begin(biz, GameUpdateService.UpdateKind.Update, null, totalBytes))
+        if (!Begin(biz, GameUpdateService.UpdateKind.Update, null, totalBytes, installDir))
         {
             return false;
         }
         _ = RunCoreAsync(biz, async (progress, ct) =>
         {
-            await Task.Run(() => GameUpdateService.SwitchTierAsync(biz, tierName, progress, ct), ct);
+            await Task.Run(() => GameUpdateService.SwitchTierAsync(biz, tierName, progress, ct, installDir), ct);
             InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_TierSwitchDone, GameUpdateService.TierDisplayName(tierName)));
         }, errorTitle: Lang.Instance.GameLauncherSettingDialog_ResourceTier);
         return true;
     }
 
+    public bool StartRepair(GameBiz biz)
+    {
+        if (!Begin(biz, GameUpdateService.UpdateKind.Update, null, 0))
+        {
+            return false;
+        }
+        IsRepair = true;
+        _ = RunCoreAsync(biz, async (progress, ct) =>
+        {
+            await GameUpdateService.RepairGameAsync(biz, progress, ct);
+            InAppToast.MainWindow?.Success(Lang.Instance.GameUpdate_RepairDone);
+        }, errorTitle: Lang.Instance.LauncherPage_RepairGame);
+        return true;
+    }
+
     private bool Begin(GameBiz biz, GameUpdateService.UpdateKind kind, string? targetVersion, long totalBytes,
-        string? installDir = null, string? tierName = null)
+        string? installDir = null, string? tierName = null, long initialBytes = 0)
     {
         lock (_gate)
         {
@@ -111,13 +131,15 @@ public sealed class GameUpdateSession
         }
         Biz = biz;
         Kind = kind;
+        IsRepair = false;
         InstallDir = installDir;
         InstallTier = tierName;
         TargetVersion = targetVersion;
         IsApplying = false;
         IsPausing = false;
-        ProgressValue = 0;
-        ReceivedBytes = 0;
+
+        ProgressValue = totalBytes > 0 ? Math.Clamp(initialBytes * 1000.0 / totalBytes, 0, 1000) : 0;
+        ReceivedBytes = initialBytes;
         TotalBytes = totalBytes;
         ProgressText = null;
         LastProgress = null;
@@ -178,7 +200,7 @@ public sealed class GameUpdateSession
             else
             {
 
-                await Task.Run(() => GameUpdateService.ApplyUpdateAsync(biz, state.Target!, progress, ct), ct);
+                await Task.Run(() => GameUpdateService.ApplyUpdateAsync(biz, state, progress, ct), ct);
                 InAppToast.MainWindow?.Success(string.Format(Lang.Instance.GameUpdate_Done, state.TargetVersion));
             }
         });
@@ -218,6 +240,7 @@ public sealed class GameUpdateSession
             }
             IsApplying = false;
             IsPausing = false;
+            IsRepair = false;
             long cancelTs = Interlocked.Exchange(ref _cancelRequestedTimestamp, 0);
             if (cancelTs != 0)
             {
@@ -233,33 +256,45 @@ public sealed class GameUpdateSession
     {
         LastProgress = p;
 
-        static string WithPercent(string text, long done, long total)
-            => total > 0 ? $"{text} · {done * 100 / total}%" : text;
+        static string WithPercent(string text, double ratio)
+            => $"{text} · {Math.Clamp(ratio, 0, 1):P0}";
+        double fileRatio = p.TotalFiles > 0 ? (double)p.CompletedFiles / p.TotalFiles : 0;
+        double overall = p.OverallProgress is { } o ? Math.Clamp(o, 0, 1) : fileRatio;
 
-        double fileProgress = p.TotalFiles > 0 ? p.CompletedFiles * 1000.0 / p.TotalFiles : 0;
+        if (p.Phase is DownloadPhase.Applying or DownloadPhase.Patching)
+        {
+            long nowMs = Environment.TickCount64;
+            if (nowMs - _lastApplyLogMs >= 5000)
+            {
+                _lastApplyLogMs = nowMs;
+                AppConfig.GetLogger<GameUpdateSession>().LogInformation(
+                    "Apply progress: phase={Phase} {Done}/{Total} overall={Overall:P1} bytes={Bytes}/{TotalBytes} speed={Speed}/s",
+                    p.Phase, p.CompletedFiles, p.TotalFiles, overall,
+                    p.ReceivedBytes, p.TotalBytes, FormatSize(p.SpeedBytesPerSec));
+            }
+        }
         if (p.Phase == DownloadPhase.Applying)
         {
             IsApplying = true;
-
-            ProgressValue = fileProgress;
+            ProgressValue = overall * 1000;
             ProgressText = p.TotalFiles > 0
-                ? WithPercent(string.Format(Lang.Instance.GameUpdate_ApplyingProgress, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)
+                ? WithPercent(string.Format(Lang.Instance.GameUpdate_ApplyingProgress, p.CompletedFiles, p.TotalFiles), overall)
                 : Lang.Instance.GameUpdate_Applying;
         }
         else if (p.Phase == DownloadPhase.Patching)
         {
             IsApplying = true;
 
-            ProgressValue = fileProgress;
+            ProgressValue = overall * 1000;
             ProgressText = p.TotalFiles > 0
-                ? WithPercent(string.Format(Lang.Instance.GameUpdate_Patching, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles)
+                ? WithPercent(string.Format(Lang.Instance.GameUpdate_Patching, p.CompletedFiles, p.TotalFiles), overall)
                 : Lang.Instance.GameUpdate_Applying;
         }
         else if (p.Phase == DownloadPhase.Verifying)
         {
             IsApplying = false;
-            ProgressValue = fileProgress;
-            ProgressText = WithPercent(string.Format(Lang.Instance.GameUpdate_Verifying, p.CompletedFiles, p.TotalFiles), p.CompletedFiles, p.TotalFiles);
+            ProgressValue = fileRatio * 1000;
+            ProgressText = WithPercent(string.Format(Lang.Instance.GameUpdate_Verifying, p.CompletedFiles, p.TotalFiles), fileRatio);
         }
         else
         {
@@ -270,6 +305,71 @@ public sealed class GameUpdateSession
             ProgressText = $"{FormatSize(p.ReceivedBytes)} / {FormatSize(p.TotalBytes)} · {FormatSize(p.SpeedBytesPerSec)}/s";
         }
         Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    public async Task SimulateApplyProgressAsync(GameBiz biz)
+    {
+        const int moveFiles = 4;
+        const int groups = 75;
+        const int units = moveFiles + groups;
+        const long totalBytes = 27L * 1024 * 1024 * 1024;
+        if (!Begin(biz, GameUpdateService.UpdateKind.Update, "DEBUG", totalBytes))
+        {
+            AppConfig.GetLogger<GameUpdateSession>().LogWarning("Fake apply progress: another session is busy, skipped");
+            return;
+        }
+        CancellationToken ct = _cts?.Token ?? CancellationToken.None;
+        try
+        {
+
+            for (int i = 0; i <= moveFiles; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+                OnProgress(new GameDownloadProgress
+                {
+                    Phase = DownloadPhase.Applying,
+                    CompletedFiles = i,
+                    TotalFiles = moveFiles,
+                    ReceivedBytes = (long)(totalBytes * 0.07 * i / moveFiles),
+                    TotalBytes = totalBytes,
+                    SpeedBytesPerSec = 540L * 1024 * 1024,
+                    OverallProgress = (double)i / units,
+                });
+                await Task.Delay(400, ct);
+            }
+
+            for (int i = 0; i <= groups; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+                OnProgress(new GameDownloadProgress
+                {
+                    Phase = DownloadPhase.Patching,
+                    CompletedFiles = i,
+                    TotalFiles = groups,
+                    ReceivedBytes = (long)(totalBytes * (0.07 + 0.93 * (double)i / groups)),
+                    TotalBytes = totalBytes,
+                    SpeedBytesPerSec = 300L * 1024 * 1024,
+                    OverallProgress = (double)(moveFiles + i) / units,
+                });
+                await Task.Delay(220, ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+
+        }
+        finally
+        {
+            lock (_gate)
+            {
+                IsBusy = false;
+                _cts?.Dispose();
+                _cts = null;
+            }
+            IsApplying = false;
+            IsPausing = false;
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
     }
 
 

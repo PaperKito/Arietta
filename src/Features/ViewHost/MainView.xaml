@@ -11,6 +11,10 @@
              mc:Ignorable="d">
 
     <Grid Background="Transparent">
+        <Grid.Resources>
+
+            <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="Transparent" />
+        </Grid.Resources>
 
         <Image Name="Image_Background"
                Stretch="UniformToFill"
@@ -19,9 +23,12 @@
 
         <mdb:DynamicBackgroundHost x:Name="DynamicBgHost" />
 
-        <Border Width="56"
-                HorizontalAlignment="Left"
-                Background="{ThemeResource CustomAcrylicBrush}" />
+        <Image Name="Image_Slogan"
+               IsHitTestVisible="False"
+               Stretch="UniformToFill"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Visibility="Collapsed" />
 
         <Border Name="Border_OverlayMask"
                 Background="{ThemeResource CustomAcrylicBrush}"
@@ -31,11 +38,27 @@
             </Border.OpacityTransition>
         </Border>
 
+        <Border Name="Border_NavPaneBackground"
+                Width="56"
+                HorizontalAlignment="Left"
+                Background="{ThemeResource CustomAcrylicBrush}"
+                CornerRadius="0,8,8,0"
+                IsHitTestVisible="False"
+                Opacity="0">
+            <Border.OpacityTransition>
+                <ScalarTransition Duration="0:0:0.15" />
+            </Border.OpacityTransition>
+            <Border.TranslationTransition>
+                <Vector3Transition Duration="0:0:0.15" />
+            </Border.TranslationTransition>
+        </Border>
+
         <NavigationView Name="MainView_NavigationView"
                         CompactPaneLength="56"
                         IsBackButtonVisible="Collapsed"
                         IsPaneToggleButtonVisible="False"
                         ItemInvoked="NavigationView_ItemInvoked"
+                        Loaded="NavigationView_Loaded"
                         PaneDisplayMode="LeftCompact">
 
             <NavigationView.PaneCustomContent>

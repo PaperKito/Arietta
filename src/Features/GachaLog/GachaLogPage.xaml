@@ -83,7 +83,8 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Margin="32,0,0,0"
+        <TextBlock x:Name="Text_GachaTitle"
+                   Margin="32,0,0,0"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Center"
                    FontSize="20"

@@ -70,16 +70,24 @@ public sealed partial class LauncherPage : PageBase
 
     private GameUpdateService.GameUpdateState? _updateState;
 
+    private bool _checkingUpdate;
+
     private bool _updateBusy => GameUpdateSession.Current.IsActiveFor(CurrentGameBiz);
 
+    private static bool IsExternalGame => ViewHost.MainView.CurrentGameEntry?.IsExternal == true;
+
     private bool _updateSessionWasActive;
+
+    private System.Timers.Timer? _updatePollTimer;
 
     public LauncherPage()
     {
         this.InitializeComponent();
-        UpdateGameState();
+
+        InitializeMainButtonState();
         InitializeBackgroundSwitcher();
         _ = RefreshUpdateStateAsync();
+        ApplyPackMode();
     }
 
 
@@ -92,18 +100,46 @@ public sealed partial class LauncherPage : PageBase
         {
             StopRunningState();
         }
-        UpdateGameState();
-        EnterRunningStateIfGameRunning(biz);
-        Button_PlayTime.Reload();
-        GameAccountSwitcher.UpdateAccounts();
-        RefreshBriefingIcon();
 
-        TryPrefetchBriefing();
+        InitializeMainButtonState();
+        ApplyPackMode();
+        if (!IsExternalGame)
+        {
+            EnterRunningStateIfGameRunning(biz);
+            Button_PlayTime.Reload();
+            GameAccountSwitcher.UpdateAccounts();
+            RefreshBriefingIcon();
+
+            TryPrefetchBriefing();
+
+            BannerAndPost.CurrentGameBiz = biz;
+            _ = BannerAndPost.ReloadAsync();
+        }
         InitializeBackgroundSwitcher();
-
-        BannerAndPost.CurrentGameBiz = biz;
-        _ = BannerAndPost.ReloadAsync();
         _ = RefreshUpdateStateAsync();
+    }
+
+    private void LaunchPackGame()
+    {
+        try
+        {
+            var entry = ViewHost.MainView.CurrentGameEntry;
+            Core.GamePack? pack = entry?.Pack;
+            if (pack is null)
+            {
+                InAppToast.MainWindow?.Error(Lang.Instance.LauncherPage_StartGame);
+                return;
+            }
+            string? error = Features.GamePacks.GamePackLauncher.Launch(pack);
+            if (error is not null)
+            {
+                InAppToast.MainWindow?.Error(error);
+            }
+        }
+        catch (Exception ex)
+        {
+            InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_StartGame);
+        }
     }
 
     private void RefreshBriefingIcon()
@@ -131,10 +167,42 @@ public sealed partial class LauncherPage : PageBase
         }
     }
 
+    private void ApplyPackMode()
+    {
+        bool external = IsExternalGame;
+        Visibility vis = external ? Visibility.Collapsed : Visibility.Visible;
+        try
+        {
+            GameAccountSwitcher.Visibility = vis;
+            Button_DailyBriefing.Visibility = vis;
+            BannerAndPost.Visibility = vis;
+            Button_PlayTime.Visibility = vis;
+
+            if (external)
+            {
+                Button_PreDownload.Visibility = Visibility.Collapsed;
+                Popup_PreDownloadProgress.IsOpen = false;
+
+                Button_StartGame.GameCommand = StartGameCommand;
+            }
+        }
+        catch { }
+    }
+
 
     [RelayCommand]
     private void StartGame()
     {
+        if (IsExternalGame)
+        {
+            LaunchPackGame();
+            return;
+        }
+
+        if (GameUpdateSession.Current.IsRepair || GameUpdateSession.Current.IsActiveFor(CurrentGameBiz))
+        {
+            return;
+        }
 
         var biz = CurrentGameBiz;
 
@@ -229,7 +297,19 @@ public sealed partial class LauncherPage : PageBase
     [RelayCommand]
     private async Task OpenLauncherSettingDialogAsync()
     {
-        var dialog = new GameLauncherSettingDialog(CurrentGameBiz, onLaunchTierChanged: UpdateGameState) { XamlRoot = this.XamlRoot };
+
+        void OnLaunchTierChanged()
+        {
+
+            var session = GameUpdateSession.Current;
+            if (session.IsActiveFor(CurrentGameBiz) && session.Kind == GameUpdateService.UpdateKind.Predownload)
+            {
+                session.Cancel();
+            }
+            UpdateGameState();
+            _ = RefreshUpdateStateAsync();
+        }
+        var dialog = new GameLauncherSettingDialog(CurrentGameBiz, onLaunchTierChanged: OnLaunchTierChanged) { XamlRoot = this.XamlRoot };
         await dialog.ShowAsync();
         UpdateGameState();
     }
@@ -245,11 +325,28 @@ public sealed partial class LauncherPage : PageBase
         GameProcessMonitor.EnsureScanned();
         UpdateGameState();
 
+        ApplyKnownUpdateState();
+
         EnterRunningStateIfGameRunning(CurrentGameBiz);
         RefreshBriefingIcon();
         InitializeBackgroundSwitcher();
 
         TryPrefetchBriefing();
+
+        if (AppConfig.CommandLineArgs.Contains("--fake-apply-progress") && !s_fakeApplyStarted)
+        {
+            s_fakeApplyStarted = true;
+            _ = SimulateApplyProgressForDebugAsync();
+        }
+    }
+
+
+    private static bool s_fakeApplyStarted;
+
+    private async Task SimulateApplyProgressForDebugAsync()
+    {
+        await Task.Delay(3000);
+        await GameUpdateSession.Current.SimulateApplyProgressAsync(CurrentGameBiz);
     }
 
     private void TryPrefetchBriefing(GameBiz? biz = null)
@@ -294,6 +391,7 @@ public sealed partial class LauncherPage : PageBase
         ViewHost.MainView.GameChanged += MainView_GameChanged;
         BackgroundGallery.SelectionChanged += OnBackgroundSelectionChanged;
         DynamicBackgroundStore.Updated += OnDynamicBackgroundUpdated;
+        StartUpdatePolling();
     }
 
 
@@ -307,6 +405,7 @@ public sealed partial class LauncherPage : PageBase
         ViewHost.MainView.GameChanged -= MainView_GameChanged;
         BackgroundGallery.SelectionChanged -= OnBackgroundSelectionChanged;
         DynamicBackgroundStore.Updated -= OnDynamicBackgroundUpdated;
+        StopUpdatePolling();
     }
 
     private async void InitializeBackgroundSwitcher()
@@ -378,7 +477,7 @@ public sealed partial class LauncherPage : PageBase
     private void UpdateVideoControls()
     {
         var host = DynamicBackgroundHost.Current;
-        CanStopVideo = BackgroundGallery.Resolve(CurrentGameBiz)?.IsVideo == true && host?.IsPlaying == true;
+        CanStopVideo = BackgroundGallery.Resolve(CurrentGameBiz)?.IsVideo == true;
         StartStopButtonIcon = host?.IsPaused == true ? PlayIcon : PauseIcon;
     }
 
@@ -558,6 +657,52 @@ public sealed partial class LauncherPage : PageBase
         BackgroundGallery.SetSelectedId(CurrentGameBiz, name);
     }
 
+    private void InitializeMainButtonState()
+    {
+        if (GameUpdateSession.Current.IsActiveFor(CurrentGameBiz))
+        {
+            _checkingUpdate = false;
+            _updateSessionWasActive = true;
+            RenderUpdateSession(GameUpdateSession.Current);
+            return;
+        }
+        if (ApplyKnownUpdateState())
+        {
+            _checkingUpdate = false;
+            UpdateGameState();
+            return;
+        }
+        _checkingUpdate = true;
+        GameState = GameState.CheckingUpdate;
+        Button_StartGame.GameCommand = null;
+
+        Button_PreDownload.Visibility = Visibility.Collapsed;
+        Popup_PreDownloadProgress.IsOpen = false;
+    }
+
+    private bool ApplyKnownUpdateState()
+    {
+        var biz = CurrentGameBiz;
+        var known = GameUpdateService.GetCachedState(biz) ?? GameUpdateService.GetPersistedUpdateHint(biz);
+        _updateState = known;
+        if (known is null)
+        {
+            return false;
+        }
+        RenderUpdateState();
+        return true;
+    }
+
+    private void LeaveCheckingState()
+    {
+        if (!_checkingUpdate)
+        {
+            return;
+        }
+        _checkingUpdate = false;
+        UpdateGameState();
+    }
+
     private async Task RefreshUpdateStateAsync()
     {
         var biz = CurrentGameBiz;
@@ -570,12 +715,54 @@ public sealed partial class LauncherPage : PageBase
                 return;
             }
             _updateState = state;
+
+            LeaveCheckingState();
             RenderUpdateState();
         }
         catch (Exception ex)
         {
+
+            LeaveCheckingState();
             AppConfig.GetLogger<LauncherPage>().LogWarning(ex, "Failed to check game update {Biz}", biz);
         }
+    }
+
+    private void StartUpdatePolling()
+    {
+        if (_updatePollTimer is not null)
+        {
+            return;
+        }
+        _updatePollTimer = new System.Timers.Timer(TimeSpan.FromMinutes(5).TotalMilliseconds) { AutoReset = true };
+        _updatePollTimer.Elapsed += OnUpdatePollElapsed;
+        _updatePollTimer.Start();
+    }
+
+
+    private void StopUpdatePolling()
+    {
+        if (_updatePollTimer is null)
+        {
+            return;
+        }
+        _updatePollTimer.Stop();
+        _updatePollTimer.Elapsed -= OnUpdatePollElapsed;
+        _updatePollTimer.Dispose();
+        _updatePollTimer = null;
+    }
+
+
+    private void OnUpdatePollElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (GameUpdateSession.Current.IsActiveFor(CurrentGameBiz))
+            {
+                return;
+            }
+            _ = RefreshUpdateStateAsync();
+        });
     }
 
     private void OnGameUpdateSessionChanged(object? sender, EventArgs e)
@@ -599,6 +786,8 @@ public sealed partial class LauncherPage : PageBase
             {
                 _updateSessionWasActive = false;
 
+                GameUpdateService.InvalidateStateCache(CurrentGameBiz);
+
                 if (GameState is GameState.Installing)
                 {
                     Button_StartGame.ResetInstallState();
@@ -619,6 +808,8 @@ public sealed partial class LauncherPage : PageBase
 
     private void RenderUpdateSession(GameUpdateSession session)
     {
+
+        _checkingUpdate = false;
 
         if (session.IsPausing)
         {
@@ -654,6 +845,7 @@ public sealed partial class LauncherPage : PageBase
 
         Button_PreDownload.Visibility = Visibility.Visible;
         Button_PreDownload.IsEnabled = true;
+        Button_StartGame.GameCommand = StartGameCommand;
         Text_PreDownload.Text = session.IsApplying
             ? Lang.Instance.GameUpdate_Applying
             : $"{session.ProgressValue / 10.0:0}%";
@@ -664,6 +856,11 @@ public sealed partial class LauncherPage : PageBase
 
     private void RenderUpdateState()
     {
+
+        if (_checkingUpdate)
+        {
+            return;
+        }
         var state = _updateState;
         if (state is not { HasUpdate: true } || state.TargetVersion is null)
         {
@@ -693,6 +890,14 @@ public sealed partial class LauncherPage : PageBase
             return;
         }
 
+        if (state.Kind == GameUpdateService.UpdateKind.Predownload && IsSelectedTierMissing())
+        {
+            Button_PreDownload.Visibility = Visibility.Collapsed;
+            Popup_PreDownloadProgress.IsOpen = false;
+            ApplyUpdateStateToMainButton();
+            return;
+        }
+
         bool done = state.PredownloadedCount > 0
             && state.Plan is { Count: > 0 }
             && state.PredownloadedCount >= state.Plan.Count;
@@ -712,7 +917,7 @@ public sealed partial class LauncherPage : PageBase
         if (CurrentGameBiz is not (GameBiz.WutheringWaves or GameBiz.WutheringWavesGlobal or GameBiz.WutheringWavesBilibili)
             || GameRegistry.GetEnabledThirdPartyToolPath(CurrentGameBiz) is not null
 
-            || _updateState is { HasUpdate: true }
+            || _updateState is { HasUpdate: true, Kind: GameUpdateService.UpdateKind.Update }
             || GameUpdateService.GetLaunchTier(CurrentGameBiz) is not { } tier
             || GameUpdateService.GetGameDir(CurrentGameBiz) is not { } dir)
         {
@@ -724,17 +929,81 @@ public sealed partial class LauncherPage : PageBase
     [RelayCommand]
     private async Task InstallTier()
     {
-        if (GameUpdateService.GetLaunchTier(CurrentGameBiz) is not { } tier || GameUpdateSession.Current.IsBusy)
+        var biz = CurrentGameBiz;
+        if (GameUpdateService.GetLaunchTier(biz) is not { } tier || GameUpdateSession.Current.IsBusy)
         {
             return;
         }
-        var options = await GameUpdateService.GetTierOptionsAsync(CurrentGameBiz);
-        long size = options?.FirstOrDefault(o => o.Name.Equals(tier, StringComparison.OrdinalIgnoreCase))?.TierPackSizeBytes ?? 0;
-        var dialog = new TierInstallDialog(CurrentGameBiz, tier, size) { XamlRoot = this.XamlRoot };
-        await dialog.ShowAsync();
-        if (dialog.Confirmed)
+        if (GameUpdateService.GetGameDir(biz) is not { } gameDir)
         {
-            GameUpdateSession.Current.StartTierSwitch(CurrentGameBiz, tier, size);
+            return;
+        }
+        var options = await GameUpdateService.GetTierOptionsAsync(biz);
+        if (options is not { Count: > 0 })
+        {
+            InAppToast.MainWindow?.Warning(Lang.Instance.GameUpdate_ErrNoManifest);
+            return;
+        }
+        GameUpdateService.GameTierOption OptionOf(string name) =>
+            options.FirstOrDefault(o => o.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?? options[0];
+
+        long RequiredFor(string dir, string name) =>
+            GameUpdateService.GetMissingBytesForTier(NormalizeInstallDir(biz, dir), OptionOf(name));
+
+        AppConfig.GetLogger<LauncherPage>().LogInformation(
+            "InstallTier {Biz}: tier={Tier} need={Need} dir={Dir} installed=[{Installed}]",
+            biz, tier, RequiredFor(gameDir, tier), gameDir,
+            string.Join(",", GameUpdateService.GetInstalledTiers(gameDir)));
+        var dialog = new InstallGameDialog(biz, null, RequiredFor(gameDir, tier), options, null, gameDir,
+            addTierMode: true, preferredTier: tier, missingBytesFactory: RequiredFor)
+        {
+            XamlRoot = this.XamlRoot,
+        };
+        await dialog.ShowAsync();
+        if (!dialog.Confirmed)
+        {
+            return;
+        }
+        string chosen = dialog.SelectedTier ?? tier;
+        string targetDir = NormalizeInstallDir(biz, dialog.InstallationPath);
+
+        if (dialog.TotalBytes <= 0)
+        {
+            GameUpdateService.SetLaunchTier(biz, chosen);
+            UpdateGameState();
+            return;
+        }
+
+        if (GameUpdateService.HasGameBody(targetDir))
+        {
+            if (!GameUpdateSession.Current.StartTierSwitch(biz, chosen, dialog.TotalBytes, targetDir))
+            {
+
+                InAppToast.MainWindow?.Warning(Lang.Instance.GameUpdate_SessionBusy);
+                return;
+            }
+
+            if (!chosen.Equals(tier, StringComparison.OrdinalIgnoreCase))
+            {
+                GameUpdateService.SetLaunchTier(biz, chosen);
+            }
+            return;
+        }
+
+        try
+        {
+            var state = await GameUpdateService.GetInstallStateAsync(biz, freshCopy: true);
+            if (state is not { TargetVersion: not null })
+            {
+                InAppToast.MainWindow?.Warning(Lang.Instance.GameUpdate_ErrNoManifest);
+                return;
+            }
+            BeginFreshInstall(biz, dialog, state);
+        }
+        catch (Exception ex)
+        {
+            AppConfig.GetLogger<LauncherPage>().LogError(ex, "Failed to install game copy {Biz}", biz);
+            InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_InstallGame);
         }
     }
 
@@ -821,13 +1090,19 @@ public sealed partial class LauncherPage : PageBase
     private void UpdatePreDownloadPopup(GameUpdateSession session)
     {
         var p = session.LastProgress;
-        if (session.IsApplying || p is { Phase: DownloadPhase.Verifying or DownloadPhase.Applying })
+        if (session.IsApplying || p is { Phase: DownloadPhase.Verifying or DownloadPhase.Applying or DownloadPhase.Patching })
         {
 
-            Popup_PreDownloadStatus.Text = session.ProgressText;
-            Popup_PreDownloadBytesRow.Visibility = Visibility.Collapsed;
-            Popup_PreDownloadSpeedRow.Visibility = Visibility.Collapsed;
+            Popup_PreDownloadStatus.Text = session.ProgressText ?? "";
+            bool showThroughput = p is { Phase: DownloadPhase.Applying or DownloadPhase.Patching } && p.TotalBytes > 0;
+            Popup_PreDownloadBytesRow.Visibility = showThroughput ? Visibility.Visible : Visibility.Collapsed;
+            Popup_PreDownloadSpeedRow.Visibility = showThroughput ? Visibility.Visible : Visibility.Collapsed;
             Popup_PreDownloadRemainRow.Visibility = Visibility.Collapsed;
+            if (showThroughput)
+            {
+                Popup_PreDownloadBytes.Text = $"{GameUpdateSession.FormatSize(p!.ReceivedBytes)} / {GameUpdateSession.FormatSize(p.TotalBytes)}";
+                Popup_PreDownloadSpeed.Text = $"{GameUpdateSession.FormatSize(p.SpeedBytesPerSec)}/s";
+            }
             return;
         }
         Popup_PreDownloadStatus.Text = string.Format(Lang.Instance.GameUpdate_Predownloading, session.TargetVersion);
@@ -853,7 +1128,14 @@ public sealed partial class LauncherPage : PageBase
     private async Task RunUpdateActionAsync(GameUpdateService.UpdateKind kind)
     {
         var state = _updateState;
-        if (state?.Target is null || state.TargetVersion is null)
+
+        if (state is { TargetVersion: not null, Target: null, TierName: null })
+        {
+            await RefreshUpdateStateAsync();
+            state = _updateState;
+        }
+
+        if (state is null || state.TargetVersion is null || (state.Target is null && state.TierName is null))
         {
             return;
         }
@@ -864,6 +1146,15 @@ public sealed partial class LauncherPage : PageBase
             return;
         }
 
+        if (kind == GameUpdateService.UpdateKind.Update
+            && !await SpaceCheckDialog.EnsureSpaceAsync(biz, state!, this.XamlRoot))
+        {
+            return;
+        }
+
+        AppConfig.GetLogger<LauncherPage>().LogInformation(
+            "Update action {Kind} {Biz}: tier={Tier} target={Target} total={Total} disk={Disk}",
+            kind, biz, state.TierName, state.TargetVersion, state.TotalBytes, state.RequiredDiskSpace);
         if (kind == GameUpdateService.UpdateKind.Predownload)
         {
             var confirm = new PreDownloadDialog(biz, state)
@@ -921,38 +1212,44 @@ public sealed partial class LauncherPage : PageBase
                 return;
             }
 
-            var entry = GameRegistry.GetEntry(biz);
-            string dir = dialog.InstallationPath;
-            string? hint = entry.DirHint;
-            if (hint is not null && !dir.Contains(hint, StringComparison.OrdinalIgnoreCase))
-            {
-                dir = Path.Combine(dir, entry.DefaultInstallDirName);
-            }
-            _lastInstallDir = dir;
-
-            AppConfig.SetConfig(GameRegistry.GetInstallDirConfigKey(biz), dir);
-
-            string? tier = dialog.SelectedTier;
-            GameUpdateService.SetInstallTier(biz, tier);
-            if (tier is not null && dialog.TotalBytes != state.TotalBytes)
-            {
-                state = new GameUpdateService.GameUpdateState
-                {
-                    Kind = state.Kind,
-                    LocalVersion = state.LocalVersion,
-                    Target = state.Target,
-                    TargetVersion = state.TargetVersion,
-                    Changelog = state.Changelog,
-                    TotalBytes = dialog.TotalBytes,
-                };
-            }
-            StartInstallSession(biz, state, dir, tier);
+            BeginFreshInstall(biz, dialog, state);
         }
         catch (Exception ex)
         {
             AppConfig.GetLogger<LauncherPage>().LogError(ex, "Failed to install game {Biz}", biz);
             InAppToast.MainWindow?.Error(ex, Lang.Instance.LauncherPage_InstallGame);
         }
+    }
+
+    private static string NormalizeInstallDir(GameBiz biz, string dir)
+    {
+        var entry = GameRegistry.GetEntry(biz);
+        return entry.DirHint is { } hint && !dir.Contains(hint, StringComparison.OrdinalIgnoreCase)
+            ? Path.Combine(dir, entry.DefaultInstallDirName)
+            : dir;
+    }
+
+    private void BeginFreshInstall(GameBiz biz, InstallGameDialog dialog, GameUpdateService.GameUpdateState state)
+    {
+        string dir = NormalizeInstallDir(biz, dialog.InstallationPath);
+        _lastInstallDir = dir;
+
+        AppConfig.SetConfig(GameRegistry.GetInstallDirConfigKey(biz), dir);
+        string? tier = dialog.SelectedTier;
+        GameUpdateService.SetInstallTier(biz, tier);
+        if (tier is not null && dialog.TotalBytes != state.TotalBytes)
+        {
+            state = new GameUpdateService.GameUpdateState
+            {
+                Kind = state.Kind,
+                LocalVersion = state.LocalVersion,
+                Target = state.Target,
+                TargetVersion = state.TargetVersion,
+                Changelog = state.Changelog,
+                TotalBytes = dialog.TotalBytes,
+            };
+        }
+        StartInstallSession(biz, state, dir, tier);
     }
 
     private void StartInstallSession(GameBiz biz, GameUpdateService.GameUpdateState state, string dir, string? tier = null)
@@ -1033,6 +1330,16 @@ public sealed partial class LauncherPage : PageBase
 
     private void UpdateGameState()
     {
+
+        if (_checkingUpdate)
+        {
+            return;
+        }
+
+        if (GameUpdateSession.Current.IsActiveFor(CurrentGameBiz))
+        {
+            return;
+        }
 
         if (_updateBusy)
         {

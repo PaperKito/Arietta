@@ -26,6 +26,36 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 {
     private readonly ILogger<GameLauncherSettingDialog> _logger = AppConfig.GetLogger<GameLauncherSettingDialog>();
 
+    public static bool IsRepairRunning { get; private set; }
+
+    private static GameLauncherSettingDialog? RepairDialog { get; set; }
+
+    public static async Task<bool> ConfirmRepairExitAsync()
+    {
+        if (!GameUpdateSession.Current.IsRepair)
+        {
+            return true;
+        }
+        var root = Arietta.Features.ViewHost.MainWindow.Current?.Content?.XamlRoot;
+        if (root is null)
+        {
+            return true;
+        }
+        var dialog = new Arietta.Features.ViewHost.CloseWindowDialog(repairExit: true) { XamlRoot = root };
+        await dialog.ShowAsync();
+        return dialog.Confirmed;
+    }
+
+    public static void CancelRepair()
+    {
+        GameUpdateSession.Current.Cancel();
+    }
+
+    private void CancelRepairCore()
+    {
+        try { _repairCts?.Cancel(); } catch { }
+    }
+
     public GameLauncherSettingDialog(GameBiz biz, Action? onLaunchTierChanged = null)
     {
         CurrentGameBiz = biz;
@@ -69,12 +99,46 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             {
 
                 GameNoticeSettings.SetShowBannerAndPost(value);
+                OnPropertyChanged(nameof(BannerScaleUpVisibility));
                 AnnouncementSettingChanged?.Invoke(this, EventArgs.Empty);
             }
         }
     }
 
     private bool _enableBannerAndPost;
+
+    public bool EnableShowVersionPoster
+    {
+        get => _showVersionPoster;
+        set
+        {
+            if (SetProperty(ref _showVersionPoster, value))
+            {
+                GameRegistry.SetDynBgSloganShown(CurrentGameBiz, value);
+                ShowVersionPosterChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+    private bool _showVersionPoster;
+
+    public static event EventHandler? ShowVersionPosterChanged;
+
+    public Visibility BannerScaleUpVisibility => EnableBannerAndPost ? Visibility.Visible : Visibility.Collapsed;
+
+    public int BannerScaleUpMode
+    {
+        get => _bannerScaleUpMode;
+        set
+        {
+            if (SetProperty(ref _bannerScaleUpMode, value))
+            {
+                GameNoticeSettings.SetScaleUpOnHover(value == 0);
+                AnnouncementSettingChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+    }
+
+    private int _bannerScaleUpMode;
 
     public static event EventHandler? AnnouncementSettingChanged;
 
@@ -228,10 +292,12 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 
     private async Task InitializeLaunchTierAsync()
     {
+
+        Button_RepairGame.IsEnabled = true;
         try
         {
             string? dir = GameUpdateService.GetGameDir(CurrentGameBiz);
-            if (dir is null || GameUpdateService.GetInstalledTiers(dir).Count == 0)
+            if (dir is null)
             {
                 return;
             }
@@ -241,6 +307,13 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
                 : new List<string> { "SD", "HD", "UHD" }
                     .Where(n => Directory.Exists(Path.Combine(dir, "Client", "Content", n)))
                     .ToList();
+            if (names.Count == 0)
+            {
+
+                return;
+            }
+
+            Segmented_LaunchTier.Items.Clear();
             foreach (string name in names)
             {
                 Segmented_LaunchTier.Items.Add(new CommunityToolkit.WinUI.Controls.SegmentedItem
@@ -253,12 +326,18 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             int index = names.FindIndex(n => n.Equals(saved, StringComparison.OrdinalIgnoreCase));
             if (index < 0)
             {
+
                 index = names.FindLastIndex(n => Directory.Exists(Path.Combine(dir, "Client", "Content", n)));
             }
-            Segmented_LaunchTier.SelectedIndex = index;
+            if (index >= 0)
+            {
+                Segmented_LaunchTier.SelectedIndex = index;
+            }
 
+            Segmented_LaunchTier.SelectionChanged -= Segmented_LaunchTier_SelectionChanged;
             Segmented_LaunchTier.SelectionChanged += Segmented_LaunchTier_SelectionChanged;
             Panel_LaunchTier.Visibility = Visibility.Visible;
+            UpdateRepairEnabledForTier();
         }
         catch (Exception ex)
         {
@@ -268,12 +347,33 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 
     private void Segmented_LaunchTier_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (Segmented_LaunchTier.SelectedItem is CommunityToolkit.WinUI.Controls.SegmentedItem { Tag: string name })
+        if (Segmented_LaunchTier.SelectedItem is not CommunityToolkit.WinUI.Controls.SegmentedItem { Tag: string name })
+        {
+            return;
+        }
+
+        if (string.Equals(GameUpdateService.GetLaunchTier(CurrentGameBiz), name, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        UpdateRepairEnabledForTier();
+        GameUpdateService.SetLaunchTier(CurrentGameBiz, name);
+        _onLaunchTierChanged?.Invoke();
+    }
+
+    private void UpdateRepairEnabledForTier()
+    {
+        if (Panel_LaunchTier.Visibility != Visibility.Visible)
         {
 
-            GameUpdateService.SetLaunchTier(CurrentGameBiz, name);
-            _onLaunchTierChanged?.Invoke();
+            Button_RepairGame.IsEnabled = true;
+            return;
         }
+        bool installed = Segmented_LaunchTier.SelectedItem is CommunityToolkit.WinUI.Controls.SegmentedItem { Tag: string tier }
+            && GameUpdateService.GetGameDir(CurrentGameBiz) is { } dir
+            && GameUpdateService.GetInstalledTiers(dir).Any(t => string.Equals(t, tier, StringComparison.OrdinalIgnoreCase));
+        Button_RepairGame.IsEnabled = installed;
     }
 
     private bool _enableThirdPartyTool;
@@ -300,6 +400,10 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         UninstallAndRepairEnabled = exePath is not null;
         _enableBannerAndPost = GameNoticeSettings.ShowBannerAndPost;
         OnPropertyChanged(nameof(EnableBannerAndPost));
+        _showVersionPoster = GameRegistry.IsDynBgSloganShown(CurrentGameBiz);
+        OnPropertyChanged(nameof(EnableShowVersionPoster));
+        _bannerScaleUpMode = GameNoticeSettings.ScaleUpOnHover ? 0 : 1;
+        OnPropertyChanged(nameof(BannerScaleUpMode));
 
         CustomBg = AppConfig.GetConfig(GameRegistry.GetCustomBgConfigKey(CurrentGameBiz));
         _enableCustomBg = AppConfig.GetConfig(GameRegistry.GetEnableCustomBgConfigKey(CurrentGameBiz)) switch
@@ -368,9 +472,81 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
 
 
     [RelayCommand]
-    private void Close()
+    private async Task Close()
     {
+        if (IsRepairRunning)
+        {
+            if (!await ShowRepairExitConfirmAsync())
+            {
+                return;
+            }
+            CancelRepair();
+        }
+        _allowClose = true;
         Hide();
+    }
+
+    private TaskCompletionSource<bool>? _repairExitTcs;
+    private bool _allowClose;
+
+    private void GameLauncherSettingDialog_Closing(ContentDialog sender, ContentDialogClosingEventArgs args)
+    {
+        if (_allowClose || !IsRepairRunning)
+        {
+            return;
+        }
+        args.Cancel = true;
+        if (_repairExitTcs is not null)
+        {
+
+            CloseRepairExitConfirm(false);
+            return;
+        }
+        _ = HandleClosingRepairExitAsync();
+    }
+
+    private async Task HandleClosingRepairExitAsync()
+    {
+        if (!await ShowRepairExitConfirmAsync())
+        {
+            return;
+        }
+        CancelRepair();
+        _allowClose = true;
+        Hide();
+    }
+
+    private Task<bool> ShowRepairExitConfirmAsync()
+    {
+        if (_repairExitTcs is not null)
+        {
+            return _repairExitTcs.Task;
+        }
+        _repairExitTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        Grid_RepairExitConfirm.Visibility = Visibility.Visible;
+        Button_RepairExitConfirm.Focus(FocusState.Programmatic);
+        return _repairExitTcs.Task;
+    }
+
+    private void CloseRepairExitConfirm(bool confirmed)
+    {
+        Grid_RepairExitConfirm.Visibility = Visibility.Collapsed;
+        var tcs = _repairExitTcs;
+        _repairExitTcs = null;
+        tcs?.TrySetResult(confirmed);
+    }
+
+    private void Button_RepairExitConfirm_Click(object sender, RoutedEventArgs e) => CloseRepairExitConfirm(true);
+
+    private void Button_RepairExitCancel_Click(object sender, RoutedEventArgs e) => CloseRepairExitConfirm(false);
+
+    private void Grid_RepairExitConfirm_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+
+        if (ReferenceEquals(e.OriginalSource, Grid_RepairExitConfirm))
+        {
+            CloseRepairExitConfirm(false);
+        }
     }
 
     [RelayCommand]
@@ -419,6 +595,7 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         Arietta.Helpers.GameAutoSearch.WriteOfficialLedger(CurrentGameBiz, Path.GetDirectoryName(path));
         InstallPath = path;
         UninstallAndRepairEnabled = true;
+        UpdateRepairEnabledForTier();
         _ = UpdateGameSizeAsync(path);
     }
 
@@ -614,62 +791,52 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     [RelayCommand]
     private async Task RepairGame()
     {
-        if (_repairBusy)
+        _logger.LogInformation("Repair requested {Biz}", CurrentGameBiz);
+        Hide();
+
+        await Task.Yield();
+
+        var root = Arietta.Features.ViewHost.MainWindow.Current?.Content?.XamlRoot;
+        if (root is not null)
         {
+            try
+            {
+                var confirm = new Arietta.Features.ViewHost.CloseWindowDialog(repairConfirm: true) { XamlRoot = root };
+                if (await confirm.ShowAsync() != ContentDialogResult.Primary || !confirm.Confirmed)
+                {
+                    _logger.LogInformation("Repair cancelled {Biz}", CurrentGameBiz);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogWarning(ex, "Repair confirm dialog failed {Biz}, starting anyway", CurrentGameBiz);
+            }
+        }
+
+        if (GameUpdateSession.Current.IsBusy)
+        {
+            _logger.LogWarning("Repair rejected: session busy {Biz}", CurrentGameBiz);
+            InAppToast.MainWindow?.Warning(Lang.Instance.RepairConfirmDialog_Busy);
             return;
         }
-        try
+        if (GameUpdateService.GetGameDir(CurrentGameBiz) is not { } repairGameDir)
         {
-            if (GameUpdateService.GetGameDir(CurrentGameBiz) is null)
-            {
-                InAppToast.MainWindow?.Warning(Lang.Instance.GameUpdate_NoGameDir);
-                return;
-            }
-            StartRepairUi();
-            _repairBusy = true;
-            _repairCts = new System.Threading.CancellationTokenSource();
-            var progress = new Progress<GameDownloadProgress>(OnRepairProgress);
-            var result = await GameUpdateService.VerifyAsync(CurrentGameBiz, progress, _repairCts.Token);
-            if (result is null)
-            {
-                ShowRepairError(Lang.Instance.GameUpdate_VerifyNoManifest);
-                return;
-            }
-            _verifyResult = result;
-            if (result.Damaged.Count == 0)
-            {
+            _logger.LogWarning("Repair rejected: no game dir {Biz}", CurrentGameBiz);
+            InAppToast.MainWindow?.Warning(Lang.Instance.GameUpdate_NoGameDir);
+            return;
+        }
+        if (GameUpdateService.GetInstalledTiers(repairGameDir).Count == 0)
+        {
 
-                HideRepairProgress();
-                InAppToast.MainWindow?.Success($"{Lang.Instance.GameUpdate_VerifyReportTitle}：{Lang.Instance.GameUpdate_VerifyDoneNone}");
-                return;
-            }
-
-            ProgressBar_Repair.Visibility = Visibility.Collapsed;
-            Text_RepairStatus.Text = string.Format(Lang.Instance.GameUpdate_VerifyDoneDamage, result.Damaged.Count, FormatSize(result.DamagedBytes))
-                + (result.CanRepair ? "" : "\n" + Lang.Instance.GameUpdate_RepairNoBaseUrl);
-            if (result.CanRepair)
-            {
-                Button_StartRepairing.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                Button_RepairGame.Visibility = Visibility.Visible;
-            }
+            _logger.LogWarning("Repair rejected: nothing installed {Biz}", CurrentGameBiz);
+            InAppToast.MainWindow?.Warning(Lang.Instance.GameUpdate_NothingInstalled);
+            return;
         }
-        catch (OperationCanceledException)
+        if (!GameUpdateSession.Current.StartRepair(CurrentGameBiz))
         {
-            ResetRepairUi();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Verify game {Biz}", CurrentGameBiz);
-            ShowRepairError(ex.Message);
-        }
-        finally
-        {
-            _repairBusy = false;
-            _repairCts?.Dispose();
-            _repairCts = null;
+            InAppToast.MainWindow?.Warning(Lang.Instance.RepairConfirmDialog_Busy);
         }
     }
 
@@ -686,7 +853,11 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             ProgressBar_Repair.Visibility = Visibility.Visible;
             ProgressBar_Repair.IsIndeterminate = true;
             Text_RepairStatus.Text = Lang.Instance.GameUpdate_Repairing;
+            ShowRepairDetails(true);
             _repairBusy = true;
+            IsRepairRunning = true;
+            RepairDialog = this;
+            _allowClose = false;
             _repairCts = new System.Threading.CancellationTokenSource();
             var progress = new Progress<GameDownloadProgress>(OnRepairProgress);
             await GameUpdateService.RepairAsync(CurrentGameBiz, result, progress, _repairCts.Token);
@@ -707,6 +878,8 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
             _repairBusy = false;
             _repairCts?.Dispose();
             _repairCts = null;
+            IsRepairRunning = false;
+            RepairDialog = null;
         }
     }
 
@@ -714,30 +887,94 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
     {
         if (p.Phase == DownloadPhase.Verifying)
         {
+
+            double percent = p.TotalBytes > 0 ? p.ReceivedBytes * 100.0 / p.TotalBytes : 0;
             ProgressBar_Repair.IsIndeterminate = false;
-            ProgressBar_Repair.Value = p.TotalFiles > 0 ? p.CompletedFiles * 100.0 / p.TotalFiles : 0;
+            ProgressBar_Repair.Value = percent;
             Text_RepairStatus.Text = string.Format(Lang.Instance.GameUpdate_Verifying, p.CompletedFiles, p.TotalFiles);
+            Text_RepairPercent.Text = $"{percent:F0}%";
+            Text_RepairBytes.Text = p.TotalBytes > 0
+                ? $"{FormatSize(p.ReceivedBytes)} / {FormatSize(p.TotalBytes)}"
+                : $"{p.CompletedFiles} / {p.TotalFiles}";
+            Row_RepairSpeed.Visibility = Visibility.Collapsed;
+            Row_RepairRemain.Visibility = Visibility.Collapsed;
         }
-        else if (p.Phase == DownloadPhase.Applying)
+        else if (p.Phase is DownloadPhase.Applying or DownloadPhase.Patching)
         {
-            ProgressBar_Repair.IsIndeterminate = true;
+            double? ratio = p.OverallProgress;
+            ProgressBar_Repair.IsIndeterminate = ratio is null;
+            if (ratio is double value)
+            {
+                ProgressBar_Repair.Value = value * 100;
+                Text_RepairPercent.Text = $"{value * 100:F0}%";
+            }
+            else
+            {
+                Text_RepairPercent.Text = "";
+            }
             Text_RepairStatus.Text = Lang.Instance.GameUpdate_Applying;
+            Text_RepairBytes.Text = $"{p.CompletedFiles} / {p.TotalFiles}";
+            Text_RepairSpeed.Text = $"{FormatSize(p.SpeedBytesPerSec)}/s";
+            Row_RepairSpeed.Visibility = p.SpeedBytesPerSec > 0 ? Visibility.Visible : Visibility.Collapsed;
+            Row_RepairRemain.Visibility = Visibility.Collapsed;
         }
         else
         {
+            double percent = p.TotalBytes > 0 ? p.ReceivedBytes * 100.0 / p.TotalBytes : 0;
             ProgressBar_Repair.IsIndeterminate = false;
-            ProgressBar_Repair.Value = p.TotalBytes > 0 ? p.ReceivedBytes * 100.0 / p.TotalBytes : 0;
-            Text_RepairStatus.Text = $"{FormatSize(p.ReceivedBytes)} / {FormatSize(p.TotalBytes)} · {FormatSize(p.SpeedBytesPerSec)}/s";
+            ProgressBar_Repair.Value = percent;
+            Text_RepairStatus.Text = Lang.Instance.GameUpdate_Repairing;
+            Text_RepairPercent.Text = $"{percent:F0}%";
+            Text_RepairBytes.Text = $"{FormatSize(p.ReceivedBytes)} / {FormatSize(p.TotalBytes)}";
+            Text_RepairSpeed.Text = $"{FormatSize(p.SpeedBytesPerSec)}/s";
+            Row_RepairSpeed.Visibility = Visibility.Visible;
+            long left = p.TotalBytes - p.ReceivedBytes;
+            if (p.SpeedBytesPerSec > 0 && left > 0)
+            {
+                Text_RepairRemain.Text = FormatRemain(TimeSpan.FromSeconds((double)left / p.SpeedBytesPerSec));
+                Row_RepairRemain.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                Row_RepairRemain.Visibility = Visibility.Collapsed;
+            }
         }
     }
 
-    private void Button_RepairCancel_Click(object sender, RoutedEventArgs e)
+    private static string FormatRemain(TimeSpan t)
     {
-        try
+        return t.TotalHours >= 1
+            ? $"{(int)t.TotalHours}:{t.Minutes:00}:{t.Seconds:00}"
+            : $"{t.Minutes:00}:{t.Seconds:00}";
+    }
+
+    private void ShowRepairDetails(bool visible)
+    {
+        Text_RepairPercent.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        Row_RepairSpeed.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        Row_RepairRemain.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+        if (!visible)
         {
-            _repairCts?.Cancel();
+            Text_RepairPercent.Text = "";
+            Text_RepairBytes.Text = "";
+            Text_RepairSpeed.Text = "";
+            Text_RepairRemain.Text = "";
         }
-        catch { }
+    }
+
+    private async void Button_RepairCancel_Click(object sender, RoutedEventArgs e)
+    {
+        if (!IsRepairRunning)
+        {
+
+            ResetRepairUi();
+            return;
+        }
+        if (!await ShowRepairExitConfirmAsync())
+        {
+            return;
+        }
+        CancelRepair();
     }
 
     private void StartRepairUi()
@@ -747,8 +984,15 @@ public sealed partial class GameLauncherSettingDialog : ContentDialog
         TextBlock_RepairError.Visibility = Visibility.Collapsed;
         ProgressBar_Repair.Visibility = Visibility.Visible;
         ProgressBar_Repair.IsIndeterminate = true;
-        Text_RepairStatus.Text = "";
+        Text_RepairStatus.Text = Lang.Instance.GameUpdate_Repairing;
+        ShowRepairDetails(true);
+        Text_RepairBytes.Text = "";
+        Row_RepairSpeed.Visibility = Visibility.Collapsed;
+        Row_RepairRemain.Visibility = Visibility.Collapsed;
         Panel_RepairProgress.Visibility = Visibility.Visible;
+        IsRepairRunning = true;
+        RepairDialog = this;
+        _allowClose = false;
     }
 
     private void HideRepairProgress()

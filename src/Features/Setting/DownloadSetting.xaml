@@ -92,6 +92,25 @@
                 </StackPanel>
             </StackPanel>
 
+            <StackPanel Spacing="8">
+                <TextBlock FontSize="18"
+                           FontWeight="Bold"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_SystemUnzip, Mode=OneWay}" />
+                <TextBlock MaxWidth="680"
+                           HorizontalAlignment="Left"
+                           FontSize="12"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           IsTextScaleFactorEnabled="False"
+                           Text="{x:Bind lang:Lang.Instance.FilePage_SystemUnzipDesc, Mode=OneWay}"
+                           TextWrapping="Wrap" />
+                <ToggleSwitch x:Name="Toggle_SystemUnzip"
+                              Margin="0,4,0,-6"
+                              OffContent="{x:Bind lang:Lang.Instance.FilePage_Disabled, Mode=OneWay}"
+                              OnContent="{x:Bind lang:Lang.Instance.FilePage_Enabled, Mode=OneWay}"
+                              Toggled="Toggle_SystemUnzip_Toggled" />
+            </StackPanel>
+
         </StackPanel>
     </ScrollViewer>
 

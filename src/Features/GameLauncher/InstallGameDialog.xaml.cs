@@ -23,20 +23,30 @@ public sealed partial class InstallGameDialog : ContentDialog
 
     public delegate Task<GameUpdate.GameUpdateService.DownloadPlan?> TierPlanFactory(string tierName);
 
-    public InstallGameDialog(GameBiz biz, GameUpdate.GameUpdateService.DownloadPlan plan, long totalBytes,
-        List<GameUpdate.GameUpdateService.GameTierOption>? tiers, TierPlanFactory? tierPlanFactory, string? initialPath)
+    public delegate long MissingBytesFactory(string installDir, string tierName);
+
+    public InstallGameDialog(GameBiz biz, GameUpdate.GameUpdateService.DownloadPlan? plan, long totalBytes,
+        List<GameUpdate.GameUpdateService.GameTierOption>? tiers, TierPlanFactory? tierPlanFactory, string? initialPath,
+        bool addTierMode = false, string? preferredTier = null, MissingBytesFactory? missingBytesFactory = null)
     {
         _biz = biz;
         _plan = plan;
+        _addTierMode = addTierMode;
+        _missingBytesFactory = missingBytesFactory;
         TotalBytes = totalBytes;
+
+        TitleText = addTierMode
+            ? Lang.Instance.LauncherPage_InstallGame
+            : Lang.Instance.InstallGameDialog_SelectInstallationPath;
         InstallationPath = initialPath ?? "";
 
-        HardLinkVisibility = AppConfig.GetConfig(GameUpdateService.UseHardLinkConfigKey) == "1"
+        HardLinkVisibility = !addTierMode && AppConfig.GetConfig(GameUpdateService.UseHardLinkConfigKey) == "1"
             ? Visibility.Visible
             : Visibility.Collapsed;
         _tierPlanFactory = tierPlanFactory;
         TierVisibility = tiers is { Count: > 0 } ? Visibility.Visible : Visibility.Collapsed;
         InitializeComponent();
+        _ready = true;
         if (tiers is { Count: > 0 })
         {
 
@@ -45,8 +55,10 @@ public sealed partial class InstallGameDialog : ContentDialog
                 _tierSizes[tier.Name] = tier.SizeBytes;
                 Segmented_Tier.Items.Add(new SegmentedItem { Content = GameUpdateService.TierDisplayName(tier.Name), Tag = tier.Name });
             }
-            SelectedTier = tiers.FirstOrDefault(t => t.Name.Equals("HD", StringComparison.OrdinalIgnoreCase))?.Name
-                ?? tiers[0].Name;
+            SelectedTier = preferredTier is not null
+                && tiers.Any(t => t.Name.Equals(preferredTier, StringComparison.OrdinalIgnoreCase))
+                ? preferredTier
+                : tiers.FirstOrDefault(t => t.Name.Equals("HD", StringComparison.OrdinalIgnoreCase))?.Name ?? tiers[0].Name;
             Segmented_Tier.SelectedIndex = tiers.FindIndex(t => t.Name.Equals(SelectedTier, StringComparison.OrdinalIgnoreCase));
             Segmented_Tier.SelectionChanged += Segmented_Tier_SelectionChanged;
             _ = ApplyTierAsync();
@@ -55,7 +67,12 @@ public sealed partial class InstallGameDialog : ContentDialog
     }
 
     private readonly GameBiz _biz;
-    private GameUpdate.GameUpdateService.DownloadPlan _plan;
+    private readonly bool _addTierMode;
+    private readonly MissingBytesFactory? _missingBytesFactory;
+
+    private bool _ready;
+
+    private GameUpdate.GameUpdateService.DownloadPlan? _plan;
     private readonly TierPlanFactory? _tierPlanFactory;
 
     private readonly Dictionary<string, long> _tierSizes = new();
@@ -74,6 +91,8 @@ public sealed partial class InstallGameDialog : ContentDialog
 
     public Visibility TierVisibility { get; private set; }
 
+    public string TitleText { get; }
+
     public long TotalBytes { get; private set; }
 
     public string RequiredBytesText { get; private set => SetProperty(ref field, value); } = "";
@@ -82,7 +101,24 @@ public sealed partial class InstallGameDialog : ContentDialog
 
     public string? HardLinkEstimateText { get; private set => SetProperty(ref field, value); }
 
-    public string InstallationPath { get => field; set { SetProperty(ref field, value); RefreshSpace(); _ = RecomputeEstimateAsync(); } }
+    public string InstallationPath
+    {
+        get => field;
+        set
+        {
+            SetProperty(ref field, value);
+            RefreshSpace();
+
+            if (_missingBytesFactory is not null && _ready)
+            {
+                _ = ApplyTierAsync();
+            }
+            else
+            {
+                _ = RecomputeEstimateAsync();
+            }
+        }
+    }
 
     public string AvailableSpaceText { get; private set => SetProperty(ref field, value); } = "--";
 
@@ -171,6 +207,11 @@ public sealed partial class InstallGameDialog : ContentDialog
         _linkedBytes = 0;
         _estimateDone = false;
         RefreshSpace();
+
+        if (_addTierMode || _plan is not { } plan)
+        {
+            return;
+        }
         string path = InstallationPath;
         if (!string.IsNullOrWhiteSpace(path))
         {
@@ -184,7 +225,7 @@ public sealed partial class InstallGameDialog : ContentDialog
             });
             try
             {
-                await Task.Run(() => GameUpdateService.EstimateHardLinkBytes(_biz, _plan, path, progress, cts.Token), cts.Token);
+                await Task.Run(() => GameUpdateService.EstimateHardLinkBytes(_biz, plan, path, progress, cts.Token), cts.Token);
                 _estimateDone = true;
                 RefreshSpace();
             }
@@ -203,6 +244,13 @@ public sealed partial class InstallGameDialog : ContentDialog
         }
         SelectedTier = name;
         int gen = ++_tierGen;
+
+        if (_missingBytesFactory is not null)
+        {
+            TotalBytes = _missingBytesFactory(InstallationPath, name);
+            RefreshSpace();
+            return;
+        }
         if (_tierSizes.TryGetValue(name, out var size) && size > 0)
         {
             TotalBytes = size;

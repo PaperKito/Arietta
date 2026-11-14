@@ -61,6 +61,12 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
+                <NavigationViewItem Content="{x:Bind lang:Lang.Instance.SettingPage_GamePack, Mode=OneWay}" Tag="GamePackSetting">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7B8;" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
                 <NavigationViewItemSeparator />
 
                 <NavigationViewItem Content="{x:Bind lang:Lang.Instance.Toolbox, Mode=OneWay}" Tag="ToolboxSetting">

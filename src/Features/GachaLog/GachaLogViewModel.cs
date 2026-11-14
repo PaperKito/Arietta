@@ -47,6 +47,13 @@ public partial class GachaLogViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsPaneOpen { get; set; }
 
+    public void ClearForPackGame()
+    {
+        Players.Clear();
+        Pools.Clear();
+        SelectedPlayer = null;
+    }
+
 
     public void Initialize()
     {

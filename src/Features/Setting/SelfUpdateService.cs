@@ -1182,9 +1182,6 @@ function Write-Log([string]$Message) {
     try { Add-Content -Path $log -Value ("[{0:HH:mm:ss}] {1}" -f (Get-Date), $Message) } catch { }
 }
 
-# Rename with retry: after the app exits its WebView2 child processes (msedgewebview2.exe)
-# keep WebView2Loader.dll / native bits mapped for a few more seconds, which makes the
-# first rename attempt fail with "file in use". Retry instead of giving up.
 function Rename-WithRetry([string]$From, [string]$To, [int]$Seconds) {
     $deadline = (Get-Date).AddSeconds($Seconds)
     while ($true) {
@@ -1201,7 +1198,6 @@ function Rename-WithRetry([string]$From, [string]$To, [int]$Seconds) {
 try {
     Write-Log "start root=$Root new=$NewApp pid=$ProcId launch=$Launch"
 
-    # Wait for the installing process to exit (up to 90s)
     $deadline = (Get-Date).AddSeconds(90)
     while ((Get-Date) -lt $deadline) {
         $p = Get-Process -Id $ProcId -ErrorAction SilentlyContinue
@@ -1217,8 +1213,6 @@ try {
     Move-Item $NewApp $app
     Write-Log "new app in place"
 
-    # Users running app\Arietta.exe without the stub keep their data inside app/:
-    # move it into the new app so settings survive the upgrade
     $oldData = Join-Path $old 'data'
     if ((Test-Path $oldData) -and -not (Test-Path (Join-Path $app 'data'))) {
         Move-Item $oldData (Join-Path $app 'data')
@@ -1235,8 +1229,6 @@ try {
     exit 0
 } catch {
     Write-Log ("FAILED: " + $_.Exception.Message)
-    # Rollback: if the new app never landed, restore app from old;
-    # if it landed, drop the new app and restore old in its place
     try {
         if ((Test-Path $old) -and (-not (Test-Path $app))) {
             Rename-Item $old 'app'
