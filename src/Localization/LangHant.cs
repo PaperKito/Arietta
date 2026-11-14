@@ -219,7 +219,7 @@ internal static class LangHant
         ["UpdateWindow_AutoRestart"] = "更新後自動重新啟動",
         ["UpdateWindow_ShowNotes"] = "重新啟動後展示更新內容",
         ["UpdateWindow_Checking"] = "正在檢查更新…",
-        ["UpdateWindow_WhatsNew"] = "本次更新內容",
+        ["UpdateWindow_WhatsNew"] = "更新歷史",
         ["UpdateWindow_RemindLater"] = "稍後提醒",
 
         ["SettingPage_About_Links"] = "相關連結",

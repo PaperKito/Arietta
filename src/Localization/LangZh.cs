@@ -641,7 +641,7 @@ internal static class LangZh
         ["UpdateWindow_AutoRestart"] = "更新后自动重启",
         ["UpdateWindow_ShowNotes"] = "重启后展示更新内容",
         ["UpdateWindow_Checking"] = "正在检查更新…",
-        ["UpdateWindow_WhatsNew"] = "本次更新内容",
+        ["UpdateWindow_WhatsNew"] = "更新历史",
         ["UpdateWindow_RemindLater"] = "以后提醒",
 
         ["SettingPage_About_Links"] = "相关链接",

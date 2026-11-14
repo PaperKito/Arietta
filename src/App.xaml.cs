@@ -78,11 +78,14 @@ public partial class App : Application
             var fakeTimer = new System.Timers.Timer(3000) { AutoReset = false };
             fakeTimer.Elapsed += (_, _) => ShowUpdateDialog(new Features.Setting.SelfUpdateInfo(
                 "9.9.9", "https://github.com/PaperKito/Arietta/releases/latest",
-                "## Arietta v9.9.9（模拟更新）\n" +
-                "- 模拟用的假版本说明，Markdown 渲染预览\n" +
-                "- 支持**加粗**、[链接](https://github.com)与列表\n" +
+                "<img width=\"1280\" height=\"635\" src=\"https://github.com/user-attachments/assets/73a87cf2-b455-48cf-b149-b5f0dcf670ac\" />\n\n" +
+                "Wallpaper: [LILY(@Joezunzun)](https://www.pixiv.net/artworks/151971871)\n\n" +
+                "Fixed\\修复\n\n" +
+                "- 首行是图 + 下面跟 Markdown 列表：这条链路以前会被当成 HTML、整段跳过渲染\n" +
+                "- 支持**加粗**、[链接](https://github.com)与列表\n\n" +
+                "Added\\新增\n\n" +
                 "- 点「立即更新」在开发树只会提示开发布局，不会真下载",
-                "https://example.invalid/Arietta-portable.zip", 0, null));
+                "https://example.invalid/Arietta-portable.zip", 0, null, NotesIsMarkdown: true));
             fakeTimer.Start();
         }
 

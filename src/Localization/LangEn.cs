@@ -614,7 +614,7 @@ internal static class LangEn
         ["UpdateWindow_AutoRestart"] = "Restart after updating",
         ["UpdateWindow_ShowNotes"] = "Show what's new after restart",
         ["UpdateWindow_Checking"] = "Checking for updates...",
-        ["UpdateWindow_WhatsNew"] = "What's new in this update",
+        ["UpdateWindow_WhatsNew"] = "What's new",
         ["UpdateWindow_RemindLater"] = "Remind me later",
 
         ["SettingPage_About_Links"] = "Links",

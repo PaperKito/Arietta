@@ -237,7 +237,7 @@ internal static class LangEs
         ["UpdateWindow_AutoRestart"] = "Reiniciar automáticamente tras la actualización",
         ["UpdateWindow_ShowNotes"] = "Mostrar las novedades tras reiniciar",
         ["UpdateWindow_Checking"] = "Buscando actualizaciones…",
-        ["UpdateWindow_WhatsNew"] = "Novedades de esta versión",
+        ["UpdateWindow_WhatsNew"] = "Historial de actualizaciones",
         ["UpdateWindow_RemindLater"] = "Recordar más tarde",
 
         ["SettingPage_About_Links"] = "Enlaces",

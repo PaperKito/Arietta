@@ -26,7 +26,8 @@ public sealed record SelfUpdateInfo(
     string AssetUrl,
     long AssetSize,
     string? Sha256,
-    string? ReleaseTime = null);
+    string? ReleaseTime = null,
+    bool NotesIsMarkdown = false);
 
 public readonly record struct SelfUpdateProgress(double Percent, long Received);
 
@@ -87,6 +88,8 @@ public static class SelfUpdateService
 
     private const string RecentReleasesApi = "https://api.github.com/repos/PaperKito/Arietta/releases?per_page=10";
 
+    private const string ReleasesListApi = "https://api.github.com/repos/PaperKito/Arietta/releases?per_page=50";
+
     private const string LatestReleaseWebUrl = "https://github.com/PaperKito/Arietta/releases/latest";
 
     private const string ReleasesAtomUrl = "https://github.com/PaperKito/Arietta/releases.atom";
@@ -98,6 +101,8 @@ public static class SelfUpdateService
     private static IReadOnlyList<ReleaseEntry>? _recentReleasesCache;
 
     private static IReadOnlyList<ReleaseEntry>? _atomReleasesCache;
+
+    private static Dictionary<string, string>? _publishedDateCache;
 
     public static async Task<IReadOnlyList<ReleaseEntry>> FetchRecentReleasesAsync(CancellationToken ct = default)
     {
@@ -149,7 +154,8 @@ public static class SelfUpdateService
                 }
                 string date = rel.TryGetProperty("published_at", out var published)
                     && DateTimeOffset.TryParse(published.GetString(), out var at)
-                        ? at.ToString("yyyy-MM-dd")
+
+                        ? at.ToLocalTime().ToString("yyyy-MM-dd")
                         : "";
                 list.Add(new ReleaseEntry(tag, date, rel.TryGetProperty("body", out var notes) ? notes.GetString() : null));
             }
@@ -227,6 +233,10 @@ public static class SelfUpdateService
             }
         }
 
+        IReadOnlyDictionary<string, string> dates = collected.Count > 0
+            ? await TryFetchPublishedDatesAsync(ct)
+            : new Dictionary<string, string>();
+
         return collected
             .Where(e =>
             {
@@ -236,7 +246,52 @@ public static class SelfUpdateService
                        && (lower is null || v > lower);
             })
             .OrderBy(e => ParseVersion(e.Tag))
+            .Select(e => dates.TryGetValue(e.Tag, out string? d) ? e with { Date = d } : e)
             .ToList();
+    }
+
+    public static async Task<IReadOnlyDictionary<string, string>> TryFetchPublishedDatesAsync(CancellationToken ct)
+    {
+        if (_publishedDateCache is { } cache)
+        {
+            return cache;
+        }
+        try
+        {
+            using var limit = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            limit.CancelAfter(TimeSpan.FromSeconds(10));
+            using var resp = await SharedHttp.SelfUpdate.GetAsync(ReleasesListApi, limit.Token);
+            if (!resp.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("SelfUpdate: published dates returned {Status}", (int)resp.StatusCode);
+                return new Dictionary<string, string>();
+            }
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync(limit.Token));
+            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (JsonElement rel in doc.RootElement.EnumerateArray())
+            {
+                if (!rel.TryGetProperty("tag_name", out var tagEl)
+                    || !rel.TryGetProperty("published_at", out var publishedEl)
+                    || !DateTimeOffset.TryParse(publishedEl.GetString(), out var at))
+                {
+                    continue;
+                }
+                string tag = tagEl.GetString() ?? "";
+                if (tag.Length > 0)
+                {
+
+                    map[tag] = at.ToLocalTime().ToString("yyyy-MM-dd");
+                }
+            }
+            _publishedDateCache = map;
+            _logger.LogInformation("SelfUpdate: published dates for {Count} release(s)", map.Count);
+            return map;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation(ex, "SelfUpdate: published dates unavailable");
+            return new Dictionary<string, string>();
+        }
     }
 
     private static async Task<IReadOnlyList<ReleaseEntry>> TryFetchAtomPageAsync(int page, CancellationToken ct)
@@ -273,9 +328,8 @@ public static class SelfUpdateService
                 {
                     continue;
                 }
-                string date = DateTimeOffset.TryParse(entry.Element(atom + "updated")?.Value, out var at)
-                    ? at.ToString("yyyy-MM-dd")
-                    : "";
+
+                string date = "";
                 string? body = entry.Element(atom + "content")?.Value is { Length: > 0 } html
                     ? WebUtility.HtmlDecode(html)
                     : null;
@@ -306,8 +360,9 @@ public static class SelfUpdateService
 
     public static string GetAssetName(string tag)
     {
+
         string version = TryParseVersion(tag, out Version v)
-            ? $"{v.Major}.{v.Minor}.{Math.Max(0, v.Build)}"
+            ? $"{v.Major}.{v.Minor}.{Math.Max(0, v.Build)}" + (v.Revision > 0 ? $".{v.Revision}" : "")
             : tag.TrimStart('v', 'V');
         string arch = RuntimeInformation.ProcessArchitecture == Architecture.Arm64 ? "arm64" : "x64";
         return $"Arietta-Portable-{version}-{arch}.zip";
@@ -423,6 +478,8 @@ public static class SelfUpdateService
                 {
                     Sha256 = api.Sha256 ?? info.Sha256,
                     Notes = api.Notes ?? info.Notes,
+
+                    NotesIsMarkdown = api.Notes is { Length: > 0 } ? api.NotesIsMarkdown : info.NotesIsMarkdown,
                     AssetSize = info.AssetSize > 0 ? info.AssetSize : api.AssetSize,
                     ReleaseTime = api.ReleaseTime ?? info.ReleaseTime,
                 };
@@ -437,10 +494,10 @@ public static class SelfUpdateService
         try
         {
             string tag = info.Version.StartsWith('v') ? info.Version : "v" + info.Version;
-            string? fromAtom = await TryFetchReleaseTimeAsync(tag, ct);
-            if (fromAtom is not null)
+            string? releaseDate = await TryFetchReleaseTimeAsync(tag, ct);
+            if (releaseDate is not null)
             {
-                return info with { ReleaseTime = fromAtom };
+                return info with { ReleaseTime = releaseDate };
             }
         }
         catch (Exception ex)
@@ -621,7 +678,9 @@ public static class SelfUpdateService
                 asset.GetProperty("browser_download_url").GetString() ?? "",
                 asset.GetProperty("size").GetInt64(),
                 sha256,
-                releaseTime));
+                releaseTime,
+
+                NotesIsMarkdown: true));
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -749,13 +808,12 @@ public static class SelfUpdateService
     {
         try
         {
-            IReadOnlyList<ReleaseEntry> releases = await FetchAtomReleasesAsync(ct);
-            return releases.FirstOrDefault(r => string.Equals(r.Tag, tag, StringComparison.OrdinalIgnoreCase))?.Date
-                is { Length: > 0 } date ? date : null;
+            IReadOnlyDictionary<string, string> dates = await TryFetchPublishedDatesAsync(ct);
+            return dates.TryGetValue(tag, out string? date) && date.Length > 0 ? date : null;
         }
         catch (Exception ex)
         {
-            _logger.LogInformation(ex, "SelfUpdate: release time unavailable via releases.atom");
+            _logger.LogInformation(ex, "SelfUpdate: release time unavailable");
             return null;
         }
     }

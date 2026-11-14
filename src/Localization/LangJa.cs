@@ -220,7 +220,7 @@ internal static class LangJa
         ["UpdateWindow_AutoRestart"] = "更新後に自動再起動",
         ["UpdateWindow_ShowNotes"] = "再起動後に更新内容を表示",
         ["UpdateWindow_Checking"] = "更新を確認しています…",
-        ["UpdateWindow_WhatsNew"] = "今回の更新内容",
+        ["UpdateWindow_WhatsNew"] = "更新履歴",
         ["UpdateWindow_RemindLater"] = "後で通知",
 
         ["SettingPage_About_Links"] = "関連リンク",

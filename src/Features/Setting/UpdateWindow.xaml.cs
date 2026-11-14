@@ -159,8 +159,7 @@ public sealed partial class UpdateWindow : WindowEx
 
         TextBlock_Channel.Text = lang.UpdateWindow_ChannelStable;
         TextBlock_BuildLabel.Text = lang.UpdateWindow_BuildTime;
-
-        TextBlock_Build.Text = info.ReleaseTime ?? AppConfig.BuildTime;
+        RefreshBuildTime();
         TextBlock_LinksLabel.Text = lang.SettingPage_About_Links;
         HyperlinkButton_Release.Content = lang.UpdateWindow_ReleasePage;
         Button_UpdateNow.Content = lang.UpdateWindow_UpdateNow;
@@ -172,6 +171,13 @@ public sealed partial class UpdateWindow : WindowEx
         RenderNotes(info.Notes);
 
         MaybeStartContent();
+    }
+
+    private void RefreshBuildTime()
+    {
+        string? time = _info?.ReleaseTime;
+
+        TextBlock_Build.Text = string.IsNullOrWhiteSpace(time) ? "—" : time.Replace('-', '/');
     }
 
     private void MaybeStartContent()
@@ -722,19 +728,18 @@ public sealed partial class UpdateWindow : WindowEx
                 }
             }
 
-            List<(string Tag, string Date, string Body)> items = [];
+            List<(string Tag, string Date, string? Body, bool IsMarkdown)> items = [];
             if (_whatsNew)
             {
-                string from = _fromVersion ?? AppConfig.GetConfig("LastAppVersion") ?? string.Empty;
+
                 IReadOnlyList<SelfUpdateService.ReleaseEntry> releases =
-                    await SelfUpdateService.FetchNotesRangeAsync(from, _info.Version, DialogToken);
+                    await SelfUpdateService.FetchNotesRangeAsync(null, _info.Version, DialogToken);
+                _logger.LogInformation("SelfUpdate: whats-new history {Count} release(s) up to {To}",
+                    releases.Count, _info.Version);
 
-                _logger.LogInformation("SelfUpdate: whats-new range {From} → {To}, {Count} release(s)",
-                    from, _info.Version, releases.Count);
-
-                foreach (SelfUpdateService.ReleaseEntry r in releases.Reverse().Take(10))
+                foreach (SelfUpdateService.ReleaseEntry r in releases.Reverse())
                 {
-                    items.Add((r.Tag, r.Date, r.Body));
+                    items.Add((r.Tag, r.Date, r.Body, false));
                 }
             }
             else
@@ -747,7 +752,7 @@ public sealed partial class UpdateWindow : WindowEx
                     return;
                 }
                 string tag = _info.Version.StartsWith('v') ? _info.Version : "v" + _info.Version;
-                items.Add((tag, string.Empty, body));
+                items.Add((tag, string.Empty, body, _info.NotesIsMarkdown));
             }
 
             if (items.Count == 0)
@@ -761,26 +766,27 @@ public sealed partial class UpdateWindow : WindowEx
                 return;
             }
 
+            bool[] isMarkdown = new bool[items.Count];
             string[] rawBodies = new string[items.Count];
             for (int i = 0; i < items.Count; i++)
             {
                 rawBodies[i] = items[i].Body ?? "";
-                if (rawBodies[i].Length > 0 && !rawBodies[i].TrimStart().StartsWith("<"))
+                isMarkdown[i] = items[i].IsMarkdown;
+                if (rawBodies[i].Length > 0 && isMarkdown[i])
                 {
                     items[i] = (items[i].Tag, items[i].Date,
-                        Arietta.Helpers.ReleaseNotesHtml.PlainTextBody(rawBodies[i]));
+                        Arietta.Helpers.ReleaseNotesHtml.PlainTextBody(rawBodies[i]), true);
                 }
             }
 
             string?[] renderedBodies = new string?[items.Count];
             async System.Threading.Tasks.Task RenderOneAsync(int index)
             {
-                string body = rawBodies[index];
-                if (body.Length == 0 || body.TrimStart().StartsWith("<"))
+                if (rawBodies[index].Length == 0 || !isMarkdown[index])
                 {
                     return;
                 }
-                renderedBodies[index] = await SelfUpdateService.TryRenderMarkdownAsync(body, DialogToken);
+                renderedBodies[index] = await SelfUpdateService.TryRenderMarkdownAsync(rawBodies[index], DialogToken);
             }
             if (items.Count > 0)
             {
@@ -798,7 +804,7 @@ public sealed partial class UpdateWindow : WindowEx
                 {
                     if (renderedBodies[i] is { Length: > 0 } renderedHtml)
                     {
-                        items[i] = (items[i].Tag, items[i].Date, renderedHtml);
+                        items[i] = (items[i].Tag, items[i].Date, renderedHtml, false);
                     }
                 }
             }
@@ -820,7 +826,8 @@ public sealed partial class UpdateWindow : WindowEx
                 }
             }
 
-            string html = Arietta.Helpers.ReleaseNotesHtml.Build(items, IsDarkTheme,
+            string html = Arietta.Helpers.ReleaseNotesHtml.Build(
+                items.Select(static x => (x.Tag, x.Date, x.Body ?? "")).ToList(), IsDarkTheme,
                 CachedImageRelativePath,
                 deferHeroImage: heroUrl is not null && heroLocal is null);
             if (cachedHtml is not null && string.Equals(html, cachedHtml, StringComparison.Ordinal))
@@ -844,11 +851,16 @@ public sealed partial class UpdateWindow : WindowEx
                 _ = WarmHeroCacheAsync(heroUrl);
             }
 
+            const int coldImageLimit = 6;
             List<string> coldImages = [];
             foreach (var item in items)
             {
                 foreach (string image in Arietta.Helpers.NotesText.ExtractImages(item.Body ?? ""))
                 {
+                    if (coldImages.Count >= coldImageLimit)
+                    {
+                        break;
+                    }
                     string normalized = Arietta.Helpers.ReleaseNotesHtml.NormalizeImageUrl(image);
                     if (!string.Equals(normalized, heroUrl, StringComparison.OrdinalIgnoreCase)
                         && CachedImageRelativePath(normalized) is null
@@ -1097,9 +1109,10 @@ public sealed partial class UpdateWindow : WindowEx
 
     private string NotesCachePath()
     {
+
         string key = _whatsNew
-            ? $"v3_whatsnew_{_fromVersion ?? AppConfig.GetConfig("LastAppVersion") ?? "0"}_{_info.Version}"
-            : $"v3_tag_{_info.Version}";
+            ? $"v5_whatsnew_{_info.Version}"
+            : $"v5_tag_{_info.Version}";
         foreach (char c in Path.GetInvalidFileNameChars())
         {
             key = key.Replace(c, '_');
@@ -1131,6 +1144,8 @@ public sealed partial class UpdateWindow : WindowEx
                 return;
             }
             _info = enriched;
+
+            RefreshBuildTime();
         }
         catch (Exception ex)
         {
@@ -1153,7 +1168,8 @@ public sealed partial class UpdateWindow : WindowEx
                 }
                 if (notes is { Length: > 0 })
                 {
-                    _info = _info with { Notes = notes };
+
+                    _info = _info with { Notes = notes, NotesIsMarkdown = false };
                 }
             }
             catch (Exception ex)

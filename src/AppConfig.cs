@@ -11,8 +11,19 @@ public static partial class AppConfig
 
     public const string AppName = "Arietta";
 
-    public static string AppVersion =>
-        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.1.0";
+    public static string AppVersion
+    {
+        get
+        {
+            Version? v = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            if (v is null)
+            {
+                return "0.1.0";
+            }
+
+            return v.Revision > 0 ? v.ToString(4) : v.ToString(3);
+        }
+    }
 
     public static string AppArchitecture =>
         System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture switch

@@ -237,7 +237,7 @@ internal static class LangPtBr
         ["UpdateWindow_AutoRestart"] = "Reiniciar automaticamente após a atualização",
         ["UpdateWindow_ShowNotes"] = "Mostrar as novidades após reiniciar",
         ["UpdateWindow_Checking"] = "Verificando atualizações…",
-        ["UpdateWindow_WhatsNew"] = "Novidades desta versão",
+        ["UpdateWindow_WhatsNew"] = "Histórico de atualizações",
         ["UpdateWindow_RemindLater"] = "Lembrar depois",
 
         ["SettingPage_About_Links"] = "Links",

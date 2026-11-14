@@ -237,7 +237,7 @@ internal static class LangDe
         ["UpdateWindow_AutoRestart"] = "Nach dem Update automatisch neu starten",
         ["UpdateWindow_ShowNotes"] = "Update-Inhalt nach dem Neustart anzeigen",
         ["UpdateWindow_Checking"] = "Updates werden gesucht…",
-        ["UpdateWindow_WhatsNew"] = "Inhalt dieses Updates",
+        ["UpdateWindow_WhatsNew"] = "Updateverlauf",
         ["UpdateWindow_RemindLater"] = "Später erinnern",
 
         ["SettingPage_About_Links"] = "Links",

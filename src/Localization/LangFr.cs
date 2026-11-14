@@ -237,7 +237,7 @@ internal static class LangFr
         ["UpdateWindow_AutoRestart"] = "Redémarrer automatiquement après la mise à jour",
         ["UpdateWindow_ShowNotes"] = "Afficher les nouveautés après le redémarrage",
         ["UpdateWindow_Checking"] = "Vérification des mises à jour…",
-        ["UpdateWindow_WhatsNew"] = "Nouveautés de cette version",
+        ["UpdateWindow_WhatsNew"] = "Historique des mises à jour",
         ["UpdateWindow_RemindLater"] = "Me rappeler plus tard",
 
         ["SettingPage_About_Links"] = "Liens utiles",

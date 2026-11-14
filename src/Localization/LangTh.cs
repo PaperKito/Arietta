@@ -237,7 +237,7 @@ internal static class LangTh
         ["UpdateWindow_AutoRestart"] = "รีสตาร์ทอัตโนมัติหลังอัปเดต",
         ["UpdateWindow_ShowNotes"] = "แสดงเนื้อหาอัปเดตหลังรีสตาร์ท",
         ["UpdateWindow_Checking"] = "กำลังตรวจสอบอัปเดต…",
-        ["UpdateWindow_WhatsNew"] = "เนื้อหาอัปเดตครั้งนี้",
+        ["UpdateWindow_WhatsNew"] = "ประวัติการอัปเดต",
         ["UpdateWindow_RemindLater"] = "เตือนภายหลัง",
 
         ["SettingPage_About_Links"] = "ลิงก์ที่เกี่ยวข้อง",

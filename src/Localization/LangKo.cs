@@ -237,7 +237,7 @@ internal static class LangKo
         ["UpdateWindow_AutoRestart"] = "업데이트 후 자동 재시작",
         ["UpdateWindow_ShowNotes"] = "재시작 후 업데이트 내용 표시",
         ["UpdateWindow_Checking"] = "업데이트 확인 중…",
-        ["UpdateWindow_WhatsNew"] = "이번 업데이트 내용",
+        ["UpdateWindow_WhatsNew"] = "업데이트 내역",
         ["UpdateWindow_RemindLater"] = "나중에 알림",
 
         ["SettingPage_About_Links"] = "관련 링크",
